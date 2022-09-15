@@ -1,0 +1,18 @@
+Package: demografr
+Type: Package
+Title: Fitting population genetic demographic models using Approximate Bayesian Computation
+Version: 0.0.9000
+Authors@R: 
+    person(given = "Martin",
+           family = "Petr",
+           role = c("aut", "cre"),
+           email = "contact@bodkan.net",
+           comment = c(ORCID = "0000-0003-4879-8421"))
+Description: An Approximate Bayesian Computation (ABC) framework for fitting parameters
+    of demographic models in population genetics.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    slendr
+Remotes: bodkan/slendr
