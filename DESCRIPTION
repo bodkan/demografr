@@ -14,5 +14,10 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    future,
+    future.apply,
     slendr
 Remotes: bodkan/slendr
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
