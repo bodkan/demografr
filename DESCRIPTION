@@ -16,6 +16,7 @@ LazyData: true
 Imports: 
     future,
     future.apply,
+    ggplot2,
     slendr
 Remotes: bodkan/slendr
 Suggests: 

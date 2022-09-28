@@ -8,10 +8,10 @@ run_simulation <- function(model, Ne_samples, sequence_length, recombination_rat
   ts
 }
 
-run_iteration <- function(it, priors, functions) {
+run_iteration <- function(it, priors, functions, sequence_length, recombination_rate) {
   Ne_samples <- lapply(priors, sample_prior)
 
-  ts <- run_simulation(model, Ne_samples, sequence_length = 1e6, recombination_rate = 1e-8)
+  ts <- run_simulation(model, Ne_samples, sequence_length, recombination_rate)
   sum_stats <- lapply(functions, function(f) f(ts))[[1]]
 
   list(
@@ -20,21 +20,29 @@ run_iteration <- function(it, priors, functions) {
   )
 }
 
-run_abc <- function(model, priors, functions, iterations = 1, epochs = 1) {
+run_abc <- function(model, priors, functions, iterations = 1, epochs = 1, sequence_length = 1e6, recombination_rate = 1e-8) {
   # make sure that every population has an assigned prior on Ne
+  # (this can be a proper prior backed by a sampling function or a fixed Ne value)
   model_populations <- model$splits$pop %>% sort
-  prior_populations <- sapply(priors, function(p) as.character(as.list(p)[[2]])) %>% sort
+  prior_populations <- sort(prior_variables(priors))
   if (!all(model_populations == prior_populations))
     stop("Every population in the model needs a prior on Ne", call. = FALSE)
 
-  abc_results <- future.apply::future_lapply(
+  results <- future.apply::future_lapply(
     seq_len(iterations),
     run_iteration,
-    priors, functions
+    priors, functions,
+    sequence_length, recombination_rate
   )
 
+  Ne_parameters <- do.call(rbind, lapply(results, `[[`, "parameters"))
+  colnames(Ne_parameters) <- prior_populations
+
+  summary_stats <- do.call(rbind, lapply(results, `[[`, "summary_stats"))
+  colnames(summary_stats) <- paste(names(functions), seq_len(ncol(summary_stats)), sep = "_")
+
   list(
-    parameters = do.call(rbind, lapply(abc_results, `[[`, "parameters")),
-    summary_stats = do.call(rbind, lapply(abc_results, `[[`, "summary_stats"))
+    Ne_parameters = Ne_parameters,
+    summary_stats = summary_stats
   )
 }

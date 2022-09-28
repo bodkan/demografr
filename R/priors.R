@@ -39,3 +39,8 @@ sample_prior <- function(f) {
 
   list(variable = variable, value = value)
 }
+
+
+prior_variables <- function(priors) {
+  sapply(priors, function(p) as.character(as.list(p)[[2]]))
+}
