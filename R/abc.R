@@ -9,6 +9,8 @@ run_simulation <- function(model, Ne_samples, sequence_length, recombination_rat
 }
 
 run_iteration <- function(it, priors, functions, sequence_length, recombination_rate) {
+  setup_env(quiet = TRUE)
+
   Ne_samples <- lapply(priors, sample_prior)
 
   ts <- run_simulation(model, Ne_samples, sequence_length, recombination_rate)
@@ -32,7 +34,8 @@ run_abc <- function(model, priors, functions, iterations = 1, epochs = 1, sequen
     seq_len(iterations),
     run_iteration,
     priors, functions,
-    sequence_length, recombination_rate
+    sequence_length, recombination_rate,
+    future.seed = TRUE
   )
 
   Ne_parameters <- do.call(rbind, lapply(results, `[[`, "parameters"))

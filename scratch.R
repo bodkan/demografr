@@ -3,7 +3,7 @@ devtools::load_all(".")
 library(dplyr)
 library(future)
 
-plan(cluster, workers = c("r1", "r2", "r6"), homogeneous = FALSE)
+plan(cluster, workers = c("r1", "r2", "r3", "r4", "r5", "r6"), homogeneous = FALSE)
 # plan(sequential)
 
 p1 <- population("p1", time = 1, N = 1000)
@@ -46,7 +46,7 @@ fun_diversity <- function(ts) {
 funs <- list(diversity = fun_diversity)
 
 # get ABC iterations
-results <- run_abc(model, priors, funs, iterations = 100)
+results <- run_abc(model, priors, funs, iterations = 1000)
 
 params <- results[[1]]
 stats <- results[[2]]
@@ -73,54 +73,60 @@ result <- abc(
 
 result
 
+# yay it works!
+summary(result)
 
-# parallel execution
-
-library(future)
-
-plan(cluster, workers = c("r1", "r2", "r6"), homogeneous = FALSE)
+plot_model(model)
 
 
 
-
-
-
-x %<-% { reticulate::py_run_string("b = 123"); reticulate::py$b }
-y <- future({ population("asd", N = 123, time = 1) }, packages = "slendr")
-val_y <- value(y)
-val_y
-
-
-z <- future({ setup_env(); msprime(model, sequence_length = 100, recombination_rate = 0) }, packages = "slendr")
-val_z <- value(z)
-val_y
-
-
-
-
-
-
-
-pid <- Sys.getpid()
-
-a %<-% {
-  pid <- Sys.getpid()
-  cat("Future 'a' ...\n")
-  3.14
-}
-
-b %<-% {
-  rm(pid)
-  cat("Future 'b' ...\n")
-  Sys.getpid()
-}
-
-c %<-% {
-  cat("Future 'c' ...\n")
-  2 * a
-}
-
-b
-c
-a
-pid
+## parallel execution
+#
+# library(future)
+#
+# plan(cluster, workers = c("r1", "r2", "r3", "r4", "r5", "r6"), homogeneous = FALSE)
+#
+#
+# x %<-% { reticulate::py_run_string("b = 123"); reticulate::py$b }
+# y <- future({ population("asd", N = 123, time = 1) }, packages = "slendr")
+# val_y <- value(y)
+# val_y
+#
+#
+# z <- future({
+#   setup_env()
+#   ts <- msprime(model, sequence_length = 100, recombination_rate = 0)
+#   ts_diversity(ts, sample_sets = c("p1_1", "p1_2"), mode = "branch")
+# }, packages = "slendr")
+# val_z <- value(z)
+# val_z
+#
+#
+#
+#
+#
+#
+#
+# pid <- Sys.getpid()
+#
+# a %<-% {
+#   pid <- Sys.getpid()
+#   cat("Future 'a' ...\n")
+#   3.14
+# }
+#
+# b %<-% {
+#   rm(pid)
+#   cat("Future 'b' ...\n")
+#   Sys.getpid()
+# }
+#
+# c %<-% {
+#   cat("Future 'c' ...\n")
+#   2 * a
+# }
+#
+# b
+# c
+# a
+# pid
