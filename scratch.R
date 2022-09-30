@@ -1,10 +1,13 @@
-devtools::load_all("~/Projects/slendr")
 devtools::load_all(".")
+library(slendr)
 library(dplyr)
 library(future)
+library(abc)
 
-plan(cluster, workers = c("r1", "r2", "r3", "r4", "r5", "r6"), homogeneous = FALSE)
-# plan(sequential)
+nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
+plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
+          tweak(multisession, workers = 50)))
+plan(multicore, workers = parallel::detectCores())
 
 p1 <- population("p1", time = 1, N = 1000)
 p2 <- population("p2", time = 2000, N = 100, parent = p1)
@@ -16,60 +19,44 @@ model <- compile_model(
   simulation_length = 10000, serialize = FALSE
 )
 
-# plot_model(model)
+plot_model(model)
 
 # generate fake "empirical" data of nucleotide diversity in each population
 ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8)
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
 observed_stats <- list(
-  diversity = ts_mutate(ts, mutation_rate = 1e-8) %>% ts_diversity(sample_sets = samples) %>% .$diversity
+  pi = ts_mutate(ts, mutation_rate = 1e-8) %>% ts_diversity(sample_sets = samples) %>% mutate(stat = paste0("pi_", set), value = diversity) %>% dplyr::select(stat, value)
 )
 
 # setup priors
 priors <- list(
-  p1 ~ runif(10, 10000),
-  p2 ~ runif(10, 10000),
-  p3 ~ rexp(1/1000)
+  p1 ~ runif(10, 20000),
+  p2 ~ runif(10, 20000),
+  p3 ~ runif(10, 20000)
 )
 
 plot_priors(priors)
 
 # setup summary statistic functions
-fun_diversity <- function(ts) {
-  ts <- ts_mutate(ts, mutation_rate = 1e-8)
+compute_diversity <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-  result <- ts_diversity(ts, sample_sets = samples)
-  result$diversity
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    dplyr::select(stat, value = diversity)
 }
 
-funs <- list(diversity = fun_diversity)
+functions <- list(pi = compute_diversity)
 
 # get ABC iterations
-results <- run_abc(model, priors, funs, iterations = 1000)
-
-params <- results[[1]]
-stats <- results[[2]]
-
-rmse <- sqrt(rowMeans((stats - obs_diversity)^2))
-best_matches <- rmse < quantile(rmse, probs = 0.05)
-
-params[best_matches, ]
-
-
-observed_stats <- observed_stats$diversity
-names(observed_stats) <- c("diversity_1", "diversity_2", "diversity_3")
-
-library(abc)
-
-result <- abc(
-  target = observed_stats,
-  param = params,
-  sumstat = stats,
-  tol = 0.05,
-  method = "neuralnet",
-  transf = c("log")
+data <- simulate_abc(
+  model, priors,
+  summary_funs = functions,
+  observed_stats = observed_stats,
+  iterations = 10000, mutation_rate = 1e-8, sequence_length = 10000
 )
+
+result <- perform_abc(data, tolerance = 0.1, method = "neuralnet")
 
 result
 
@@ -78,9 +65,17 @@ summary(result)
 
 plot_model(model)
 
+hist(result, breaks = 50)
+plot(result, param = params)
 
+result$adj.values %>%
+  as_tibble() %>%
+  tidyr::pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>%
+  ggplot(aes(value, color = variable)) +
+  geom_density() +
+  geom_vline(xintercept = summary(result)[4, ])
 
-## parallel execution
+# parallel execution
 #
 # library(future)
 #
