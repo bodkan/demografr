@@ -31,9 +31,9 @@ observed_stats <- list(
 
 # setup priors
 priors <- list(
-  p1 ~ runif(10, 20000),
-  p2 ~ runif(10, 20000),
-  p3 ~ runif(10, 20000)
+  p1 ~ runif(10, 10000),
+  p2 ~ runif(10, 10000),
+  p3 ~ runif(10, 10000)
 )
 
 plot_priors(priors)
@@ -53,12 +53,14 @@ data <- simulate_abc(
   model, priors,
   summary_funs = functions,
   observed_stats = observed_stats,
-  iterations = 10000, mutation_rate = 1e-8, sequence_length = 10000
+  iterations = 10000, mutation_rate = 1e-8
 )
+saveRDS(data, "/tmp/data.rds")
 
-result <- perform_abc(data, tolerance = 0.1, method = "neuralnet")
+result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 
-result
+attr(result, "parameters") <- data$parameters
+class(result) <- c("demographr_abc", "abc")
 
 # yay it works!
 summary(result)
@@ -66,7 +68,27 @@ summary(result)
 plot_model(model)
 
 hist(result, breaks = 50)
-plot(result, param = params)
+plot(result, param = data$parameters)
+
+
+hist.demographr_abc <- function(x, param = NULL, ...) {
+  params <- attr(x, "parameters")
+  if (!is.null(param)) {
+    x$numparam <- 1
+    x$names$parameter.names <- param
+    params <- params[, param]
+  }
+  abc:::hist.abc(x, ...)
+}
+
+plot.demographr_abc <- function(x, param = NULL, ...) {
+  params <- attr(x, "parameters")
+  if (!is.null(param)) {
+    x$numparam <- 1
+    params <- params[, param]
+  }
+  abc:::plot.abc(x, param = params, ...)
+}
 
 result$adj.values %>%
   as_tibble() %>%

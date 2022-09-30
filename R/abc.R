@@ -31,14 +31,14 @@ run_iteration <- function(it, priors, functions, mutation_rate, sequence_length,
 simulate_abc <- function(
   model, priors, summary_funs, observed_stats,
   iterations = 1, epochs = 1,
-  mutation_rate = 0, sequence_length = 1e6, recombination_rate = 1e-8
+  mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8
 ) {
   if (length(setdiff(names(summary_funs), names(observed_stats))))
     stop("List of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
-  results <- future.apply::future_lapply(
-  # results <- parallel::mclapply(
+  # results <- future.apply::future_lapply(
+  results <- parallel::mclapply(
   # results <- lapply(
     X = seq_len(iterations),
     FUN = run_iteration,
@@ -47,11 +47,11 @@ simulate_abc <- function(
     mutation_rate = mutation_rate,
     sequence_length = sequence_length,
     recombination_rate = recombination_rate,
-    #mc.cores = 10
-    future.seed = TRUE
+    mc.cores = 10
+    # future.seed = TRUE
   )
 
-  parameters <- lapply(results, `[[`, "parameters")
+  parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
   simulated_stats <- lapply(results, `[[`, "simulated_stats")
 
   list(
@@ -63,7 +63,7 @@ simulate_abc <- function(
 }
 
 perform_abc <- function(data, tolerance, method, ...) {
-  parameters <- as.matrix(do.call(rbind, data$parameters))
+  parameters <- data$parameters
 
   observed_stats <- lapply(data$stats_names, function(stat) {
     df <- data$observed_stats[[stat]]
