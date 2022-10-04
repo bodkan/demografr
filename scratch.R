@@ -26,7 +26,8 @@ ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8)
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
 observed_stats <- list(
-  pi = ts_mutate(ts, mutation_rate = 1e-8) %>% ts_diversity(sample_sets = samples) %>% mutate(stat = paste0("pi_", set), value = diversity) %>% dplyr::select(stat, value)
+  pi = ts_mutate(ts, mutation_rate = 1e-8) %>% ts_diversity(sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set), value = diversity) %>% dplyr::select(stat, value)
 )
 
 # setup priors
@@ -58,6 +59,7 @@ data <- simulate_abc(
 )
 Sys.time()
 saveRDS(data, "/tmp/data.rds")
+data <- readRDS("/tmp/data.rds")
 
 result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 
@@ -70,17 +72,7 @@ summary(result)
 plot_model(model)
 
 hist(result, breaks = 50)
-plot(result, param = data$parameters)
-
-
-
-result$adj.values %>%
-  as_tibble() %>%
-  tidyr::pivot_longer(cols = everything(), names_to = "variable", values_to = "value") %>%
-  ggplot(aes(value, color = variable)) +
-  geom_density() +
-  geom_vline(xintercept = summary(result)[4, ])
-
+plot(result, param = "N_p1")
 
 
 # parallel execution
