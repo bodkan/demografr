@@ -4,9 +4,9 @@ library(dplyr)
 library(future)
 library(abc)
 
-nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
-plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
-          tweak(multisession, workers = 50)))
+# nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
+# plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
+#           tweak(multisession, workers = 50)))
 plan(multicore, workers = parallel::detectCores())
 
 p1 <- population("p1", time = 1, N = 1000)
@@ -48,13 +48,15 @@ compute_diversity <- function(ts) {
 
 functions <- list(pi = compute_diversity)
 
+Sys.time()
 # get ABC iterations
 data <- simulate_abc(
   model, priors,
   summary_funs = functions,
   observed_stats = observed_stats,
-  iterations = 10000, mutation_rate = 1e-8
+  iterations = 1000, mutation_rate = 1e-8
 )
+Sys.time()
 saveRDS(data, "/tmp/data.rds")
 
 result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
@@ -71,24 +73,6 @@ hist(result, breaks = 50)
 plot(result, param = data$parameters)
 
 
-hist.demographr_abc <- function(x, param = NULL, ...) {
-  params <- attr(x, "parameters")
-  if (!is.null(param)) {
-    x$numparam <- 1
-    x$names$parameter.names <- param
-    params <- params[, param]
-  }
-  abc:::hist.abc(x, ...)
-}
-
-plot.demographr_abc <- function(x, param = NULL, ...) {
-  params <- attr(x, "parameters")
-  if (!is.null(param)) {
-    x$numparam <- 1
-    params <- params[, param]
-  }
-  abc:::plot.abc(x, param = params, ...)
-}
 
 result$adj.values %>%
   as_tibble() %>%
@@ -96,6 +80,8 @@ result$adj.values %>%
   ggplot(aes(value, color = variable)) +
   geom_density() +
   geom_vline(xintercept = summary(result)[4, ])
+
+
 
 # parallel execution
 #
