@@ -2,8 +2,6 @@
 
 export(hist.demographr_abc)
 export(plot.demographr_abc)
-export(plot_posteriors)
-export(plot_priors)
+export(plot_posterior)
+export(plot_prior)
 export(sample_prior)
-importFrom(abc,hist.abc)
-importFrom(ape,plot.abc)

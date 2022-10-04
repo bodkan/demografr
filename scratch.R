@@ -71,9 +71,11 @@ summary(result)
 
 plot_model(model)
 
-hist(result, breaks = 50)
+hist(result, breaks = 50, "N_p1")
 plot(result, param = "N_p1")
 
+plot_posteriors(result)
+plot_posteriors(result, param = "N_p1", geom = ggplot2::geom_histogram)
 
 # parallel execution
 #
