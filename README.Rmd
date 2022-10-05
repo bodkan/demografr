@@ -1,0 +1,60 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# demografr
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of demografr is to ...
+
+## Installation
+
+You can install the development version of demografr from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("bodkan/demografr")
+```
+
+## Example
+
+Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
+
+Let's also assume that we know that the three populations are related in the following way but we don't know anything else (i.e., we have no idea about the effective population sizes $N_e$ or split times).
+
+```{r, echo=FALSE, eval=FALSE}
+library(slendr)
+library(ggplot2)
+
+p1 <- population("p1", time = 1, N = 1000)
+p2 <- population("p2", time = 2000, N = 300, parent = p1)
+p3 <- population("p3", time = 6000, N = 10000, parent = p2)
+
+model <- compile_model(
+  populations = list(p1, p2, p3),
+  generation_time = 1,
+  simulation_length = 10000, serialize = FALSE
+)
+
+plot_model(model, sizes = FALSE) +
+  theme(
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank()
+  )
+```
+

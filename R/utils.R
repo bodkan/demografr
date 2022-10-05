@@ -1,0 +1,7 @@
+# a function to silence the unnecessary summary() output on abc objects
+# https://stackoverflow.com/a/54136863
+quiet <- function(x) {
+  sink(tempfile())
+  on.exit(sink())
+  invisible(force(x))
+}

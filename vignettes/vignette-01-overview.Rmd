@@ -1,0 +1,132 @@
+---
+title: "vignette-01-overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette-01-overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+rds_file <- system.file("extdata/vignette_01.rds", package = "demografr")
+```
+
+```{r setup}
+devtools::load_all(".")
+library(slendr)
+library(dplyr)
+library(future)
+library(abc)
+```
+
+```{r}
+# nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
+# plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
+#           tweak(multisession, workers = 50)))
+plan(multicore, workers = 10)
+```
+
+Define a skeleton model to fit parameters for:
+
+```{r}
+p1 <- population("p1", time = 1, N = 1000)
+p2 <- population("p2", time = 2000, N = 100, parent = p1)
+p3 <- population("p3", time = 6000, N = 3000, parent = p2)
+
+model <- compile_model(
+  populations = list(p1, p2, p3),
+  generation_time = 1,
+  simulation_length = 10000, serialize = FALSE
+)
+
+plot_model(model)
+```
+
+Simulate true summary statistics from this model. Later, we will use those to fit parameters of the model, pretending that we forgot the truth:
+
+```{r}
+ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
+samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+
+observed_stats <- list(
+  pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set), value = diversity) %>% dplyr::select(stat, value)
+)
+```
+
+Define prior distributions for model parameters:
+
+```{r}
+priors <- list(
+  N_p1 ~ runif(10, 10000),
+  N_p2 ~ runif(10, 10000),
+  N_p3 ~ runif(10, 10000)
+)
+
+plot_prior(priors)
+```
+
+Define set of R functions operating on a tree sequence which will be used to compute summary statistics during the ABC inference:
+
+```{r}
+# setup summary statistic functions
+compute_pi <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    dplyr::select(stat, value = diversity)
+}
+
+functions <- list(pi = compute_pi)
+```
+
+Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
+
+```{r, eval=!file.exists(rds_file)}
+Sys.time()
+# get ABC iterations
+data <- simulate_abc(
+  model, priors,
+  summary_funs = functions,
+  observed_stats = observed_stats,
+  iterations = 1000, mutation_rate = 1e-8
+)
+Sys.time()
+```
+
+```{r, echo=FALSE}
+data <- readRDS(rds_file)
+```
+
+```{r}
+result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+```
+
+```{r}
+summary(result)
+```
+
+```{r}
+hist(result, breaks = 50, "N_p1")
+plot(result, param = "N_p1")
+```
+
+Plot posterior distributions of interest:
+
+```{r}
+plot_posterior(result)
+plot_posterior(result, param = "N_p1")
+
+```
+
+Extract posterior data (or simulate from priors) as simple data frames:
+
+```{r}
+simulate_priors(priors, replicates = 100)
+extract_posterior(result)
+```
+
