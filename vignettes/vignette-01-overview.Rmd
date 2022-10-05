@@ -12,8 +12,6 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-
-rds_file <- system.file("extdata/vignette_01.rds", package = "demografr")
 ```
 
 ```{r setup}
@@ -22,6 +20,10 @@ library(slendr)
 library(dplyr)
 library(future)
 library(abc)
+```
+
+```{r, echo=FALSE}
+rds_file <- system.file("extdata/vignette_01.rds", package = "demografr")
 ```
 
 ```{r}
@@ -99,27 +101,28 @@ Sys.time()
 ```
 
 ```{r, echo=FALSE}
+# saveRDS(data, rds_file)
 data <- readRDS(rds_file)
 ```
 
 ```{r}
-result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
 ```{r}
-summary(result)
+summary(abc)
 ```
 
 ```{r}
-hist(result, breaks = 50, "N_p1")
-plot(result, param = "N_p1")
+hist(abc, breaks = 50, "N_p1")
+plot(abc, param = "N_p1")
 ```
 
 Plot posterior distributions of interest:
 
 ```{r}
-plot_posterior(result)
-plot_posterior(result, param = "N_p1")
+plot_posterior(abc)
+plot_posterior(abc, param = "N_p1")
 
 ```
 

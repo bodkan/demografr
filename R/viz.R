@@ -1,33 +1,37 @@
 # custom plotting functions -----------------------------------------------
 
+#' @import ggplot2
 #' @export
 plot_prior <- function(priors, replicates = 1000, geom = ggplot2::geom_histogram) {
   samples_df <- simulate_priors(priors, replicates)
-  ggplot2::ggplot(samples_df) +
-    geom(ggplot2::aes(value, fill = param, color = param)) +
-    ggplot2::facet_wrap(~ param)
+  ggplot(samples_df) +
+    geom(aes(value, fill = param, color = param)) +
+    facet_wrap(~ param) +
+    guides(fill = guide_legend(""), color = guide_legend(""))
 }
 
+#' @import ggplot2
 #' @export
-plot_posterior <- function(x, param = NULL, type = c("adj", "unadj"),
-                            geom = ggplot2::geom_density) {
-  df <- extract_posterior(x, type)
+plot_posterior <- function(abc, param = NULL, type = c("adj", "unadj"),
+                           geom = ggplot2::geom_density, ...) {
+  df <- extract_posterior(abc, type)
 
-  if (is.null(param)) param <- colnames(attr(x, "parameters"))   
+  if (is.null(param)) param <- colnames(attr(abc, "parameters"))   
 
   # compute a given summary statistic of the posterior
-  summary_df <- quiet(summary(result))["Weighted Mean:", param]
+  summary_df <- quiet(summary(abc))["Weighted Mean:", param]
 
-  ggplot2::ggplot(df[df$param %in% param, ]) +
-    geom(ggplot2::aes(value, fill = param, color = param)) +
-    ggplot2::geom_vline(xintercept = summary_df, linetype = 2, alpha = 0.75)
+  ggplot(df[df$param %in% param, ]) +
+    geom(aes(value, fill = param, color = param), ...) +
+    geom_vline(xintercept = summary_df, linetype = 2, alpha = 0.75) +
+    guides(fill = guide_legend(""), color = guide_legend(""))
 }
-
 
 # overloaded functions from the abc package -------------------------------
 
-#' @export hist.demographr_abc
-hist.demographr_abc <- function(x, param = NULL, ...) {
+#' @export hist.demografr_abc
+#' @export
+hist.demografr_abc <- function(x, param = NULL, ...) {
   params <- attr(x, "parameters")
   if (!is.null(param)) {
     x$numparam <- 1
@@ -37,8 +41,9 @@ hist.demographr_abc <- function(x, param = NULL, ...) {
   abc:::hist.abc(x, ...)
 }
 
-#' @export plot.demographr_abc
-plot.demographr_abc <- function(x, param = NULL, ...) {
+#' @export plot.demografr_abc
+#' @export
+plot.demografr_abc <- function(x, param = NULL, ...) {
   params <- attr(x, "parameters")
   if (!is.null(param)) {
     x$numparam <- 1
