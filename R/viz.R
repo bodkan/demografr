@@ -69,12 +69,12 @@ simulate_priors <- function(priors, replicates = 1000) {
 }
 
 #' @export
-extract_posterior <- function(x, type = c("adj", "unadj")) {
+extract_posterior <- function(abc, type = c("adj", "unadj")) {
   type <- match.arg(type)
   # TODO check demographr_abc type
 
   # get the entire posterior sample, convert it to a long format, subset variables
-  df <- x[[paste0(type, ".values")]] %>%
+  df <- abc[[paste0(type, ".values")]] %>%
     dplyr::as_tibble() %>%
     tidyr::pivot_longer(cols = dplyr::everything(), names_to = "param", values_to = "value") %>%
     dplyr::filter(param %in% param)
