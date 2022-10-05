@@ -121,15 +121,16 @@ plot(abc, param = "N_p1")
 Plot posterior distributions of interest:
 
 ```{r}
-plot_posterior(abc)
-plot_posterior(abc, param = "N_p1")
-
+plot_posterior(abc, alpha = 0.75)
 ```
 
 Extract posterior data (or simulate from priors) as simple data frames:
 
 ```{r}
 simulate_priors(priors, replicates = 100)
-extract_posterior(result)
+```
+
+```{r}
+extract_posterior(abc)
 ```
 
