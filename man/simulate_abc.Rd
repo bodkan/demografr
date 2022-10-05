@@ -8,7 +8,7 @@ simulate_abc(
   model,
   priors,
   summary_funs,
-  observed,
+  observed_stats,
   iterations = 1,
   epochs = 1,
   mutation_rate = 0,

@@ -38,11 +38,11 @@ run_iteration <- function(it, priors, functions, mutation_rate, sequence_length,
 #'
 #' @export
 simulate_abc <- function(
-  model, priors, summary_funs, observed,
+  model, priors, summary_funs, observed_stats,
   iterations = 1, epochs = 1,
   mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8
 ) {
-  if (length(setdiff(names(summary_funs), names(observed))))
+  if (length(setdiff(names(summary_funs), names(observed_stats))))
     stop("List of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
@@ -66,7 +66,7 @@ simulate_abc <- function(
   list(
     parameters = parameters,
     simulated = simulated_stats,
-    observed = observed,
+    observed = observed_stats,
     statistics = names(summary_funs)
   )
 }
@@ -107,7 +107,7 @@ perform_abc <- function(data, tolerance, method, ...) {
   )
 
   attr(result, "parameters") <- data$parameters
-  class(result) <- c("demographr_abc", "abc")
+  class(result) <- c("demografr_abc", "abc")
 
   result
 }
