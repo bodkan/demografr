@@ -9,14 +9,16 @@ plot_prior <- function(priors, replicates = 1000, geom = ggplot2::geom_histogram
 }
 
 #' @export
-plot_posterior <- function(x, param = colnames(attr(x, "parameters")), type = c("adj", "unadj"),
+plot_posterior <- function(x, param = NULL, type = c("adj", "unadj"),
                             geom = ggplot2::geom_density) {
   df <- extract_posterior(x, type)
+
+  if (is.null(param)) param <- colnames(attr(x, "parameters"))   
 
   # compute a given summary statistic of the posterior
   summary_df <- quiet(summary(result))["Weighted Mean:", param]
 
-  ggplot2::ggplot(df) +
+  ggplot2::ggplot(df[df$param %in% param, ]) +
     geom(ggplot2::aes(value, fill = param, color = param)) +
     ggplot2::geom_vline(xintercept = summary_df, linetype = 2, alpha = 0.75)
 }
@@ -45,15 +47,6 @@ plot.demographr_abc <- function(x, param = NULL, ...) {
   abc:::plot.abc(x, param = params, ...)
 }
 
-# a function to silence the unnecessary summary() output on abc objects
-# https://stackoverflow.com/a/54136863
-quiet <- function(x) {
-  sink(tempfile())
-  on.exit(sink())
-  invisible(force(x))
-}
-
-# used by plot_priors
 #' @export
 simulate_priors <- function(priors, replicates = 1000) {
   if (!is.list(priors)) priors <- list(priors)
@@ -66,7 +59,7 @@ simulate_priors <- function(priors, replicates = 1000) {
     stringsAsFactors = FALSE
   ))
 
-  samples_df <- do.call(rbind, samples_list)
+  samples_df <- dplyr::as_tibble(do.call(rbind, samples_list))
   samples_df
 }
 

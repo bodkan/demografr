@@ -21,6 +21,9 @@ Imports:
     slendr
 Remotes: bodkan/slendr
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.2.1
+VignetteBuilder: knitr

@@ -37,7 +37,7 @@ priors <- list(
   p3 ~ runif(10, 10000)
 )
 
-plot_priors(priors)
+plot_prior(priors)
 
 # setup summary statistic functions
 compute_diversity <- function(ts) {
@@ -63,9 +63,6 @@ data <- readRDS("/tmp/data.rds")
 
 result <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 
-attr(result, "parameters") <- data$parameters
-class(result) <- c("demographr_abc", "abc")
-
 # yay it works!
 summary(result)
 
@@ -74,8 +71,11 @@ plot_model(model)
 hist(result, breaks = 50, "N_p1")
 plot(result, param = "N_p1")
 
-plot_posteriors(result)
-plot_posteriors(result, param = "N_p1", geom = ggplot2::geom_histogram)
+plot_posterior(result)
+plot_posterior(result, param = "N_p1")
+
+simulate_priors(priors, replicates = 100)
+extract_posterior(result)
 
 # parallel execution
 #
