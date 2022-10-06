@@ -19,11 +19,12 @@ plot_posterior <- function(abc, param = NULL, type = c("adj", "unadj"),
   if (is.null(param)) param <- colnames(attr(abc, "parameters"))   
 
   # compute a given summary statistic of the posterior
-  summary_df <- quiet(summary(abc))["Weighted Mean:", param]
+  posterior_stats <- quiet(summary(abc))["Weighted Mean:", param] %>%
+    data.frame(param = param, value = ., stringsAsFactors = FALSE)
 
   ggplot(df[df$param %in% param, ]) +
     geom(aes(value, fill = param, color = param), ...) +
-    geom_vline(xintercept = summary_df, linetype = 2, alpha = 0.75) +
+    geom_vline(data = posterior_stats, aes(xintercept = value, color = param), linetype = 2) +
     guides(fill = guide_legend(""), color = guide_legend(""))
 }
 
