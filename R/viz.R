@@ -21,6 +21,7 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
 #' @import ggplot2
 #' @export
 plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", "unadj"),
+                           summary = c("mode", "mean", "median"),
                            geom = ggplot2::geom_density, facets = TRUE, ...) {
   df <- extract_posterior(abc, posterior)
   df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", df$param)
@@ -35,13 +36,13 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
     param <- colnames(attr(abc, "parameters"))   
 
   # compute a given summary statistic of the posterior
-  posterior_stats <- quiet(summary(abc))["Weighted Mean:", param] %>%
-    data.frame(param = param, value = ., stringsAsFactors = FALSE)
+  summary_df <- extract_posterior_summary(abc, summary)
 
   p <- ggplot(df[df$param %in% param, ]) +
     geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
-    geom_vline(data = posterior_stats, aes(xintercept = value), linetype = 2) +
-    guides(fill = guide_legend("parameter\ntype"), color = guide_legend("parameter\ntype")) +
+    geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
+    guides(fill = guide_legend("parameter\ntype"),
+           color = guide_legend("parameter\ntype")) +
     scale_x_continuous(expand = c(0, 0), limits = c(0, NA))
 
   if (facets) p <- p + facet_wrap(~ param)
