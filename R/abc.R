@@ -2,8 +2,11 @@
 modify_model <- function(model, prior_samples) {
   # replace Ne values in the model object with the prior samples
   if (!is.null(prior_samples[["Ne"]])) {
-    for (Ne in prior_samples[["Ne"]])
-      model$splits[model$splits$pop == Ne$variable, "N"] <- Ne$value
+    for (Ne in prior_samples[["Ne"]]) {
+      # split variable symbol name into tokens ("Ne", "population name")
+      var_tokens <- strsplit(as.character(Ne$variable), "_")[[1]]
+      model$splits[model$splits$pop == var_tokens[2], "N"] <- Ne$value
+    }
   }
 
   # replace split time values in the model object with the prior samples
@@ -22,6 +25,8 @@ modify_model <- function(model, prior_samples) {
   model
 }
 
+# Run a single simulation replicate from a model with parameters modified by the
+# prior distribution
 run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
   new_model <- modify_model(model, prior_samples)
 
@@ -37,6 +42,7 @@ run_simulation <- function(model, prior_samples, sequence_length, recombination_
   ts
 }
 
+# Get parameters from the priors, simulate a tree sequence, compute summary statistics
 run_iteration <- function(it, model, priors, functions,
                           sequence_length, recombination_rate, mutation_rate) {
   slendr::setup_env(quiet = TRUE)
@@ -90,6 +96,9 @@ simulate_abc <- function(
 
   # results <- list(run_iteration(
 
+  # results <- lapply(seq_len(10),
+  #   function(it) run_iteration(it,
+  
     model = model,
     priors = priors,
     functions = summary_funs,
@@ -99,7 +108,7 @@ simulate_abc <- function(
     mc.cores = 10
     # future.seed = TRUE
 
-  # ))
+  # )
 
   )
 
