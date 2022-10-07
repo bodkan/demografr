@@ -109,12 +109,12 @@ data <- simulate_abc(
 ```
 
 ```{r, echo=FALSE}
-# saveRDS(data, "inst/extdata/vignette_01_splits.rds")
+saveRDS(data, "inst/extdata/vignette_01_splits.rds")
 data <- readRDS(rds_file)
 ```
 
 ```{r}
-abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+abc <- perform_abc(data, tolerance = 0.01, method = "neuralnet")
 ```
 
 ```{r}
