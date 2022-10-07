@@ -2,12 +2,17 @@
 
 #' @import ggplot2
 #' @export
-plot_prior <- function(priors, replicates = 1000, geom = ggplot2::geom_histogram) {
+plot_prior <- function(priors, type = NULL, replicates = 1000, geom = ggplot2::geom_histogram) {
+  if (!is.null(type))
+    priors <- subset_priors(priors, type)
+
   samples_df <- simulate_priors(priors, replicates)
+  samples_df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", samples_df$param)
+
   ggplot(samples_df) +
-    geom(aes(value, fill = param, color = param)) +
-    facet_wrap(~ param) +
-    guides(fill = guide_legend(""), color = guide_legend(""))
+    geom(aes(value, fill = type, color = type)) +
+    facet_wrap(~ param, scales = "free_x") +
+    guides(fill = guide_legend("prior type"), color = guide_legend("prior type"))
 }
 
 #' @import ggplot2
