@@ -26,17 +26,25 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
   df <- extract_posterior(abc, posterior)
   df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", df$param)
 
+  # subset to a given type of parameters
   if (!is.null(type)) {
     type <- match.arg(type, c("Ne", "Tgf", "Tsplit", "gf"))
     df <- df[df$type == type, ]
     param <- unique(df$param)
   }
 
+  # if requested, subset to a given set of parameters
   if (is.null(param))
     param <- colnames(attr(abc, "parameters"))   
+  else {
+    check_param_presence(unique(df$param), param)
+    df <- df[df$param %in% param, ]
+  }
 
-  # compute a given summary statistic of the posterior
+  # compute a given summary statistic of the posterior which will be added
+  # as a vertical line overlaid on top of the distribution plot
   summary_df <- extract_posterior_summary(abc, summary)
+  summary_df <- summary_df[summary_df$param %in% param, ]
 
   p <- ggplot(df[df$param %in% param, ]) +
     geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
@@ -57,6 +65,7 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
 hist.demografr_abc <- function(x, param = NULL, ...) {
   params <- attr(x, "parameters")
   if (!is.null(param)) {
+    check_param_presence(colnames(params), param)
     x$numparam <- 1
     x$names$parameter.names <- param
     params <- params[, param]
@@ -69,6 +78,7 @@ hist.demografr_abc <- function(x, param = NULL, ...) {
 plot.demografr_abc <- function(x, param = NULL, ...) {
   params <- attr(x, "parameters")
   if (!is.null(param)) {
+    check_param_presence(colnames(params), param)
     x$numparam <- 1
     params <- params[, param]
   }

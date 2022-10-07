@@ -122,8 +122,12 @@ summary(abc)
 ```
 
 ```{r}
-hist(abc, breaks = 50, "N_p1")
-plot(abc, param = "N_p1")
+extract_summary(abc)
+```
+
+```{r}
+hist(abc, breaks = 50, "Ne_p1")
+plot(abc, param = "Ne_p1")
 ```
 
 Plot posterior distributions of interest:
