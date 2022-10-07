@@ -1,5 +1,5 @@
 ---
-title: "vignette-01-overview"
+title: "vignette-02-split_times"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{vignette-01-overview}
@@ -24,7 +24,7 @@ devtools::load_all(".")
 ```
 
 ```{r, echo=FALSE}
-rds_file <- system.file("extdata/vignette_01.rds", package = "demografr")
+rds_file <- system.file("extdata/vignette_01_splits.rds", package = "demografr")
 ```
 
 ```{r}
@@ -57,7 +57,8 @@ ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>% ts_m
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
 observed_stats <- list(
-  pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
+  pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity),
+  divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
 )
 ```
 
@@ -67,10 +68,12 @@ Define prior distributions for model parameters:
 priors <- list(
   Ne_p1 ~ runif(10, 10000),
   Ne_p2 ~ runif(10, 10000),
-  Ne_p3 ~ runif(10, 10000)
+  Ne_p3 ~ runif(10, 10000),
+  Tsplit_p2_p3 ~ runif(3000, 8000),
+  Tsplit_p1_p2 ~ runif(1, 5000)
 )
 
-# plot_prior(priors)
+plot_prior(priors)
 ```
 
 Define set of R functions operating on a tree sequence which will be used to compute summary statistics during the ABC inference:
