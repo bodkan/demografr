@@ -317,3 +317,8 @@ collect_prior_matrix <- function(prior_samples) {
     Filter(Negate(is.null), .) %>%
     do.call(cbind, .)
 }
+
+check_param_presence <- function(params, p) {
+  if (length(intersect(params, p)) != length(p))
+    stop("'", param, "'' is not among the estimated model parameters", call. = FALSE)
+}
