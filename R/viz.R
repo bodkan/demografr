@@ -2,7 +2,9 @@
 
 #' @import ggplot2
 #' @export
-plot_prior <- function(priors, type = NULL, replicates = 1000, geom = ggplot2::geom_histogram) {
+plot_prior <- function(x, type = NULL, replicates = 1000, geom = ggplot2::geom_histogram) {
+  priors <- if (inherits(x, "demografr_abc")) attr(x, "priors") else x
+
   if (!is.null(type))
     priors <- subset_priors(priors, type)
 
@@ -17,20 +19,32 @@ plot_prior <- function(priors, type = NULL, replicates = 1000, geom = ggplot2::g
 
 #' @import ggplot2
 #' @export
-plot_posterior <- function(abc, param = NULL, type = c("adj", "unadj"),
-                           geom = ggplot2::geom_density, ...) {
-  df <- extract_posterior(abc, type)
+plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", "unadj"),
+                           geom = ggplot2::geom_density, facets = TRUE, ...) {
+  df <- extract_posterior(abc, posterior)
+  df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", df$param)
 
-  if (is.null(param)) param <- colnames(attr(abc, "parameters"))   
+  if (!is.null(type)) {
+    type <- match.arg(type, c("Ne", "Tgf", "Tsplit", "gf"))
+    df <- df[df$type == type, ]
+    param <- unique(df$param)
+  }
+
+  if (is.null(param))
+    param <- colnames(attr(abc, "parameters"))   
 
   # compute a given summary statistic of the posterior
   posterior_stats <- quiet(summary(abc))["Weighted Mean:", param] %>%
     data.frame(param = param, value = ., stringsAsFactors = FALSE)
 
-  ggplot(df[df$param %in% param, ]) +
-    geom(aes(value, fill = param, color = param), ...) +
-    geom_vline(data = posterior_stats, aes(xintercept = value, color = param), linetype = 2) +
-    guides(fill = guide_legend(""), color = guide_legend(""))
+  p <- ggplot(df[df$param %in% param, ]) +
+    geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
+    geom_vline(data = posterior_stats, aes(xintercept = value), linetype = 2) +
+    guides(fill = guide_legend("parameter\ntype"), color = guide_legend("parameter\ntype"))
+
+  if (facets) p <- p + facet_wrap(~ param)
+
+  p
 }
 
 # overloaded functions from the abc package -------------------------------

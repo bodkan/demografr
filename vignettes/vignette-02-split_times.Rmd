@@ -47,7 +47,7 @@ model <- compile_model(
   simulation_length = 10000, serialize = FALSE
 )
 
-# plot_model(model)
+plot_model(model)
 ```
 
 Simulate true summary statistics from this model. Later, we will use those to fit parameters of the model, pretending that we forgot the truth:
@@ -70,7 +70,7 @@ priors <- list(
   Ne_p2 ~ runif(10, 10000),
   Ne_p3 ~ runif(10, 10000),
   Tsplit_p2_p3 ~ runif(3000, 8000),
-  Tsplit_p1_p2 ~ runif(1, 5000)
+  Tsplit_p1_p2 ~ runif(1, 2000)
 )
 
 plot_prior(priors)
@@ -84,27 +84,28 @@ compute_pi <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
-    dplyr::select(stat, value = diversity)
+    select(stat, value = diversity)
 }
 
-functions <- list(pi = compute_pi)
+compute_divergence <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+functions <- list(pi = compute_pi, divergence = compute_divergence)
 ```
 
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
 
 ```{r, eval=!file.exists(rds_file)}
-mutation_rate <- 1e-8
-sequence_length <- 10e6
-recombination_rate <- 1e-8
-Sys.time()
-# get ABC iterations
 data <- simulate_abc(
   model, priors,
   summary_funs = functions,
   observed_stats = observed_stats,
-  iterations = 1000, mutation_rate = 1e-8
+  iterations = 10000, mutation_rate = 1e-8
 )
-Sys.time()
 ```
 
 ```{r, echo=FALSE}
@@ -113,7 +114,7 @@ data <- readRDS(rds_file)
 ```
 
 ```{r}
-abc <- perform_abc(data, tolerance = 0.01, method = "neuralnet")
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
 ```{r}
@@ -128,7 +129,8 @@ plot(abc, param = "N_p1")
 Plot posterior distributions of interest:
 
 ```{r}
-plot_posterior(abc, alpha = 0.75)
+plot_posterior(abc)
+plot_prior(abc, type = "Tsplit")
 ```
 
 Extract posterior data (or simulate from priors) as simple data frames:
