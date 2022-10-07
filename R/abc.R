@@ -1,7 +1,3 @@
-prior_variables <- function(priors) {
-  sapply(priors, function(p) as.character(as.list(p)[[2]]))
-}
-
 run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
   # replace Ne values in the model object with the prior samples
   if (!is.null(prior_samples[["Ne"]])) {

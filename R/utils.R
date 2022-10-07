@@ -5,3 +5,8 @@ quiet <- function(x) {
   on.exit(sink())
   invisible(force(x))
 }
+
+# Extract prior variable names as a character vector
+prior_variables <- function(priors) {
+  sapply(priors, function(p) as.character(as.list(p)[[2]]))
+}
