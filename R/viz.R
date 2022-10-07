@@ -2,7 +2,7 @@
 
 #' @import ggplot2
 #' @export
-plot_prior <- function(x, type = NULL, replicates = 1000, geom = ggplot2::geom_histogram) {
+plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_histogram) {
   priors <- if (inherits(x, "demografr_abc")) attr(x, "priors") else x
 
   if (!is.null(type))
@@ -14,7 +14,8 @@ plot_prior <- function(x, type = NULL, replicates = 1000, geom = ggplot2::geom_h
   ggplot(samples_df) +
     geom(aes(value, fill = type, color = type)) +
     facet_wrap(~ param, scales = "free_x") +
-    guides(fill = guide_legend("prior type"), color = guide_legend("prior type"))
+    guides(fill = guide_legend("prior type"), color = guide_legend("prior type") +
+    scale_x_continuous(expand = c(0, 0), limits = c(0, NA)))
 }
 
 #' @import ggplot2
@@ -40,7 +41,8 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
   p <- ggplot(df[df$param %in% param, ]) +
     geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
     geom_vline(data = posterior_stats, aes(xintercept = value), linetype = 2) +
-    guides(fill = guide_legend("parameter\ntype"), color = guide_legend("parameter\ntype"))
+    guides(fill = guide_legend("parameter\ntype"), color = guide_legend("parameter\ntype")) +
+    scale_x_continuous(expand = c(0, 0), limits = c(0, NA))
 
   if (facets) p <- p + facet_wrap(~ param)
 
