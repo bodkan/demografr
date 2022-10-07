@@ -1,29 +1,72 @@
-run_simulation <- function(model, Ne_samples, sequence_length, recombination_rate) {
-  # replace Ne values in the model object
-  for (Ne in Ne_samples) {
-    model$splits[model$splits$pop == Ne$variable, "N"] <- as.integer(Ne$value)
+prior_variables <- function(priors) {
+  sapply(priors, function(p) as.character(as.list(p)[[2]]))
+}
+
+run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
+  # replace Ne values in the model object with the prior samples
+  if (!is.null(prior_samples[["Ne"]])) {
+    for (Ne in prior_samples[["Ne"]])
+      model$splits[model$splits$pop == Ne$variable, "N"] <- round(Ne$value)
   }
 
   ts <- slendr::msprime(model, sequence_length = sequence_length, recombination_rate = recombination_rate)
-  ts
-}
 
-run_iteration <- function(it, priors, functions, mutation_rate, sequence_length, recombination_rate) {
-  setup_env(quiet = TRUE)
-
-  Ne_samples <- lapply(priors, sample_prior)
-
-  ts <- run_simulation(model, Ne_samples, sequence_length, recombination_rate)
   if (mutation_rate != 0)
     ts <- ts_mutate(ts, mutation_rate = mutation_rate)
 
-  simulated_stats <- lapply(functions, function(f) f(ts))
+  ts
+}
 
-  Ne_values <- matrix(sapply(Ne_samples, `[[`, "value"), nrow = 1)
-  colnames(Ne_values) <- as.character(lapply(Ne_samples, `[[`, "variable"))
+# Check if the provided prior formula contains the specified parameter type
+# (i.e. "Ne", "T_split", etc.)
+match_prior_type <- function(formula, type) {
+  if (!length(formula)) return(FALSE)
+
+  variable <- as.list(formula)[[2]]
+  grepl(type, variable)
+}
+
+# Subset prior formulas to just those of a given type
+subset_priors <- function(priors, type = c("Ne", "Tgf", "Tsplit", "gf")) {
+  type <- match.arg(type)
+  Filter(function(p) match_prior_type(p, type), priors)
+}
+
+collect_prior_matrix <- function(prior_samples) {
+  # 1. iterate over the list of all prior samples (Ne priors, T_split priors, etc.)
+  # represented by lists (<variable name>, <value>)
+  # 2. convert those lists into matrices
+  # 3. bind columns of those individual per-prior matrices together in a single matrix 
+  lapply(prior_samples, function(type) {
+    if (!length(type)) return(NULL)
+    values <- matrix(sapply(type, `[[`, "value"), nrow = 1) 
+    colnames(values) <- sapply(type, `[[`, "variable")
+    values
+  }) %>%
+    Filter(Negate(is.null), .) %>%
+    do.call(cbind, .)
+}
+
+run_iteration <- function(it, model, priors, functions,
+                          sequence_length, recombination_rate, mutation_rate) {
+  slendr::setup_env(quiet = TRUE)
+
+  # sample parameters from appropriate priors
+  prior_samples <- list(
+    Ne      = subset_priors(priors, "Ne")      %>% lapply(sample_prior),
+    T_split = subset_priors(priors, "T_split") %>% lapply(sample_prior)
+  )
+
+  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate)
+
+  # collect data for a downstream ABC inference:
+  #   1. compute summary statistics using user-defined tree-sequence functions
+  simulated_stats <- lapply(functions, function(f) f(ts))
+  #   2. collect all sampled prior values into a single parameter matrix
+  prior_values <- collect_prior_matrix(prior_samples)
 
   list(
-    parameters = Ne_values,
+    parameters = prior_values,
     simulated_stats = simulated_stats
   )
 }
@@ -42,6 +85,9 @@ simulate_abc <- function(
   iterations = 1, epochs = 1,
   mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8
 ) {
+  if (mutation_rate < 0)
+    stop("Mutation rate must be a non-negative number", call. = FALSE)
+
   if (length(setdiff(names(summary_funs), names(observed_stats))))
     stop("List of summary functions and observed statistics must have the same names",
          call. = FALSE)
@@ -51,8 +97,9 @@ simulate_abc <- function(
   # results <- lapply(
     X = seq_len(iterations),
     FUN = run_iteration,
+    model = model,
     priors = priors,
-    functions = functions,
+    functions = summary_funs,
     mutation_rate = mutation_rate,
     sequence_length = sequence_length,
     recombination_rate = recombination_rate,
@@ -133,5 +180,77 @@ extract_model <- function(abc, summary = c("mode", "mean", "median")) {
     }
   }
 
+  # TODO: this should create a whole new slendr model from scratch because the way
+  # things are right now, the model$populations list is out of sync with the rest
+  # of the slendr model tables
   model
+}
+
+#' @export
+simulate_priors <- function(priors, replicates = 1000) {
+  if (!is.list(priors)) priors <- list(priors)
+
+  vars <- prior_variables(priors)
+
+  samples_list <- lapply(seq_along(priors), \(i) data.frame(
+    param = vars[i],
+    value = replicate(n = replicates, sample_prior(priors[[i]])$value),
+    stringsAsFactors = FALSE
+  ))
+
+  samples_df <- dplyr::as_tibble(do.call(rbind, samples_list))
+  samples_df
+}
+
+#' @export
+extract_posterior <- function(abc, type = c("adj", "unadj")) {
+  type <- match.arg(type)
+  # TODO check demographr_abc type
+
+  # get the entire posterior sample, convert it to a long format, subset variables
+  df <- abc[[paste0(type, ".values")]] %>%
+    dplyr::as_tibble() %>%
+    tidyr::pivot_longer(cols = dplyr::everything(), names_to = "param", values_to = "value") %>%
+    dplyr::filter(param %in% param)
+
+  df
+}
+
+# Sample value from a given prior sampling formula object
+sample_prior <- function(f) {
+  if (!inherits(f, "formula"))
+    stop("A prior expression must take a form of an R formula such as:\n\n",
+         "     N_pop1 ~ runif(min = 100, max = 10000)\n",
+         "     N_NEA ~ rnorm(mean = 1000, sd = 300)\n",
+         "     N_afr <- 10000\n\n",
+         "I.e. <parameter> ~ <random generation function>(parameters)\n\n",
+         "Incorrect prior formula given: ", as.character(f), call. = FALSE)
+
+  # split the formula into an abstract syntax tree
+  ast <- as.list(f)
+
+  # the head of the list in ast[[1]] is `~` and can be ignored
+  variable <- ast[[2]] # variable name
+  call <- as.list(ast[[3]]) # split the function call into another AST
+
+  if (is.numeric(call[[1]])) { # a fixed-value "prior"
+    value <- call[[1]]
+  } else { # a proper prior
+    # get the random-generation function name
+    fun_symbol <- call[[1]]
+    if (!exists(fun_symbol)) stop("An unknown function ", fun_symbol, " given for sampling", call. = FALSE)
+    fun <- get(fun_symbol)
+
+    # compose arguments for the function, forcing n = 1 as its first argument
+    args <- c(n = 1, call[-1])
+
+    # call the random-generation function, getting a single value
+    error_msg <- sprintf("%%s was raised when internally sampling from a prior as\n%s(%s). Please check the validity of the prior expression.",
+                         as.character(fun_symbol), paste("n = 1,", paste(args[-1], collapse = ", ")))
+    tryCatch(value <- do.call(fun, args),
+             error = function(e) stop(sprintf(error_msg, "An error"), call. = FALSE),
+             warning = function(w) stop(sprintf(error_msg, "A warning"), call. = FALSE))
+  }
+
+  list(variable = variable, value = value)
 }

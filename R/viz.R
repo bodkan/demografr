@@ -52,33 +52,3 @@ plot.demografr_abc <- function(x, param = NULL, ...) {
   }
   abc:::plot.abc(x, param = params, ...)
 }
-
-#' @export
-simulate_priors <- function(priors, replicates = 1000) {
-  if (!is.list(priors)) priors <- list(priors)
-
-  vars <- prior_variables(priors)
-
-  samples_list <- lapply(seq_along(priors), \(i) data.frame(
-    param = vars[i],
-    value = replicate(n = replicates, sample_prior(priors[[i]])$value),
-    stringsAsFactors = FALSE
-  ))
-
-  samples_df <- dplyr::as_tibble(do.call(rbind, samples_list))
-  samples_df
-}
-
-#' @export
-extract_posterior <- function(abc, type = c("adj", "unadj")) {
-  type <- match.arg(type)
-  # TODO check demographr_abc type
-
-  # get the entire posterior sample, convert it to a long format, subset variables
-  df <- abc[[paste0(type, ".values")]] %>%
-    dplyr::as_tibble() %>%
-    tidyr::pivot_longer(cols = dplyr::everything(), names_to = "param", values_to = "value") %>%
-    dplyr::filter(param %in% param)
-
-  df
-}
