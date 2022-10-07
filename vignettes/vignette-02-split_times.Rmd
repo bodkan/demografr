@@ -109,7 +109,7 @@ data <- simulate_abc(
 ```
 
 ```{r, echo=FALSE}
-# saveRDS(data, rds_file)
+# saveRDS(data, "inst/extdata/vignette_01_splits.rds")
 data <- readRDS(rds_file)
 ```
 
