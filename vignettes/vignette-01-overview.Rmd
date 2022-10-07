@@ -81,7 +81,7 @@ compute_pi <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
-    dplyr::select(stat, value = diversity)
+    select(stat, value = diversity)
 }
 
 functions <- list(pi = compute_pi)
@@ -90,18 +90,12 @@ functions <- list(pi = compute_pi)
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
 
 ```{r, eval=!file.exists(rds_file)}
-mutation_rate <- 1e-8
-sequence_length <- 10e6
-recombination_rate <- 1e-8
-Sys.time()
-# get ABC iterations
 data <- simulate_abc(
   model, priors,
   summary_funs = functions,
   observed_stats = observed_stats,
   iterations = 1000, mutation_rate = 1e-8
 )
-Sys.time()
 ```
 
 ```{r, echo=FALSE}

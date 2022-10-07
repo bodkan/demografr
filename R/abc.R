@@ -1,46 +1,36 @@
-run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
+run_simulation <- function(
+  model, prior_samples,
+  sequence_length, recombination_rate, mutation_rate
+) {
   # replace Ne values in the model object with the prior samples
   if (!is.null(prior_samples[["Ne"]])) {
     for (Ne in prior_samples[["Ne"]])
       model$splits[model$splits$pop == Ne$variable, "N"] <- round(Ne$value)
   }
 
-  ts <- slendr::msprime(model, sequence_length = sequence_length, recombination_rate = recombination_rate)
+  # replace split time values in the model object with the prior samples
+  if (!is.null(prior_samples[["Tsplit"]])) {
+    for (split in prior_samples[["Tsplit"]]) {
+      # split variable symbol name into tokens ("T_split", "ancestor pop", "daughter pop")
+      var_tokens <- strsplit(as.character(split$variable), "_")[[1]]
+      model$splits[
+        model$splits$parent == var_tokens[2] &
+        model$splits$pop == var_tokens[3],
+        "tsplit_gen"
+      ] <- round(split$value)
+    }
+  }
+
+  ts <- slendr::msprime(
+    model,
+    sequence_length = sequence_length,
+    recombination_rate = recombination_rate
+  )
 
   if (mutation_rate != 0)
-    ts <- ts_mutate(ts, mutation_rate = mutation_rate)
+    ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
 
   ts
-}
-
-# Check if the provided prior formula contains the specified parameter type
-# (i.e. "Ne", "T_split", etc.)
-match_prior_type <- function(formula, type) {
-  if (!length(formula)) return(FALSE)
-
-  variable <- as.list(formula)[[2]]
-  grepl(type, variable)
-}
-
-# Subset prior formulas to just those of a given type
-subset_priors <- function(priors, type = c("Ne", "Tgf", "Tsplit", "gf")) {
-  type <- match.arg(type)
-  Filter(function(p) match_prior_type(p, type), priors)
-}
-
-collect_prior_matrix <- function(prior_samples) {
-  # 1. iterate over the list of all prior samples (Ne priors, T_split priors, etc.)
-  # represented by lists (<variable name>, <value>)
-  # 2. convert those lists into matrices
-  # 3. bind columns of those individual per-prior matrices together in a single matrix 
-  lapply(prior_samples, function(type) {
-    if (!length(type)) return(NULL)
-    values <- matrix(sapply(type, `[[`, "value"), nrow = 1) 
-    colnames(values) <- sapply(type, `[[`, "variable")
-    values
-  }) %>%
-    Filter(Negate(is.null), .) %>%
-    do.call(cbind, .)
 }
 
 run_iteration <- function(it, model, priors, functions,
@@ -50,7 +40,7 @@ run_iteration <- function(it, model, priors, functions,
   # sample parameters from appropriate priors
   prior_samples <- list(
     Ne      = subset_priors(priors, "Ne")      %>% lapply(sample_prior),
-    T_split = subset_priors(priors, "T_split") %>% lapply(sample_prior)
+    T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior)
   )
 
   ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate)
@@ -68,7 +58,7 @@ run_iteration <- function(it, model, priors, functions,
 }
 
 #' Simulate data for ABC inference using specified priors
-#' 
+#'
 #' @param model A compiled slendr model object
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param summary_funs A named list of summary statistic functions to apply on simulated
@@ -89,10 +79,13 @@ simulate_abc <- function(
          call. = FALSE)
 
   # results <- future.apply::future_lapply(
+
   results <- parallel::mclapply(
-  # results <- lapply(
     X = seq_len(iterations),
     FUN = run_iteration,
+
+  # results <- list(run_iteration(
+
     model = model,
     priors = priors,
     functions = summary_funs,
@@ -101,6 +94,9 @@ simulate_abc <- function(
     recombination_rate = recombination_rate,
     mc.cores = 10
     # future.seed = TRUE
+
+  # ))
+
   )
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
@@ -110,7 +106,8 @@ simulate_abc <- function(
     parameters = parameters,
     simulated = simulated_stats,
     observed = observed_stats,
-    statistics = names(summary_funs)
+    statistics = names(summary_funs),
+    priors = priors
   )
 }
 
@@ -150,6 +147,7 @@ perform_abc <- function(data, tolerance, method, ...) {
   )
 
   attr(result, "parameters") <- data$parameters
+  attr(result, "priors") <- data$priors
   class(result) <- c("demografr_abc", "abc")
 
   result
@@ -199,12 +197,12 @@ simulate_priors <- function(priors, replicates = 1000) {
 }
 
 #' @export
-extract_posterior <- function(abc, type = c("adj", "unadj")) {
-  type <- match.arg(type)
+extract_posterior <- function(abc, posterior = c("adj", "unadj")) {
+  posterior <- match.arg(posterior)
   # TODO check demographr_abc type
 
   # get the entire posterior sample, convert it to a long format, subset variables
-  df <- abc[[paste0(type, ".values")]] %>%
+  df <- abc[[paste0(posterior, ".values")]] %>%
     dplyr::as_tibble() %>%
     tidyr::pivot_longer(cols = dplyr::everything(), names_to = "param", values_to = "value") %>%
     dplyr::filter(param %in% param)
@@ -249,4 +247,34 @@ sample_prior <- function(f) {
   }
 
   list(variable = variable, value = value)
+}
+
+# Check if the provided prior formula contains the specified parameter type
+# (i.e. "Ne", "T_split", etc.)
+match_prior_type <- function(formula, type) {
+  if (!length(formula)) return(FALSE)
+
+  variable <- as.list(formula)[[2]]
+  grepl(type, variable)
+}
+
+# Subset prior formulas to just those of a given type
+subset_priors <- function(priors, type = c("Ne", "Tgf", "Tsplit", "gf")) {
+  type <- match.arg(type)
+  Filter(function(p) match_prior_type(p, type), priors)
+}
+
+collect_prior_matrix <- function(prior_samples) {
+  # 1. iterate over the list of all prior samples (Ne priors, T_split priors, etc.)
+  # represented by lists (<variable name>, <value>)
+  # 2. convert those lists into matrices
+  # 3. bind columns of those individual per-prior matrices together in a single matrix 
+  lapply(prior_samples, function(type) {
+    if (!length(type)) return(NULL)
+    values <- matrix(sapply(type, `[[`, "value"), nrow = 1) 
+    colnames(values) <- sapply(type, `[[`, "variable")
+    values
+  }) %>%
+    Filter(Negate(is.null), .) %>%
+    do.call(cbind, .)
 }
