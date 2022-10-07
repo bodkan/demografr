@@ -19,7 +19,8 @@ Imports:
     future,
     future.apply,
     ggplot2,
-    slendr
+    slendr,
+    magrittr
 Remotes: bodkan/slendr
 Suggests: 
     knitr,
