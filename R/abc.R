@@ -121,7 +121,7 @@ simulate_abc <- function(
       priors = priors, functions = summary_funs,
       mutation_rate = mutation_rate, sequence_length = sequence_length,
       recombination_rate = recombination_rate,
-      future.seed = TRUE
+      future.seed = TRUE, future.packages = c("dplyr", "combinat", "slendr")
     )
   } else if (execution == "single") {
     results <- list(run_iteration(it = 1, model = model,
