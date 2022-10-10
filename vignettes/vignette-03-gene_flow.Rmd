@@ -18,13 +18,14 @@ knitr::opts_chunk$set(
 library(abc)
 library(dplyr)
 library(future)
-library(slendr)
+# library(slendr)
 
 devtools::load_all(".")
+devtools::load_all("~/Projects/slendr/")
 ```
 
 ```{r, echo=FALSE}
-rds_file <- system.file("extdata/vignette_01_splits.rds", package = "demografr")
+rds_file <- system.file("extdata/vignette_01_gene_flow", package = "demografr")
 ```
 
 ```{r}
@@ -40,25 +41,35 @@ Define a skeleton model to fit parameters for:
 p1 <- population("p1", time = 1, N = 1000)
 p2 <- population("p2", time = 2000, N = 100, parent = p1)
 p3 <- population("p3", time = 6000, N = 3000, parent = p2)
+p4 <- population("p4", time = 7000, N = 2000, parent = p3)
+
+gf <- gene_flow(from = p2, to = p4, start = 8000, end = 8001, rate = 0.25)
 
 model <- compile_model(
-  populations = list(p1, p2, p3),
+  populations = list(p1, p2, p3, p4), gene_flow = gf,
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
 
-plot_model(model)
+plot_model(model, proportions = TRUE)
 ```
 
 Simulate true summary statistics from this model. Later, we will use those to fit parameters of the model, pretending that we forgot the truth:
 
 ```{r}
-ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
+ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
 observed_stats <- list(
   pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity),
-  divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
+  divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence),
+  f4 = combinat::permn(samples) %>%
+    lapply(function(pops) {
+      ts_f4(ts, W = pops[1], X = pops[2], Y = pops[3], Z = pops[4]) 
+    }) %>%
+    do.call(rbind, .) %>%
+    mutate(stat = paste("f4", W, X, Y, Z, sep = "_")) %>%
+    select(stat, value = f4)
 )
 ```
 
@@ -69,8 +80,11 @@ priors <- list(
   Ne_p1 ~ runif(10, 10000),
   Ne_p2 ~ runif(10, 10000),
   Ne_p3 ~ runif(10, 10000),
+
   Tsplit_p2_p3 ~ runif(3000, 8000),
-  Tsplit_p1_p2 ~ runif(1, 2000)
+  Tsplit_p1_p2 ~ runif(1, 2000),
+
+  gf_p2_p4 ~ runif(0, 1)
 )
 
 plot_prior(priors)
@@ -94,7 +108,21 @@ compute_divergence <- function(ts) {
     select(stat, value = divergence)
 }
 
-functions <- list(pi = compute_pi, divergence = compute_divergence)
+compute_f4 <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  perms <- combinat::permn(samples)
+
+  lapply(perms, function(pops) ts_f4(ts, W = pops[1], X = pops[2], Y = pops[3], Z = pops[4])) %>%
+    do.call(rbind, .) %>%
+    mutate(stat = paste("f4", W, X, Y, Z, sep = "_")) %>%
+    select(stat, value = f4)
+}
+
+functions <- list(
+  pi = compute_pi,
+  divergence = compute_divergence,
+  f4 = compute_f4
+)
 ```
 
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
