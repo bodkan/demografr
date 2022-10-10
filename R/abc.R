@@ -336,6 +336,9 @@ collect_prior_matrix <- function(prior_samples) {
 }
 
 check_param_presence <- function(params, p) {
-  if (length(intersect(params, p)) != length(p))
-    stop("'", param, "'' is not among the estimated model parameters", call. = FALSE)
+  if (length(intersect(params, p)) != length(p)) {
+    missing <- setdiff(p, params)
+    stop(paste(missing, collapse = ", "), " not among the estimated model parameters",
+         call. = FALSE)
+  }
 }
