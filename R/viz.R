@@ -11,11 +11,17 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
   samples_df <- simulate_priors(priors, replicates)
   samples_df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", samples_df$param)
 
-  ggplot(samples_df) +
+  p <- ggplot(samples_df) +
     geom(aes(value, fill = type, color = type)) +
-    facet_wrap(~ param, scales = "free_x") +
+    facet_wrap(~ param, scales = "free") +
     guides(fill = guide_legend("prior type"), color = guide_legend("prior type")) +
-    scale_x_continuous(expand = c(0, 0), limits = c(0, NA))
+    scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
+    theme_minimal()
+
+  scales <- if (length(unique(summary_df$type)) == 1) "fixed" else "free"
+  p <- p + facet_wrap(~ param, scales = scales)
+
+  p
 }
 
 #' @import ggplot2
@@ -51,9 +57,13 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
     geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
     guides(fill = guide_legend("parameter\ntype"),
            color = guide_legend("parameter\ntype")) +
-    scale_x_continuous(expand = c(0, 0), limits = c(0, NA))
+    scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
+    theme_minimal()
 
-  if (facets) p <- p + facet_wrap(~ param)
+  if (facets) {
+    scales <- if (length(unique(summary_df$type)) == 1) "fixed" else "free"
+    p <- p + facet_wrap(~ param, scales = scales)
+  }
 
   p
 }
