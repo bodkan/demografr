@@ -22,6 +22,19 @@ modify_model <- function(model, prior_samples) {
     }
   }
 
+  # replace gene flow proportions in the model object with the prior samples
+  if (!is.null(prior_samples[["gf"]])) {
+    for (gf in prior_samples[["gf"]]) {
+      # split variable symbol name into tokens ("gf", "from pop", "to pop")
+      var_tokens <- strsplit(as.character(gf$variable), "_")[[1]]
+      model$geneflow[
+        model$geneflow$from == var_tokens[2] &
+        model$geneflow$to == var_tokens[3],
+        "rate"
+      ] <- gf$value
+    }
+  }
+
   model
 }
 
@@ -50,7 +63,8 @@ run_iteration <- function(it, model, priors, functions,
   # sample parameters from appropriate priors
   prior_samples <- list(
     Ne      = subset_priors(priors, "Ne")     %>% lapply(sample_prior, convert = round),
-    T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior, convert = round)
+    T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior, convert = round),
+    gf      = subset_priors(priors, "gf")     %>% lapply(sample_prior)
   )
 
   ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate)
@@ -120,7 +134,8 @@ simulate_abc <- function(
     simulated = simulated_stats,
     observed = observed_stats,
     statistics = names(summary_funs),
-    priors = priors
+    priors = priors,
+    model = model
   )
 }
 
@@ -161,6 +176,8 @@ perform_abc <- function(data, tolerance, method, ...) {
 
   attr(result, "parameters") <- data$parameters
   attr(result, "priors") <- data$priors
+  attr(result, "model") <- data$model
+
   class(result) <- c("demografr_abc", "abc")
 
   result
@@ -192,7 +209,7 @@ extract_model <- function(abc, summary = c("mode", "mean", "median")) {
   for (param in summary_df$param) {
     if (grepl("^Ne_", param)) {
       pop <- gsub("Ne_", "", param)
-      model$splits[model$splits$pop == pop, "N"] <- summary_df[summary_df$param == param, param]
+      model$splits[model$splits$pop == pop, "N"] <- summary_df[summary_df$param == param, ]$value
     }
   }
 
