@@ -93,7 +93,8 @@ run_iteration <- function(it, model, priors, functions,
 simulate_abc <- function(
   model, priors, summary_funs, observed_stats,
   iterations = 1, epochs = 1,
-  mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8
+  mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8,
+  execution = c("mclapply", "lapply", "future_lapply", "single")
 ) {
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
@@ -102,29 +103,33 @@ simulate_abc <- function(
     stop("List of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
-  # results <- future.apply::future_lapply(
+  execution <- match.arg(execution)
 
-  results <- parallel::mclapply(
-    X = seq_len(iterations),
-    FUN = run_iteration,
-
-  # results <- list(run_iteration(
-
-  # results <- lapply(seq_len(10),
-  #   function(it) run_iteration(it,
-  
-    model = model,
-    priors = priors,
-    functions = summary_funs,
-    mutation_rate = mutation_rate,
-    sequence_length = sequence_length,
-    recombination_rate = recombination_rate,
-    mc.cores = 10
-    # future.seed = TRUE
-
-  # )
-
-  )
+  if (execution == "lapply") {
+    results <- lapply(X = seq_len(iterations), FUN = run_iteration, model = model,
+                      priors = priors, functions = summary_funs,
+                      mutation_rate = mutation_rate, sequence_length = sequence_length,
+                      recombination_rate = recombination_rate)
+  } else if (execution == "mclapply") {
+    results <- parallel::mclapply(X = seq_len(iterations), FUN = run_iteration, model = model,
+                                  priors = priors, functions = summary_funs,
+                                  mutation_rate = mutation_rate, sequence_length = sequence_length,
+                                  recombination_rate = recombination_rate, mc.cores = future::availableCores())
+  } else if (execution == "future_lapply") {
+    results <- future.apply::future_lapply(
+      X = seq_len(iterations), FUN = run_iteration, model = model,
+      priors = priors, functions = summary_funs,
+      mutation_rate = mutation_rate, sequence_length = sequence_length,
+      recombination_rate = recombination_rate,
+      future.seed = TRUE
+    )
+  } else if (execution == "single") {
+    results <- list(run_iteration(it = 1, model = model,
+                                  priors = priors, functions = summary_funs,
+                                  mutation_rate = mutation_rate, sequence_length = sequence_length,
+                                  recombination_rate = recombination_rate))
+  } else
+     stop("Unknown mode of execution", call. = FALSE)
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
   simulated_stats <- lapply(results, `[[`, "simulated_stats")
