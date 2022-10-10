@@ -14,8 +14,8 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
   ggplot(samples_df) +
     geom(aes(value, fill = type, color = type)) +
     facet_wrap(~ param, scales = "free_x") +
-    guides(fill = guide_legend("prior type"), color = guide_legend("prior type") +
-    scale_x_continuous(expand = c(0, 0), limits = c(0, NA)))
+    guides(fill = guide_legend("prior type"), color = guide_legend("prior type")) +
+    scale_x_continuous(expand = c(0, 0), limits = c(0, NA))
 }
 
 #' @import ggplot2
