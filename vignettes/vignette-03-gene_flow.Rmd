@@ -19,10 +19,10 @@ library(abc)
 library(dplyr)
 library(future)
 library(combinat)
-# library(slendr)
+library(slendr)
 
-devtools::load_all(".")
-devtools::load_all("~/Projects/slendr/")
+devtools::install(".")
+library(demografr)
 ```
 
 ```{r, echo=FALSE}
@@ -30,10 +30,11 @@ rds_file <- system.file("extdata/vignette_01_gene_flow.rds", package = "demograf
 ```
 
 ```{r}
-# nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
-# plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
-#           tweak(multisession, workers = 50)))
-plan(multicore, workers = 10)
+nodes <- c("r1", "r2", "r3", "r4")
+plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
+          tweak(multisession, workers = 50)))
+
+# plan(multicore, workers = 10)
 ```
 
 Define a skeleton model to fit parameters for:
@@ -135,11 +136,24 @@ functions <- list(
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
 
 ```{r, eval=!file.exists(rds_file)}
-microbenchmark::microbenchmark(
-  mclapply = {data <- simulate_abc(model, priors, summary_funs = functions, observed_stats = observed_stats, iterations = 1000, mutation_rate = 1e-8, execution = "mclapply")},
+bench <- microbenchmark::microbenchmark(
+  mclapply      = {data <- simulate_abc(model, priors, summary_funs = functions, observed_stats = observed_stats, iterations = 1000, mutation_rate = 1e-8, execution = "mclapply")},
+  future_lapply = {data <- simulate_abc(model, priors, summary_funs = functions, observed_stats = observed_stats, iterations = 1000, mutation_rate = 1e-8, execution = "future_lapply")},
   times = 1
 )
+saveRDS(bench, "/tmp/bench.rds")
 ```
+
+```{r}
+data <- simulate_abc(model, priors, summary_funs = functions, observed_stats = observed_stats, iterations = 5, mutation_rate = 1e-8, execution = "mclapply")
+```
+
+```{r}
+data <- simulate_abc(model, priors, summary_funs = functions, observed_stats = observed_stats, iterations = 123, mutation_rate = 1e-8, execution = "future_lapply")
+```
+
+
+
 
 ```{r, echo=FALSE}
 saveRDS(data, "inst/extdata/vignette_01_gene_flow.rds")
