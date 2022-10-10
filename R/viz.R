@@ -18,7 +18,7 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
     scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
     theme_minimal()
 
-  scales <- if (length(unique(summary_df$type)) == 1) "fixed" else "free"
+  scales <- if (length(unique(samples_df$type)) == 1) "fixed" else "free"
   p <- p + facet_wrap(~ param, scales = scales)
 
   p

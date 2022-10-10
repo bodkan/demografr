@@ -23,7 +23,9 @@ Imports:
     magrittr
 Remotes: bodkan/slendr
 Suggests: 
+    combinat,
     knitr,
+    microbenchmark,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
