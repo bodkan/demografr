@@ -20,6 +20,7 @@ devtools::install(".")
 ```{r setup}
 library(dplyr)
 library(slendr)
+library(combinat)
 
 library(demografr)
 ```
@@ -37,9 +38,9 @@ Define a skeleton model to fit parameters for:
 
 ```{r}
 p1 <- population("p1", time = 1,    N = 3000)
-p2 <- population("p2", time = 2000, N = 250, parent = p1)
+p2 <- population("p2", time = 2000, N = 800, parent = p1)
 p3 <- population("p3", time = 6000, N = 5000, parent = p2)
-p4 <- population("p4", time = 8000, N = 1000, parent = p3)
+p4 <- population("p4", time = 9000, N = 2000, parent = p3)
 
 model <- compile_model(
   populations = list(p1, p2, p3, p4),
@@ -53,13 +54,12 @@ plot_model(model, proportions = TRUE)
 Simulate true summary statistics from this model. Later, we will use those to fit parameters of the model, pretending that we forgot the truth:
 
 ```{r}
-ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
+ts <- msprime(model, sequence_length = 200e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
 
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
 
 observed_stats <- list(
-  pi         = ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity),
-  divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
+  pi         = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
 )
 ```
 
@@ -70,10 +70,7 @@ priors <- list(
   Ne_p1 ~ runif(1, 10000),
   Ne_p2 ~ runif(1, 10000),
   Ne_p3 ~ runif(1, 10000),
-  Ne_p4 ~ runif(1, 10000),
-
-  Tsplit_p2_p3 ~ runif(3000, 8000),
-  Tsplit_p1_p2 ~ runif(1, 2000)
+  Ne_p4 ~ runif(1, 10000)
 )
 
 plot_prior(priors)
@@ -89,14 +86,7 @@ compute_pi <- function(ts) {
     select(stat, value = diversity)
 }
 
-compute_divergence <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-  ts_divergence(ts, sample_sets = samples) %>%
-    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
-    select(stat, value = divergence)
-}
-
-functions <- list(pi = compute_pi, divergence = compute_divergence)
+functions <- list(pi = compute_pi)
 ```
 
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
@@ -108,21 +98,21 @@ data <- simulate_abc(
   priors,                          # prior distributions
   summary_funs = functions,        # user-defined summary functions
   observed_stats = observed_stats, # observed popgen statistics
-  iterations = 1000,               # number of ABC simulation replicates
+  iterations = 10000,               # number of ABC simulation replicates
   sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 Sys.time()
 
-saveRDS(data, "data_splits.rds")
+saveRDS(data, "data_Ne.rds")
 ```
 
 ```{r}
-data <- readRDS("data_splits.rds")
+data <- readRDS("data_Ne.rds")
 ```
 
 ```
 ```{r}
-abc <- perform_abc(data, tolerance = 0.01, method = "neuralnet")
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
 ```{r}
@@ -139,9 +129,6 @@ plot(abc, param = "Ne_p1")
 plot(abc, param = "Ne_p2")
 plot(abc, param = "Ne_p3")
 plot(abc, param = "Ne_p4")
-
-plot(abc, param = "Tsplit_p2_p3")
-plot(abc, param = "Tsplit_p1_p2")
 ```
 
 Plot posterior distributions of interest:
@@ -149,28 +136,16 @@ Plot posterior distributions of interest:
 ```{r}
 plot_posterior(abc)
 plot_posterior(abc, type = "Ne")
-plot_posterior(abc, type = "Tsplit")
 ```
 
 
 ```{r}
 truth_df <- data.frame(
   param = c("Ne_p1", "Ne_p2", "Ne_p3", "Ne_p4"),
-  value = c(3000, 250, 5000, 1000)
+  value = c(3000, 800, 5000, 2000)
 )
 
-plot_posterior(abc) +
-  ggplot2::geom_vline(data = truth_df, ggplot2::aes(xintercept = value), linetype = 2)
-```
-
-
-```{r}
-truth_df <- data.frame(
-  param = c("Tsplit_p2_p3", "Tsplit_p1_p2"),
-  value = c(6000, 2000)
-)
-
-plot_posterior(abc, type = "Tsplit") +
+plot_posterior(abc, type = "Ne") +
   ggplot2::geom_vline(data = truth_df, ggplot2::aes(xintercept = value), linetype = 2)
 ```
 
