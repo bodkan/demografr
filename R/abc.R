@@ -92,8 +92,7 @@ run_iteration <- function(it, model, priors, functions,
 #' @export
 simulate_abc <- function(
   model, priors, summary_funs, observed_stats,
-  iterations = 1, epochs = 1,
-  mutation_rate = 0, sequence_length = 10e6, recombination_rate = 1e-8,
+  iterations, sequence_length, recombination_rate, mutation_rate = 0,
   execution = c("mclapply", "lapply", "future_lapply", "single")
 ) {
   if (mutation_rate < 0)
