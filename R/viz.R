@@ -28,7 +28,7 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
 #' @export
 plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", "unadj"),
                            summary = c("mode", "mean", "median"),
-                           geom = ggplot2::geom_density, facets = TRUE, ...) {
+                           geom = ggplot2::geom_density, facets = TRUE, xlim = NULL, ...) {
   df <- extract_posterior(abc, posterior)
   df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", df$param)
 
@@ -54,11 +54,13 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
 
   p <- ggplot(df[df$param %in% param, ]) +
     geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
-    geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
+    # geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
     guides(fill = guide_legend("parameter\ntype"),
            color = guide_legend("parameter\ntype")) +
     scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
-    theme_minimal()
+    theme_minimal() +
+    theme(strip.text.x = element_text(face = "bold", size = 15)) +
+    coord_cartesian(xlim = xlim)
 
   if (facets) {
     scales <- if (length(unique(df$type)) == 1) "fixed" else "free"
