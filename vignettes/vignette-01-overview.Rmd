@@ -1,5 +1,5 @@
 ---
-title: "vignette-01-overview"
+title: "vignette-02-split_times"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{vignette-01-overview}
@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -18,20 +19,24 @@ knitr::opts_chunk$set(
 library(abc)
 library(dplyr)
 library(future)
+library(combinat)
 library(slendr)
 
-devtools::load_all(".")
+devtools::install(".")
+library(demografr)
 ```
 
 ```{r, echo=FALSE}
-rds_file <- system.file("extdata/vignette_01.rds", package = "demografr")
+# rds_file <- system.file("extdata/vignette_01_Ne.rds", package = "demografr")
+# rds_file <- "inst/extdata/vignette_01_Ne.rds"
 ```
 
 ```{r}
-# nodes <- c("r1", "r2", "r3", "r4", "r5", "r6")
+# nodes <- c("r1", "r2", "r3", "r4")
 # plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE),
 #           tweak(multisession, workers = 50)))
-plan(multicore, workers = 10)
+
+# plan(multicore, workers = 10)
 ```
 
 Define a skeleton model to fit parameters for:
@@ -40,34 +45,43 @@ Define a skeleton model to fit parameters for:
 p1 <- population("p1", time = 1, N = 1000)
 p2 <- population("p2", time = 2000, N = 100, parent = p1)
 p3 <- population("p3", time = 6000, N = 3000, parent = p2)
+p4 <- population("p4", time = 8000, N = 1000, parent = p3)
 
 model <- compile_model(
-  populations = list(p1, p2, p3),
+  populations = list(p1, p2, p3, p4),
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
 
-plot_model(model)
+plot_model(model, proportions = TRUE)
 ```
 
 Simulate true summary statistics from this model. Later, we will use those to fit parameters of the model, pretending that we forgot the truth:
 
 ```{r}
-ts <- msprime(model, sequence_length = 10e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
+ts <- msprime(model, sequence_length = 100e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
+
 samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
 observed_stats <- list(
-  pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
+  pi = ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity),
+  divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
 )
+```
+
+```{r, echo=FALSE}
+saveRDS(model, "~/Desktop/demografr_Ne_model.rds")
+saveRDS(observed_stats, "~/Desktop/demografr_Ne_observed_stats.rds")
 ```
 
 Define prior distributions for model parameters:
 
 ```{r}
 priors <- list(
-  Ne_p1 ~ runif(10, 10000),
-  Ne_p2 ~ runif(10, 10000),
-  Ne_p3 ~ runif(10, 10000)
+  Ne_p1 ~ runif(1, 10000),
+  Ne_p2 ~ runif(1, 10000),
+  Ne_p3 ~ runif(1, 10000),
+  Ne_p4 ~ runif(1, 10000)
 )
 
 plot_prior(priors)
@@ -76,31 +90,44 @@ plot_prior(priors)
 Define set of R functions operating on a tree sequence which will be used to compute summary statistics during the ABC inference:
 
 ```{r}
-# setup summary statistic functions
 compute_pi <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 
-functions <- list(pi = compute_pi)
+compute_divergence <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+functions <- list(
+  pi = compute_pi,
+  divergence = compute_divergence
+)
 ```
 
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
 
-```{r, eval=!file.exists(rds_file)}
+```{r}
+Sys.time()
 data <- simulate_abc(
-  model, priors,
-  summary_funs = functions,
-  observed_stats = observed_stats,
-  iterations = 2000, mutation_rate = 1e-8
+  model,                           # "scaffold" slendr model
+  priors,                          # prior distributions
+  summary_funs = functions,        # user-defined summary functions
+  observed_stats = observed_stats, # observed popgen statistics
+  iterations = 2000,               # number of ABC simulation replicates
+  sequence_length = 100e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
+Sys.time()
 ```
 
+
 ```{r, echo=FALSE}
-saveRDS(data, rds_file)
-data <- readRDS(rds_file)
+saveRDS(data, "~/Desktop/demografr_Ne_data.rds")
 ```
 
 ```{r}
@@ -112,14 +139,20 @@ summary(abc)
 ```
 
 ```{r}
-hist(abc, breaks = 50, "N_p1")
-plot(abc, param = "N_p1")
+extract_summary(abc)
+```
+
+```{r}
+hist(abc, breaks = 50, "Ne_p1")
+plot(abc, param = "Ne_p1")
+plot(abc, param = "gf_p2_p4")
 ```
 
 Plot posterior distributions of interest:
 
 ```{r}
 plot_posterior(abc)
+plot_prior(abc, type = "Tsplit")
 ```
 
 Extract posterior data (or simulate from priors) as simple data frames:
@@ -130,4 +163,8 @@ simulate_priors(priors, replicates = 100)
 
 ```{r}
 extract_posterior(abc)
+```
+
+```{r}
+inferred_model <- extract_model(abc)
 ```

@@ -10,7 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
@@ -99,7 +100,7 @@ functions <- list(pi = compute_pi, divergence = compute_divergence)
 
 Generate simulation replicates for ABC analysis, drawing parameters of the model from the prior and computing summary statistics for each simulation:
 
-```{r, eval=!file.exists(rds_file)}
+```{r}
 data <- simulate_abc(
   model, priors,
   summary_funs = functions,

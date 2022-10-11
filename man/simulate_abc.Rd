@@ -9,11 +9,11 @@ simulate_abc(
   priors,
   summary_funs,
   observed_stats,
-  iterations = 1,
-  epochs = 1,
+  iterations,
+  sequence_length,
+  recombination_rate,
   mutation_rate = 0,
-  sequence_length = 1e+07,
-  recombination_rate = 1e-08
+  execution = c("mclapply", "lapply", "future_lapply", "single")
 )
 }
 \arguments{
