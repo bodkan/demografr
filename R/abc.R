@@ -169,7 +169,7 @@ perform_abc <- function(data, tolerance, method, ...) {
     }))
   ) %>% do.call(cbind, .)
 
-  result <- abc(
+  result <- abc::abc(
     param = parameters,
     target = observed,
     sumstat = simulated,
