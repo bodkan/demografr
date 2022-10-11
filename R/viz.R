@@ -61,7 +61,7 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
     theme_minimal()
 
   if (facets) {
-    scales <- if (length(unique(summary_df$type)) == 1) "fixed" else "free"
+    scales <- if (length(unique(df$type)) == 1) "fixed" else "free"
     p <- p + facet_wrap(~ param, scales = scales)
   }
 
@@ -91,7 +91,11 @@ plot.demografr_abc <- function(x, param = NULL, ...) {
   if (!is.null(param)) {
     check_param_presence(colnames(params), param)
     x$numparam <- 1
-    params <- params[, param]
+    x$names$parameter.names <- param
+    x$adj.values <- x$adj.values[, param, drop = FALSE]
+    x$residuals <- x$residuals[, param, drop = FALSE]
+    x$unadj.values <- x$unadj.values[, param, drop = FALSE]
+    params <- params[, param, drop = FALSE]
   }
   abc:::plot.abc(x, param = params, ...)
 }
