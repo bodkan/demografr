@@ -13,12 +13,37 @@ knitr::opts_chunk$set(
 )
 ```
 
-# demografr
+# _demografr_: Simple and efficient toolkit for ABC inference in R
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of _demografr_ is to simplify and streamline the process of inference about population histories
+The goal of _demografr_ is to simplify and streamline the inference of parameters of population genetic models by means of [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC), and make them as fast and efficient as possible by leveraging the [succint tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
+
+Unlike traditional ABC inference procedues, which generally involve custom-build pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform the simulation, data analysis, and ABC inference itself entirely in R. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
+
+**For a list of issues that _demografr_ helps to solve with traditional ABC inference procedures, consider the following steps involved in almost any ABC analysis in population genetics:**
+
+#### 0. Computing summary statistics from _empirical data_
+
+The inputs vary based on specific statistics to be computed (VCF, EIGENSTRAT, PLINK, etc.). Crucially, however, those statistics should capture as much useful information about the evolutionary processes under study. These could be, for instance, nucleotide diversity, population divergence, $f$-statistics ($f_3$, $f_4$, $D$, etc.), the allele frequency spectrum in general, or perhaps linkage disequilibrium statistics.
+
+#### 1. Simulations
+
+A simulation 
+The parameters of these models are what we want to infer. These might be effective population sizes ($N_e$) of different populations, the times when they split from each other, or the times, durations, and magnitudes of gene flow events. Crucially, because we don't know these variables, each simulation run draws values of these parameters from defined prior distributions.
+
+This very first step often presents a significant hurdle for novice data analysts because it either involves learning a new piece of software (ms, scrm) and custom pipeline for drawing parameters from posterior distributions, or learning the intricacies of 
+
+**By leveraging the [_slendr_](https://www.slendr.net) R package for defining population genetic models and providing an function for running automated, _demografr_ makes it trivial to define models for inference and 
+
+#### 2. Computing summary statistics from simulated data
+
+For each simulation run, the same statistics that have been computed from the empirical data are calculated on simulation outputs.
+
+#### X. ABC inference
+
+There are a number of ways
 
 ## Installation
 
@@ -29,14 +54,16 @@ You can install the development version of demografr from [GitHub](https://githu
 devtools::install_github("bodkan/demografr")
 ```
 
+**No you can't, the GitHub repo is private for now!**
+
 ## Example
 
 Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
 
-Let's also assume that we know that the three populations are related in the following way but we don't know anything else (i.e., we have no idea about the effective population sizes $N_e$ or split times).
+Let's also assume that we know that the three populations are related in the following way but we don't know anything else (i.e., we have no idea about the effective population sizes $N_e$ or split times). For simplicity, how can we use ABC to get the posterior distributions of $N_e$ for each population from some summary statistics we computed from the "real data" (maybe a VCF).
 
-```{r, echo=FALSE, eval=FALSE}
-library(slendr)
+```{r, echo=FALSE}
+suppressPackageStartupMessages(library(slendr))
 library(ggplot2)
 
 p1 <- population("p1", time = 1, N = 1000)
