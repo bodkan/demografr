@@ -19,8 +19,9 @@ devtools::install(".")
 
 ```{r setup}
 library(dplyr)
+library(ggplot2)
+
 library(slendr)
-library(combinat)
 
 library(demografr)
 ```
@@ -63,7 +64,7 @@ samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
 observed_stats <- list(
   pi         = ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity),
   divergence = ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence),
-  f4 = permn(samples) %>%
+  f4 = combinat::permn(samples) %>%
     lapply(function(pops) {
       ts_f4(ts, W = pops[1], X = pops[2], Y = pops[3], Z = pops[4]) 
     }) %>%
@@ -89,7 +90,9 @@ priors <- list(
   gf_p4_p2 ~ runif(0, 1)
 )
 
-plot_prior(priors)
+plot_prior(priors, type = "Ne")
+plot_prior(priors, type = "Tsplit")
+plot_prior(priors, type = "gf")
 ```
 
 Define set of R functions operating on a tree sequence which will be used to compute summary statistics during the ABC inference:
@@ -111,7 +114,7 @@ compute_divergence <- function(ts) {
 
 compute_f4 <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
-  perms <- permn(samples)
+  perms <- combinat::permn(samples)
 
   lapply(perms, function(pops) ts_f4(ts, W = pops[1], X = pops[2], Y = pops[3], Z = pops[4])) %>%
     do.call(rbind, .) %>%
@@ -120,9 +123,9 @@ compute_f4 <- function(ts) {
 }
 
 functions <- list(
-  pi = compute_pi,
+  pi         = compute_pi,
   divergence = compute_divergence,
-  f4 = compute_f4
+  f4         = compute_f4
 )
 ```
 
@@ -147,7 +150,6 @@ saveRDS(data, "data_gf.rds")
 data <- readRDS("data_gf.rds")
 ```
 
-```
 ```{r}
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
@@ -191,24 +193,41 @@ truth_df <- data.frame(
 )
 
 plot_posterior(abc, type = "Ne") +
-  ggplot2::geom_vline(data = truth_df, ggplot2::aes(xintercept = value), linetype = 2)
+  geom_vline(data = truth_df, aes(xintercept = value), linetype = 2)
 ```
 
 
 ```{r}
-truth_df <- data.frame(
-  param = c("Tsplit_p2_p3", "Tsplit_p1_p2"),
-  value = c(6000, 2000)
-)
+truth_df <- data.frame(param = c("Tsplit_p2_p3", "Tsplit_p1_p2"), value = c(6000, 2000))
 
 plot_posterior(abc, type = "Tsplit") +
-  ggplot2::geom_vline(data = truth_df, ggplot2::aes(xintercept = value), linetype = 2)
+  geom_vline(data = truth_df, aes(xintercept = value), linetype = 2)
 ```
 
+
+```{r}
+truth_df <- data.frame(param = "gf_p4_p2", value = 0.17)
+
+plot_posterior(abc, type = "g", xlim = c(0, 1)) +
+  geom_vline(data = truth_df, aes(xintercept = value), linetype = 2)
+```
 
 
 ```{r}
 inferred_model <- extract_model(abc, summary = "mode")
-
-plot_model(inferred_model)
 ```
+
+```{r}
+
+truth_Ne <- data.frame(
+  param = c("Ne_p1", "Ne_p2", "Ne_p3", "Ne_p4"),
+  value = c(3000, 800, 5000, 2000)
+)
+
+truth_splits <- data.frame(param = c("Tsplit_p2_p3", "Tsplit_p1_p2", "Tsplit_p3_p4"), value = c(6000, 2000, 9000))
+
+truth_gf <- data.frame(param = "gf_p4_p2", value = 0.17)
+
+save(truth_Ne, truth_splits, truth_gf, file = "truth2.Rdata")
+```
+
