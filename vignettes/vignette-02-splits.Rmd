@@ -20,7 +20,6 @@ devtools::install(".")
 ```{r setup}
 library(dplyr)
 library(slendr)
-library(combinat)
 
 library(demografr)
 ```
@@ -78,7 +77,8 @@ priors <- list(
   Tsplit_p3_p4 ~ runif(8000, 10000)
 )
 
-plot_prior(priors)
+plot_prior(priors, type = "Ne")
+plot_prior(priors, type = "Tsplit")
 ```
 
 Define set of R functions operating on a tree sequence which will be used to compute summary statistics during the ABC inference:
@@ -125,7 +125,6 @@ saveRDS(data, "data_splits.rds")
 data <- readRDS("data_splits.rds")
 ```
 
-```
 ```{r}
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```

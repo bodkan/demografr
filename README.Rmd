@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of _demografr_ is to simplify and streamline the inference of parameters of population genetic models by means of [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC), and make them as fast and efficient as possible by leveraging the [succint tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
+The goal of _demografr_ is to simplify and streamline the process of [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics in R, and make them as fast and efficient as possible by leveraging the [succint tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
 Unlike traditional ABC inference procedues, which generally involve custom-build pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform the simulation, data analysis, and ABC inference itself entirely in R. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
 
@@ -30,7 +30,6 @@ The inputs vary based on specific statistics to be computed (VCF, EIGENSTRAT, PL
 
 #### 1. Simulations
 
-A simulation 
 The parameters of these models are what we want to infer. These might be effective population sizes ($N_e$) of different populations, the times when they split from each other, or the times, durations, and magnitudes of gene flow events. Crucially, because we don't know these variables, each simulation run draws values of these parameters from defined prior distributions.
 
 This very first step often presents a significant hurdle for novice data analysts because it either involves learning a new piece of software (ms, scrm) and custom pipeline for drawing parameters from posterior distributions, or learning the intricacies of 
@@ -84,4 +83,3 @@ plot_model(model, sizes = FALSE) +
     axis.line.y = element_blank()
   )
 ```
-

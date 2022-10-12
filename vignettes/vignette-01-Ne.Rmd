@@ -19,8 +19,9 @@ devtools::install(".")
 
 ```{r setup}
 library(dplyr)
+library(ggplot2)
+
 library(slendr)
-library(combinat)
 
 library(demografr)
 ```
@@ -110,7 +111,6 @@ saveRDS(data, "data_Ne.rds")
 data <- readRDS("data_Ne.rds")
 ```
 
-```
 ```{r}
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
