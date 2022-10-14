@@ -14,13 +14,15 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    ape,
     dplyr,
     abc,
     future,
     future.apply,
     ggplot2,
     slendr,
-    magrittr
+    magrittr,
+    phangorn
 Remotes: bodkan/slendr
 Suggests: 
     combinat,
