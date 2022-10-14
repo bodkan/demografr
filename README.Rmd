@@ -13,73 +13,175 @@ knitr::opts_chunk$set(
 )
 ```
 
-# _demografr_: Simple and efficient toolkit for ABC inference in R
+# _demografr_: Simple and efficient Approximate Bayesian Computation in R
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of _demografr_ is to simplify and streamline the process of [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics in R, and make them as fast and efficient as possible by leveraging the [succint tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
+The goal of the _demografr_ R package is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) inferences in population genetics and make them more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
-Unlike traditional ABC inference procedues, which generally involve custom-build pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform the simulation, data analysis, and ABC inference itself entirely in R. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
+Unlike traditional ABC approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform simulation, data analysis, and ABC inference itself entirely in R within a single reproducible analysis script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
 
-**For a list of issues that _demografr_ helps to solve with traditional ABC inference procedures, consider the following steps involved in almost any ABC analysis in population genetics:**
+### What are the issues with standard ABC?
 
-#### 0. Computing summary statistics from _empirical data_
+A traditional ABC analysis in population genetics generally involves:
 
-The inputs vary based on specific statistics to be computed (VCF, EIGENSTRAT, PLINK, etc.). Crucially, however, those statistics should capture as much useful information about the evolutionary processes under study. These could be, for instance, nucleotide diversity, population divergence, $f$-statistics ($f_3$, $f_4$, $D$, etc.), the allele frequency spectrum in general, or perhaps linkage disequilibrium statistics.
+1. Writing a simulation script tailor-made for the demographic model of species in question using tools such as [ms](http://home.uchicago.edu/rhudson1/source/mksamples.html), [scrm](https://github.com/scrm/scrm/), [msprime](https://github.com/tskit-dev/msprime/), or [SLiM](https://github.com/MesserLab/SLiM/). For most realistic demographic models this presents a significant obstacle unless one is well versed in software development.
+2. Programming a pipeline which will draw the parameters of the model from a set of priors, and simulate output data in an appropriate format. Saving outputs to disk can be very slow, especially for large genome-scale simulations across hundreds of thousands simulation replicates.
+3. Computing summary statistics on the simulated data using various pieces of software (ADMIXTOOLS, PLINK, vcftools, or even custom scripts), often requiring conversion of the simulated outputs in an appropriate file format required by each software. In addition to the cost of disk-access, computation of summary statistics itself can be quite slow depending on the statistic or program in question.
+4. Feeding (and often re-formatting) the outputs of summary statistics in the right format to use with the appropriate ABC inference engine, such as the R package [_abc_](https://cran.r-project.org/package=abc).
 
-#### 1. Simulations
+Given the range of disparate tools required for the steps above, traditional ABC pipelines end up being quite complex, require a large amount of programming work, and due the unique characteristics of application need to be often re-invented from scratch for each study.
 
-The parameters of these models are what we want to infer. These might be effective population sizes ($N_e$) of different populations, the times when they split from each other, or the times, durations, and magnitudes of gene flow events. Crucially, because we don't know these variables, each simulation run draws values of these parameters from defined prior distributions.
+All in all, an unnecessary amount of time spent on ABC analyses is dedicated to software development&mdash;programming, debugging, and data munging&mdash;work that would be better spent doing research.
 
-This very first step often presents a significant hurdle for novice data analysts because it either involves learning a new piece of software (ms, scrm) and custom pipeline for drawing parameters from posterior distributions, or learning the intricacies of 
+### How does _demografr_ help?
 
-**By leveraging the [_slendr_](https://www.slendr.net) R package for defining population genetic models and providing an function for running automated, _demografr_ makes it trivial to define models for inference and 
+_demografr_ streamlines every step of a typical ABC pipeline by leveraging the [_slendr_](https://github.com/bodkan/slendr/) framework as a building block for simulation and data analysis, making it possible to perform an entire ABC analysis in R. Taking the steps above one by one:
 
-#### 2. Computing summary statistics from simulated data
-
-For each simulation run, the same statistics that have been computed from the empirical data are calculated on simulation outputs.
-
-#### X. ABC inference
-
-There are a number of ways
+1. _slendr_'s intuitive functionality for definning population genetic models makes it easy to encode even complex demographic models with only bare minimum of R knowledge needed.
+2. _demografr_ makes it possible to encode prior distributions of parameters using familiar R interface which resembles standard probabilistic statements, and provides an automated function which simulates a defined number of ABC simulation replicates in a trivial manner.
+3. Because _slendr_'s simulation output is a [tree sequence](https://tskit.dev/learn/), most population genetic statistics can be computed directly on such tree sequences using R functions which are part of _slendr_'s statistical library. Tree sequence is never saved to disk and no conversion between file formats is required.
+4. _demografr_ facilitates tight integration with the powerful R package [_abc_](https://cran.r-project.org/package=abc) by automatically feeding ABC simulation data to the _abc_ package for inference.
 
 ## Installation
 
-You can install the development version of demografr from [GitHub](https://github.com/) with:
+You can install the development version of _demografr_ from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
 devtools::install_github("bodkan/demografr")
 ```
 
-**No you can't, the GitHub repo is private for now!**
+Note that this requires an R package _devtools_, which you can obtain simply by running `install.packages("devtools")`.
 
 ## Example
 
-Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
-
-Let's also assume that we know that the three populations are related in the following way but we don't know anything else (i.e., we have no idea about the effective population sizes $N_e$ or split times). For simplicity, how can we use ABC to get the posterior distributions of $N_e$ for each population from some summary statistics we computed from the "real data" (maybe a VCF).
-
-```{r, echo=FALSE}
-suppressPackageStartupMessages(library(slendr))
+```{r}
+library(slendr)
 library(ggplot2)
+library(dplyr)
+
+library(demografr)
+```
+
+```{r setup, echo=FALSE}
+SEED <- 42
 
 p1 <- population("p1", time = 1, N = 1000)
-p2 <- population("p2", time = 2000, N = 300, parent = p1)
+p2 <- population("p2", time = 3000, N = 3000, parent = p1)
 p3 <- population("p3", time = 6000, N = 10000, parent = p2)
+
+example_model <- compile_model(
+  populations = list(p1, p2, p3),
+  generation_time = 1,
+  simulation_length = 10000, serialize = FALSE
+)
+
+ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>% ts_mutate(1e-8, random_seed = SEED)
+
+samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
+
+diversity <- ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity)
+
+divergence <- ts_divergence(ts, sample_sets = samples)  %>% mutate(stat = sprintf("d_%s_%s", x, y))       %>% select(stat, value = divergence)
+```
+
+Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
+
+Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
+
+```{r ape_tree}
+tree <- ape::read.tree(text="(p1,(p2,p3));")
+plot(tree)
+```
+
+After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in standard R data frame:
+
+```{r}
+diversity
+```
+
+```{r}
+divergence
+```
+
+### Setting up a "scaffold" model
+
+The first step in an ABC analysis using _demografr_ is setting up a "scaffold" model for which we will estimate the posterior parameters of interest. One way to do this is by building a simple _slendr_ model of the relationships between populations. Note that the parameters of interest (here split `time` and $N_e$ `N`) are simply placeholder values. Whether or not they will be estimated with ABC depends on whether or not we set up prior distributions for them in the next step.
+
+```{r}
+p1 <- population("p1", time = 1, N = 1000)
+p2 <- population("p2", time = 2000, N = 1000, parent = p1)
+p3 <- population("p3", time = 3000, N = 1000, parent = p2)
 
 model <- compile_model(
   populations = list(p1, p2, p3),
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
+```
 
-plot_model(model, sizes = FALSE) +
-  theme(
-    axis.title.y = element_blank(),
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(),
-    axis.line.y = element_blank()
-  )
+We can verify that the phylogenetic relationships between populations are defined correctly by visualizing the _slendr_ model we've just created (again, we don't pay attention to the defined split times or population sizes of this model):
+
+```{r, slendr_model}
+plot_model(model)
+```
+
+### Setting up priors
+
+We are interested in estimating the $N_e$ of all populations and their split times. _demografr_ makes this very easy using a familiar symbolic formula syntax in R:
+
+```{r}
+priors <- list(
+  Ne_p1 ~ runif(1, 10000),
+  Ne_p2 ~ runif(1, 10000),
+  Ne_p3 ~ runif(1, 10000),
+
+  Tsplit_p1_p2 ~ runif(1, 5000),
+  Tsplit_p2_p3 ~ runif(5000, 10000)
+)
+```
+
+In an ABC simulation step below, the formulas are used to draw the values of each parameter from specified distributions (in this case, all uniform distributions across a wide range of parameter values).
+
+### Defining summary functions
+
+Each run of a _demografr_ ABC simulation internally produces a tree sequence as an output. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save each simulation output to disk for computation in different software. In the context of ABC simulations in _demografr_, it is possible to define a set of summary statistic functions in R using _slendr_'s library of [tree-sequence functions](https://www.slendr.net/reference/index.html#tree-sequence-statistics) available thanks to the [_tskit_ project](https://tskit.dev/tskit/docs/stable/stats.html).
+
+In our example, because we computed nucleotide diversity and pairwise divergence in the individuals sequenced from populations "p1", "p2", and "p3", we will define the following functions. Crucially, when run on a tree-sequence object, they will produce an output data frame in the format analogous to the empirical statistics shown in data frames `diversity` and `divergence` above:
+
+```{r}
+compute_diversity <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    select(stat, value = diversity)
+}
+
+compute_divergence <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+functions <- list(diversity  = compute_diversity, divergence = compute_divergence)
+```
+
+### ABC simulations
+
+Having defined the scaffold model, a set of priors for our parameters of interest ($N_e$ and split times), as well as two summary statistic functions, we can plug all this information into the function `simulate_abc`.
+
+Before we do that though, we need to create a list of all summary statistics computed from our empirical data, binding them in the same structure as the summary functions above. This step is needed in order to make sure that the data frames with empirical and simulated summary statistics are in comparable formats:
+
+```{r}
+observed_stats <- list(diversity = diversity, divergence = divergence)
+observed_stats
+```
+
+```{r}
+abc_data <- simulate_abc(
+  model, priors, summary_funs = functions, observed_stats = observed_stats,
+  iterations = 10000, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
 ```
