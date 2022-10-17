@@ -1,27 +1,7 @@
-# If the tree contains a single outgroup, use that as an ancestral population
-# when generating a slendr model. Otherwise pick the first population in the
-# given tree.
-get_ancestral_lineage <- function(tree) {
-  root_children <- phangorn::Children(tree, phangorn::getRoot(tree))
-  any_leaves <- root_children <= length(tree$tip.label)
-
-  if (any(any_leaves)) {
-    ancestor <- tree$tip.label[root_children[any_leaves][1]]
-  } else
-    ancestor <- tree$tip.label[1]
-  
-  ancestor
-}
-
-# Get names of populations under the given internal node
-get_pop_leaves <- function(tree, node) {
-  tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
-}
-
 #' Create a list of slendr populations based on given phylogenetic tree
 #'
 #' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
-#'   for more details)
+#'   for more details on the format)
 #' @param Ne Effective population size of all lineages. A value of 1000 is used by default.
 #' @param time_span Integer number specifying what time span should the encoded demographic
 #'   history cover.
@@ -187,21 +167,19 @@ random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
 #' tree <- ape::rtree(6)
 #' tree_model(tree = tree, population_size = 200, n_gene_flow = 4,
 #'   rate_gene_flow = c(0.2, 0.9), time_span = 1000)
-tree_model <- function(tree, time_span, population_size = 1000, n_gene_flow = 0,
-                       rate_gene_flow = c(0.01, 0.99), use_tree_lengths = FALSE) {
-
+tree_model <- function(tree, time_span, Ne = 1000, gene_flows = 0, rates = c(0.01, 0.99)) {
   # get the list of populations by calling the tree_populations function
-  populations <- tree_populations(tree, population_size, time_span,
-                                  use_tree_lengths)
+  populations <- tree_populations(tree, time_span, Ne)
+
   # get the list of gene flow events by calling the random_gene_flow function
-  gf <- random_gene_flow(populations, n_gene_flow, rate_gene_flow,
-                         time_span)
+  gf <- random_gene_flow(populations, gene_flows, rates, time_span)
+
   # compile the model based on populations, gene flow events and simulation length
   # the generation time is set to 1
   model <- compile_model(populations = populations, gene_flow = gf,
                          generation_time = 1, time_span = time_span)
-  # return the created model
-  return(model)
+
+  model
 }
 
 #' Create random model
@@ -299,4 +277,25 @@ random_gene_flow <- function(populations, n, rate, time_span) {
     }
   }
   return(gf)
+}
+
+
+# If the tree contains a single outgroup, use that as an ancestral population
+# when generating a slendr model. Otherwise pick the first population in the
+# given tree.
+get_ancestral_lineage <- function(tree) {
+  root_children <- phangorn::Children(tree, phangorn::getRoot(tree))
+  any_leaves <- root_children <= length(tree$tip.label)
+
+  if (any(any_leaves)) {
+    ancestor <- tree$tip.label[root_children[any_leaves][1]]
+  } else
+    ancestor <- tree$tip.label[1]
+  
+  ancestor
+}
+
+# Get names of populations under the given internal node
+get_pop_leaves <- function(tree, node) {
+  tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
 }
