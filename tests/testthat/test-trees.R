@@ -18,7 +18,16 @@ test_that("rootedness of input trees is correctly enforced", {
 test_that("tree_populations results in the correct number of slendr populations", {
   expect_s3_class(tree_populations(ape::rtopology(1, rooted = TRUE), time_span = 1000), "slendr_pop")
   for (n in c(2, 3, 4, 5, 10, 50, 100)) {
-    pops <- tree_populations(ape::rtopology(n, rooted = TRUE), time_span = 1000)
+    tree <- ape::rtopology(n, rooted = TRUE)
+    pops <- tree_populations(tree, time_span = 1000)
+    expect_true(length(pops) == n)
+  }
+})
+
+test_that("random_populations results in the correct number of slendr populations", {
+  expect_s3_class(random_populations(1, time_span = 1000), "slendr_pop")
+  for (n in c(2, 3, 4, 5, 10, 50, 100)) {
+    pops <- random_populations(n, time_span = 1000)
     expect_true(length(pops) == n)
   }
 })

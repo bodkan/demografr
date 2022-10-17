@@ -15,7 +15,7 @@ tree_populations <- function(tree, time_span, Ne = 1000) {
   if (!ape::is.rooted(tree))
     stop("The input phylogenetic tree must be rooted", call. = FALSE)
 
-  split_times <- as.list(sort(round(runif(n = tree$Nnode, min = 2, max = time_span - 1))))
+  split_times <- as.list(sort(sample(2 : (time_span - 1), tree$Nnode)))
 
   populations <- list()
 
@@ -85,11 +85,11 @@ tree_populations <- function(tree, time_span, Ne = 1000) {
     children <- phangorn::Children(tree, node)
     children <- children[!tree$tip.label[children] %in% names_taken]
 
-    parents <- list(parent)
-    if (length(children) > 1)
-      parents <- append(parents, list(pop))
-    parents <- sample(parents)
-  
+    if (length(children) == 1)
+      parents <- list(parent)
+    else
+      parents <- list(parent, pop)
+
     for (child in children) {
       parent <- parents[[1]]; parents[[1]] <- NULL
       new_item <- list(node = child, parent = parent)
@@ -97,30 +97,27 @@ tree_populations <- function(tree, time_span, Ne = 1000) {
     }
   }
 
-  # return the list of populations
   populations
 }
 
 #' Create a list of a given number of random slendr populations
 #'
-#' Creates a random list of slendr populations of given length. Internally, a
-#' random list of populations is created and the function \code{tree_populations} is
-#' called to create the populations.
+#' Creates a random list of slendr populations of a given length. Internally, a
+#' random phylogenetic tree of a given size is created and \code{tree_populations} is
+#' called on that tree to create the populations themselves.
 #'
 #' @param n The desired number of populations that should be created
-#' @param n The desired number of populations that should be created
-#' @param Ne Integer number defining the populations size of all
-#'   populations
+#' @param Ne Integer number defining the effective populations size of all populations
 #' @param time_span Integer number defining on how long the simulation
 #'   of the populations will last, to scale the edge lengths of the tree
 #'   accordingly
-#' @param names Names of the populations created
+#' @param names Names of the populations created. If \code{NULL}, a set of names
+#'   "pop1", "pop2", ... will be created.
+#'
 #' @return A set of slendr populations
+#'
 #' @examples
-#' random_populations(5,tree_populations(n_populations = 4, population_size = 1000,
-#'   time_span = 50)
-#' tree_populations(n_populations = 6, population_size = 200,
-#'   simulations_length = 500)
+#' random_populations(5, time_span = 10000, population_size = 1000)
 random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
   if (n < 1)
     stop("A non-negative integer number of populations must be given", call. = FALSE)
@@ -132,34 +129,29 @@ random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
     output <- slendr::population(name = names, time = 1, N = Ne)
   else {
     tree <- ape::rtopology(n, tip.label = names, rooted = TRUE)
-    output <- tree_populations(tree, time_span, Ne)
+    output <- tree_populations(tree, time_span = time_span, Ne = Ne)
   }
 
   output
 }
 
-#' Create a slendr model based on a given tree
+#' Create a slendr model based on a given phylogenetic tree
 #'
-#' Creates a slendr model based on a given tree and a given number of gene flow
-#' events. The function \code{tree_populations} is used to get a list of
-#' populations from given tree. It can be chosed whether the creation times of
-#' the populations should be sampled randomly or be based on the edge lengths of
-#' the tree. This is regulated with the use_tree_lengths parameter. Gene flow
-#' events between these populations are created randomly. The rate of the gene
-#' flow events can either be a fixed value or sampled in a specific range.
+#' Creates a slendr model based on a given phylogenetic tree and a given number
+#' of gene flow events. First, the function \code{tree_populations} is used to get
+#' generate a slendr model capturing a demographic history of a aset of populations
+#' based on a given phylogenetic tree.
+#' Gene flow events between these populations are created randomly. The rate of
+#' the gene flow events can either be a fixed value or sampled in a specific range.
 #'
-#' @param tree An ape tree
-#' @param population_size Integer number defining the populations size of all
-#'   populations
-#' @param n_gene_flow Integer number defining the number of gene_flow events
-#' @param rate_gene_flow Vector that specifies the min and max gene flow rate
-#' @param time_span Integer number defining on how long the simulation
-#'   of the populations will last, to scale the edge lengths of the tree
-#'   accordingly
-#' @param use_tree_lengths specifies the method used to find the creation times
-#'   of the populations. By default they are randomly sampled, but the can also
-#'   be based on the lengths of the tree
-#' @return A slendr model
+#' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
+#'   for more details on the format)
+#' @param Ne Effective population size of all lineages. A value of 1000 is used by default.
+#' @param time_span Integer number specifying what time span should the encoded demographic
+#'   history cover.
+#' @param gene_flows Integer number defining the number of gene-flow events
+#' @param rate Vector that specifies the min and max gene flow rate
+#' @return An object of the \code{slendr} class
 #' @examples
 #' tree <- ape::rtree(4)
 #' tree_model(tree = tree, population_size = 1000, n_gene_flow = 3,
