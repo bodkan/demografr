@@ -68,11 +68,12 @@ library(demografr)
 SEED <- 42
 
 p1 <- population("p1", time = 1, N = 1000)
-p2 <- population("p2", time = 3000, N = 3000, parent = p1)
-p3 <- population("p3", time = 6000, N = 10000, parent = p2)
+p2 <- population("p2", time = 2000, N = 3000, parent = p1)
+p3 <- population("p3", time = 4000, N = 10000, parent = p2)
+p4 <- population("p4", time = 6000, N = 10000, parent = p3)
 
 example_model <- compile_model(
-  populations = list(p1, p2, p3),
+  populations = list(p1, p2, p3, p4),
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
@@ -91,8 +92,8 @@ Imagine that we sequenced genomes of individuals from three populations "p1", "p
 Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
 ```{r ape_tree}
-tree <- ape::read.tree(text="(p1,(p2,p3));")
-plot(tree)
+tree <- ape::read.tree(text="(p1,(p2,(p3,p4)));")
+plot(tree); ape::nodelabels()
 ```
 
 After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in standard R data frame:
@@ -119,6 +120,10 @@ model <- compile_model(
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
+```
+
+```{r}
+model <- tree_model(tree, generation_time = 1, time_span = 10000)
 ```
 
 We can verify that the phylogenetic relationships between populations are defined correctly by visualizing the _slendr_ model we've just created (again, we don't pay attention to the defined split times or population sizes of this model):
@@ -182,6 +187,6 @@ observed_stats
 ```{r}
 abc_data <- simulate_abc(
   model, priors, summary_funs = functions, observed_stats = observed_stats,
-  iterations = 10000, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  iterations = 100, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
