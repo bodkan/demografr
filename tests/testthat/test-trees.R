@@ -1,14 +1,23 @@
-test_that("correct tree lineage is picked as a slendr ancestral population", {
-  t1 <- ape::read.tree(text="(out,(p2,p3));")
-  t2 <- ape::read.tree(text="((p1,(p2,p3)),out);")
-  t3 <- ape::read.tree(text="((p1,p2),(p3,p4));")
-  t4 <- ape::read.tree(text="((p1,p2),((p3,p5),p4));")
+# test_that("correct tree lineage is picked as a slendr ancestral population", {
+#   t1 <- ape::read.tree(text="(out,(p2,p3));")
+#   t2 <- ape::read.tree(text="((p1,(p2,p3)),out);")
+#   t3 <- ape::read.tree(text="((p1,p2),(p3,p4));")
+#   t4 <- ape::read.tree(text="((p1,p2),((p3,p5),p4));")
+# })
 
-  expect_equal(get_ancestral_lineage(t1), "out")
-  expect_equal(get_ancestral_lineage(t2), "out")
-  expect_equal(get_ancestral_lineage(t3), "p1")
-  expect_equal(get_ancestral_lineage(t4), "p1")
-})
+# devtools::load_all("~/Projects/slendr/")
+
+# tree <- ape::read.tree(text = "(((t1,t2),t3),t4);")
+# model <- tree_model(tree, time_span = 10000); plot_model(model); plot(tree); ape::nodelabels()
+
+# tree <- readRDS("/tmp/tree.rds")
+# model <- tree_model(tree, time_span = 10000); plot_model(model); plot(tree); ape::nodelabels()
+
+# tree <- ape::read.tree(text = "(((t1,t2),t3),((t4,t5),t6));")
+# model <- tree_model(tree, time_span = 10000); plot_model(model); plot(tree); ape::nodelabels()
+
+# tree <- ape::read.tree(text = "(((t1,t2),(t3,t4)),((t5,t6),t7));")
+# model <- tree_model(tree, time_span = 10000); plot_model(model); plot(tree); ape::nodelabels()
 
 test_that("rootedness of input trees is correctly enforced", {
   expect_error(tree_populations(ape::rtopology(5), time_span = 1000), "must be rooted")

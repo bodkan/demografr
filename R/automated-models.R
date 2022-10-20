@@ -1,8 +1,25 @@
+get_ordered_tips <- function(tree) {
+  tip_edges <- tree$edge[, 2] <= length(tree$tip.label)
+  ordered_tips <- tree$edge[tip_edges, 2]
+  ordered_tips
+}
+
+get_leftmost_tip <- function(tree, node) {
+  ordered_tips <- get_ordered_tips(tree)
+  subtree_tips <- phangorn::Descendants(tree, node, type = "tips")[[1]]
+  leftmost_tip <- intersect(ordered_tips, subtree_tips)[1]
+  tree$tip.label[leftmost_tip]
+}
+
+get_slendr_population <- function(name, populations) {
+  populations[[which(sapply(populations, function(pop) pop$pop == name))]]
+}
+
 #' Create a list of slendr populations based on given phylogenetic tree
 #'
 #' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
 #'   for more details on the format)
-#' @param Ne Effective population size of all lineages. A value of 1000 is used by default.
+#' @param N Effective population size of all lineages. A value of 1000 is used by default.
 #' @param time_span Integer number specifying what time span should the encoded demographic
 #'   history cover.
 #' @return A list of populations of the class \code{slendr}
@@ -10,90 +27,79 @@
 #' # create a random phylogenetic tree
 #' tree <- ape::rtopology(3, tip.label = sprintf("pop_%d", 1:3), rooted = TRUE)
 #' populations <- tree_populations(tree = tree, time_span = 1000)
-tree_populations <- function(tree, time_span, Ne = 1000) {
+tree_populations <- function(tree, time_span, N = 1000, verbose = FALSE) {
+  if (!hasArg(time_span))
+    stop("Total time span of the model must be specified", call. = FALSE)
+
   if (is.character(tree)) tree <- ape::read.tree(text = tree)
+
   if (!ape::is.rooted(tree))
     stop("The input phylogenetic tree must be rooted", call. = FALSE)
 
-  split_times <- as.list(sort(sample(2 : (time_span - 1), tree$Nnode)))
+  # split_times <- as.list(sort(sample(2 : (time_span - 1), tree$Nnode)))
+  split_times <- as.list(round(seq(2, time_span - 1, length.out = tree$Nnode + 2))) %>%
+    .[-c(1, length(.))]
 
   populations <- list()
 
   # create the ancestral population in generation 1 (note that this happens "above"
   # the root node in the tree)
-  ancestral_name <- get_ancestral_lineage(tree)
-  ancestral_pop <- slendr::population(name = ancestral_name, time = 1, N = Ne)
+  ancestral_name <- tree$tip.label[get_ordered_tips(tree)][1]; ancestral_time <- 1
+  ancestral_pop <- slendr::population(name = ancestral_name, time = ancestral_time, N = N)
+  if (verbose)
+    cat(sprintf("Created an ancestral population %s at time %d\n", ancestral_name, ancestral_time))
+
+  if (length(tree$tip.label) == 1)
+    return(ancestral_pop)
 
   populations[[1]] <- ancestral_pop
-  names_taken <- ancestral_name
 
-  # create the first split from the ancestral population represented
+  # add the first split node to the queue
   root_node <- phangorn::getRoot(tree)
+  parent <- ancestral_pop
 
-  root_children <- phangorn::Children(tree, root_node)
-
-  if (length(root_children) < 2)
-    return(populations[[1]])
-
-  left_child <- root_children[1]
-  right_child <- root_children[2]
-
-  left_names <- get_pop_leaves(tree, root_children[1])
-  right_names <- get_pop_leaves(tree, root_children[2])
-
-  if (length(intersect(ancestral_name, left_names))) {
-    next_name <- sample(right_names, size = 1)
-    next_pop <- slendr::population(name = next_name, time = split_times[[1]], N = Ne, parent = populations[[1]])
-    right_parent <- next_pop
-    left_parent <- ancestral_pop
-  } else {
-    next_name <- sample(left_names, size = 1)
-    next_pop <- slendr::population(name = next_name, time = split_times[[1]], N = Ne, parent = populations[[1]])
-    left_parent <- next_pop
-    right_parent <- ancestral_pop
-  }
-
-  names_taken <- c(names_taken, next_name)
-  split_times[[1]] <- NULL
-
-  populations[[length(populations) + 1]] <- next_pop
-
-  queue <- list(
-    list(node = left_child, parent = left_parent),
-    list(node = right_child, parent = right_parent)
-  )
+  queue <- list(list(node = root_node, parent = parent))
+  if (verbose)
+    cat(sprintf("- Added node %d with parent %s to the queue\n", root_node, parent$pop))
 
   while (length(queue)) {
-    # pick a node from the queue, removing it
-    pick <- sample(length(queue), size = 1)
-    item <- queue[[pick]]; queue[[pick]] <- NULL
-
+    # pick the next item from the queue, removing it
+    i <- sample.int(length(queue), 1)
+    item <- queue[[i]]; queue[[i]] <- NULL
     node <- item$node
     parent <- item$parent
 
-    available_names <- setdiff(get_pop_leaves(tree, node), names_taken)
-    if (!length(available_names))
-      next
-  
-    name <- sample(available_names, size = 1)
-    pop <- slendr::population(name, split_times[[1]], N = Ne, parent = parent)
-  
+    children <- phangorn::Children(tree, node)
+    left_child <- children[1]
+    right_child <- children[2]
+
+    # create a split of a leftmost population in the right subtree
+    name <- get_leftmost_tip(tree, right_child)
+    time <- split_times[[1]]
+    pop <- slendr::population(name, time, N = N, parent = parent)
+    if (verbose)
+      cat(sprintf("Created a population %s splitting from %s at time %d (node %d)\n",
+                  name, parent$pop, time, node))
+
     populations[[length(populations) + 1]] <- pop
     split_times[[1]] <- NULL
-    names_taken <- c(names_taken, name)
 
-    children <- phangorn::Children(tree, node)
-    children <- children[!tree$tip.label[children] %in% names_taken]
+    # add both child nodes to the queue for further processing (if they are not
+    # tips at which point their populations will be already created)
+    if (left_child > length(tree$tip.label)) {
+      item <- list(node = left_child, parent = parent)
+      queue <- append(queue, list(item))
 
-    if (length(children) == 1)
-      parents <- list(parent)
-    else
-      parents <- list(parent, pop)
+      if (verbose)
+        cat(sprintf("- Added node %d with parent %s to the queue\n", left_child, parent$pop))
+    }
+    if (right_child > length(tree$tip.label)) {
+      parent <- get_leftmost_tip(tree, right_child) %>% get_slendr_population(populations)
+      item <- list(node = right_child, parent = parent)
+      queue <- append(queue, list(item))
 
-    for (child in children) {
-      parent <- parents[[1]]; parents[[1]] <- NULL
-      new_item <- list(node = child, parent = parent)
-      queue <- append(queue, list(new_item))
+      if (verbose)
+        cat(sprintf("- Added node %d with parent %s to the queue\n", right_child, parent$pop))
     }
   }
 
@@ -107,7 +113,7 @@ tree_populations <- function(tree, time_span, Ne = 1000) {
 #' called on that tree to create the populations themselves.
 #'
 #' @param n The desired number of populations that should be created
-#' @param Ne Integer number defining the effective populations size of all populations
+#' @param N Integer number defining the effective populations size of all populations
 #' @param time_span Integer number defining on how long the simulation
 #'   of the populations will last, to scale the edge lengths of the tree
 #'   accordingly
@@ -118,18 +124,18 @@ tree_populations <- function(tree, time_span, Ne = 1000) {
 #'
 #' @examples
 #' random_populations(5, time_span = 10000, population_size = 1000)
-random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
+random_populations <- function(n, time_span, N = 10000, names = NULL) {
   if (n < 1)
     stop("A non-negative integer number of populations must be given", call. = FALSE)
 
   if (is.null(names))
     names <- sprintf("pop%d", seq_len(n))
 
-  if (n == 1)
-    output <- slendr::population(name = names, time = 1, N = Ne)
-  else {
+  if (n == 1) {
+    output <- slendr::population(name = names, time = 1, N = N)
+  } else {
     tree <- ape::rtopology(n, tip.label = names, rooted = TRUE)
-    output <- tree_populations(tree, time_span = time_span, Ne = Ne)
+    output <- tree_populations(tree, time_span = time_span, N = N)
   }
 
   output
@@ -146,9 +152,10 @@ random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
 #'
 #' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
 #'   for more details on the format)
-#' @param Ne Effective population size of all lineages. A value of 1000 is used by default.
+#' @param N Effective population size of all lineages. A value of 1000 is used by default.
 #' @param time_span Integer number specifying what time span should the encoded demographic
 #'   history cover.
+#' @param generation_time Generation time used by the model
 #' @param gene_flows Integer number defining the number of gene-flow events
 #' @param rate Vector that specifies the min and max gene flow rate
 #' @return An object of the \code{slendr} class
@@ -159,17 +166,19 @@ random_populations <- function(n, time_span, Ne = 10000, names = NULL) {
 #' tree <- ape::rtree(6)
 #' tree_model(tree = tree, population_size = 200, n_gene_flow = 4,
 #'   rate_gene_flow = c(0.2, 0.9), time_span = 1000)
-tree_model <- function(tree, time_span, Ne = 1000, gene_flows = 0, rates = c(0.01, 0.99)) {
+tree_model <- function(tree, time_span, N = 1000, generation_time = 1,
+                       gene_flows = 0, rates = c(0.01, 0.99)) {
   # get the list of populations by calling the tree_populations function
-  populations <- tree_populations(tree, time_span, Ne)
+  populations <- tree_populations(tree, time_span, N)
 
   # get the list of gene flow events by calling the random_gene_flow function
   gf <- random_gene_flow(populations, gene_flows, rates, time_span)
 
   # compile the model based on populations, gene flow events and simulation length
   # the generation time is set to 1
-  model <- compile_model(populations = populations, gene_flow = gf,
-                         generation_time = 1, time_span = time_span)
+  model <- slendr::compile_model(populations = populations, gene_flow = gf,
+                         generation_time = generation_time, simulation_length = time_span,
+                         serialize = FALSE)
 
   model
 }
@@ -209,7 +218,6 @@ random_model <- function(n_populations, population_size, n_gene_flow,
 }
 
 random_gene_flow <- function(populations, n, rate, time_span) {
-
   # create empty gene flow list
   gf <- vector(mode = "list", length = n)
   if (n != 0){
@@ -269,22 +277,6 @@ random_gene_flow <- function(populations, n, rate, time_span) {
     }
   }
   return(gf)
-}
-
-
-# If the tree contains a single outgroup, use that as an ancestral population
-# when generating a slendr model. Otherwise pick the first population in the
-# given tree.
-get_ancestral_lineage <- function(tree) {
-  root_children <- phangorn::Children(tree, phangorn::getRoot(tree))
-  any_leaves <- root_children <= length(tree$tip.label)
-
-  if (any(any_leaves)) {
-    ancestor <- tree$tip.label[root_children[any_leaves][1]]
-  } else
-    ancestor <- tree$tip.label[1]
-  
-  ancestor
 }
 
 # Get names of populations under the given internal node
