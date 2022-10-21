@@ -26,7 +26,7 @@ print.demografr_sims <- function(x, ...) {
   cat("    <object>$parameters  -- parameter matrix\n")
   cat("    <object>$observed    -- observed summary statistics\n")
   cat("    <object>$functions   -- summary functions\n")
-  cat("    <object>$priors      -- prior expressions")
+  cat("    <object>$priors      -- prior expressions\n")
 }
 
 # a function to silence the unnecessary summary() output on abc objects
