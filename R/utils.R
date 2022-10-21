@@ -3,27 +3,30 @@
 #' @return Used exclusively for printing
 #' @export
 print.demografr_sims <- function(x, ...) {
-  n_iterations <- nrow(x$parameters)
-  parameters <- colnames(x$parameters) %>% paste(collapse = ", ")
-  summaries <- names(x$functions) %>% paste(collapse = ", ")
 
+  n_iterations <- nrow(x$parameters)
   cat("Number of simulation replicates:", n_iterations, "\n\n")
 
-  cat("Model parameters to be estimated:\n    ")
-  cat(parameters, "\n")
+  parameters <- colnames(x$parameters) #%>% paste(collapse = ", ")
+  types <- sapply(parameters, function(p) strsplit(p, "_")[[1]][1])
+  cat("Model parameters to be estimated:\n")
+  for (set in split(parameters, types)) {
+    cat("   ", paste(set, collapse = ", "), "\n")
+  }
 
   cat("\n")
 
+  summaries <- names(x$functions) %>% paste(collapse = ", ")
   cat("Summary statistics used:\n    ")
   cat(summaries, "\n")
 
   cat("\n")
 
-  cat("Individual components of the <object> can be accessed as:\n")
-  cat("  parameter matrix:            <object>$parameters\n")
-  cat("  observed summary statistics: <object>$observed\n")
-  cat("  summary functions:           <object>$functions\n")
-  cat("  prior expressions:           <object>$priors\n")
+  cat("Individual components of this object can be accessed as:\n")
+  cat("    <object>$parameters  -- parameter matrix\n")
+  cat("    <object>$observed    -- observed summary statistics\n")
+  cat("    <object>$functions   -- summary functions\n")
+  cat("    <object>$priors      -- prior expressions")
 }
 
 # a function to silence the unnecessary summary() output on abc objects
