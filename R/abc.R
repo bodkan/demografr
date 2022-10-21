@@ -77,7 +77,7 @@ run_iteration <- function(it, model, priors, functions,
 
   list(
     parameters = prior_values,
-    simulated_stats = simulated_stats
+    simulated = simulated_stats
   )
 }
 
@@ -131,11 +131,11 @@ simulate_abc <- function(
      stop("Unknown mode of execution", call. = FALSE)
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
-  simulated_stats <- lapply(results, `[[`, "simulated_stats")
+  simulated <- lapply(results, `[[`, "simulated")
 
   result <- list(
     parameters = parameters,
-    simulated = simulated_stats,
+    simulated = simulated,
     observed = observed_stats,
     functions = summary_funs,
     priors = priors,
@@ -156,15 +156,16 @@ simulate_abc <- function(
 #' @export 
 perform_abc <- function(data, tolerance, method, ...) {
   parameters <- data$parameters
+  statistics <- names(data$functions)
 
-  observed <- lapply(data$statistics, function(stat) {
+  observed <- lapply(statistics, function(stat) {
     df <- data$observed[[stat]]
     values <- matrix(df[, 2, drop = TRUE], nrow = 1)
     colnames(values) <- df[, 1, drop = TRUE]
     values
   }) %>% do.call(cbind, .)
 
-  simulated <- lapply(data$statistics, function(stat) do.call(
+  simulated <- lapply(statistics, function(stat) do.call(
     rbind, lapply(data$simulated, function(it) {
       df <- it[[stat]]
       values <- matrix(df[, 2, drop = TRUE], nrow = 1)
