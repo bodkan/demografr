@@ -35,6 +35,10 @@ modify_model <- function(model, prior_samples) {
     }
   }
 
+  # just to be sure there's no confusion, drop the populations list because
+  # it is not meaningful anymore at this point
+  model$populations <- NULL
+
   model
 }
 
@@ -81,6 +85,96 @@ run_iteration <- function(it, model, priors, functions,
   )
 }
 
+# Validate ABC setup by checking that all priors can be correctly sampled from,
+# that a slendr model resulting from those priors can simulate a tree sequence,
+# and that the user-defined summary functions produce output compatible with
+# the provided empirical summary statistics
+validate_abc <- function(model, priors, summary_funs, observed_stats,
+                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0) {
+
+  if (length(setdiff(names(summary_funs), names(observed_stats))))
+    stop("Lists of summary functions and observed statistics must have the same names",
+         call. = FALSE)
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Testing sampling of each prior parameter:\n")
+  prior_samples <- list()
+  for (p in c("Ne", "Tsplit", "gf")) {
+    p_priors <- subset_priors(priors, p)
+    cat(sprintf("  Found %d priors of type %s", length(p_priors), p))
+
+    if (length(p_priors)) {
+      fun <- if (p %in% c("Ne", "Tsplit")) round else identity
+
+      p_samples <- lapply(p_priors, sample_prior, convert = fun)
+      cat("... priors successfully sampled")
+
+      prior_samples[[p]] <- p_samples
+    }
+
+    cat("\n")
+  }
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Modifying the scaffold model with sampled prior values...\n")
+  new_model <- modify_model(model, prior_samples)
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Simulating a tree sequence from the constructed model...\n")
+  ts <- slendr::msprime(
+    new_model,
+    sequence_length = sequence_length,
+    recombination_rate = recombination_rate
+  ) %>%
+    slendr::ts_mutate(mutation_rate = mutation_rate)
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Computing user-defined summary functions on the tree sequence:\n")
+
+  simulated_stats <- list()
+  for (stat in names(summary_funs)) {
+    cat(sprintf("  * %s\n", stat))
+    simulated_stats[[stat]] <- tryCatch(summary_funs[[stat]](ts),
+      error = function(e) {
+        stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
+             stat, e$message), call. = FALSE)
+      })
+  }
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Checking the format of data frames with simulated summary statistics:\n")
+
+  for (stat in names(summary_funs)) {
+    cat(sprintf("  * %s\n", stat))
+    sim_df <- simulated_stats[[stat]]
+    obs_df <- observed_stats[[stat]]
+    if (!all(dim(sim_df) == dim(obs_df))) {
+      error_msg <- paste(
+        "Dimensions of observed and simulated statistics differ\n",
+        sprintf("    observed: %d rows, %d columns\n", nrow(obs_df), ncol(obs_df)),
+        sprintf("    simulated: %d rows, %d columns\n", nrow(sim_df), ncol(sim_df))
+      )
+      stop(error_msg, call. = FALSE)
+    }
+    if (length(intersect(sim_df[[1]], obs_df[[1]])) != nrow(sim_df)) {
+      error_msg <- paste(
+        "Names of observed and simulated statistics differ\n",
+        "    observed:", paste(sort(obs_df[[1]]), collapse = ", "), "\n",
+        "    simulated:", paste(sort(sim_df[[1]]), collapse = ", "), "\n"
+      )
+      stop(error_msg, call. = FALSE)
+    }
+  }
+
+  cat("============================================================\n")
+  cat("No issues have been found in the ABC setup!\n")
+}
+
 #' Simulate data for ABC inference using specified priors
 #'
 #' @param model A compiled slendr model object
@@ -98,9 +192,6 @@ simulate_abc <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  if (length(setdiff(names(summary_funs), names(observed_stats))))
-    stop("List of summary functions and observed statistics must have the same names",
-         call. = FALSE)
 
   execution <- match.arg(execution)
 
@@ -324,8 +415,7 @@ match_prior_type <- function(formula, type) {
 }
 
 # Subset prior formulas to just those of a given type
-subset_priors <- function(priors, type = c("Ne", "Tgf", "Tsplit", "gf")) {
-  type <- match.arg(type)
+subset_priors <- function(priors, type) {
   Filter(function(p) match_prior_type(p, type), priors)
 }
 
