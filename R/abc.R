@@ -100,17 +100,26 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
 
   cat("Testing sampling of each prior parameter:\n")
   prior_samples <- list()
-  for (p in c("Ne", "Tsplit", "gf")) {
-    p_priors <- subset_priors(priors, p)
-    cat(sprintf("  Found %d priors of type %s", length(p_priors), p))
+  for (param in c("Ne", "Tsplit", "gf")) {
+    p_priors <- subset_priors(priors, param)
+    cat(sprintf("  Found %d priors of type %s -- testing their sampling...\n", length(p_priors), param))
 
     if (length(p_priors)) {
-      fun <- if (p %in% c("Ne", "Tsplit")) round else identity
+      fun <- if (param %in% c("Ne", "Tsplit")) round else identity
 
-      p_samples <- lapply(p_priors, sample_prior, convert = fun)
-      cat("... priors successfully sampled")
+      p_samples <- list()
+      for (p in p_priors) {
+        p_sample <- tryCatch(
+          sample_prior(p, convert = fun),
+          error = function(e) {
+            stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
+                         as.character(as.list(p)[[2]]), e$message), call. = FALSE)
+          }
+        )
+        p_samples <- append(p_samples, list(p_sample))
+      }
 
-      prior_samples[[p]] <- p_samples
+      prior_samples[[param]] <- p_samples
     }
 
     cat("\n")
@@ -395,11 +404,13 @@ sample_prior <- function(f, convert = identity) {
     args <- c(n = 1, call[-1])
 
     # call the random-generation function, getting a single value
-    error_msg <- sprintf("%%s was raised when internally sampling from a prior as\n%s(%s). Please check the validity of the prior expression.",
+    error_msg <- sprintf("%%s was raised when internally sampling from a prior as\n%s(%s). Please check the validity of the prior expression.\n\nThe message was: %%s",
                          as.character(fun_symbol), paste("n = 1,", paste(args[-1], collapse = ", ")))
     tryCatch(value <- do.call(fun, args),
-             error = function(e) stop(sprintf(error_msg, "An error"), call. = FALSE),
-             warning = function(w) stop(sprintf(error_msg, "A warning"), call. = FALSE))
+             error = function(e) stop(sprintf(error_msg, "An error", e$message), call. = FALSE),
+             warning = function(w) stop(sprintf(error_msg, "A warning", w$message), call. = FALSE))
+    if (is.na(value) || is.nan(value) || is.infinite(value))
+      stop("Invalid prior value %s", value, call. = FALSE)
   }
 
   list(variable = variable, value = convert(value))

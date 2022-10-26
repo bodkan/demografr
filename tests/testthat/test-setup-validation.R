@@ -79,3 +79,10 @@ test_that("names of observed and simulated statistics must be the same", {
   xobserved_stats$diversity <- NULL
   expect_error(validate_abc(model, priors, summary_funs, xobserved_stats), error_msg)
 })
+
+test_that("errors in prior sampling are correctly caught", {
+  xpriors <- priors
+  xpriors[[1]] <- Ne_popA ~ runif(1e6, 10000)
+  error_msg <- "Sampling the prior Ne_popA resuted in the following problem"
+  expect_error(qiet(validate_abc(model, xpriors, summary_funs, observed_stats), error_msg))
+})
