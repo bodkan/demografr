@@ -1,10 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# *demografr*: Simple and efficient Approximate Bayesian Computation in R
+# *demografr*: Simple and efficient ABC toolkit for R
 
 <!-- badges: start -->
 <!-- badges: end -->
+
+<img src="man/figures/logo.png" align="right" />
 
 The goal of *demografr* is to simplify and streamline [Approximate
 Bayesian
@@ -116,46 +118,10 @@ parameters of more complex custom models such as spatial models etc.
 
 ## An example ABC analysis
 
-    #> * checking for file ‘/Users/mp/Projects/demografr/DESCRIPTION’ ... OK
-    #> * preparing ‘demografr’:
-    #> * checking DESCRIPTION meta-information ... OK
-    #> * checking for LF line-endings in source and make files and shell scripts
-    #> * checking for empty or unneeded directories
-    #> Removed empty directory ‘demografr/inst/extdata’
-    #> Removed empty directory ‘demografr/inst’
-    #> Omitted ‘LazyData’ from DESCRIPTION
-    #> * building ‘demografr_0.0.9000.tar.gz’
-    #> 
-    #> Running /Library/Frameworks/R.framework/Resources/bin/R CMD INSTALL \
-    #>   /var/folders/d_/hblb15pd3b94rg0v35920wd80000gn/T//Rtmp5nuz93/demografr_0.0.9000.tar.gz \
-    #>   --install-tests 
-    #> * installing to library ‘/private/var/folders/d_/hblb15pd3b94rg0v35920wd80000gn/T/RtmpuAgT1E/temp_libpathc2857400f5b8’
-    #> * installing *source* package ‘demografr’ ...
-    #> ** using staged installation
-    #> ** R
-    #> ** tests
-    #> ** byte-compile and prepare package for lazy loading
-    #> ** help
-    #> *** installing help indices
-    #> ** building package indices
-    #> ** installing vignettes
-    #> ** testing if installed package can be loaded from temporary location
-    #> ** testing if installed package can be loaded from final location
-    #> ** testing if installed package keeps a record of temporary installation path
-    #> * DONE (demografr)
-
 ``` r
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(slendr)
-#> The interface to all required Python modules has been activated.
+
 library(demografr)
 ```
 
@@ -166,7 +132,7 @@ Let’s also assume that we know that the three populations are
 phylogenetically related in the following way but we don’t know anything
 else (i.e., we have no idea about their $N_e$ or split times):
 
-<img src="man/figures/README-ape_tree-1.png" width="100%" />
+<img src="man/figures/README-ape_tree-1.png" style="display: block; margin: auto;" />
 
 After sequencing the genomes of individuals from these populations, we
 computed the nucleotide diversity in these populations as well as their
@@ -174,7 +140,7 @@ pairwise genetic divergence, and observed the following values which we
 saved in two standard R data frames:
 
 ``` r
-pi_df
+pi_df # nucleotide diversity in each population
 #> # A tibble: 4 × 2
 #>   stat        value
 #>   <chr>       <dbl>
@@ -185,7 +151,7 @@ pi_df
 ```
 
 ``` r
-div_df
+div_df # pairwise divergence d_X_Y between populations X and Y
 #> # A tibble: 6 × 2
 #>   stat           value
 #>   <chr>          <dbl>
@@ -198,7 +164,9 @@ div_df
 ```
 
 For the purpose of the ABC analysis below, we will bind all statistics
-in to a standard R list, naming them appropriately:
+in an R list, naming them appropriately. The names of each statistic
+(here “diversity” and “divergence”) have meaning and are quite important
+for later steps:
 
 ``` r
 observed <- list(diversity = pi_df, divergence = div_df)
@@ -217,32 +185,49 @@ scaffold as a standard phylogenetic tree (here we use the function
 `tree_model()` to input a tree in the [Newick
 format](https://en.wikipedia.org/wiki/Newick_format)).
 
-Note that the parameter `time_span` indicates how much evolutionary time
-does of our model cover (this can be currently only specified in
-generations):
-
 ``` r
 model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
 ```
 
+(Note that the parameter `time_span` indicates how much evolutionary
+time does of our model cover, in units of generations. Support for
+arbitrary units such as years will be supported soon.)
+
 Because the `model` object contains a standard *slendr* demographic
-model, we can visualize it as such, to make sure everything is set up
+model, we can inspect it as such, to make sure everything is set up
 correctly:
+
+``` r
+model
+#> slendr 'model' object 
+#> --------------------- 
+#> populations: popA, popB, popC, popD 
+#> geneflow events: [no geneflow]
+#> generation time: 1 
+#> time direction: forward 
+#> total running length: 10000 model time units
+#> model type: non-spatial
+#> 
+#> non-serialized slendr model
+```
 
 ``` r
 plot_model(model)
 ```
 
-<img src="man/figures/README-slendr_model-1.png" width="100%" />
+<img src="man/figures/README-slendr_model-1.png" style="display: block; margin: auto;" />
 
 Note that we don’t pay attention to the split times or population sizes
 of this model because we will be fitting those parameters with the ABC
 procedure below—the model we just constructed is really just a
 *scaffold* capturing some prior information we have about the
-phylogenetic relationship between populations. That said, we have the
-option to fix some aspects of our model by building and fine-tuning the
-model using standard *slendr* features for defining models rather than
-importing the model as a phylogenetic tree (see
+phylogenetic relationship between populations, the values of other model
+parameters ($N_e$, split times) are arbitrary.
+
+That said, we have the option to fix some aspects of our model by
+building and fine-tuning the model using standard *slendr* features for
+defining models rather than importing the model as a phylogenetic tree
+(see
 [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)
 *slendr* vignette).
 
@@ -291,21 +276,21 @@ format analogous to the empirical statistics shown in data frames
 `diversity` and `divergence` above:
 
 ``` r
-compute_diversity <- function(ts) {
+compute_pi <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 
-compute_divergence <- function(ts) {
+compute_div <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
 }
 
-functions <- list(diversity  = compute_diversity, divergence = compute_divergence)
+functions <- list(diversity = compute_pi, divergence = compute_div)
 ```
 
 Crucially, the outputs of these summary functions *must* match the
@@ -359,20 +344,6 @@ data <- simulate_abc(
 )
 
 data
-#> Number of simulation replicates: 10000 
-#> 
-#> Model parameters to be estimated:
-#>     Ne_popA, Ne_popB, Ne_popC, Ne_popD 
-#>     Tsplit_popA_popB, Tsplit_popB_popC, Tsplit_popC_popD 
-#> 
-#> Summary statistics used:
-#>     diversity, divergence 
-#> 
-#> Individual components of this object can be accessed as:
-#>     <object>$parameters -- parameter matrix
-#>     <object>$observed   -- observed summary statistics
-#>     <object>$functions  -- summary functions
-#>     <object>$priors     -- prior expressions
 ```
 
 At this point we have generated summary statistics for simulations of
@@ -413,21 +384,21 @@ Mode:”:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   684.3326 1857.268  7606.990 2002.317        -146.7885
-#> Weighted 2.5 % Perc.:   861.4518 2418.953  8128.436 2389.335         284.0415
-#> Weighted Median:       1236.8493 2797.563  8875.089 3187.592        1773.6837
-#> Weighted Mean:         1259.5196 2819.391  8879.863 3192.692        1705.2854
-#> Weighted Mode:         1029.5353 2733.298  9000.810 3142.313        1860.5549
-#> Weighted 97.5 % Perc.: 1706.0118 3262.358  9686.463 3979.821        3020.4795
-#> Max.:                  2176.2821 4823.882 10263.670 4559.770        3403.1390
+#> Min.:                   732.4446 2263.037  7913.928 1937.771        -56.92838
+#> Weighted 2.5 % Perc.:   981.0543 2486.451  8384.649 2392.855        350.93585
+#> Weighted Median:       1286.0200 2792.185  9178.549 3244.835       1725.07007
+#> Weighted Mean:         1279.0194 2796.884  9173.395 3262.525       1676.77737
+#> Weighted Mode:         1415.3427 2744.639  9298.698 3196.112       2420.66630
+#> Weighted 97.5 % Perc.: 1613.3523 3094.075  9905.164 4203.204       2912.56639
+#> Max.:                  1872.2067 3247.760 10552.792 4912.133       3124.42587
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2778.619         5736.544
-#> Weighted 2.5 % Perc.:          3074.460         6057.134
-#> Weighted Median:               4457.510         7440.845
-#> Weighted Mean:                 4469.090         7481.847
-#> Weighted Mode:                 4207.606         6513.809
-#> Weighted 97.5 % Perc.:         5896.900         8856.096
-#> Max.:                          6186.125         9482.677
+#> Min.:                          2633.633         5810.885
+#> Weighted 2.5 % Perc.:          2993.411         6133.104
+#> Weighted Median:               4382.730         7505.768
+#> Weighted Mean:                 4406.088         7545.439
+#> Weighted Mode:                 3931.193         6580.756
+#> Weighted 97.5 % Perc.:         5827.728         8915.765
+#> Max.:                          6203.838         9441.003
 ```
 
 Because a chart is always more informative than a table, we can easily
@@ -438,14 +409,14 @@ get a visualization of our posteriors using the function
 plot_posterior(abc, type = "Ne")
 ```
 
-<img src="man/figures/README-demografr_posterior_Ne-1.png" width="100%" />
+![](man/figures/README-demografr_posterior_Ne-1.png)<!-- -->
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 1 rows containing non-finite values (stat_density).
+#> Warning: Removed 2 rows containing non-finite values (stat_density).
 ```
 
-<img src="man/figures/README-demografr_posterior_Tsplit-1.png" width="100%" />
+![](man/figures/README-demografr_posterior_Tsplit-1.png)<!-- -->
 
 Because the internals of *demografr* ABC objects are represented by
 standard objects created by the *abc* package, we have many of the
@@ -455,7 +426,7 @@ standard diagnostics functions of the *abc* R package at our disposal:
 plot(abc, param = "Ne_popC")
 ```
 
-<img src="man/figures/README-abc_diagnostic_Ne-1.png" width="100%" />
+![](man/figures/README-abc_diagnostic_Ne-1.png)<!-- -->
 
 ## The example as a single script
 
