@@ -7,6 +7,7 @@ logo := man/figures/logo.png
 web: README.md $(logo)
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'pkgdown::build_site()'
+	git checkout docs/pkgdown.yml
 
 docs:
 	R -e 'devtools::install(upgrade = "never")'
