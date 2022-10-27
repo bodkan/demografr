@@ -7,8 +7,8 @@
 simulate_abc(
   model,
   priors,
-  summary_funs,
-  observed_stats,
+  functions,
+  observed,
   iterations,
   sequence_length,
   recombination_rate,
@@ -21,7 +21,7 @@ simulate_abc(
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
-\item{summary_funs}{A named list of summary statistic functions to apply on simulated
+\item{functions}{A named list of summary statistic functions to apply on simulated
 tree sequences}
 
 \item{observed}{A named list of observed summary statistics}

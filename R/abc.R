@@ -85,14 +85,26 @@ run_iteration <- function(it, model, priors, functions,
   )
 }
 
-# Validate ABC setup by checking that all priors can be correctly sampled from,
-# that a slendr model resulting from those priors can simulate a tree sequence,
-# and that the user-defined summary functions produce output compatible with
-# the provided empirical summary statistics
-validate_abc <- function(model, priors, summary_funs, observed_stats,
+#' Validate the individual components of an ABC model
+#'
+#' Validates the ABC setup by checking that all priors can be correctly sampled from,
+#' that a slendr model resulting from those priors can simulate a tree sequence,
+#' and that the user-defined summary functions produce output compatible with
+#' the provided empirical summary statistics.
+#'
+#' @param model A compiled slendr model object
+#' @param priors A list of prior distributions to use for sampling of model parameters
+#' @param functions A named list of summary statistic functions to apply on simulated
+#'   tree sequences
+#' @param observed A named list of observed summary statistics 
+#'
+#' @return No return value. The function is ran for its terminal output.
+#'
+#' @export
+validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0) {
 
-  if (length(setdiff(names(summary_funs), names(observed_stats))))
+  if (length(setdiff(names(functions), names(observed))))
     stop("Lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
@@ -145,9 +157,9 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
   cat("Computing user-defined summary functions on the tree sequence:\n")
 
   simulated_stats <- list()
-  for (stat in names(summary_funs)) {
+  for (stat in names(functions)) {
     cat(sprintf("  * %s\n", stat))
-    simulated_stats[[stat]] <- tryCatch(summary_funs[[stat]](ts),
+    simulated_stats[[stat]] <- tryCatch(functions[[stat]](ts),
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)
@@ -158,10 +170,10 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
 
   cat("Checking the format of data frames with simulated summary statistics:\n")
 
-  for (stat in names(summary_funs)) {
+  for (stat in names(functions)) {
     cat(sprintf("  * %s\n", stat))
     sim_df <- simulated_stats[[stat]]
-    obs_df <- observed_stats[[stat]]
+    obs_df <- observed[[stat]]
     if (!all(dim(sim_df) == dim(obs_df))) {
       error_msg <- paste(
         "Dimensions of observed and simulated statistics differ\n",
@@ -188,13 +200,13 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
 #'
 #' @param model A compiled slendr model object
 #' @param priors A list of prior distributions to use for sampling of model parameters
-#' @param summary_funs A named list of summary statistic functions to apply on simulated
+#' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
 #'
 #' @export
 simulate_abc <- function(
-  model, priors, summary_funs, observed_stats,
+  model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   execution = c("mclapply", "lapply", "future_lapply", "single")
 ) {
@@ -206,25 +218,25 @@ simulate_abc <- function(
 
   if (execution == "lapply") {
     results <- lapply(X = seq_len(iterations), FUN = run_iteration, model = model,
-                      priors = priors, functions = summary_funs,
+                      priors = priors, functions = functions,
                       mutation_rate = mutation_rate, sequence_length = sequence_length,
                       recombination_rate = recombination_rate)
   } else if (execution == "mclapply") {
     results <- parallel::mclapply(X = seq_len(iterations), FUN = run_iteration, model = model,
-                                  priors = priors, functions = summary_funs,
+                                  priors = priors, functions = functions,
                                   mutation_rate = mutation_rate, sequence_length = sequence_length,
                                   recombination_rate = recombination_rate, mc.cores = future::availableCores())
   } else if (execution == "future_lapply") {
     results <- future.apply::future_lapply(
       X = seq_len(iterations), FUN = run_iteration, model = model,
-      priors = priors, functions = summary_funs,
+      priors = priors, functions = functions,
       mutation_rate = mutation_rate, sequence_length = sequence_length,
       recombination_rate = recombination_rate,
       future.seed = TRUE, future.packages = c("dplyr", "combinat", "slendr")
     )
   } else if (execution == "single") {
     results <- list(run_iteration(it = 1, model = model,
-                                  priors = priors, functions = summary_funs,
+                                  priors = priors, functions = functions,
                                   mutation_rate = mutation_rate, sequence_length = sequence_length,
                                   recombination_rate = recombination_rate))
   } else
@@ -236,8 +248,8 @@ simulate_abc <- function(
   result <- list(
     parameters = parameters,
     simulated = simulated,
-    observed = observed_stats,
-    functions = summary_funs,
+    observed = observed,
+    functions = functions,
     priors = priors,
     model = model
   )

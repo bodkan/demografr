@@ -1,3 +1,6 @@
+skip_if(!slendr:::check_env_present())
+slendr::setup_env(quiet = TRUE)
+
 model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
 
 priors <- list(
@@ -12,23 +15,23 @@ priors <- list(
 )
 
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-  ts_diversity(ts, sample_sets = samples) %>%
-    mutate(stat = paste0("pi_", set)) %>%
-    select(stat, value = diversity)
+  samples <- slendr::ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  slendr::ts_diversity(ts, sample_sets = samples) %>%
+    dplyr::mutate(stat = paste0("pi_", set)) %>%
+    dplyr::select(stat, value = diversity)
 }
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-  ts_divergence(ts, sample_sets = samples) %>%
-    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
-    select(stat, value = divergence)
+  samples <- slendr::ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  slendr::ts_divergence(ts, sample_sets = samples) %>%
+    dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    dplyr::select(stat, value = divergence)
 }
 summary_funs <- list(diversity  = compute_diversity, divergence = compute_divergence)
 
-ts <- msprime(example_model, sequence_length = 100000, recombination_rate = 0)
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
-diversity <- ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity)
-divergence <- ts_divergence(ts, sample_sets = samples)  %>% mutate(stat = sprintf("d_%s_%s", x, y))       %>% select(stat, value = divergence)
+ts <- slendr::msprime(model, sequence_length = 100000, recombination_rate = 0)
+samples <- slendr::ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+diversity <- slendr::ts_diversity(ts, sample_sets = samples)  %>% dplyr::mutate(stat = paste0("pi_", set)) %>% dplyr::select(stat, value = diversity)
+divergence <- slendr::ts_divergence(ts, sample_sets = samples)  %>% dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>% dplyr::select(stat, value = divergence)
 observed_stats <- list(diversity = diversity, divergence = divergence)
 
 test_that("correct ABC setups are validated", {

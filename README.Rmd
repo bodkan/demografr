@@ -60,11 +60,12 @@ _demografr_ is very much in an early experimental stage at this point. Although 
 
 ## An example ABC analysis
 
-```{r}
+```{r, echo=FALSE}
 devtools::install(".", upgrade = "never")
 ```
 
-```{r}
+```{r, results="hide"}
+library(dplyr)
 library(slendr)
 library(demografr)
 ```
@@ -85,35 +86,43 @@ example_model <- compile_model(
 
 ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>% ts_mutate(1e-8, random_seed = SEED)
 
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(pull, name)
+samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
 
-diversity <- ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity)
+pi_df <- ts_diversity(ts, sample_sets = samples)  %>% mutate(stat = paste0("pi_", set))       %>% select(stat, value = diversity)
 
-divergence <- ts_divergence(ts, sample_sets = samples)  %>% mutate(stat = sprintf("d_%s_%s", x, y))       %>% select(stat, value = divergence)
+div_df <- ts_divergence(ts, sample_sets = samples)  %>% mutate(stat = sprintf("d_%s_%s", x, y))       %>% select(stat, value = divergence)
 ```
 
 Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
 
 Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
-```{r ape_tree, echo=FALSE, fig.width=6, fig.height=4}
+```{r ape_tree, echo=FALSE, fig.width=4, fig.height=3}
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree)
 ```
 
-After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in standard R data frame:
+After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
 
 ```{r}
-diversity
+pi_df
 ```
 
 ```{r}
-divergence
+div_df
+```
+
+For the purpose of the ABC analysis below, we will bind all statistics in to a standard R list, naming them appropriately:
+
+```{r}
+observed <- list(diversity = pi_df, divergence = div_df)
 ```
 
 ### Setting up a "scaffold" model
 
-The first step in an ABC analysis using _demografr_ is setting up a "scaffold" model for which we will estimate the posterior parameters of interest. One way to do this is by building a simple _slendr_ model of the relationships between populations (a model [like this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html), for instance). However, for simpler models like ours, it can be easier to input the scaffold as a standard phylogenetic tree (here we use the function `tree_model()` to input a tree in the [Newick format](https://en.wikipedia.org/wiki/Newick_format)).
+The first step in a _demografr_ ABC analysis is setting up a "scaffold" model for which we will estimate the posterior parameters of interest.
+
+One way to do this is by building a normal _slendr_ model (for instance, a model such as [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)). However, for simpler models like ours, it can be easier to input the scaffold as a standard phylogenetic tree (here we use the function `tree_model()` to input a tree in the [Newick format](https://en.wikipedia.org/wiki/Newick_format)).
 
 Note that the parameter `time_span` indicates how much evolutionary time does of our model cover (this can be currently only specified in generations):
 
@@ -121,11 +130,13 @@ Note that the parameter `time_span` indicates how much evolutionary time does of
 model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
 ```
 
-Because the result is just a standard _slendr_ demographic model, we can visualize it as such, to make sure everything is set up correctly. Again, we don't pay attention to the split times or population sizes of this model because we will be fitting those parameters. The "scaffold" model is simply intended to capture the phylogenetic relationships of our populations, and is internally used by the ABC procedure below to generate simulated data for inference.
+Because the `model` object contains a standard _slendr_ demographic model, we can visualize it as such, to make sure everything is set up correctly:
 
-```{r, slendr_model, fig.width=6, fig.height=4}
+```{r, slendr_model, fig.width=5, fig.height=3}
 plot_model(model)
 ```
+
+ Note that we don't pay attention to the split times or population sizes of this model because we will be fitting those parameters with the ABC procedure below&mdash;the model we just constructed is really just a _scaffold_ capturing some prior information we have about the phylogenetic relationship between populations. That said, we have the option to fix some aspects of our model by building and fine-tuning the model using standard _slendr_ features for defining models rather than importing the model as a phylogenetic tree (see [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html) _slendr_ vignette).
 
 ### Setting up priors
 
@@ -148,7 +159,7 @@ In an ABC simulation step below, the formulas are used to draw the values of eac
 
 ### Defining summary functions
 
-Each run of a _demografr_ ABC simulation internally produces a tree sequence as an output. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save each simulation output to disk for computation in different software. In the context of ABC simulations in _demografr_, it is possible to define a set of summary statistic functions in R using _slendr_'s library of [tree-sequence functions](https://www.slendr.net/reference/index.html#tree-sequence-statistics) available thanks to the [_tskit_ project](https://tskit.dev/tskit/docs/stable/stats.html).
+Each run of a _demografr_ ABC simulation internally produces a tree sequence as an output. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save each simulation output to disk for computation in different software. Thanks to _slendr_'s library of [tree-sequence functions](https://www.slendr.net/reference/index.html#tree-sequence-statistics) serving as an R interface to the [_tskit_ module](https://tskit.dev/tskit/docs/stable/stats.html), you can specify summary statistics to be computed for ABC using plain and simple R code.
 
 In our example, because we computed nucleotide diversity and pairwise divergence in the individuals sequenced from populations "p1", "p2", and "p3", we will define the following functions. Crucially, when run on a tree-sequence object, they will produce an output data frame in the format analogous to the empirical statistics shown in data frames `diversity` and `divergence` above:
 
@@ -167,41 +178,26 @@ compute_divergence <- function(ts) {
     select(stat, value = divergence)
 }
 
-summary_funs <- list(diversity  = compute_diversity, divergence = compute_divergence)
+functions <- list(diversity  = compute_diversity, divergence = compute_divergence)
 ```
 
-We can test these functions by using our scaffold model to simulate a test tree sequence, and compute the defined statistics on it (i.e. doing what the ABC procedure will be doing automatically).
-
-```{r}
-ts_test <- msprime(model, sequence_length = 1e6, recombination_rate = 1e-8) %>% ts_mutate(1e-8)
-
-summary_funs$diversity(ts_test)
-summary_funs$divergence(ts_test)
-```
-
-The outputs of user-defined summary functions _must_ match the format of the observed summary statistics. Here we can see that this is the case.
+Crucially, the outputs of these summary functions _must_ match the format of the observed summary statistics (i.e., the data frames produced must have the same format). This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.
 
 ### ABC simulations
 
 Having defined the scaffold model, a set of priors for our parameters of interest ($N_e$ and split times), as well as two summary statistic functions, we can plug all this information into the function `simulate_abc`.
 
-Before we do that though, we need to create a list of all summary statistics computed from our empirical data, binding them in the same structure as the summary functions above. This step is needed in order to make sure that the data frames with empirical and simulated summary statistics are in comparable formats:
-
-```{r}
-observed_stats <- list(diversity = diversity, divergence = divergence)
-```
-
 Before we run a potentially computationally costly simulations, it is a good idea to validate the ABC components we have so far assembled using the function `validate_abc()`:
 
 ```{r}
-validate_abc(model, priors, summary_funs, observed_stats)
+validate_abc(model, priors, functions, observed)
 ```
 
 Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using _demografr_'s function `simulate_abc()`:
 
 ```{r, eval=!file.exists("inst/extdata/data.rds")}
 data <- simulate_abc(
-  model, priors, summary_funs, observed_stats, iterations = 10000,
+  model, priors, functions, observed, iterations = 10000,
   sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 
@@ -250,4 +246,38 @@ Because the internals of _demografr_ ABC objects are represented by standard obj
 
 ```{r, abc_diagnostic_Ne}
 plot(abc, param = "Ne_popC")
+```
+
+## The example as a single script
+
+```{r, eval=FALSE}
+model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
+
+priors <- list(
+  Ne_popA ~ runif(1, 10000),
+  Ne_popB ~ runif(1, 10000),
+  Ne_popC ~ runif(1, 10000),
+  Ne_popD ~ runif(1, 10000),
+
+  Tsplit_popA_popB ~ runif(1, 3000),
+  Tsplit_popB_popC ~ runif(3000, 6000),
+  Tsplit_popC_popD ~ runif(6000, 9000)
+)
+
+compute_diversity <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    select(stat, value = diversity)
+}
+
+compute_divergence <- function(ts) {
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+summary_funs <- list(diversity  = compute_diversity, divergence = compute_divergence)
+
 ```

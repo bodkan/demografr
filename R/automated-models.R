@@ -119,24 +119,19 @@ tree_populations <- function(tree, time_span, N = 1000, verbose = FALSE) {
 #'
 #' @examples
 #' tree <- ape::rtree(4)
-#' tree_model(tree = tree, population_size = 1000, n_gene_flow = 3,
-#'   rate_gene_flow = 0.5, time_span = 100, use_tree_lengths = TRUE)
-#' tree <- ape::rtree(6)
-#' tree_model(tree = tree, population_size = 200, n_gene_flow = 4,
-#'   rate_gene_flow = c(0.2, 0.9), time_span = 1000)
-tree_model <- function(tree, time_span, N = 1000, generation_time = 1,
-                       gene_flows = 0, rates = c(0.01, 0.99)) {
+#' tree_model(tree = tree, population_size = 1000, time_span = 100)
+tree_model <- function(tree, time_span, N = 1000, generation_time = 1) {
   # get the list of populations by calling the tree_populations function
   populations <- tree_populations(tree, time_span, N)
 
-  # get the list of gene flow events by calling the random_gene_flow function
-  gf <- random_gene_flow(populations, gene_flows, rates, time_span)
-
   # compile the model based on populations, gene flow events and simulation length
   # the generation time is set to 1
-  model <- slendr::compile_model(populations = populations, gene_flow = gf,
-                         generation_time = generation_time, simulation_length = time_span,
-                         serialize = FALSE)
+  model <- slendr::compile_model(
+    populations = populations,
+    generation_time = generation_time,
+    simulation_length = time_span,
+    serialize = FALSE
+  )
 
   model
 }
