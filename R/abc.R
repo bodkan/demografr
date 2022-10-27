@@ -102,7 +102,7 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
   prior_samples <- list()
   for (param in c("Ne", "Tsplit", "gf")) {
     p_priors <- subset_priors(priors, param)
-    cat(sprintf("  Found %d priors of type %s -- testing their sampling...\n", length(p_priors), param))
+    cat(sprintf("  Found %d priors of type %s -- testing their sampling...", length(p_priors), param))
 
     if (length(p_priors)) {
       fun <- if (param %in% c("Ne", "Tsplit")) round else identity
@@ -112,7 +112,7 @@ validate_abc <- function(model, priors, summary_funs, observed_stats,
         p_sample <- tryCatch(
           sample_prior(p, convert = fun),
           error = function(e) {
-            stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
+            stop(sprintf("\nSampling the prior %s resuted in the following problem:\n\n%s",
                          as.character(as.list(p)[[2]]), e$message), call. = FALSE)
           }
         )
