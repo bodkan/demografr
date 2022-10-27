@@ -1,20 +1,3 @@
-get_ordered_tips <- function(tree) {
-  tip_edges <- tree$edge[, 2] <= length(tree$tip.label)
-  ordered_tips <- tree$edge[tip_edges, 2]
-  ordered_tips
-}
-
-get_leftmost_tip <- function(tree, node) {
-  ordered_tips <- get_ordered_tips(tree)
-  subtree_tips <- phangorn::Descendants(tree, node, type = "tips")[[1]]
-  leftmost_tip <- intersect(ordered_tips, subtree_tips)[1]
-  tree$tip.label[leftmost_tip]
-}
-
-get_slendr_population <- function(name, populations) {
-  populations[[which(sapply(populations, function(pop) pop$pop == name))]]
-}
-
 #' Create a list of slendr populations based on given phylogenetic tree
 #'
 #' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
@@ -23,6 +6,9 @@ get_slendr_population <- function(name, populations) {
 #' @param time_span Integer number specifying what time span should the encoded demographic
 #'   history cover.
 #' @return A list of populations of the class \code{slendr}
+#'
+#' @export
+#'
 #' @examples
 #' # create a random phylogenetic tree
 #' tree <- ape::rtopology(3, tip.label = sprintf("pop_%d", 1:3), rooted = TRUE)
@@ -109,41 +95,6 @@ tree_populations <- function(tree, time_span, N = 1000, verbose = FALSE) {
   populations
 }
 
-#' Create a list of a given number of random slendr populations
-#'
-#' Creates a random list of slendr populations of a given length. Internally, a
-#' random phylogenetic tree of a given size is created and \code{tree_populations} is
-#' called on that tree to create the populations themselves.
-#'
-#' @param n The desired number of populations that should be created
-#' @param N Integer number defining the effective populations size of all populations
-#' @param time_span Integer number defining on how long the simulation
-#'   of the populations will last, to scale the edge lengths of the tree
-#'   accordingly
-#' @param names Names of the populations created. If \code{NULL}, a set of names
-#'   "pop1", "pop2", ... will be created.
-#'
-#' @return A set of slendr populations
-#'
-#' @examples
-#' random_populations(5, time_span = 10000, population_size = 1000)
-random_populations <- function(n, time_span, N = 10000, names = NULL) {
-  if (n < 1)
-    stop("A non-negative integer number of populations must be given", call. = FALSE)
-
-  if (is.null(names))
-    names <- sprintf("pop%d", seq_len(n))
-
-  if (n == 1) {
-    output <- slendr::population(name = names, time = 1, N = N)
-  } else {
-    tree <- ape::rtopology(n, tip.label = names, rooted = TRUE)
-    output <- tree_populations(tree, time_span = time_span, N = N)
-  }
-
-  output
-}
-
 #' Create a slendr model based on a given phylogenetic tree
 #'
 #' Creates a slendr model based on a given phylogenetic tree and a given number
@@ -161,7 +112,11 @@ random_populations <- function(n, time_span, N = 10000, names = NULL) {
 #' @param generation_time Generation time used by the model
 #' @param gene_flows Integer number defining the number of gene-flow events
 #' @param rate Vector that specifies the min and max gene flow rate
+#'
 #' @return An object of the \code{slendr} class
+#'
+#' @export
+#'
 #' @examples
 #' tree <- ape::rtree(4)
 #' tree_model(tree = tree, population_size = 1000, n_gene_flow = 3,
@@ -186,103 +141,123 @@ tree_model <- function(tree, time_span, N = 1000, generation_time = 1,
   model
 }
 
-#' Create random model
-#'
-#' Creates a slendr model based on a given number of populations and a given
-#' number of gene flow events. A random ape tree is created according to the
-#' specified number of populations. With this tree, the function
-#' \code{tree_model} is called to create the model.
-#'
-#' @param n_populations The desired number of populations for the model
-#' @param population_size Integer number defining the populations size of all
-#'   populations
-#' @param n_gene_flow Integer number defining the number of gene_flow events
-#' @param rate_gene_flow Vector that specifies the min and max gene flow rate
-#' @param time_span Integer number defining on how long the simulation
-#'   of the populations will last, to scale the edge lengths of the tree
-#'   accordingly
-#' @return A slendr model
-#' @examples
-#' tree_model(n_populations = 4, population_size = 1000, n_gene_flow = 3,
-#'   rate_gene_flow = 0.5, time_span = 100)
-#' tree_model(n_populations = 6, population_size = 200, n_gene_flow = 4,
-#'   rate_gene_flow = c(0.2, 0.9), time_span = 1000)
-random_model <- function(n_populations, population_size, n_gene_flow,
-                         rate_gene_flow = c(0.01, 0.99), time_span) {
-
-  # create a random tree with the number of leaves equal to the number of
-  # populations
-  tree <- ape::rtree(n_populations)
-  # create the model by calling the tree_model function with the created tree
-  model <- tree_model(tree, population_size, n_gene_flow,
-                      rate_gene_flow, time_span)
-  # return the created model
-  return(model)
-}
-
-random_gene_flow <- function(populations, n, rate, time_span) {
-  # create empty gene flow list
-  gf <- vector(mode = "list", length = n)
-  if (n != 0){
-
-    # find the times where the populations were created and store in list
-    creation_times <- sapply(populations,
-                             function(p) attr(p, "history")[[1]]$time)
-    # for each gene flow event
-    for(i in 1:n) {
-
-      # sample start time of gene flow, can only be one generation after second
-      # population is generated only one population exists
-      start_gf <- sample((burn_in + 1):(time_span - 1), 1)
-      # gene flow ends one generation after it started
-      end_gf <- start_gf + 1
-
-      # get a list of all populations that were created befor the gene flow
-      # starts as only these can be considered
-      possible <- list()
-      j = 1
-      for (p in populations) {
-        # check if the creation time of the population is smaller than the time
-        # where the gene flow starts
-        if (p$time < start_gf) {
-          # if so, add population to list of possible populations
-          possible[[j]] <- p
-          j = j + 1
-        }
-      }
-
-      # sample two indices within the possible population list
-      number1 <- sample(1:length(possible), 1)
-      number2 <- sample(1:length(possible), 1)
-      # check that gene flow would not be between the same population
-      while(number1 == number2){
-        number2 <- sample(1:length(possible), 1)
-      }
-      # get the populations corresponding to the sampled indices
-      pop1 <- possible[[number1]]
-      pop2 <- possible[[number2]]
-
-      # given rate of gene flow can be either list of min/max or single value
-      if (length(rate) == 2){
-        if (rate[1] > rate[2]) {
-          stop("No valid range for gene flow rate", call. = FALSE)
-        }
-        # sample rate within given range
-        rate_gf <- runif(1, rate[1], rate[2])
-      } else {
-        # keep given rate
-        rate_gf <- rate
-      }
-
-      # create new gene flow event and add to list
-      gf[[i]] <- gene_flow(from = pop1, to = pop2, start = start_gf,
-                           end = end_gf, rate = rate_gf)
-    }
-  }
-  return(gf)
-}
-
 # Get names of populations under the given internal node
 get_pop_leaves <- function(tree, node) {
   tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
 }
+
+get_ordered_tips <- function(tree) {
+  tip_edges <- tree$edge[, 2] <= length(tree$tip.label)
+  ordered_tips <- tree$edge[tip_edges, 2]
+  ordered_tips
+}
+
+get_leftmost_tip <- function(tree, node) {
+  ordered_tips <- get_ordered_tips(tree)
+  subtree_tips <- phangorn::Descendants(tree, node, type = "tips")[[1]]
+  leftmost_tip <- intersect(ordered_tips, subtree_tips)[1]
+  tree$tip.label[leftmost_tip]
+}
+
+get_slendr_population <- function(name, populations) {
+  populations[[which(sapply(populations, function(pop) pop$pop == name))]]
+}
+
+# #' Create a list of a given number of random slendr populations
+# #'
+# #' Creates a random list of slendr populations of a given length. Internally, a
+# #' random phylogenetic tree of a given size is created and \code{tree_populations} is
+# #' called on that tree to create the populations themselves.
+# #'
+# #' @param n The desired number of populations that should be created
+# #' @param N Integer number defining the effective populations size of all populations
+# #' @param time_span Integer number defining on how long the simulation
+# #'   of the populations will last, to scale the edge lengths of the tree
+# #'   accordingly
+# #' @param names Names of the populations created. If \code{NULL}, a set of names
+# #'   "pop1", "pop2", ... will be created.
+# #'
+# #' @return A set of slendr populations
+# #'
+# #' @export
+# #'
+# #' @examples
+# #' random_populations(5, time_span = 10000, population_size = 1000)
+# random_populations <- function(n, time_span, N = 10000, names = NULL) {
+#   if (n < 1)
+#     stop("A non-negative integer number of populations must be given", call. = FALSE)
+
+#   if (is.null(names))
+#     names <- sprintf("pop%d", seq_len(n))
+
+#   if (n == 1) {
+#     output <- slendr::population(name = names, time = 1, N = N)
+#   } else {
+#     tree <- ape::rtopology(n, tip.label = names, rooted = TRUE)
+#     output <- tree_populations(tree, time_span = time_span, N = N)
+#   }
+
+#   output
+# }
+
+# random_gene_flow <- function(populations, n, rate, time_span) {
+#   # create empty gene flow list
+#   gf <- vector(mode = "list", length = n)
+#   if (n != 0){
+
+#     # find the times where the populations were created and store in list
+#     creation_times <- sapply(populations,
+#                              function(p) attr(p, "history")[[1]]$time)
+#     # for each gene flow event
+#     for(i in 1:n) {
+
+#       # sample start time of gene flow, can only be one generation after second
+#       # population is generated only one population exists
+#       start_gf <- sample((burn_in + 1):(time_span - 1), 1)
+#       # gene flow ends one generation after it started
+#       end_gf <- start_gf + 1
+
+#       # get a list of all populations that were created befor the gene flow
+#       # starts as only these can be considered
+#       possible <- list()
+#       j = 1
+#       for (p in populations) {
+#         # check if the creation time of the population is smaller than the time
+#         # where the gene flow starts
+#         if (p$time < start_gf) {
+#           # if so, add population to list of possible populations
+#           possible[[j]] <- p
+#           j = j + 1
+#         }
+#       }
+
+#       # sample two indices within the possible population list
+#       number1 <- sample(1:length(possible), 1)
+#       number2 <- sample(1:length(possible), 1)
+#       # check that gene flow would not be between the same population
+#       while(number1 == number2){
+#         number2 <- sample(1:length(possible), 1)
+#       }
+#       # get the populations corresponding to the sampled indices
+#       pop1 <- possible[[number1]]
+#       pop2 <- possible[[number2]]
+
+#       # given rate of gene flow can be either list of min/max or single value
+#       if (length(rate) == 2){
+#         if (rate[1] > rate[2]) {
+#           stop("No valid range for gene flow rate", call. = FALSE)
+#         }
+#         # sample rate within given range
+#         rate_gf <- runif(1, rate[1], rate[2])
+#       } else {
+#         # keep given rate
+#         rate_gf <- rate
+#       }
+
+#       # create new gene flow event and add to list
+#       gf[[i]] <- gene_flow(from = pop1, to = pop2, start = start_gf,
+#                            end = end_gf, rate = rate_gf)
+#     }
+#   }
+#   return(gf)
+# }
