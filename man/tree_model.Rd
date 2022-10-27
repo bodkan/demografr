@@ -4,7 +4,14 @@
 \alias{tree_model}
 \title{Create a slendr model based on a given phylogenetic tree}
 \usage{
-tree_model(tree, time_span, Ne = 1000, gene_flows = 0, rates = c(0.01, 0.99))
+tree_model(
+  tree,
+  time_span,
+  N = 1000,
+  generation_time = 1,
+  gene_flows = 0,
+  rates = c(0.01, 0.99)
+)
 }
 \arguments{
 \item{tree}{A phylogenetic tree of the class \code{phylo} (see the ape R package
@@ -13,7 +20,9 @@ for more details on the format)}
 \item{time_span}{Integer number specifying what time span should the encoded demographic
 history cover.}
 
-\item{Ne}{Effective population size of all lineages. A value of 1000 is used by default.}
+\item{N}{Effective population size of all lineages. A value of 1000 is used by default.}
+
+\item{generation_time}{Generation time used by the model}
 
 \item{gene_flows}{Integer number defining the number of gene-flow events}
 

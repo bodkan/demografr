@@ -4,7 +4,7 @@
 \alias{tree_populations}
 \title{Create a list of slendr populations based on given phylogenetic tree}
 \usage{
-tree_populations(tree, time_span, Ne = 1000)
+tree_populations(tree, time_span, N = 1000, verbose = FALSE)
 }
 \arguments{
 \item{tree}{A phylogenetic tree of the class \code{phylo} (see the ape R package
@@ -13,7 +13,7 @@ for more details on the format)}
 \item{time_span}{Integer number specifying what time span should the encoded demographic
 history cover.}
 
-\item{Ne}{Effective population size of all lineages. A value of 1000 is used by default.}
+\item{N}{Effective population size of all lineages. A value of 1000 is used by default.}
 }
 \value{
 A list of populations of the class \code{slendr}

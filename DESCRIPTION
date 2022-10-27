@@ -10,6 +10,7 @@ Authors@R:
            comment = c(ORCID = "0000-0003-4879-8421"))
 Description: An Approximate Bayesian Computation (ABC) framework for fitting parameters
     of demographic models in population genetics.
+Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

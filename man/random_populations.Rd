@@ -4,7 +4,7 @@
 \alias{random_populations}
 \title{Create a list of a given number of random slendr populations}
 \usage{
-random_populations(n, time_span, Ne = 10000, names = NULL)
+random_populations(n, time_span, N = 10000, names = NULL)
 }
 \arguments{
 \item{n}{The desired number of populations that should be created}
@@ -13,7 +13,7 @@ random_populations(n, time_span, Ne = 10000, names = NULL)
 of the populations will last, to scale the edge lengths of the tree
 accordingly}
 
-\item{Ne}{Integer number defining the effective populations size of all populations}
+\item{N}{Integer number defining the effective populations size of all populations}
 
 \item{names}{Names of the populations created. If \code{NULL}, a set of names
 "pop1", "pop2", ... will be created.}
