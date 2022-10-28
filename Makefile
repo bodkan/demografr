@@ -6,6 +6,9 @@ logo := man/figures/logo.png
 
 web: README.md $(logo)
 	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::document()'
+	R -e 'pkgdown::build_reference()'
+	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_site()'
 	git checkout docs/pkgdown.yml
 
