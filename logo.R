@@ -5,6 +5,8 @@ sticker("logo.png", package = "demografr",
         h_fill = "white", h_color = "#4d4d4d", h_size = 3,
         s_x = 1, s_y = 1.22, s_width = 0.65, dpi = 2000,
         filename = "sticker.png", white_around_sticker = TRUE)
+
+dir.create("man/figures", showWarnings = FALSE, recursive = TRUE)
 system("mv sticker.png man/figures/logo.png")
 system("convert man/figures/logo.png  -resize 270x270 man/figures/logo.png")
 # system("open man/figures/logo.png")

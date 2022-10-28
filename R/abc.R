@@ -259,7 +259,8 @@ extract_summary <- function(abc, param = NULL, type = NULL) {
   else if (!is.null(type)) {
     type <- match.arg(type, c("Ne", "Tgf", "Tsplit", "gf"))
     param <- grep(type, params, value = TRUE)
-  }
+  } else if (is.null(param))
+    param <- params
 
   posterior_df %>% dplyr::select(dplyr::starts_with(param))
 }

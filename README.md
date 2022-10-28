@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# *demografr*: Simple and efficient ABC toolkit for R
+# *demografr*: A simple and efficient ABC toolkit for R
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -121,13 +121,6 @@ parameters of more complex custom models such as spatial models etc.
 
 ## An example ABC analysis
 
-``` r
-library(dplyr)
-library(slendr)
-
-library(demografr)
-```
-
 Imagine that we sequenced genomes of individuals from three populations
 “p1”, “p2”, and “p3”.
 
@@ -239,6 +232,8 @@ abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
     #> 12345678910
     #> 12345678910
 
+## Analysing posterior distributions of parameters
+
 After we run this R script, we end up with an object called `abc` here.
 This object contains the complete information about the results of our
 inference. In particular, it carries the posterior samples for our
@@ -250,21 +245,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   739.4359 2142.528  7800.827 1789.560        -195.9601
-#> Weighted 2.5 % Perc.:   854.0726 2358.806  8253.856 2376.887         316.0738
-#> Weighted Median:       1287.2786 2788.271  9064.945 3225.585        1736.8276
-#> Weighted Mean:         1310.7663 2797.039  9033.882 3243.711        1683.4828
-#> Weighted Mode:         1029.4328 2710.555  9160.963 3134.738        2370.7561
-#> Weighted 97.5 % Perc.: 1823.8979 3220.549  9794.018 4187.346        3021.7000
-#> Max.:                  2428.1726 3481.835 10391.146 5018.297        3478.3473
+#> Min.:                   688.1067 2139.173  7690.331 2146.954        -149.9703
+#> Weighted 2.5 % Perc.:   883.0213 2418.635  8177.603 2510.962         285.2612
+#> Weighted Median:       1322.2845 2823.075  9012.562 3131.644        1753.2258
+#> Weighted Mean:         1345.8740 2834.627  8987.128 3141.043        1689.4296
+#> Weighted Mode:         1050.4076 2731.173  9114.195 3119.071        2451.9920
+#> Weighted 97.5 % Perc.: 1914.6595 3259.677  9818.690 3770.846        3002.9920
+#> Max.:                  2258.4403 3515.045 10657.346 4251.742        3278.3543
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2684.420         5943.725
-#> Weighted 2.5 % Perc.:          2984.316         6184.833
-#> Weighted Median:               4369.572         7439.457
-#> Weighted Mean:                 4408.100         7476.549
-#> Weighted Mode:                 3935.760         6633.505
-#> Weighted 97.5 % Perc.:         5855.312         8740.527
-#> Max.:                          6135.693         9208.741
+#> Min.:                          2607.623         5681.233
+#> Weighted 2.5 % Perc.:          2931.548         6158.054
+#> Weighted Median:               4393.470         7486.168
+#> Weighted Mean:                 4403.442         7536.149
+#> Weighted Mode:                 3887.986         8391.645
+#> Weighted 97.5 % Perc.:         5854.048         8952.861
+#> Max.:                          6215.657         9367.072
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -282,7 +277,17 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 1 rows containing non-finite values (stat_density).
+#> Warning: Removed 4 rows containing non-finite values (stat_density).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->
+
+Finally, we have the diagnostic functionality of the
+[*abc*](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf)
+R package at our disposal:
+
+``` r
+plot(abc, param = "Ne_popC")
+```
+
+![](man/figures/README-diagnostic_Ne-1.png)<!-- -->

@@ -17,8 +17,8 @@ navbar:
       icon: fa-book
       text: Articles
       menu:
-        - text: Example analysis
-          href: vignette-01-basic-abc.html
+        - text: A basic ABC analysis
+          href: articles/vignette-01-basic-abc.html
     twitter:
       icon: fa-twitter
       href: https://twitter.com/dr_bodkan
@@ -26,9 +26,9 @@ navbar:
 reference:
   - title: Building scaffold models
     contents:
-    - slendr::compile_model
     - tree_populations
     - tree_model
+    - slendr::compile_model
 
   - title: ABC analysis
     contents:
