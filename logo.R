@@ -6,5 +6,5 @@ sticker("logo.png", package = "demografr",
         s_x = 1, s_y = 1.22, s_width = 0.65, dpi = 2000,
         filename = "sticker.png", white_around_sticker = TRUE)
 system("mv sticker.png man/figures/logo.png")
-system("convert man/figures/logo.png  -resize 300x300 man/figures/logo.png")
-# system("open man/figures/logo.png")
+system("convert man/figures/logo.png  -resize 500x500 man/figures/logo.png")
+system("open man/figures/logo.png")
