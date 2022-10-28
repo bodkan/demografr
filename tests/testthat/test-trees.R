@@ -20,8 +20,8 @@
 # model <- tree_model(tree, time_span = 10000); plot_model(model); plot(tree); ape::nodelabels()
 
 test_that("Newick inputs are in the correct format", {
-  expect_error(tree_populations("(p1,p2)", time_span = 1000), "Invalid tree specified.")
-  expect_error(tree_model("(p1,p2)", time_span = 1000), "Invalid tree specified.")
+  expect_error(tree_populations("(p1,p2)", time_span = 1000), "Invalid input tree specified.")
+  expect_error(tree_model("(p1,p2)", time_span = 1000), "Invalid input tree specified.")
 
   expect_type(tree_populations("(p1,p2);", time_span = 1000), "list")
   expect_s3_class(tree_model("(p1,p2);", time_span = 1000), "slendr_model")

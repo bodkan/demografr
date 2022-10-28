@@ -19,11 +19,8 @@ tree_populations <- function(tree, time_span, N = 1000, verbose = FALSE) {
 
   if (is.character(tree)) tree <- ape::read.tree(text = tree)
 
-  if (!inherits(tree, "phylo"))
-    stop("An input tree must be either a string in the Newick format or ape's phylo tree", call. = FALSE)
-
   if (is.null(tree))
-    stop("Invalid tree specified. Please check the correctnes of the tree input.",
+    stop("Invalid input tree specified. Please check the correctnes of the tree input.",
          call. = FALSE)
 
   if (!ape::is.rooted(tree))
