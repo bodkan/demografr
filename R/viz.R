@@ -1,5 +1,6 @@
 # custom plotting functions -----------------------------------------------
 
+#' Plot prior distribution(s)
 #' @import ggplot2
 #' @export
 plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_histogram) {
@@ -25,6 +26,7 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
   p
 }
 
+#' Plot posterior distribution(s)
 #' @import ggplot2
 #' @export
 plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", "unadj"),
@@ -76,6 +78,7 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
 
 # overloaded functions from the abc package -------------------------------
 
+#' Plot histogram of posterior distribution(s)
 #' @export hist.demografr_abc
 #' @export
 hist.demografr_abc <- function(x, param = NULL, ...) {
@@ -90,6 +93,7 @@ hist.demografr_abc <- function(x, param = NULL, ...) {
   abc:::hist.abc(x, ...)
 }
 
+#' Plot diagnostics of posterior distribution(s)
 #' @export plot.demografr_abc
 #' @export
 plot.demografr_abc <- function(x, param = NULL, ...) {
