@@ -110,7 +110,7 @@ library(demografr)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
-observed <- list(diversity = pi_df, divergence = div_df)
+observed <- list(diversity = diversity_df, divergence = divergence_df)
 
 #--------------------------------------------------------------------------------
 # create a "scaffold model" to be used for fitting parameters
@@ -132,13 +132,13 @@ priors <- list(
 #--------------------------------------------------------------------------------
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
-compute_pi <- function(ts) {
+compute_diversity <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
-compute_div <- function(ts) {
+compute_divergence <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
@@ -146,7 +146,7 @@ compute_div <- function(ts) {
 }
 # the summary functions must be also bound to an R list named in the same
 # way as the empirical summary statistics
-functions <- list(diversity = compute_pi, divergence = compute_div)
+functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations

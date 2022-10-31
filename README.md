@@ -174,7 +174,7 @@ library(demografr)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
-observed <- list(diversity = pi_df, divergence = div_df)
+observed <- list(diversity = diversity_df, divergence = divergence_df)
 
 #--------------------------------------------------------------------------------
 # create a "scaffold model" to be used for fitting parameters
@@ -196,13 +196,13 @@ priors <- list(
 #--------------------------------------------------------------------------------
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
-compute_pi <- function(ts) {
+compute_diversity <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
-compute_div <- function(ts) {
+compute_divergence <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
@@ -210,7 +210,7 @@ compute_div <- function(ts) {
 }
 # the summary functions must be also bound to an R list named in the same
 # way as the empirical summary statistics
-functions <- list(diversity = compute_pi, divergence = compute_div)
+functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations
@@ -237,21 +237,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   884.4391 1804.460  7556.039 1694.158        -91.82526
-#> Weighted 2.5 % Perc.:  1096.4940 2253.460  8233.198 2344.188        140.60793
-#> Weighted Median:       1381.2176 2699.669  9074.046 3071.173       1605.52232
-#> Weighted Mean:         1426.5854 2739.519  9056.890 3099.444       1577.36036
-#> Weighted Mode:         1208.3099 2631.220  8809.196 2987.182       2329.58406
-#> Weighted 97.5 % Perc.: 1877.9533 3245.835  9935.209 3813.637       2935.92274
-#> Max.:                  2069.5441 3650.840 10509.558 4225.104       3331.12838
+#> Min.:                   456.0585 1966.680  7467.562 1685.810      -202.808909
+#> Weighted 2.5 % Perc.:   980.6422 2143.553  8131.701 2464.793        -4.242878
+#> Weighted Median:       1390.0411 2588.580  8883.315 3170.381      1488.916069
+#> Weighted Mean:         1410.1825 2600.790  8886.597 3198.226      1465.537013
+#> Weighted Mode:         1126.1015 2599.003  8922.075 3084.364      2274.076814
+#> Weighted 97.5 % Perc.: 1921.3738 3153.541  9720.414 3944.046      2878.473675
+#> Max.:                  2126.8775 3544.456 10150.891 4372.277      3184.741115
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2800.522         5523.817
-#> Weighted 2.5 % Perc.:          3082.445         6187.376
-#> Weighted Median:               4426.678         7541.645
-#> Weighted Mean:                 4461.477         7484.024
-#> Weighted Mode:                 4226.553         7730.201
-#> Weighted 97.5 % Perc.:         5866.484         8777.584
-#> Max.:                          6218.455         9595.155
+#> Min.:                          2798.508         5991.981
+#> Weighted 2.5 % Perc.:          3036.407         6798.146
+#> Weighted Median:               4457.787         8059.935
+#> Weighted Mean:                 4435.278         8031.826
+#> Weighted Mode:                 4688.047         8294.431
+#> Weighted 97.5 % Perc.:         5885.709         9226.172
+#> Max.:                          6267.799         9575.897
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -269,7 +269,7 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 4 rows containing non-finite values (stat_density).
+#> Warning: Removed 18 rows containing non-finite values (stat_density).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->
