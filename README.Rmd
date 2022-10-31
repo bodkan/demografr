@@ -63,31 +63,15 @@ _demografr_ is very much in an early experimental stage at this point. Although 
 
 ## An example ABC analysis
 
-```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-library(dplyr)
-library(slendr)
-library(demografr)
 
-SEED <- 42
+```{r, echo=FALSE}
+devtools::load_all(".")
 
-p1 <- population("popA", time = 1, N = 1000)
-p2 <- population("popB", time = 2000, N = 3000, parent = p1)
-p3 <- population("popC", time = 4000, N = 10000, parent = p2)
-p4 <- population("popD", time = 6000, N = 5000, parent = p3)
+data_file <- system.file("examples/01_data.rds", package = "demografr")
 
-example_model <- compile_model(
-  populations = list(p1, p2, p3, p4),
-  generation_time = 1,
-  simulation_length = 10000, serialize = FALSE
-)
+diversity_df <- read.table(system.file("examples/01_diversity.tsv", package = "demografr"), header = TRUE)
 
-ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>% ts_mutate(1e-8, random_seed = SEED)
-
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-
-pi_df <- ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
-
-div_df <- ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
+divergence_df <- read.table(system.file("examples/01_divergence.tsv", package = "demografr"), header = TRUE)
 ```
 
 Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
@@ -105,13 +89,13 @@ After sequencing the genomes of individuals from these populations, we computed 
 1. Nucleotide diversity in each population:
 
 ```{r}
-pi_df
+diversity_df
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
-div_df
+divergence_df
 ```
 
 ### A complete ABC analysis in a single R script
@@ -176,8 +160,8 @@ data <- simulate_abc(
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-```{r, echo=FALSE}
-data <- readRDS("inst/extdata/data.rds")
+```{r, eval=file.exists(data_file)}
+data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
