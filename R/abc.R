@@ -123,9 +123,16 @@ simulate_abc <- function(
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   execution = c("mclapply", "lapply", "future_lapply", "single")
 ) {
+  # check the presence of all arguments to avoid cryptic errors when running simulations
+  # in parallel
+  if (!check_arg(functions))
+    stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
+              "the number of iterations, and sequence information must be provided."), call. = FALSE)
+  # if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) || !check_arg(iterations)) stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
+  #             "the number of iterations, and sequence information must be provided."), call. = FALSE)
+
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
-
 
   execution <- match.arg(execution)
 
@@ -156,7 +163,25 @@ simulate_abc <- function(
      stop("Unknown mode of execution", call. = FALSE)
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
-  simulated <- lapply(results, `[[`, "simulated")
+
+  simulated <- lapply(names(functions), function(stat) do.call(
+    rbind,
+    {
+      lapply(results, `[[`, "simulated") %>% lapply(function(it) {
+        df <- it[[stat]]
+        values <- matrix(df[, 2, drop = TRUE], nrow = 1)
+        colnames(values) <- df[, 1, drop = TRUE]
+        values
+      })
+    }
+  )) %>% do.call(cbind, .)
+
+  observed <- lapply(names(functions), function(stat) {
+    df <- observed[[stat]]
+    values <- matrix(df[, 2, drop = TRUE], nrow = 1)
+    colnames(values) <- df[, 1, drop = TRUE]
+    values
+  }) %>% do.call(cbind, .)
 
   result <- list(
     parameters = parameters,
@@ -180,29 +205,10 @@ simulate_abc <- function(
 #'
 #' @export 
 perform_abc <- function(data, tolerance, method, ...) {
-  parameters <- data$parameters
-  statistics <- names(data$functions)
-
-  observed <- lapply(statistics, function(stat) {
-    df <- data$observed[[stat]]
-    values <- matrix(df[, 2, drop = TRUE], nrow = 1)
-    colnames(values) <- df[, 1, drop = TRUE]
-    values
-  }) %>% do.call(cbind, .)
-
-  simulated <- lapply(statistics, function(stat) do.call(
-    rbind, lapply(data$simulated, function(it) {
-      df <- it[[stat]]
-      values <- matrix(df[, 2, drop = TRUE], nrow = 1)
-      colnames(values) <- df[, 1, drop = TRUE]
-      values
-    }))
-  ) %>% do.call(cbind, .)
-
   result <- abc::abc(
-    param = parameters,
-    target = observed,
-    sumstat = simulated,
+    param = data$parameters,
+    target = data$observed,
+    sumstat = data$simulated,
     tol = tolerance,
     method = method,
     ...
