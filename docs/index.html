@@ -147,7 +147,6 @@
 <div class="section level2">
 <h2 id="an-example-abc-analysis">An example ABC analysis<a class="anchor" aria-label="anchor" href="#an-example-abc-analysis"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Loading demografr</span></span></code></pre></div>
 <p>Imagine that we sequenced genomes of individuals from three populations “p1”, “p2”, and “p3”.</p>
 <p>Let’s also assume that we know that the three populations are phylogenetically related in the following way but we don’t know anything else (i.e., we have no idea about their <span class="math inline"><em>N</em><sub><em>e</em></sub></span> or split times):</p>
 <p><img src="reference/figures/README-ape_tree-1.png" style="display: block; margin: auto;"></p>
@@ -155,7 +154,7 @@
 <ol style="list-style-type: decimal">
 <li>Nucleotide diversity in each population:</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diversity_df</span></span>
 <span><span class="co">#&gt;      stat        value</span></span>
 <span><span class="co">#&gt; 1 pi_popA 3.962604e-05</span></span>
@@ -165,7 +164,7 @@
 <ol start="2" style="list-style-type: decimal">
 <li>Pairwise divergence d_X_Y between populations X and Y:</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">divergence_df</span></span>
 <span><span class="co">#&gt;          stat        value</span></span>
 <span><span class="co">#&gt; 1 d_popA_popB 0.0001984640</span></span>
@@ -178,7 +177,7 @@
 <h3 id="a-complete-abc-analysis-in-a-single-r-script">A complete ABC analysis in a single R script<a class="anchor" aria-label="anchor" href="#a-complete-abc-analysis-in-a-single-r-script"></a>
 </h3>
 <p>This is how we would use <em>demografr</em> to estimate the <span class="math inline"><em>N</em><sub><em>e</em></sub></span> and split times for all populations with Approximate Bayesian Computation in a single R script. You will find a more detailed explanation of each step below.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
 <span></span>
@@ -234,12 +233,6 @@
 <span><span class="co">#--------------------------------------------------------------------------------</span></span>
 <span><span class="co"># infer posterior distributions of parameters</span></span>
 <span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, tolerance <span class="op">=</span> <span class="fl">0.05</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/01_data.rds"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, tolerance <span class="op">=</span> <span class="fl">0.05</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: All parameters are "none" transformed.</span></span>
-<span><span class="co">#&gt; 12345678910</span></span>
-<span><span class="co">#&gt; 12345678910</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -247,34 +240,35 @@
 </h2>
 <p>After we run this R script, we end up with an object called <code>abc</code> here. This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest (<span class="math inline"><em>N</em><sub><em>e</em></sub></span> of populations and their split times).</p>
 <p>For instance, we can get a table of all posterior values with the function <code><a href="reference/extract_summary.html">extract_summary()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB</span></span>
-<span><span class="co">#&gt; Min.:                   821.0667 2140.479  7757.564 2248.640         61.24159</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:   976.0228 2492.051  8451.718 2776.034        177.90568</span></span>
-<span><span class="co">#&gt; Weighted Median:       1371.8613 2827.327  9298.988 3189.754       1646.43317</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1379.1468 2849.521  9281.017 3199.475       1611.93210</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1307.8464 2785.431  9428.026 3164.497       2412.37625</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1815.0574 3209.265 10168.348 3617.630       3009.28508</span></span>
-<span><span class="co">#&gt; Max.:                  2134.3624 3479.068 10618.309 3891.349       3322.80536</span></span>
+<span><span class="co">#&gt; Min.:                   884.4391 1804.460  7556.039 1694.158        -91.82526</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1096.4940 2253.460  8233.198 2344.188        140.60793</span></span>
+<span><span class="co">#&gt; Weighted Median:       1381.2176 2699.669  9074.046 3071.173       1605.52232</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1426.5854 2739.519  9056.890 3099.444       1577.36036</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1208.3099 2631.220  8809.196 2987.182       2329.58406</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1877.9533 3245.835  9935.209 3813.637       2935.92274</span></span>
+<span><span class="co">#&gt; Max.:                  2069.5441 3650.840 10509.558 4225.104       3331.12838</span></span>
 <span><span class="co">#&gt;                        Tsplit_popB_popC Tsplit_popC_popD</span></span>
-<span><span class="co">#&gt; Min.:                          2613.312         5339.402</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:          2946.050         6220.770</span></span>
-<span><span class="co">#&gt; Weighted Median:               4416.774         7394.844</span></span>
-<span><span class="co">#&gt; Weighted Mean:                 4397.101         7353.142</span></span>
-<span><span class="co">#&gt; Weighted Mode:                 4645.944         7587.548</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.:         5856.789         8387.364</span></span>
-<span><span class="co">#&gt; Max.:                          6258.414         8930.929</span></span></code></pre></div>
+<span><span class="co">#&gt; Min.:                          2800.522         5523.817</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:          3082.445         6187.376</span></span>
+<span><span class="co">#&gt; Weighted Median:               4426.678         7541.645</span></span>
+<span><span class="co">#&gt; Weighted Mean:                 4461.477         7484.024</span></span>
+<span><span class="co">#&gt; Weighted Mode:                 4226.553         7730.201</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.:         5866.484         8777.584</span></span>
+<span><span class="co">#&gt; Max.:                          6218.455         9595.155</span></span></code></pre></div>
 <p>We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let’s first check out the posterior distributions of inferred <span class="math inline"><em>N</em><sub><em>e</em></sub></span> values:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-posterior_Ne-1.png"><!-- --></p>
 <p>Similarly, we can take a look at the inferred posteriors of the split times:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Tsplit"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Tsplit"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Removed 4 rows containing non-finite values (stat_density).</span></span></code></pre></div>
 <p><img src="reference/figures/README-posterior_Tsplit-1.png"><!-- --></p>
 <p>Finally, we have the diagnostic functionality of the <a href="https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf" class="external-link"><em>abc</em></a> R package at our disposal:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_popC"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-diagnostic_Ne-1.png"><!-- --></p>
 </div>

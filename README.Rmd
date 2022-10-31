@@ -64,7 +64,7 @@ _demografr_ is very much in an early experimental stage at this point. Although 
 ## An example ABC analysis
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, message=FALSE}
 devtools::load_all(".")
 
 data_file <- system.file("examples/01_data.rds", package = "demografr")
@@ -160,7 +160,7 @@ data <- simulate_abc(
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-```{r, eval=file.exists(data_file)}
+```{r, echo=FALSE, eval=file.exists(data_file), warning=FALSE, message=FALSE, results="hide"}
 data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```

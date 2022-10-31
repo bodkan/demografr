@@ -121,8 +121,6 @@ parameters of more complex custom models such as spatial models etc.
 
 ## An example ABC analysis
 
-    #> ℹ Loading demografr
-
 Imagine that we sequenced genomes of individuals from three populations
 “p1”, “p2”, and “p3”.
 
@@ -226,14 +224,6 @@ data <- simulate_abc(
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-``` r
-data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
-abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
-#> Warning: All parameters are "none" transformed.
-#> 12345678910
-#> 12345678910
-```
-
 ## Analysing posterior distributions of parameters
 
 After we run this R script, we end up with an object called `abc` here.
@@ -247,21 +237,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   821.0667 2140.479  7757.564 2248.640         61.24159
-#> Weighted 2.5 % Perc.:   976.0228 2492.051  8451.718 2776.034        177.90568
-#> Weighted Median:       1371.8613 2827.327  9298.988 3189.754       1646.43317
-#> Weighted Mean:         1379.1468 2849.521  9281.017 3199.475       1611.93210
-#> Weighted Mode:         1307.8464 2785.431  9428.026 3164.497       2412.37625
-#> Weighted 97.5 % Perc.: 1815.0574 3209.265 10168.348 3617.630       3009.28508
-#> Max.:                  2134.3624 3479.068 10618.309 3891.349       3322.80536
+#> Min.:                   884.4391 1804.460  7556.039 1694.158        -91.82526
+#> Weighted 2.5 % Perc.:  1096.4940 2253.460  8233.198 2344.188        140.60793
+#> Weighted Median:       1381.2176 2699.669  9074.046 3071.173       1605.52232
+#> Weighted Mean:         1426.5854 2739.519  9056.890 3099.444       1577.36036
+#> Weighted Mode:         1208.3099 2631.220  8809.196 2987.182       2329.58406
+#> Weighted 97.5 % Perc.: 1877.9533 3245.835  9935.209 3813.637       2935.92274
+#> Max.:                  2069.5441 3650.840 10509.558 4225.104       3331.12838
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2613.312         5339.402
-#> Weighted 2.5 % Perc.:          2946.050         6220.770
-#> Weighted Median:               4416.774         7394.844
-#> Weighted Mean:                 4397.101         7353.142
-#> Weighted Mode:                 4645.944         7587.548
-#> Weighted 97.5 % Perc.:         5856.789         8387.364
-#> Max.:                          6258.414         8930.929
+#> Min.:                          2800.522         5523.817
+#> Weighted 2.5 % Perc.:          3082.445         6187.376
+#> Weighted Median:               4426.678         7541.645
+#> Weighted Mean:                 4461.477         7484.024
+#> Weighted Mode:                 4226.553         7730.201
+#> Weighted 97.5 % Perc.:         5866.484         8777.584
+#> Max.:                          6218.455         9595.155
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -279,6 +269,7 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
+#> Warning: Removed 4 rows containing non-finite values (stat_density).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->
