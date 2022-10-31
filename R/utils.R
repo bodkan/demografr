@@ -33,6 +33,12 @@ print.demografr_sims <- function(x, ...) {
   cat("    <object>$priors     -- prior expressions\n")
 }
 
+# Check that the function argument is really provided by the user
+check_arg <- function(x) {
+  tryCatch({get(deparse(substitute(x))); TRUE}, error = function(e) FALSE) ||
+  tryCatch({!is.null(x); TRUE}, error = function(e) FALSE)
+}
+
 # a function to silence the unnecessary summary() output on abc objects
 # https://stackoverflow.com/a/54136863
 quiet <- function(x) {
