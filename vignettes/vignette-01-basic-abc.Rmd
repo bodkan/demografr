@@ -36,42 +36,21 @@ par(opar)
 After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
 
 ```{r setup, echo=FALSE, message=FALSE}
-library(dplyr)
-library(slendr)
-library(demografr)
+diversity_df <- read.table(system.file("examples/01_diversity.tsv", package = "demografr"), header = TRUE)
 
-SEED <- 42
-
-p1 <- population("popA", time = 1, N = 1000)
-p2 <- population("popB", time = 2000, N = 3000, parent = p1)
-p3 <- population("popC", time = 4000, N = 10000, parent = p2)
-p4 <- population("popD", time = 6000, N = 5000, parent = p3)
-
-example_model <- compile_model(
-  populations = list(p1, p2, p3, p4),
-  generation_time = 1,
-  simulation_length = 10000, serialize = FALSE
-)
-
-ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>% ts_mutate(1e-8, random_seed = SEED)
-
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
-
-pi_df <- ts_diversity(ts, sample_sets = samples) %>% mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
-
-div_df <- ts_divergence(ts, sample_sets = samples) %>% mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
+divergence_df <- read.table(system.file("examples/01_divergence.tsv", package = "demografr"), header = TRUE)
 ```
 
 1. Nucleotide diversity in each population:
 
 ```{r}
-pi_df
+diversity_df
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
-div_df
+divergence_df
 ```
 
 **Now let's develop a simple ABC pipeline which will infer the posterior distributions of two sets of parameters we are interested in: $N_e$ of each population lineage, as well as split times between our populations of interest.**
@@ -90,7 +69,7 @@ library(demografr)
 For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here "diversity" and "divergence") have meaning and are quite important for later steps:
 
 ```{r}
-observed <- list(diversity = pi_df, divergence = div_df)
+observed <- list(diversity = diversity_df, divergence = divergence_df)
 ```
 
 ### Setting up a "scaffold" model
@@ -145,21 +124,21 @@ Each run of a _demografr_ ABC simulation internally produces a tree sequence as 
 In our example, because we computed nucleotide diversity and pairwise divergence in the individuals sequenced from populations "p1", "p2", and "p3", we will define the following functions. Crucially, when run on a tree-sequence object, they will produce an output data frame in the format analogous to the empirical statistics shown in data frames `diversity` and `divergence` above:
 
 ```{r}
-compute_pi <- function(ts) {
+compute_diversity <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 
-compute_div <- function(ts) {
+compute_divergence <- function(ts) {
   samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
 }
 
-functions <- list(diversity = compute_pi, divergence = compute_div)
+functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 ```
 
 Crucially, the outputs of these summary functions _must_ match the format of the observed summary statistics (i.e., the data frames produced must have the same format). This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.
