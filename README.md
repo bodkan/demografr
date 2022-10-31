@@ -121,6 +121,8 @@ parameters of more complex custom models such as spatial models etc.
 
 ## An example ABC analysis
 
+    #> ℹ Loading demografr
+
 Imagine that we sequenced genomes of individuals from three populations
 “p1”, “p2”, and “p3”.
 
@@ -138,29 +140,25 @@ saved in two standard R data frames:
 1.  Nucleotide diversity in each population:
 
 ``` r
-pi_df
-#> # A tibble: 4 × 2
-#>   stat        value
-#>   <chr>       <dbl>
-#> 1 pi_popA 0.0000396
-#> 2 pi_popB 0.0000983
-#> 3 pi_popC 0.000150 
-#> 4 pi_popD 0.000129
+diversity_df
+#>      stat        value
+#> 1 pi_popA 3.962604e-05
+#> 2 pi_popB 9.827821e-05
+#> 3 pi_popC 1.501280e-04
+#> 4 pi_popD 1.286567e-04
 ```
 
 2.  Pairwise divergence d_X\_Y between populations X and Y:
 
 ``` r
-div_df
-#> # A tibble: 6 × 2
-#>   stat           value
-#>   <chr>          <dbl>
-#> 1 d_popA_popB 0.000198
-#> 2 d_popA_popC 0.000199
-#> 3 d_popA_popD 0.000200
-#> 4 d_popB_popC 0.000183
-#> 5 d_popB_popD 0.000183
-#> 6 d_popC_popD 0.000175
+divergence_df
+#>          stat        value
+#> 1 d_popA_popB 0.0001984640
+#> 2 d_popA_popC 0.0001991969
+#> 3 d_popA_popD 0.0001999640
+#> 4 d_popB_popC 0.0001825852
+#> 5 d_popB_popD 0.0001832798
+#> 6 d_popC_popD 0.0001754839
 ```
 
 ### A complete ABC analysis in a single R script
@@ -228,9 +226,13 @@ data <- simulate_abc(
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-    #> Warning: All parameters are "none" transformed.
-    #> 12345678910
-    #> 12345678910
+``` r
+data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+#> Warning: All parameters are "none" transformed.
+#> 12345678910
+#> 12345678910
+```
 
 ## Analysing posterior distributions of parameters
 
@@ -245,21 +247,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   688.1067 2139.173  7690.331 2146.954        -149.9703
-#> Weighted 2.5 % Perc.:   883.0213 2418.635  8177.603 2510.962         285.2612
-#> Weighted Median:       1322.2845 2823.075  9012.562 3131.644        1753.2258
-#> Weighted Mean:         1345.8740 2834.627  8987.128 3141.043        1689.4296
-#> Weighted Mode:         1050.4076 2731.173  9114.195 3119.071        2451.9920
-#> Weighted 97.5 % Perc.: 1914.6595 3259.677  9818.690 3770.846        3002.9920
-#> Max.:                  2258.4403 3515.045 10657.346 4251.742        3278.3543
+#> Min.:                   821.0667 2140.479  7757.564 2248.640         61.24159
+#> Weighted 2.5 % Perc.:   976.0228 2492.051  8451.718 2776.034        177.90568
+#> Weighted Median:       1371.8613 2827.327  9298.988 3189.754       1646.43317
+#> Weighted Mean:         1379.1468 2849.521  9281.017 3199.475       1611.93210
+#> Weighted Mode:         1307.8464 2785.431  9428.026 3164.497       2412.37625
+#> Weighted 97.5 % Perc.: 1815.0574 3209.265 10168.348 3617.630       3009.28508
+#> Max.:                  2134.3624 3479.068 10618.309 3891.349       3322.80536
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2607.623         5681.233
-#> Weighted 2.5 % Perc.:          2931.548         6158.054
-#> Weighted Median:               4393.470         7486.168
-#> Weighted Mean:                 4403.442         7536.149
-#> Weighted Mode:                 3887.986         8391.645
-#> Weighted 97.5 % Perc.:         5854.048         8952.861
-#> Max.:                          6215.657         9367.072
+#> Min.:                          2613.312         5339.402
+#> Weighted 2.5 % Perc.:          2946.050         6220.770
+#> Weighted Median:               4416.774         7394.844
+#> Weighted Mean:                 4397.101         7353.142
+#> Weighted Mode:                 4645.944         7587.548
+#> Weighted 97.5 % Perc.:         5856.789         8387.364
+#> Max.:                          6258.414         8930.929
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -277,7 +279,6 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 4 rows containing non-finite values (stat_density).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->
