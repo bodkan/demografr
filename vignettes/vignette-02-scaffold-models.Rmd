@@ -1,8 +1,8 @@
 ---
-title: "A basic ABC analysis"
+title: "Defining scaffold models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{A basic ABC analysis}
+  %\VignetteIndexEntry{Defining scaffold models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

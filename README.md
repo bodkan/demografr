@@ -121,8 +121,8 @@ parameters of more complex custom models such as spatial models etc.
 
 ## An example ABC analysis
 
-Imagine that we sequenced genomes of individuals from three populations
-“p1”, “p2”, and “p3”.
+Imagine that we sequenced genomes of individuals from populations
+“popA”, “popB”, “popC”, and “popD”.
 
 Let’s also assume that we know that the three populations are
 phylogenetically related in the following way but we don’t know anything
@@ -178,7 +178,7 @@ observed <- list(diversity = diversity_df, divergence = divergence_df)
 
 #--------------------------------------------------------------------------------
 # create a "scaffold model" to be used for fitting parameters
-model <- tree_model("(popA,(popB,(popC,popD)));", time_span = 10000)
+model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
 
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
@@ -237,21 +237,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   456.0585 1966.680  7467.562 1685.810      -202.808909
-#> Weighted 2.5 % Perc.:   980.6422 2143.553  8131.701 2464.793        -4.242878
-#> Weighted Median:       1390.0411 2588.580  8883.315 3170.381      1488.916069
-#> Weighted Mean:         1410.1825 2600.790  8886.597 3198.226      1465.537013
-#> Weighted Mode:         1126.1015 2599.003  8922.075 3084.364      2274.076814
-#> Weighted 97.5 % Perc.: 1921.3738 3153.541  9720.414 3944.046      2878.473675
-#> Max.:                  2126.8775 3544.456 10150.891 4372.277      3184.741115
+#> Min.:                   804.7554 1781.872  7467.403 1641.636        -160.2667
+#> Weighted 2.5 % Perc.:   970.8283 2285.109  8225.524 2380.860         218.6822
+#> Weighted Median:       1290.7201 2724.991  9054.711 3101.464        1660.9392
+#> Weighted Mean:         1330.5339 2745.694  9032.949 3121.904        1628.8970
+#> Weighted Mode:         1169.6489 2650.226  8761.923 3032.915        2399.3400
+#> Weighted 97.5 % Perc.: 1844.8893 3232.468  9933.372 3856.459        2968.6147
+#> Max.:                  2135.8553 3522.799 10406.015 4352.898        3365.1435
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2798.508         5991.981
-#> Weighted 2.5 % Perc.:          3036.407         6798.146
-#> Weighted Median:               4457.787         8059.935
-#> Weighted Mean:                 4435.278         8031.826
-#> Weighted Mode:                 4688.047         8294.431
-#> Weighted 97.5 % Perc.:         5885.709         9226.172
-#> Max.:                          6267.799         9575.897
+#> Min.:                          2826.918         5503.187
+#> Weighted 2.5 % Perc.:          3067.291         6117.435
+#> Weighted Median:               4454.494         7497.031
+#> Weighted Mean:                 4478.389         7455.087
+#> Weighted Mode:                 4225.729         7741.752
+#> Weighted 97.5 % Perc.:         5930.984         8702.061
+#> Max.:                          6268.375         9755.374
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -269,7 +269,7 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 18 rows containing non-finite values (stat_density).
+#> Warning: Removed 2 rows containing non-finite values (stat_density).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->

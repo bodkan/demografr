@@ -74,7 +74,7 @@ diversity_df <- read.table(system.file("examples/01_diversity.tsv", package = "d
 divergence_df <- read.table(system.file("examples/01_divergence.tsv", package = "demografr"), header = TRUE)
 ```
 
-Imagine that we sequenced genomes of individuals from three populations "p1", "p2", and "p3".
+Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
 Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
@@ -114,7 +114,7 @@ observed <- list(diversity = diversity_df, divergence = divergence_df)
 
 #--------------------------------------------------------------------------------
 # create a "scaffold model" to be used for fitting parameters
-model <- tree_model("(popA,(popB,(popC,popD)));", time_span = 10000)
+model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
 
 #--------------------------------------------------------------------------------
 # setup priors for model parameters

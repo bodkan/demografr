@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   vignette-01-basic-abc: vignette-01-basic-abc.html
-last_built: 2022-10-31T18:10Z
+last_built: 2022-11-01T09:35Z
 urls:
   reference: https://bodkan.github.io/demografr/reference
   article: https://bodkan.github.io/demografr/articles
