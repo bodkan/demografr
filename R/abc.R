@@ -16,75 +16,110 @@
 #' @export
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0) {
-
   if (length(setdiff(names(functions), names(observed))))
     stop("Lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
-  cat("------------------------------------------------------------\n")
+  cat("============================================================\n")
 
-  cat("Testing sampling of each prior parameter:\n")
   prior_samples <- list()
-  for (param in c("Ne", "Tsplit", "gf")) {
-    p_priors <- subset_priors(priors, param)
-    cat(sprintf("  Found %d priors of type %s -- testing their sampling...", length(p_priors), param))
+  if (inherits(model, "slendr_model")) {
+    cat("Standard slendr model provided as a scaffold\n")
+    cat("============================================================\n")
+    cat("Testing sampling of each prior parameter:\n")
 
-    if (length(p_priors)) {
-      fun <- if (param %in% c("Ne", "Tsplit")) round else identity
+    for (param in c("Ne", "Tsplit", "gf")) {
+      p_priors <- subset_priors(priors, param)
+      cat(sprintf("  Found %d priors of type %s -- testing their sampling...", length(p_priors), param))
 
-      p_samples <- list()
-      for (p in p_priors) {
-        p_sample <- tryCatch(
-          sample_prior(p, convert = fun),
-          error = function(e) {
-            stop(sprintf("\nSampling the prior %s resuted in the following problem:\n\n%s",
-                         as.character(as.list(p)[[2]]), e$message), call. = FALSE)
-          }
-        )
-        p_samples <- append(p_samples, list(p_sample))
+      if (length(p_priors)) {
+        fun <- if (param %in% c("Ne", "Tsplit")) round else identity
+
+        p_samples <- list()
+        for (p in p_priors) {
+          p_sample <- tryCatch(
+            sample_prior(p, convert = fun),
+            error = function(e) {
+              stop(sprintf("\nSampling the prior %s resuted in the following problem:\n\n%s",
+                          as.character(as.list(p)[[2]]), e$message), call. = FALSE)
+            }
+          )
+          p_samples <- append(p_samples, list(p_sample))
+        }
+
+        prior_samples[[param]] <- p_samples
       }
 
-      prior_samples[[param]] <- p_samples
+      cat("\n")
     }
+  } else {
+    cat("A generating function was provided as a scaffold\n")
+    cat("============================================================\n")
+    cat("Testing sampling of each prior parameter:\n")
 
-    cat("\n")
+    for (prior in priors) {
+      prior_name <- as.character(as.list(prior)[[2]])
+      cat(sprintf("  Found prior for %s -- testing sampling...", prior_name))
+
+      prior_sample <- tryCatch(
+        sample_prior(prior, convert = identity),
+        error = function(e) {
+          cat(" \u274C\n\n")
+          stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
+                      prior_name, e$message), call. = FALSE)
+        }
+      )
+
+      cat(" \u2713\n")
+      prior_samples <- append(prior_samples, list(prior_sample))
+    }
   }
 
   cat("------------------------------------------------------------\n")
 
-  cat("Modifying the scaffold model with sampled prior values...\n")
-  new_model <- modify_model(model, prior_samples)
+  if (is.function(model)) {
+    arguments <- lapply(prior_samples, `[[`, "value")
+    names(arguments) <- lapply(prior_samples, `[[`, "variable")
+    cat("Running the model function with sampled prior values...")
+    new_model <- do.call(model, arguments)
+  } else {
+    cat("Modifying the scaffold model with sampled prior values...")
+    new_model <- modify_model(model, prior_samples)
+  }
+  cat(" \u2713\n")
 
   cat("------------------------------------------------------------\n")
 
-  cat("Simulating a tree sequence from the constructed model...\n")
+  cat("Simulating a tree sequence from the constructed model...")
   ts <- slendr::msprime(
     new_model,
     sequence_length = sequence_length,
     recombination_rate = recombination_rate
   ) %>%
     slendr::ts_mutate(mutation_rate = mutation_rate)
+  cat(" \u2713\n")
 
   cat("------------------------------------------------------------\n")
 
-  cat("Computing user-defined summary functions on the tree sequence:\n")
+  cat("Computing user-defined summary functions:\n")
 
   simulated_stats <- list()
   for (stat in names(functions)) {
-    cat(sprintf("  * %s\n", stat))
+    cat(sprintf("  * %s", stat))
     simulated_stats[[stat]] <- tryCatch(functions[[stat]](ts),
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)
       })
+    cat(" \u2713\n")
   }
 
   cat("------------------------------------------------------------\n")
 
-  cat("Checking the format of data frames with simulated summary statistics:\n")
+  cat("Checking the format of simulated summary statistics:\n")
 
   for (stat in names(functions)) {
-    cat(sprintf("  * %s\n", stat))
+    cat(sprintf("  * %s", stat))
     sim_df <- simulated_stats[[stat]]
     obs_df <- observed[[stat]]
     if (!all(dim(sim_df) == dim(obs_df))) {
@@ -103,6 +138,7 @@ validate_abc <- function(model, priors, functions, observed,
       )
       stop(error_msg, call. = FALSE)
     }
+    cat(" \u2713\n")
   }
 
   cat("============================================================\n")
@@ -125,7 +161,8 @@ simulate_abc <- function(
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
-  if (!check_arg(functions))
+  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||
+      !check_arg(iterations))
     stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
               "the number of iterations, and sequence information must be provided."), call. = FALSE)
   # if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) || !check_arg(iterations)) stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
