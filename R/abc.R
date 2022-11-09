@@ -23,56 +23,93 @@ validate_abc <- function(model, priors, functions, observed,
   cat("============================================================\n")
 
   prior_samples <- list()
-  if (inherits(model, "slendr_model")) {
+  if (inherits(model, "slendr_model"))
     cat("Standard slendr model provided as a scaffold\n")
-    cat("============================================================\n")
-    cat("Testing sampling of each prior parameter:\n")
-
-    for (param in c("Ne", "Tsplit", "gf")) {
-      p_priors <- subset_priors(priors, param)
-      cat(sprintf("  Found %d priors of type %s -- testing their sampling...", length(p_priors), param))
-
-      if (length(p_priors)) {
-        fun <- if (param %in% c("Ne", "Tsplit")) round else identity
-
-        p_samples <- list()
-        for (p in p_priors) {
-          p_sample <- tryCatch(
-            sample_prior(p, convert = fun),
-            error = function(e) {
-              stop(sprintf("\nSampling the prior %s resuted in the following problem:\n\n%s",
-                          as.character(as.list(p)[[2]]), e$message), call. = FALSE)
-            }
-          )
-          p_samples <- append(p_samples, list(p_sample))
-        }
-
-        prior_samples[[param]] <- p_samples
-      }
-
-      cat("\n")
-    }
-  } else {
+  else
     cat("A generating function was provided as a scaffold\n")
-    cat("============================================================\n")
-    cat("Testing sampling of each prior parameter:\n")
 
-    for (prior in priors) {
-      prior_name <- as.character(as.list(prior)[[2]])
-      cat(sprintf("  Found prior for %s -- testing sampling...", prior_name))
+  cat("============================================================\n")
 
-      prior_sample <- tryCatch(
-        sample_prior(prior, convert = identity),
-        error = function(e) {
-          cat(" \u274C\n\n")
-          stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
-                      prior_name, e$message), call. = FALSE)
-        }
-      )
+  prior_names <- sapply(seq_along(priors), function(i) as.character(as.list(priors[[i]])[[2]]))
 
+  if (is.function(model)) {
+    cat("Checking the presence of required function arguments... ")
+
+    missing_priors <- setdiff(formalArgs(model), prior_names)
+    if (length(missing_priors) > 0) {
+      cat(" \u274C\n\n")
+      stop("The following model parameters lack priors:\n    ", missing_priors, "\n\n",
+           "All model function arguments must have priors assigned to them.\n",
+           call. = FALSE)
+    } else
       cat(" \u2713\n")
-      prior_samples <- append(prior_samples, list(prior_sample))
+
+  }
+
+  if (inherits(model, "slendr_model")) {
+    population_names <- model$splits$pop
+
+    cat("Checking the correct syntax of population names... ")
+
+    non_alphanum <- grepl("[^[:alnum:]]", population_names)
+    if (any(non_alphanum)) {
+      cat(" \u274c\n\n")
+      stop("Parameter syntax requires alphanumeric population names.\n\n",
+           "Invalid names are: ", population_names[non_alphanum], call. = FALSE)
     }
+
+    cat(" \u2713\n")
+
+    cat("Checking the correctness of prior parameter names... ")
+
+    # ensure that all populations with given Ne priors really exist in the model
+    Ne_priors <- grep("^Ne_", prior_names, value = TRUE) %>% gsub("Ne_", "", .)
+    if (any(duplicated(Ne_priors))) {
+      cat(" \u274c\n\n")
+      stop("Duplicated Ne priors for population(s): ", Ne_priors[duplicated(Ne_priors)], call. = FALSE)
+    }
+
+    # make sure that multiple priors for a single split event are not specified
+    split_pairs <- grep("^Tsplit_", prior_names, value = TRUE) %>% gsub("Tsplit_", "", .)
+    if (any(duplicated(split_pairs))) {
+      cat(" \u274c\n\n")
+      stop("Duplicated split time priors for pair(s): ",
+           gsub("_", "-", split_pairs[duplicated(splir_priors)]), call. = FALSE)
+    }
+
+    for (i in seq_along(split_pairs)) {
+      # peek into the splits table for the corresponding parent-daughter population pair
+      pair <- strsplit(split_pairs[i], "_")[[1]]
+      split_row <- model$splits %>% { .[.$parent == pair[1] & .$pop == pair[2], ] }
+      # write an informative error if the split doesn't exist in the model configuration
+      if (nrow(split_row) == 0) {
+        cat(" \u274c\n\n")
+        stop("Split of '", pair[2], "' from '", pair[1], "' is not encoded in the model.\n",
+             "Please make sure the population names match the model specification.", call. = FALSE)
+      }
+    }
+
+    cat(" \u2713\n")
+  }
+
+  cat("------------------------------------------------------------\n")
+
+  cat("Testing sampling of each prior parameter:\n")
+
+  for (i in seq_along(priors)) {
+    cat(sprintf("  * %s", prior_names[i]))
+
+    prior_sample <- tryCatch(
+      sample_prior(priors[[i]], convert = identity),
+      error = function(e) {
+        cat(" \u274C\n\n")
+        stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
+                    prior_names[i], e$message), call. = FALSE)
+      }
+    )
+
+    cat(" \u2713\n")
+    prior_samples <- append(prior_samples, list(prior_sample))
   }
 
   cat("------------------------------------------------------------\n")
@@ -353,7 +390,7 @@ modify_model <- function(model, prior_samples) {
   if (!is.null(prior_samples[["Tsplit"]])) {
     for (split in prior_samples[["Tsplit"]]) {
       # split variable symbol name into tokens ("T_split", "ancestor pop", "daughter pop")
-      var_tokens <- strsplit(as.character(split$variable), "_")[[1]]
+      var_tokens <- strsplit(as.character(split$variable), "-")[[1]]
       model$splits[
         model$splits$parent == var_tokens[2] &
         model$splits$pop == var_tokens[3],
