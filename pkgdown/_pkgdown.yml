@@ -19,6 +19,8 @@ navbar:
       menu:
         - text: A basic ABC analysis
           href: articles/vignette-01-basic-abc.html
+        - text: Defining scaffold models
+          href: articles/vignette-02-scaffold-models.html
     twitter:
       icon: fa-twitter
       href: https://twitter.com/dr_bodkan
@@ -34,6 +36,7 @@ reference:
     contents:
     - validate_abc
     - simulate_abc
+    - combine_abc
     - perform_abc
 
   - title: Visualization of priors and posteriors

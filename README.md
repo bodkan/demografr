@@ -197,13 +197,13 @@ priors <- list(
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  samples <- ts_samples(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  samples <- ts_samples(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
@@ -237,21 +237,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   804.7554 1781.872  7467.403 1641.636        -160.2667
-#> Weighted 2.5 % Perc.:   970.8283 2285.109  8225.524 2380.860         218.6822
-#> Weighted Median:       1290.7201 2724.991  9054.711 3101.464        1660.9392
-#> Weighted Mean:         1330.5339 2745.694  9032.949 3121.904        1628.8970
-#> Weighted Mode:         1169.6489 2650.226  8761.923 3032.915        2399.3400
-#> Weighted 97.5 % Perc.: 1844.8893 3232.468  9933.372 3856.459        2968.6147
-#> Max.:                  2135.8553 3522.799 10406.015 4352.898        3365.1435
+#> Min.:                   456.9466 1786.983  7269.716 1561.702       -146.79968
+#> Weighted 2.5 % Perc.:   949.7835 2240.788  7974.730 2365.532         55.44157
+#> Weighted Median:       1451.6596 2708.875  8891.336 3110.409       1443.92678
+#> Weighted Mean:         1467.5406 2718.136  8891.433 3160.459       1427.85605
+#> Weighted Mode:         1244.5832 2677.400  8880.467 3024.810       2214.12686
+#> Weighted 97.5 % Perc.: 2017.1019 3295.407  9995.459 4009.037       2755.62326
+#> Max.:                  2235.6294 3942.230 10579.829 4626.789       3059.36873
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2826.918         5503.187
-#> Weighted 2.5 % Perc.:          3067.291         6117.435
-#> Weighted Median:               4454.494         7497.031
-#> Weighted Mean:                 4478.389         7455.087
-#> Weighted Mode:                 4225.729         7741.752
-#> Weighted 97.5 % Perc.:         5930.984         8702.061
-#> Max.:                          6268.375         9755.374
+#> Min.:                          2957.558         5703.118
+#> Weighted 2.5 % Perc.:          3136.027         6172.928
+#> Weighted Median:               4469.104         7591.053
+#> Weighted Mean:                 4470.146         7534.247
+#> Weighted Mode:                 4237.780         7832.415
+#> Weighted 97.5 % Perc.:         5842.363         8854.766
+#> Max.:                          6176.139         9190.189
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -269,7 +269,7 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 2 rows containing non-finite values (stat_density).
+#> Warning: Removed 8 rows containing non-finite values (`stat_density()`).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->

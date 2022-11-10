@@ -113,9 +113,9 @@ priors <- list(
   Ne_popC ~ runif(1, 10000),
   Ne_popD ~ runif(1, 10000),
 
-  Tsplit_popA_popB ~ runif(1, 3000),
-  Tsplit_popB_popC ~ runif(3000, 6000),
-  Tsplit_popC_popD ~ runif(6000, 9000)
+  Tsplit_popA-popB ~ runif(1, 3000),
+  Tsplit_popB-popC ~ runif(3000, 6000),
+  Tsplit_popC-popD ~ runif(6000, 9000)
 )
 ```
 
@@ -129,14 +129,14 @@ In our example, because we computed nucleotide diversity and pairwise divergence
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  samples <- ts_samples(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+  samples <- ts_samples(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
