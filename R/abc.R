@@ -225,6 +225,9 @@ simulate_abc <- function(
 
   execution <- match.arg(execution)
 
+  # validate the ABC setup
+  capture.output(validate_abc(model, priors, functions, observed, sequence_length, recombination_rate, mutation_rate))
+
   if (execution == "lapply") {
     results <- lapply(X = seq_len(iterations), FUN = run_iteration, model = model,
                       priors = priors, functions = functions,
