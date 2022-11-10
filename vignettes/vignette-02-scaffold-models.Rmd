@@ -17,17 +17,23 @@ knitr::opts_chunk$set(
 devtools::install(".")
 ```
 
+## Introduction
+
+Let's return to our [introductory example](vignette-01-basic-abc.html). The "scaffold" model we defined in that vignette was created using a built-in function `tree_model()`, which accepts a phylogenetic tree as input and converts it into an appropriate _slendr_ demographic model which _demografr_ later uses as a scaffold for ABC inference.
+
+We begin by loading all required packages, and setting up parallelization for our inference using the package _future_:
+
 ```{r, message=FALSE}
 library(dplyr)
 library(readr)
 
 library(slendr)
 library(demografr)
+
+# my Mac has 10 cores, feel free to adjust this
+library(future)
+plan(multisession, workers = availableCores())
 ```
-
-## Introduction
-
-Let's return to our [introductory example](vignette-01-basic-abc.html). The "scaffold" model we defined in that vignette was created using a built-in function `tree_model()`, which accepts a phylogenetic tree as input and converts it into an appropriate _slendr_ demographic model which _demografr_ later uses as a scaffold for ABC inference.
 
 Load observed summary statistics computed from "sequenced" real data:
 
@@ -91,13 +97,23 @@ priors <- list(
 )
 ```
 
+From the previous vignette we already know this ABC model setup is valid, but it's always worth checking again:
+
 ```{r}
 validate_abc(model1, priors, functions, observed)
 ```
 
+In order to save computational time, we won't simulate the full ABC run. That said, for completeness, here are two commands we would usually run once the ABC setup is successfully validated. We would first simulate data for ABC inference:
+
 ```{r, eval=FALSE}
-simulate_abc(model1, priors, functions, observed, iterations = 10,
-             sequence_length = 1e5, recombination_rate = 1e-8)
+data <- simulate_abc(model1, priors, functions, observed, iterations = 10000,
+                    sequence_length = 1e6, recombination_rate = 1e-8)
+```
+
+Then we would plug the simulations into the inference function `perform_abc()`:
+
+```{r}
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
 
@@ -134,22 +150,16 @@ Why would you use this option instead of inputting a phylogenetic tree? For one 
 validate_abc(model2, priors, functions, observed)
 ```
 
+Again, we will skip the simulations and inference, which we would normally perform with something like this:
+
 ```{r, eval=FALSE}
-simulate_abc(model2, priors, functions, observed, iterations = 10,
-             sequence_length = 1e5, recombination_rate = 1e-8)
+# first simulate data
+data <- simulate_abc(model2, priors, functions, observed, iterations = 10000,
+                    sequence_length = 1e6, recombination_rate = 1e-8)
+
+# then perform ABC inference
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
-
-```{r}
-a=simulate_abc(model2, priors, functions, observed, iterations = 10,
-             sequence_length = 1e5, recombination_rate = 1e-8)
-b=simulate_abc(model2, priors, functions, observed, iterations = 10,
-             sequence_length = 1e5, recombination_rate = 1e-8)
-c=simulate_abc(model2, priors, functions, observed, iterations = 10,
-             sequence_length = 1e5, recombination_rate = 1e-8)
-```
-
-
-
 
 
 
@@ -180,7 +190,7 @@ Hopefully, it should be clear how much more flexibility this kind of set up give
 
 ```{r, slendr_model3, fig.width=5, fig.height=3, fig.align="center"}
 test_model <- custom_model(
-  size_popA = 1123, size_popB = 4321, size_popC = 42, size_popD = 2000,
+  size_A = 1123, size_B = 4321, size_C = 42, size_D = 2000,
   split_AB = 500, split_BC = 5000, split_CD = 7000
 )
 
@@ -210,7 +220,16 @@ For such generating function-based models, it is even more worth to validate the
 validate_abc(custom_model, custom_priors, functions, observed)
 ```
 
+Having convinced ourselves that the ABC model components are correctly configured, we would proceed with inference:
+
+
 ```{r, eval=FALSE}
-simulate_abc(generate_model, custom_priors, functions, observed, iterations = 100,
-             sequence_length = 1e5, recombination_rate = 1e-8)
+# first simulate data
+data <- simulate_abc(custom_model, custom_priors, functions, observed, iterations = 10000,
+                     sequence_length = 1e6, recombination_rate = 1e-8)
+
+# then perform ABC inference
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
+
+
