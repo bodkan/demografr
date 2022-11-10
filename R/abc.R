@@ -222,7 +222,8 @@ simulate_abc <- function(
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   # validate the ABC setup
-  capture.output(validate_abc(model, priors, functions, observed, sequence_length, recombination_rate, mutation_rate))
+  capture.output(validate_abc(model, priors, functions, observed,
+                              sequence_length, recombination_rate, mutation_rate))
 
   results <- future.apply::future_lapply(
       X = seq_len(iterations),
@@ -230,10 +231,11 @@ simulate_abc <- function(
       model = model,
       priors = priors,
       functions = functions,
-      mutation_rate = mutation_rate,
       sequence_length = sequence_length,
       recombination_rate = recombination_rate,
-      future.seed = TRUE
+      mutation_rate = mutation_rate,
+      future.seed = TRUE,
+      future.packages = c("slendr", "dplyr")
   )
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
@@ -496,7 +498,13 @@ modify_model <- function(model, prior_samples) {
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
-  new_model <- modify_model(model, prior_samples)
+  if (is.function(model)) {
+    arguments <- lapply(prior_samples$custom, `[[`, "value")
+    names(arguments) <- lapply(prior_samples$custom, `[[`, "variable")
+    new_model <- do.call(model, arguments)
+  } else {
+    new_model <- modify_model(model, prior_samples)
+  }
 
   ts <- slendr::msprime(
     new_model,
@@ -516,11 +524,15 @@ run_iteration <- function(it, model, priors, functions,
   slendr::setup_env(quiet = TRUE)
 
   # sample parameters from appropriate priors
-  prior_samples <- list(
-    Ne      = subset_priors(priors, "Ne")     %>% lapply(sample_prior, convert = round),
-    T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior, convert = round),
-    gf      = subset_priors(priors, "gf")     %>% lapply(sample_prior)
-  )
+  if (is.function(model)) {
+    prior_samples <- list(custom = lapply(priors, sample_prior))
+  } else {
+    prior_samples <- list(
+      Ne      = subset_priors(priors, "Ne")     %>% lapply(sample_prior, convert = round),
+      T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior, convert = round),
+      gf      = subset_priors(priors, "gf")     %>% lapply(sample_prior)
+    )
+  }
 
   ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate)
 
