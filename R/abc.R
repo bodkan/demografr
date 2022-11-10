@@ -209,7 +209,7 @@ validate_abc <- function(model, priors, functions, observed,
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  execution = c("mclapply", "lapply", "future_lapply", "single")
+  pieces = FALSE, execution = c("mclapply", "lapply", "future_lapply", "single")
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -275,16 +275,23 @@ simulate_abc <- function(
     values
   }) %>% do.call(cbind, .)
 
-  result <- list(
-    parameters = parameters,
-    simulated = simulated,
-    observed = observed,
-    functions = functions,
-    priors = priors,
-    model = model
-  )
-
-  class(result) <- "demografr_sims"
+  if (pieces) {
+    result <- list(
+      param = parameters,
+      target = observed,
+      sumstats = simulated
+    )
+  } else {
+    result <- list(
+      parameters = parameters,
+      simulated = simulated,
+      observed = observed,
+      functions = functions,
+      priors = priors,
+      model = model
+    )
+    class(result) <- "demografr_sims"
+  }
 
   result
 }
