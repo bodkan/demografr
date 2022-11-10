@@ -223,36 +223,20 @@ simulate_abc <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  execution <- match.arg(execution)
-
   # validate the ABC setup
   capture.output(validate_abc(model, priors, functions, observed, sequence_length, recombination_rate, mutation_rate))
 
-  if (execution == "lapply") {
-    results <- lapply(X = seq_len(iterations), FUN = run_iteration, model = model,
-                      priors = priors, functions = functions,
-                      mutation_rate = mutation_rate, sequence_length = sequence_length,
-                      recombination_rate = recombination_rate)
-  } else if (execution == "mclapply") {
-    results <- parallel::mclapply(X = seq_len(iterations), FUN = run_iteration, model = model,
-                                  priors = priors, functions = functions,
-                                  mutation_rate = mutation_rate, sequence_length = sequence_length,
-                                  recombination_rate = recombination_rate, mc.cores = future::availableCores())
-  } else if (execution == "future_lapply") {
-    results <- future.apply::future_lapply(
-      X = seq_len(iterations), FUN = run_iteration, model = model,
-      priors = priors, functions = functions,
-      mutation_rate = mutation_rate, sequence_length = sequence_length,
+  results <- future.apply::future_lapply(
+      X = seq_len(iterations),
+      FUN = run_iteration,
+      model = model,
+      priors = priors,
+      functions = functions,
+      mutation_rate = mutation_rate,
+      sequence_length = sequence_length,
       recombination_rate = recombination_rate,
-      future.seed = TRUE, future.packages = c("dplyr", "combinat", "slendr")
-    )
-  } else if (execution == "single") {
-    results <- list(run_iteration(it = 1, model = model,
-                                  priors = priors, functions = functions,
-                                  mutation_rate = mutation_rate, sequence_length = sequence_length,
-                                  recombination_rate = recombination_rate))
-  } else
-     stop("Unknown mode of execution", call. = FALSE)
+      future.seed = TRUE
+  )
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
 
