@@ -63,14 +63,29 @@ validate_abc <- function(model, priors, functions, observed,
     cat("Checking the correctness of prior parameter names... ")
 
     # ensure that all populations with given Ne priors really exist in the model
-    Ne_priors <- grep("^Ne_", prior_names, value = TRUE) %>% gsub("Ne_", "", .)
-    if (any(duplicated(Ne_priors))) {
+    Ne_pops <- grep("^Ne_", prior_names, value = TRUE) %>% gsub("Ne_", "", .)
+    missing_pops <- setdiff(Ne_pops, population_names)
+    if (length(missing_pops) > 0) {
       cat(" \u274c\n\n")
-      stop("Duplicated Ne priors for population(s): ", Ne_priors[duplicated(Ne_priors)], call. = FALSE)
+      stop("Unknown population(s) among Ne priors: ", missing_pops, call. = FALSE)
+    }
+
+    # ensure that no poopulations' Ne priors are duplicated
+    if (any(duplicated(Ne_pops))) {
+      cat(" \u274c\n\n")
+      stop("Duplicated Ne priors for population(s): ", Ne_pops[duplicated(Ne_pops)], call. = FALSE)
     }
 
     # make sure that multiple priors for a single split event are not specified
     split_pairs <- grep("^Tsplit_", prior_names, value = TRUE) %>% gsub("Tsplit_", "", .)
+
+    split_pops <- unique(unlist(strsplit(split_pairs, "_")))
+    missing_pops <- setdiff(split_pops, population_names)
+    if (length(missing_pops) > 0) {
+      cat(" \u274c\n\n")
+      stop("Unknown population(s) among split time priors: ", missing_pops, call. = FALSE)
+    }
+
     if (any(duplicated(split_pairs))) {
       cat(" \u274c\n\n")
       stop("Duplicated split time priors for pair(s): ",
@@ -85,7 +100,7 @@ validate_abc <- function(model, priors, functions, observed,
       if (nrow(split_row) == 0) {
         cat(" \u274c\n\n")
         stop("Split of '", pair[2], "' from '", pair[1], "' is not encoded in the model.\n",
-             "Please make sure the population names match the model specification.", call. = FALSE)
+             call. = FALSE)
       }
     }
 
