@@ -209,7 +209,7 @@ validate_abc <- function(model, priors, functions, observed,
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  pieces = FALSE, execution = c("mclapply", "lapply", "future_lapply", "single")
+  pieces = FALSE
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -217,8 +217,6 @@ simulate_abc <- function(
       !check_arg(iterations))
     stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
               "the number of iterations, and sequence information must be provided."), call. = FALSE)
-  # if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) || !check_arg(iterations)) stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
-  #             "the number of iterations, and sequence information must be provided."), call. = FALSE)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
@@ -310,7 +308,8 @@ perform_abc <- function(data, tolerance, method, ...) {
 #'
 #' @param ... Either a list of objects of the class \code{demografr_sims} as produced
 #'   by the function \code{simulate_abc}, or individual objects of this class given
-#'   as standard function arguments.
+#'   as standard function arguments, or paths to 'rds' files containing serializations of
+#'   such \code{demografr_sims} objects.
 #'
 #' @return A combined object of the class \code{demografr_sims}
 #'
@@ -318,6 +317,18 @@ perform_abc <- function(data, tolerance, method, ...) {
 combine_abc <- function(...) {
   runs <- list(...)
   if (length(runs) == 1) runs <- runs[[1]]
+
+  if (all(sapply(runs, is.character))) {
+    for (i in seq_along(runs)) {
+      if (file.exists(runs[[i]]))
+        runs[[i]] <- readRDS(runs[[i]])
+      else
+        stop("File ", runs[[i]], " does not exist", call. = FALSE)
+    }
+  }
+
+  if (!all(sapply(runs, inherits, "demografr_sims")))
+    stop("All provided runs must be a product of the function `simulate_abc()`", call. = FALSE)
  
   # check that all individual demografr_sims objects are from the same model
   for (i in seq_along(runs)) {

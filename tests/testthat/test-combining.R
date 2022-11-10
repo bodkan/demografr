@@ -108,3 +108,64 @@ test_that("both a list of runs and individual runs can be combined", {
   expect_true(ncol(runs_list$observed) == ncol(run2$observed))
   expect_true(ncol(runs_list$observed) == ncol(run3$observed))
 })
+
+test_that("simulation runs can be loaded in their serialized form", {
+  f1 <- tempfile()
+  f2 <- tempfile()
+  f3 <- tempfile()
+  saveRDS(run1, f1)
+  saveRDS(run2, f2)
+  saveRDS(run3, f3)
+
+  # individual runs as combine arguments
+  runs_ind <- combine_abc(f1, f2, f3)
+  expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+  expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
+  expect_true(ncol(runs_ind$parameters) == ncol(run2$parameters))
+  expect_true(ncol(runs_ind$parameters) == ncol(run3$parameters))
+
+  expect_true(nrow(runs_ind$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+  expect_true(ncol(runs_ind$simulated) == ncol(run1$simulated))
+  expect_true(ncol(runs_ind$simulated) == ncol(run2$simulated))
+  expect_true(ncol(runs_ind$simulated) == ncol(run3$simulated))
+
+  expect_true(nrow(runs_ind$observed) == nrow(run1$observed))
+  expect_true(nrow(runs_ind$observed) == nrow(run2$observed))
+  expect_true(nrow(runs_ind$observed) == nrow(run3$observed))
+  expect_true(ncol(runs_ind$observed) == ncol(run1$observed))
+  expect_true(ncol(runs_ind$observed) == ncol(run2$observed))
+  expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
+
+  # list of runs
+  expect_s3_class(runs_list <- combine_abc(f1, f2, f3), "demografr_sims")
+
+  expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+  expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
+  expect_true(ncol(runs_list$parameters) == ncol(run2$parameters))
+  expect_true(ncol(runs_list$parameters) == ncol(run3$parameters))
+
+  expect_true(nrow(runs_list$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+  expect_true(ncol(runs_list$simulated) == ncol(run1$simulated))
+  expect_true(ncol(runs_list$simulated) == ncol(run2$simulated))
+  expect_true(ncol(runs_list$simulated) == ncol(run3$simulated))
+
+  expect_true(nrow(runs_list$observed) == nrow(run1$observed))
+  expect_true(nrow(runs_list$observed) == nrow(run2$observed))
+  expect_true(nrow(runs_list$observed) == nrow(run3$observed))
+  expect_true(ncol(runs_list$observed) == ncol(run1$observed))
+  expect_true(ncol(runs_list$observed) == ncol(run2$observed))
+  expect_true(ncol(runs_list$observed) == ncol(run3$observed))
+})
+
+test_that("missing serialized files are correctly handled", {
+  f1 <- tempfile()
+  f2 <- tempfile()
+  f3 <- tempfile()
+  saveRDS(run1, f1)
+  saveRDS(run2, f2)
+  saveRDS(run3, f3)
+
+  unlink(f1)
+  expect_error(combine_abc(f1, f2, f3), "File .* does not exist")
+  expect_error(combine_abc(list(f1, f2, f3)), "File .* does not exist")
+})
