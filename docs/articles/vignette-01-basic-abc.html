@@ -71,6 +71,9 @@
 <li>
       <a href="../articles/vignette-01-basic-abc.html">A basic ABC analysis</a>
     </li>
+    <li>
+      <a href="../articles/vignette-02-scaffold-models.html">Defining scaffold models</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -225,9 +228,9 @@ formula syntax in R:</p>
 <span>  <span class="va">Ne_popC</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
 <span>  <span class="va">Ne_popD</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
 <span></span>
-<span>  <span class="va">Tsplit_popA_popB</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3000</span><span class="op">)</span>,</span>
-<span>  <span class="va">Tsplit_popB_popC</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">3000</span>, <span class="fl">6000</span><span class="op">)</span>,</span>
-<span>  <span class="va">Tsplit_popC_popD</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">6000</span>, <span class="fl">9000</span><span class="op">)</span></span>
+<span>  <span class="va">Tsplit_popA</span><span class="op">-</span><span class="va">popB</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3000</span><span class="op">)</span>,</span>
+<span>  <span class="va">Tsplit_popB</span><span class="op">-</span><span class="va">popC</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">3000</span>, <span class="fl">6000</span><span class="op">)</span>,</span>
+<span>  <span class="va">Tsplit_popC</span><span class="op">-</span><span class="va">popD</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">6000</span>, <span class="fl">9000</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>In an ABC simulation step below, the formulas are used to draw the
 values of each parameter from specified distributions (in this case, all
@@ -254,14 +257,14 @@ format analogous to the empirical statistics shown in data frames
 <code>diversity</code> and <code>divergence</code> above:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_samples.html" class="external-link">ts_samples</a></span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">.</span><span class="op">$</span><span class="va">pop</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">`[[`</span>, <span class="st">"name"</span><span class="op">)</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_samples.html" class="external-link">ts_samples</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_diversity.html" class="external-link">ts_diversity</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"pi_"</span>, <span class="va">set</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stat</span>, value <span class="op">=</span> <span class="va">diversity</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">compute_divergence</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_samples.html" class="external-link">ts_samples</a></span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/split.html" class="external-link">split</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">.</span><span class="op">$</span><span class="va">pop</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">`[[`</span>, <span class="st">"name"</span><span class="op">)</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_samples.html" class="external-link">ts_samples</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_divergence.html" class="external-link">ts_divergence</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"d_%s_%s"</span>, <span class="va">x</span>, <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stat</span>, value <span class="op">=</span> <span class="va">divergence</span><span class="op">)</span></span>
@@ -286,23 +289,32 @@ a good idea to validate the ABC components we have so far assembled
 using the function <code><a href="../reference/validate_abc.html">validate_abc()</a></code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ============================================================</span></span>
+<span><span class="co">#&gt; Standard slendr model provided as a scaffold</span></span>
+<span><span class="co">#&gt; ============================================================</span></span>
+<span><span class="co">#&gt; Checking the correct syntax of population names...  ✓</span></span>
+<span><span class="co">#&gt; Checking the correctness of prior parameter names...  ✓</span></span>
 <span><span class="co">#&gt; ------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; Testing sampling of each prior parameter:</span></span>
-<span><span class="co">#&gt;   Found 4 priors of type Ne -- testing their sampling...</span></span>
-<span><span class="co">#&gt;   Found 3 priors of type Tsplit -- testing their sampling...</span></span>
-<span><span class="co">#&gt;   Found 0 priors of type gf -- testing their sampling...</span></span>
+<span><span class="co">#&gt;   * Ne_popA ✓</span></span>
+<span><span class="co">#&gt;   * Ne_popB ✓</span></span>
+<span><span class="co">#&gt;   * Ne_popC ✓</span></span>
+<span><span class="co">#&gt;   * Ne_popD ✓</span></span>
+<span><span class="co">#&gt;   * c("-", "Tsplit_popA", "popB") ✓</span></span>
+<span><span class="co">#&gt;   * c("-", "Tsplit_popB", "popC") ✓</span></span>
+<span><span class="co">#&gt;   * c("-", "Tsplit_popC", "popD") ✓</span></span>
 <span><span class="co">#&gt; ------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; Modifying the scaffold model with sampled prior values...</span></span>
+<span><span class="co">#&gt; Modifying the scaffold model with sampled prior values... ✓</span></span>
 <span><span class="co">#&gt; ------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; Simulating a tree sequence from the constructed model...</span></span>
+<span><span class="co">#&gt; Simulating a tree sequence from the constructed model... ✓</span></span>
 <span><span class="co">#&gt; ------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; Computing user-defined summary functions on the tree sequence:</span></span>
-<span><span class="co">#&gt;   * diversity</span></span>
-<span><span class="co">#&gt;   * divergence</span></span>
+<span><span class="co">#&gt; Computing user-defined summary functions:</span></span>
+<span><span class="co">#&gt;   * diversity ✓</span></span>
+<span><span class="co">#&gt;   * divergence ✓</span></span>
 <span><span class="co">#&gt; ------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; Checking the format of data frames with simulated summary statistics:</span></span>
-<span><span class="co">#&gt;   * diversity</span></span>
-<span><span class="co">#&gt;   * divergence</span></span>
+<span><span class="co">#&gt; Checking the format of simulated summary statistics:</span></span>
+<span><span class="co">#&gt;   * diversity ✓</span></span>
+<span><span class="co">#&gt;   * divergence ✓</span></span>
 <span><span class="co">#&gt; ============================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre></div>
 <p>Having verified that all model components are set up correctly, we
@@ -356,56 +368,56 @@ probability (MAP) of the parameters in the row labelled “Weighted
 Mode:”:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB</span></span>
-<span><span class="co">#&gt; Min.:                   623.3216 1749.601  7720.141 1699.552        -109.7299</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:   867.9621 2252.565  8366.249 2469.452         167.8974</span></span>
-<span><span class="co">#&gt; Weighted Median:       1220.9012 2669.306  9202.402 3196.957        1664.8695</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1252.4179 2696.793  9195.454 3218.359        1641.4181</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1033.6865 2623.014  8953.499 3142.988        2413.5371</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1742.0999 3178.525 10068.509 3928.523        3001.9751</span></span>
-<span><span class="co">#&gt; Max.:                  2005.6378 3509.164 10595.172 4291.699        3285.0959</span></span>
+<span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC   Ne_popD Tsplit_popA_popB</span></span>
+<span><span class="co">#&gt; Min.:                   317.9937 2351.017  6127.580  398.3602       -1987.2545</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   721.9790 2527.447  7285.506 3070.2727         902.1314</span></span>
+<span><span class="co">#&gt; Weighted Median:       1233.9575 2753.268  8591.103 3209.7451        1578.3031</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1246.6632 2769.703  8612.789 3215.2054        1569.3698</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1079.7187 2713.087  8205.407 3190.8496        1915.9826</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1728.2976 3056.333 10162.854 3362.1234        2233.0511</span></span>
+<span><span class="co">#&gt; Max.:                  1946.2608 3324.196 11190.179 3428.8759        2351.1774</span></span>
 <span><span class="co">#&gt;                        Tsplit_popB_popC Tsplit_popC_popD</span></span>
-<span><span class="co">#&gt; Min.:                          2791.307         5632.409</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:          3090.581         6266.662</span></span>
-<span><span class="co">#&gt; Weighted Median:               4503.787         7609.117</span></span>
-<span><span class="co">#&gt; Weighted Mean:                 4503.158         7535.781</span></span>
-<span><span class="co">#&gt; Weighted Mode:                 4295.878         7751.711</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.:         5923.443         8746.853</span></span>
-<span><span class="co">#&gt; Max.:                          6301.639         9487.336</span></span></code></pre></div>
+<span><span class="co">#&gt; Min.:                          2647.386         6229.098</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:          2941.466         6585.954</span></span>
+<span><span class="co">#&gt; Weighted Median:               4468.397         7549.354</span></span>
+<span><span class="co">#&gt; Weighted Mean:                 4507.956         7516.610</span></span>
+<span><span class="co">#&gt; Weighted Mode:                 4248.170         7730.367</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.:         6143.424         8403.914</span></span>
+<span><span class="co">#&gt; Max.:                          6391.469         8869.133</span></span></code></pre></div>
 <p>Because large tables can get a little hard to read, it is possible to
 subset to only a specific <em>type</em> of parameter:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC  Ne_popD</span></span>
-<span><span class="co">#&gt; Min.:                   623.3216 1749.601  7720.141 1699.552</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:   867.9621 2252.565  8366.249 2469.452</span></span>
-<span><span class="co">#&gt; Weighted Median:       1220.9012 2669.306  9202.402 3196.957</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1252.4179 2696.793  9195.454 3218.359</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1033.6865 2623.014  8953.499 3142.988</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1742.0999 3178.525 10068.509 3928.523</span></span>
-<span><span class="co">#&gt; Max.:                  2005.6378 3509.164 10595.172 4291.699</span></span></code></pre></div>
+<span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC   Ne_popD</span></span>
+<span><span class="co">#&gt; Min.:                   317.9937 2351.017  6127.580  398.3602</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   721.9790 2527.447  7285.506 3070.2727</span></span>
+<span><span class="co">#&gt; Weighted Median:       1233.9575 2753.268  8591.103 3209.7451</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1246.6632 2769.703  8612.789 3215.2054</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1079.7187 2713.087  8205.407 3190.8496</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1728.2976 3056.333 10162.854 3362.1234</span></span>
+<span><span class="co">#&gt; Max.:                  1946.2608 3324.196 11190.179 3428.8759</span></span></code></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Tsplit"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                        Tsplit_popA_popB Tsplit_popB_popC Tsplit_popC_popD</span></span>
-<span><span class="co">#&gt; Min.:                         -109.7299         2791.307         5632.409</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:          167.8974         3090.581         6266.662</span></span>
-<span><span class="co">#&gt; Weighted Median:              1664.8695         4503.787         7609.117</span></span>
-<span><span class="co">#&gt; Weighted Mean:                1641.4181         4503.158         7535.781</span></span>
-<span><span class="co">#&gt; Weighted Mode:                2413.5371         4295.878         7751.711</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.:        3001.9751         5923.443         8746.853</span></span>
-<span><span class="co">#&gt; Max.:                         3285.0959         6301.639         9487.336</span></span></code></pre></div>
+<span><span class="co">#&gt; Min.:                        -1987.2545         2647.386         6229.098</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:          902.1314         2941.466         6585.954</span></span>
+<span><span class="co">#&gt; Weighted Median:              1578.3031         4468.397         7549.354</span></span>
+<span><span class="co">#&gt; Weighted Mean:                1569.3698         4507.956         7516.610</span></span>
+<span><span class="co">#&gt; Weighted Mode:                1915.9826         4248.170         7730.367</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.:        2233.0511         6143.424         8403.914</span></span>
+<span><span class="co">#&gt; Max.:                         2351.1774         6391.469         8869.133</span></span></code></pre></div>
 <p>Alternatively, we can also extract the posterior summary for a single
 parameter like this:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_popD"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                         Ne_popD</span></span>
-<span><span class="co">#&gt; Min.:                  1699.552</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  2469.452</span></span>
-<span><span class="co">#&gt; Weighted Median:       3196.957</span></span>
-<span><span class="co">#&gt; Weighted Mean:         3218.359</span></span>
-<span><span class="co">#&gt; Weighted Mode:         3142.988</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3928.523</span></span>
-<span><span class="co">#&gt; Max.:                  4291.699</span></span></code></pre></div>
+<span><span class="co">#&gt;                          Ne_popD</span></span>
+<span><span class="co">#&gt; Min.:                   398.3602</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  3070.2727</span></span>
+<span><span class="co">#&gt; Weighted Median:       3209.7451</span></span>
+<span><span class="co">#&gt; Weighted Mean:         3215.2054</span></span>
+<span><span class="co">#&gt; Weighted Mode:         3190.8496</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3362.1234</span></span>
+<span><span class="co">#&gt; Max.:                  3428.8759</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualizing-posterior-distributions-of-parameters">Visualizing posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-parameters"></a>
@@ -423,7 +435,7 @@ times are not as informative compared to the priors that we
 specified:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Tsplit"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 1 rows containing non-finite values (stat_density).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 1 rows containing non-finite values (`stat_density()`).</span></span></code></pre></div>
 <p><img src="vignette-01-basic-abc_files/figure-html/posterior_Tsplit-1.png" width="768" style="display: block; margin: auto;"></p>
 <p>Because the internals of <em>demografr</em> ABC objects are
 represented by standard objects created by the <em>abc</em> package, we

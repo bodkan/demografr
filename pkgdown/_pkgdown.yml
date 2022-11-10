@@ -26,13 +26,12 @@ navbar:
       href: https://twitter.com/dr_bodkan
 
 reference:
-  - title: Building scaffold models
+  - title: Helpers for building scaffold models
     contents:
     - tree_populations
     - tree_model
-    - slendr::compile_model
 
-  - title: ABC analysis
+  - title: ABC simulations and inference
     contents:
     - validate_abc
     - simulate_abc

@@ -112,7 +112,7 @@ data <- simulate_abc(model1, priors, functions, observed, iterations = 10000,
 
 Then we would plug the simulations into the inference function `perform_abc()`:
 
-```{r}
+```{r, eval=FALSE}
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 

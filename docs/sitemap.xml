@@ -16,10 +16,16 @@
     <loc>https://bodkan.github.io/demografr/articles/vignette-01-basic-abc.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.github.io/demografr/articles/vignette-02-scaffold-models.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.github.io/demografr/authors.html</loc>
   </url>
   <url>
     <loc>https://bodkan.github.io/demografr/index.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.github.io/demografr/reference/combine_abc.html</loc>
   </url>
   <url>
     <loc>https://bodkan.github.io/demografr/reference/extract_model.html</loc>

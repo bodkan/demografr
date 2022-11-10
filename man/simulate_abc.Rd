@@ -13,7 +13,7 @@ simulate_abc(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
-  execution = c("mclapply", "lapply", "future_lapply", "single")
+  pieces = FALSE
 )
 }
 \arguments{
