@@ -3,26 +3,28 @@ slendr::setup_env(quiet = TRUE)
 
 SEED <- 42
 
-p1 <- population("popA", time = 1, N = 1000)
-p2 <- population("popB", time = 2000, N = 3000, parent = p1)
-p3 <- population("popC", time = 4000, N = 10000, parent = p2)
-p4 <- population("popD", time = 6000, N = 5000, parent = p3)
+p1 <- slendr::population("popA", time = 1, N = 1000)
+p2 <- slendr::population("popB", time = 2000, N = 3000, parent = p1)
+p3 <- slendr::population("popC", time = 4000, N = 10000, parent = p2)
+p4 <- slendr::population("popD", time = 6000, N = 5000, parent = p3)
 
-model <- compile_model(
+model <- slendr::compile_model(
   populations = list(p1, p2, p3, p4),
   generation_time = 1,
   simulation_length = 10000, serialize = FALSE
 )
 
-ts <- msprime(example_model, sequence_length = 1e6, recombination_rate = 0, random_seed = SEED)
+ts <- slendr::msprime(model, sequence_length = 1e6, recombination_rate = 0, random_seed = SEED)
 
-samples <- ts_samples(ts, split = TRUE)
+samples <- slendr::ts_samples(ts, split = TRUE)
 
-pi_df <- ts_diversity(ts, sample_sets = samples) %>%
-  mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
+pi_df <- slendr::ts_diversity(ts, sample_sets = samples) %>%
+  dplyr::mutate(stat = paste0("pi_", set)) %>% dplyr::select(stat, value = diversity)
 
-div_df <- ts_divergence(ts, sample_sets = samples) %>%
-  mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
+div_df <- slendr::ts_divergence(ts, sample_sets = samples) %>%
+  dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>% dplyr::select(stat, value = divergence)
+
+observed <- list(diversity = pi_df, divergence = div_df)
 
 priors <- list(
   Ne_popA ~ runif(1, 10000),
@@ -34,6 +36,20 @@ priors <- list(
   Tsplit_popB_popC ~ runif(3000, 6000),
   Tsplit_popC_popD ~ runif(6000, 9000)
 )
+
+compute_diversity <- function(ts) {
+  samples <- slendr::ts_samples(ts, split = TRUE)
+  slendr::ts_diversity(ts, sample_sets = samples) %>%
+    dplyr::mutate(stat = paste0("pi_", set)) %>%
+    dplyr::select(stat, value = diversity)
+}
+compute_divergence <- function(ts) {
+  samples <- slendr::ts_samples(ts, split = TRUE)
+  slendr::ts_divergence(ts, sample_sets = samples) %>%
+    dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    dplyr::select(stat, value = divergence)
+}
+functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 
 run1 <- simulate_abc(model, priors, functions, observed, iterations = 3, sequence_length = 10000, recombination_rate = 0)
 run2 <- simulate_abc(model, priors, functions, observed, iterations = 3, sequence_length = 10000, recombination_rate = 0)
@@ -168,4 +184,14 @@ test_that("missing serialized files are correctly handled", {
   unlink(f1)
   expect_error(combine_abc(f1, f2, f3), "File .* does not exist")
   expect_error(combine_abc(list(f1, f2, f3)), "File .* does not exist")
+})
+
+test_that("the function comparison hack works as intended", {
+  funs1 <- list(mean, lm, print)
+  funs2 <- list(mean, lm, print)
+  expect_true(identical_functions(funs1, funs2))
+
+  funs1 <- list(function() 1 + 2, function(x, y) print(x^y), function(z) hist(z))
+  funs2 <- list(function() (1 + 2) - 1, function(x, y) print(x^y), function(z) hist(z))
+  expect_false(identical_functions(funs1, funs2))
 })

@@ -345,7 +345,7 @@ combine_abc <- function(...) {
       stop("Simulation runs must originate from the same ABC setup but priors\n",
            "differ between runs number 1 and ", i, call. = FALSE)
 
-    if (!identical(runs[[1]]$functions, runs[[i]]$functions))
+    if (!identical_functions(runs[[1]]$functions, runs[[i]]$functions))
       stop("Simulation runs must originate from the same ABC setup but summary functions\n",
            "differ between runs number 1 and ", i, call. = FALSE)
 
@@ -622,4 +622,16 @@ check_param_presence <- function(params, p) {
     stop(paste(missing, collapse = ", "), " not among the estimated model parameters",
          call. = FALSE)
   }
+}
+
+# This seems like a horrible hack but unless it turns out this is completely
+# broken, it seems better to keep the ability to compare summary functions
+# between ABC simulation runs rather than not. Either way, all functions *will*
+# be identical between runs unless the user messes up in some way, so being
+# potentially overly conservative here seems appropriate.
+identical_functions <- function(run1_functions, run2_functions) {
+  # get sources of both functions, stripping the address line
+  run1_sources <- lapply(run1_functions, function(x) capture.output(print(x)) %>% .[-length(.)])
+  run2_sources <- lapply(run2_functions, function(x) capture.output(print(x)) %>% .[-length(.)])
+  identical(run1_sources, run2_sources)
 }
