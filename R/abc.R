@@ -603,7 +603,7 @@ sample_prior <- function(f) {
       stop("Invalid prior value %s", value, call. = FALSE)
   }
 
-  list(variable = variable, value = convert(value))
+  list(variable = variable, value = value)
 }
 
 # Check if the provided prior formula contains the specified parameter type
