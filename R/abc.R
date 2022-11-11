@@ -558,8 +558,15 @@ extract_posterior_summary <- function(abc, summary = c("mode", "mean", "median")
   )
 }
 
-# Sample value from a given prior sampling formula object
-sample_prior <- function(f, convert = identity) {
+#' Sample value from a given prior sampling formula object
+#'
+#' @param f Formula-based prior sampling expression such as <variable> ~ <sampling statement>
+#'
+#' @return A list of two elements, "variable" containing the name of the sampled variable,
+#'   and "value" containing the actual value of the sampled prior.
+#'
+#' @export
+sample_prior <- function(f) {
   if (!inherits(f, "formula"))
     stop("A prior expression must take a form of an R formula such as:\n\n",
          "     N_pop1 ~ runif(min = 100, max = 10000)\n",
