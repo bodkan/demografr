@@ -33,10 +33,14 @@ reference:
 
   - title: ABC simulations and inference
     contents:
-    - validate_abc
     - simulate_abc
     - combine_abc
     - perform_abc
+
+  - title: Troubleshooting helper functions
+    contents:
+    - validate_abc
+    - sample_prior
 
   - title: Visualization of priors and posteriors
     contents:
