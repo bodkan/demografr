@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 
-devtools::install(".")
+devtools::install(".", upgrade = FALSE)
 ```
 
 This vignette contains an expanded version of the basic ABC inference example from the homepage of _demografr_.

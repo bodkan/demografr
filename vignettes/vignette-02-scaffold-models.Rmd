@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 
-devtools::install(".")
+devtools::install(".", upgrade = FALSE)
 ```
 
 ## Introduction
@@ -150,7 +150,7 @@ Why would you use this option instead of inputting a phylogenetic tree? For one 
 validate_abc(model2, priors, functions, observed)
 ```
 
-Again, we will skip the simulations and inference, which we would normally perform with something like this:
+Again, we will skip the simulations and inference, which we would normally perform with something like this (skipping this step here to save computational time):
 
 ```{r, eval=FALSE}
 # first simulate data
@@ -220,7 +220,7 @@ For such generating function-based models, it is even more worth to validate the
 validate_abc(custom_model, custom_priors, functions, observed)
 ```
 
-Having convinced ourselves that the ABC model components are correctly configured, we would proceed with inference:
+Having convinced ourselves that the ABC model components are correctly configured, we would proceed with inference (again, we're not going to run the full ABC pipeline here because it would take a lot of time to get useful posteriors):
 
 
 ```{r, eval=FALSE}
