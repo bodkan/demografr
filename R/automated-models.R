@@ -1,3 +1,23 @@
+get_ordered_tips <- function(tree) {
+  env <- new.env()
+  env$list <- integer()
+  root <- phangorn::getRoot(tree)
+
+  get_ordered_tips_recursive(tree, root, env)
+
+  return(env$list)
+}
+
+get_ordered_tips_recursive <- function(tree, node, env) {
+  if (node <= length(tree$tip.label)) {
+    env$list[[length(env$list) + 1]] <- node
+  } else {
+     children <- phangorn::Children(tree, node)
+     get_ordered_tips_recursive(tree, children[1], env)
+     get_ordered_tips_recursive(tree, children[2], env)
+  }
+}
+
 #' Create a list of slendr populations based on given phylogenetic tree
 #'
 #' @param tree A phylogenetic tree of the class \code{phylo} (see the ape R package
@@ -140,12 +160,6 @@ tree_model <- function(tree, time_span, N = 1000, generation_time = 1) {
 # Get names of populations under the given internal node
 get_pop_leaves <- function(tree, node) {
   tree$tip.label[phangorn::Descendants(tree, node, type = "tips")[[1]]]
-}
-
-get_ordered_tips <- function(tree) {
-  tip_edges <- tree$edge[, 2] <= length(tree$tip.label)
-  ordered_tips <- tree$edge[tip_edges, 2]
-  ordered_tips
 }
 
 get_leftmost_tip <- function(tree, node) {
