@@ -227,7 +227,7 @@ validate_abc <- function(model, priors, functions, observed,
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  pieces = FALSE
+  pieces = FALSE, debug = FALSE, ...
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -241,9 +241,17 @@ simulate_abc <- function(
 
   # validate the ABC setup
   capture.output(validate_abc(model, priors, functions, observed,
-                              sequence_length, recombination_rate, mutation_rate))
+                              sequence_length, recombination_rate, mutation_rate, ...))
 
-  results <- future.apply::future_lapply(
+  globals <- c(
+    lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
+    names(list(...)),
+    "run_simulation"
+  ) %>%
+    unlist()
+
+  if (!debug) {
+    results <- future.apply::future_lapply(
       X = seq_len(iterations),
       FUN = run_iteration,
       model = model,
@@ -253,8 +261,19 @@ simulate_abc <- function(
       recombination_rate = recombination_rate,
       mutation_rate = mutation_rate,
       future.seed = TRUE,
-      future.packages = c("slendr", "dplyr")
-  )
+      future.globals = globals,
+      future.packages = c("slendr", "dplyr"),
+      ...
+    )
+  } else {
+    results <- list(
+      run_iteration(
+        it = 1, model = model, priors = priors, functions = functions,
+        sequence_length = sequence_length, recombination_rate = recombination_rate, mutation_rate = mutation_rate,
+        ...
+      )
+    )
+  }
 
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
 
