@@ -15,7 +15,7 @@
 #'
 #' @export
 validate_abc <- function(model, priors, functions, observed,
-                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0) {
+                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0, ...) {
   if (length(setdiff(names(functions), names(observed))))
     stop("Lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
@@ -35,15 +35,22 @@ validate_abc <- function(model, priors, functions, observed,
   if (is.function(model)) {
     cat("Checking the presence of required function arguments... ")
 
-    missing_priors <- setdiff(formalArgs(model), prior_names)
+    missing_priors <- setdiff(prior_names, formalArgs(model))
     if (length(missing_priors) > 0) {
       cat(" \u274C\n\n")
-      stop("The following model parameters lack priors:\n    ", missing_priors, "\n\n",
-           "All model function arguments must have priors assigned to them.\n",
+      stop("The following priors are not present in the model interface:\n    ", missing_priors, "\n\n",
+           "Each prior must correspond to a model function argument.\n",
            call. = FALSE)
-    } else
-      cat(" \u2713\n")
+    }
 
+    missing_args <- setdiff(formalArgs(model), c(prior_names, names(list(...))))
+    if (length(missing_args) > 0) {
+      cat(" \u274C\n\n")
+      stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
+           call. = FALSE)
+    }
+
+    cat(" \u2713\n")
   }
 
   if (inherits(model, "slendr_model")) {
@@ -115,7 +122,7 @@ validate_abc <- function(model, priors, functions, observed,
     cat(sprintf("  * %s", prior_names[i]))
 
     prior_sample <- tryCatch(
-      sample_prior(priors[[i]], convert = identity),
+      sample_prior(priors[[i]]),
       error = function(e) {
         cat(" \u274C\n\n")
         stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
@@ -130,12 +137,23 @@ validate_abc <- function(model, priors, functions, observed,
   cat("------------------------------------------------------------\n")
 
   if (is.function(model)) {
+    # collect prior model function arguments
     arguments <- lapply(prior_samples, `[[`, "value")
     names(arguments) <- lapply(prior_samples, `[[`, "variable")
+
+    # append additional non-prior arguments supplied via `...`
+    arguments <- c(arguments, list(...))
+
     cat("Running the model function with sampled prior values...")
     new_model <- do.call(model, arguments)
   } else {
     cat("Modifying the scaffold model with sampled prior values...")
+    prior_samples <- list(
+      Ne     = Filter(function(pair) grepl("Ne",     pair$variable), prior_samples),
+      Tsplit = Filter(function(pair) grepl("Tsplit", pair$variable), prior_samples),
+      gf     = Filter(function(pair) grepl("gf",     pair$variable), prior_samples),
+      Tgf    = Filter(function(pair) grepl("Tgf",    pair$variable), prior_samples)
+    )
     new_model <- modify_model(model, prior_samples)
   }
   cat(" \u2713\n")
@@ -454,29 +472,29 @@ extract_posterior <- function(abc, posterior = c("adj", "unadj")) {
 # Modify slendr model object with prior parameter values
 modify_model <- function(model, prior_samples) {
   # replace Ne values in the model object with the prior samples
-  if (!is.null(prior_samples[["Ne"]])) {
+  if (length(prior_samples[["Ne"]]) > 0) {
     for (Ne in prior_samples[["Ne"]]) {
       # split variable symbol name into tokens ("Ne", "population name")
       var_tokens <- strsplit(as.character(Ne$variable), "_")[[1]]
-      model$splits[model$splits$pop == var_tokens[2], "N"] <- Ne$value
+      model$splits[model$splits$pop == var_tokens[2], "N"] <- as.integer(Ne$value)
     }
   }
 
   # replace split time values in the model object with the prior samples
-  if (!is.null(prior_samples[["Tsplit"]])) {
+  if (length(prior_samples[["Tsplit"]]) > 0) {
     for (split in prior_samples[["Tsplit"]]) {
       # split variable symbol name into tokens ("T_split", "ancestor pop", "daughter pop")
-      var_tokens <- strsplit(as.character(split$variable), "-")[[1]]
+      var_tokens <- strsplit(as.character(split$variable), "_")[[1]]
       model$splits[
         model$splits$parent == var_tokens[2] &
         model$splits$pop == var_tokens[3],
         "tsplit_gen"
-      ] <- split$value
+      ] <- as.integer(split$value)
     }
   }
 
   # replace gene flow proportions in the model object with the prior samples
-  if (!is.null(prior_samples[["gf"]])) {
+  if (length(prior_samples[["gf"]]) > 0) {
     for (gf in prior_samples[["gf"]]) {
       # split variable symbol name into tokens ("gf", "from pop", "to pop")
       var_tokens <- strsplit(as.character(gf$variable), "_")[[1]]
@@ -497,10 +515,11 @@ modify_model <- function(model, prior_samples) {
 
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
-run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate) {
+run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate, ...) {
   if (is.function(model)) {
     arguments <- lapply(prior_samples$custom, `[[`, "value")
     names(arguments) <- lapply(prior_samples$custom, `[[`, "variable")
+    arguments <- c(arguments, list(...))
     new_model <- do.call(model, arguments)
   } else {
     new_model <- modify_model(model, prior_samples)
@@ -520,7 +539,8 @@ run_simulation <- function(model, prior_samples, sequence_length, recombination_
 
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
 run_iteration <- function(it, model, priors, functions,
-                          sequence_length, recombination_rate, mutation_rate) {
+                          sequence_length, recombination_rate, mutation_rate,
+                          ...) {
   slendr::setup_env(quiet = TRUE)
 
   # sample parameters from appropriate priors
@@ -528,13 +548,14 @@ run_iteration <- function(it, model, priors, functions,
     prior_samples <- list(custom = lapply(priors, sample_prior))
   } else {
     prior_samples <- list(
-      Ne      = subset_priors(priors, "Ne")     %>% lapply(sample_prior, convert = round),
-      T_split = subset_priors(priors, "Tsplit") %>% lapply(sample_prior, convert = round),
-      gf      = subset_priors(priors, "gf")     %>% lapply(sample_prior)
+      Ne     = subset_priors(priors, "Ne")     %>% lapply(sample_prior),
+      Tsplit = subset_priors(priors, "Tsplit") %>% lapply(sample_prior),
+      gf     = subset_priors(priors, "gf")     %>% lapply(sample_prior),
+      Tgf    = subset_priors(priors, "Tgf")    %>% lapply(sample_prior)
     )
   }
 
-  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate)
+  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate, ...)
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
@@ -579,7 +600,7 @@ sample_prior <- function(f) {
   ast <- as.list(f)
 
   # the head of the list in ast[[1]] is `~` and can be ignored
-  variable <- ast[[2]] # variable name
+  variable <- as.character(ast[[2]]) # variable name
   call <- as.list(ast[[3]]) # split the function call into another AST
 
   if (is.numeric(call[[1]])) { # a fixed-value "prior"
