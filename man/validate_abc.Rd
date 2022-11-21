@@ -11,7 +11,8 @@ validate_abc(
   observed,
   sequence_length = 10000,
   recombination_rate = 0,
-  mutation_rate = 0
+  mutation_rate = 0,
+  ...
 )
 }
 \arguments{

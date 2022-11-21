@@ -13,7 +13,9 @@ simulate_abc(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
-  pieces = FALSE
+  pieces = FALSE,
+  debug = FALSE,
+  ...
 )
 }
 \arguments{

@@ -246,21 +246,21 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB</span></span>
-<span><span class="co">#&gt; Min.:                   456.9466 1786.983  7269.716 1561.702       -146.79968</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:   949.7835 2240.788  7974.730 2365.532         55.44157</span></span>
-<span><span class="co">#&gt; Weighted Median:       1451.6596 2708.875  8891.336 3110.409       1443.92678</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1467.5406 2718.136  8891.433 3160.459       1427.85605</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1244.5832 2677.400  8880.467 3024.810       2214.12686</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2017.1019 3295.407  9995.459 4009.037       2755.62326</span></span>
-<span><span class="co">#&gt; Max.:                  2235.6294 3942.230 10579.829 4626.789       3059.36873</span></span>
+<span><span class="co">#&gt; Min.:                   523.7406 2083.255  7664.463 2166.191        -81.05097</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   801.0286 2312.572  8208.358 2677.950        202.02356</span></span>
+<span><span class="co">#&gt; Weighted Median:       1260.2080 2685.938  9086.437 3124.858       1650.63009</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1274.2332 2707.789  9068.257 3141.304       1622.06456</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1178.8326 2639.446  8804.845 3090.615       2400.59639</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1766.0479 3137.912  9949.667 3618.092       2973.30404</span></span>
+<span><span class="co">#&gt; Max.:                  2005.8523 3395.432 10640.415 3811.722       3340.87736</span></span>
 <span><span class="co">#&gt;                        Tsplit_popB_popC Tsplit_popC_popD</span></span>
-<span><span class="co">#&gt; Min.:                          2957.558         5703.118</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:          3136.027         6172.928</span></span>
-<span><span class="co">#&gt; Weighted Median:               4469.104         7591.053</span></span>
-<span><span class="co">#&gt; Weighted Mean:                 4470.146         7534.247</span></span>
-<span><span class="co">#&gt; Weighted Mode:                 4237.780         7832.415</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.:         5842.363         8854.766</span></span>
-<span><span class="co">#&gt; Max.:                          6176.139         9190.189</span></span></code></pre></div>
+<span><span class="co">#&gt; Min.:                          2734.523         5789.999</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:          3090.184         6297.085</span></span>
+<span><span class="co">#&gt; Weighted Median:               4453.029         7524.670</span></span>
+<span><span class="co">#&gt; Weighted Mean:                 4471.333         7495.847</span></span>
+<span><span class="co">#&gt; Weighted Mode:                 4213.312         7739.591</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.:         5906.066         8613.613</span></span>
+<span><span class="co">#&gt; Max.:                          6249.404         9510.527</span></span></code></pre></div>
 <p>We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let’s first check out the posterior distributions of inferred <span class="math inline"><em>N</em><sub><em>e</em></sub></span> values:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
@@ -268,7 +268,7 @@
 <p>Similarly, we can take a look at the inferred posteriors of the split times:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, type <span class="op">=</span> <span class="st">"Tsplit"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 8 rows containing non-finite values (`stat_density()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 2 rows containing non-finite values (`stat_density()`).</span></span></code></pre></div>
 <p><img src="reference/figures/README-posterior_Tsplit-1.png"><!-- --></p>
 <p>Finally, we have the diagnostic functionality of the <a href="https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf" class="external-link"><em>abc</em></a> R package at our disposal:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">

@@ -277,7 +277,8 @@ by leaving them out of the prior definition list.</p>
 <span><span class="co">#&gt; ============================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre></div>
 <p>Again, we will skip the simulations and inference, which we would
-normally perform with something like this:</p>
+normally perform with something like this (skipping this step here to
+save computational time):</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first simulate data</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_abc.html">simulate_abc</a></span><span class="op">(</span><span class="va">model2</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
@@ -371,7 +372,9 @@ validate the ABC setup to catch issues as early as possible:</p>
 <span><span class="co">#&gt; ============================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre></div>
 <p>Having convinced ourselves that the ABC model components are
-correctly configured, we would proceed with inference:</p>
+correctly configured, we would proceed with inference (again, we’re not
+going to run the full ABC pipeline here because it would take a lot of
+time to get useful posteriors):</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first simulate data</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_abc.html">simulate_abc</a></span><span class="op">(</span><span class="va">custom_model</span>, <span class="va">custom_priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>

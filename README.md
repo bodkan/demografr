@@ -237,21 +237,21 @@ function `extract_summary()`:
 ``` r
 extract_summary(abc)
 #>                          Ne_popA  Ne_popB   Ne_popC  Ne_popD Tsplit_popA_popB
-#> Min.:                   456.9466 1786.983  7269.716 1561.702       -146.79968
-#> Weighted 2.5 % Perc.:   949.7835 2240.788  7974.730 2365.532         55.44157
-#> Weighted Median:       1451.6596 2708.875  8891.336 3110.409       1443.92678
-#> Weighted Mean:         1467.5406 2718.136  8891.433 3160.459       1427.85605
-#> Weighted Mode:         1244.5832 2677.400  8880.467 3024.810       2214.12686
-#> Weighted 97.5 % Perc.: 2017.1019 3295.407  9995.459 4009.037       2755.62326
-#> Max.:                  2235.6294 3942.230 10579.829 4626.789       3059.36873
+#> Min.:                   523.7406 2083.255  7664.463 2166.191        -81.05097
+#> Weighted 2.5 % Perc.:   801.0286 2312.572  8208.358 2677.950        202.02356
+#> Weighted Median:       1260.2080 2685.938  9086.437 3124.858       1650.63009
+#> Weighted Mean:         1274.2332 2707.789  9068.257 3141.304       1622.06456
+#> Weighted Mode:         1178.8326 2639.446  8804.845 3090.615       2400.59639
+#> Weighted 97.5 % Perc.: 1766.0479 3137.912  9949.667 3618.092       2973.30404
+#> Max.:                  2005.8523 3395.432 10640.415 3811.722       3340.87736
 #>                        Tsplit_popB_popC Tsplit_popC_popD
-#> Min.:                          2957.558         5703.118
-#> Weighted 2.5 % Perc.:          3136.027         6172.928
-#> Weighted Median:               4469.104         7591.053
-#> Weighted Mean:                 4470.146         7534.247
-#> Weighted Mode:                 4237.780         7832.415
-#> Weighted 97.5 % Perc.:         5842.363         8854.766
-#> Max.:                          6176.139         9190.189
+#> Min.:                          2734.523         5789.999
+#> Weighted 2.5 % Perc.:          3090.184         6297.085
+#> Weighted Median:               4453.029         7524.670
+#> Weighted Mean:                 4471.333         7495.847
+#> Weighted Mode:                 4213.312         7739.591
+#> Weighted 97.5 % Perc.:         5906.066         8613.613
+#> Max.:                          6249.404         9510.527
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
@@ -269,7 +269,7 @@ times:
 
 ``` r
 plot_posterior(abc, type = "Tsplit")
-#> Warning: Removed 8 rows containing non-finite values (`stat_density()`).
+#> Warning: Removed 2 rows containing non-finite values (`stat_density()`).
 ```
 
 ![](man/figures/README-posterior_Tsplit-1.png)<!-- -->

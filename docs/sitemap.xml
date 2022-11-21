@@ -19,6 +19,9 @@
     <loc>https://bodkan.github.io/demografr/articles/vignette-02-scaffold-models.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.github.io/demografr/articles/vignette-03-custom-priors.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.github.io/demografr/authors.html</loc>
   </url>
   <url>
@@ -59,6 +62,9 @@
   </url>
   <url>
     <loc>https://bodkan.github.io/demografr/reference/print.demografr_sims.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.github.io/demografr/reference/sample_prior.html</loc>
   </url>
   <url>
     <loc>https://bodkan.github.io/demografr/reference/simulate_abc.html</loc>
