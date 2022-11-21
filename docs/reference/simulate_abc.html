@@ -108,6 +108,32 @@ tree sequences</p></dd>
 <dt>observed</dt>
 <dd><p>A named list of observed summary statistics</p></dd>
 
+
+<dt>sequence_length</dt>
+<dd><p>Amount of sequence to simulate using slendr (in numbers of basepairs)</p></dd>
+
+
+<dt>recombination_rate</dt>
+<dd><p>Recombination rate to use for the simulation</p></dd>
+
+
+<dt>mutation_rate</dt>
+<dd><p>Mutation rate to use for the simulation</p></dd>
+
+
+<dt>pieces</dt>
+<dd><p>If <code>TRUE</code>, the function returns a list of individual ABC components used
+by the function <code>abc</code> from the abc package as input</p></dd>
+
+
+<dt>debug</dt>
+<dd><p>Only perform a single ABC simulation run, skipping parallelization</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional parameters used in the model generating function <code>model</code> (ignored
+if a standard slendr model is used as a scaffold model)</p></dd>
+
 </dl></div>
 
   </div>

@@ -172,8 +172,7 @@ abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 A yet another way to define a _demografr_ scaffold model which allows even more flexibility in terms of supporting complex parametrizations is to provide an entire self-contained function:
 
 ```{r}
-custom_model <- function(size_A, size_B, size_C, size_D,
-                         split_AB, split_BC, split_CD) {
+custom_model <- function(size_A, size_B, size_C, size_D, split_AB, split_BC, split_CD) {
   popA <- population("popA", time = 1,        N = size_A)
   popB <- population("popB", time = split_AB, N = size_B, parent = popA)
   popC <- population("popC", time = split_BC, N = size_C, parent = popB)

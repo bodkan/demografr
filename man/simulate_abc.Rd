@@ -27,6 +27,20 @@ simulate_abc(
 tree sequences}
 
 \item{observed}{A named list of observed summary statistics}
+
+\item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
+
+\item{recombination_rate}{Recombination rate to use for the simulation}
+
+\item{mutation_rate}{Mutation rate to use for the simulation}
+
+\item{pieces}{If \code{TRUE}, the function returns a list of individual ABC components used
+by the function \code{abc} from the abc package as input}
+
+\item{debug}{Only perform a single ABC simulation run, skipping parallelization}
+
+\item{...}{Additional parameters used in the model generating function \code{model} (ignored
+if a standard slendr model is used as a scaffold model)}
 }
 \description{
 Simulate data for ABC inference using specified priors

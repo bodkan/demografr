@@ -40,6 +40,7 @@ reference:
   - title: Troubleshooting helper functions
     contents:
     - validate_abc
+    - simulate_ts
     - sample_prior
 
   - title: Visualization of priors and posteriors
