@@ -113,9 +113,9 @@ priors <- list(
   Ne_popC ~ runif(1, 10000),
   Ne_popD ~ runif(1, 10000),
 
-  Tsplit_popA-popB ~ runif(1, 3000),
-  Tsplit_popB-popC ~ runif(3000, 6000),
-  Tsplit_popC-popD ~ runif(6000, 9000)
+  Tsplit_popA_popB ~ runif(1, 3000),
+  Tsplit_popB_popC ~ runif(3000, 6000),
+  Tsplit_popC_popD ~ runif(6000, 9000)
 )
 ```
 

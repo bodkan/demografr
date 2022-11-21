@@ -103,7 +103,7 @@ runif(1, 1000)
 That is not a problem, because sampling from priors (which _demografr_ performs internally during ABC simulations) is taken care of automatically, converting the above function call into proper sampling statement:
 
 ```{r}
-sample_prior( Ne_popXYZ ~ runif(1, 1000) )
+( Ne_popXYZ ~ runif(1, 1000) ) %>% sample_prior()
 ```
 
 ### How to define custom priors?
@@ -179,7 +179,6 @@ validate_abc(model, priors, functions, observed, topologies = topologies)
 
 Having convinced ourselves that the ABC model components are correctly configured, we would proceed with inference (again, we're not going to run the full ABC pipeline here because it would take a lot of time to get useful posteriors):
 
-
 ```{r, eval=FALSE}
 # first simulate data
 data <- simulate_abc(model, priors, functions, observed, iterations = 1000, sequence_length = 1e6, recombination_rate = 1e-8, topologies = topologies)
@@ -187,7 +186,3 @@ data <- simulate_abc(model, priors, functions, observed, iterations = 1000, sequ
 # then perform ABC inference
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
-
-
-
-
