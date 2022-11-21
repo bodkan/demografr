@@ -232,4 +232,3 @@ data <- simulate_abc(custom_model, custom_priors, functions, observed, iteration
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-
