@@ -99,7 +99,7 @@ plot_model(model)
 ```
 
  Note that we don't pay attention to the split times or population sizes of this model because we will be fitting those parameters with the ABC procedure below&mdash;the model we just constructed is really just a _scaffold_ capturing some prior information we have about the phylogenetic relationship between populations, the values of other model parameters ($N_e$, split times) are arbitrary.
- 
+
  That said, we have the option to fix some aspects of our model by building and fine-tuning the model using standard _slendr_ features for defining models rather than importing the model as a phylogenetic tree (see [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html) _slendr_ vignette).
 
 ### Setting up priors
@@ -129,14 +129,14 @@ In our example, because we computed nucleotide diversity and pairwise divergence
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts, split = TRUE)
+  samples <- sample_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts, split = TRUE)
+  samples <- sample_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
@@ -163,7 +163,7 @@ Having verified that all model components are set up correctly, we can proceed t
 
 ```{r, eval=!file.exists(data_file)}
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 100,
+  model, priors, functions, observed, iterations = 10000,
   sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```

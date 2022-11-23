@@ -9,6 +9,7 @@ validate_abc(
   priors,
   functions,
   observed,
+  model_args = NULL,
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,

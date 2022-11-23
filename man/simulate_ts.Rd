@@ -10,7 +10,10 @@ simulate_ts(
   sequence_length = 1e+06,
   recombination_rate = 0,
   mutation_rate = 0,
-  ...
+  samples = NULL,
+  engine = NULL,
+  model_args = NULL,
+  engine_args = NULL
 )
 }
 \arguments{
@@ -23,6 +26,10 @@ simulate_ts(
 \item{recombination_rate}{Recombination rate to use for the simulation}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
+
+\item{model_args}{Optional arguments for the scaffold model generating function}
+
+\item{engine_args}{Optional arguments for the slendr simulation back ends}
 }
 \description{
 Simulates a tree sequence object from a model with parameters sampled from priors

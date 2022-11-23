@@ -48,26 +48,19 @@ Define tree-sequence-based summary functions:
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts, split = TRUE)
+  samples <- sample_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples) %>%
     mutate(stat = paste0("pi_", set)) %>%
     select(stat, value = diversity)
 }
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts, split = TRUE)
+  samples <- sample_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples) %>%
     mutate(stat = sprintf("d_%s_%s", x, y)) %>%
     select(stat, value = divergence)
 }
 functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 ```
-
-
-
-
-
-
-
 
 
 

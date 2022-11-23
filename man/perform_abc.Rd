@@ -6,7 +6,7 @@
 \usage{
 perform_abc(
   data,
-  tol,
+  tolerance,
   method,
   hcorr = TRUE,
   transf = "none",
@@ -24,9 +24,7 @@ perform_abc(
 \arguments{
 \item{data}{Simulated data set produced by \code{simulate_abc}}
 
-\item{tol}{
-    tolerance, the required proportion of points accepted nearest the
-    target values.}
+\item{tolerance}{The proportion of simulated samples to accept}
 
 \item{method}{
     a character string indicating the type of ABC algorithm to be

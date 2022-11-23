@@ -81,7 +81,10 @@
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  recombination_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -105,6 +108,14 @@
 
 <dt>mutation_rate</dt>
 <dd><p>Mutation rate to use for the simulation</p></dd>
+
+
+<dt>model_args</dt>
+<dd><p>Optional arguments for the scaffold model generating function</p></dd>
+
+
+<dt>engine_args</dt>
+<dd><p>Optional arguments for the slendr simulation back ends</p></dd>
 
 </dl></div>
     <div id="details">

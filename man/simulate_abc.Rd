@@ -13,7 +13,11 @@ simulate_abc(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
-  pieces = FALSE,
+  samples = NULL,
+  model_args = NULL,
+  engine_args = NULL,
+  packages = NULL,
+  engine = c("msprime", "SLiM", "custom"),
   debug = FALSE,
   ...
 )
@@ -34,8 +38,15 @@ tree sequences}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
-\item{pieces}{If \code{TRUE}, the function returns a list of individual ABC components used
-by the function \code{abc} from the abc package as input}
+\item{model_args}{Optional arguments for the scaffold model generating function}
+
+\item{engine_args}{Optional arguments for the slendr simulation back ends}
+
+\item{packages}{A character vector with package names used by user-defined summary statistic
+functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.}
+
+\item{engine}{Which simulation engine to use? Values "msprime" and "SLiM" will use the
+built-in slendr simulation back ends.}
 
 \item{debug}{Only perform a single ABC simulation run, skipping parallelization}
 
