@@ -37,8 +37,9 @@ reference:
     - combine_abc
     - perform_abc
 
-  - title: Troubleshooting helper functions
+  - title: Helper functions
     contents:
+    - sample_names
     - validate_abc
     - simulate_ts
     - sample_prior
