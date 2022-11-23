@@ -89,3 +89,23 @@ test_that("errors in prior sampling are correctly caught", {
   error_msg <- "Sampling the prior Ne_popA resuted in the following problem"
   expect_error(qiet(validate_abc(model, xpriors, summary_funs, observed_stats), error_msg))
 })
+
+test_that("an error is raised with SLiM ABC on non-serialized models", {
+  expect_error(simulate_abc(model, priors, functions, observed, iterations = 1,
+                            sequence_length = 1e6, recombination_rate = 0, engine = "SLiM"),
+               "Non-serialized slendr model cannot be used")
+})
+
+test_that("a warning is given with msprime ABC on serialized models", {
+  popA <- population("popA", time = 1, N = 1)
+  popB <- population("popB", time = 2500, N = 1, parent = popA)
+  popC <- population("popC", time = 5000, N = 1, parent = popB)
+  popD <- population("popD", time = 7500, N = 1, parent = popC)
+
+  xmodel <- compile_model(populations = list(popA, popB, popC, popD),
+                          simulation_length = 10000, generation_time = 1, serialize = TRUE)
+
+  expect_warning(simulate_abc(xmodel, priors, functions, observed, iterations = 1,
+                              sequence_length = 1e6, recombination_rate = 0, engine = "msprime"),
+                 "Model is serialized to disk which is unnecessary and inefficient")
+})
