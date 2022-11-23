@@ -14,7 +14,7 @@
 #' @return No return value. The function is ran for its terminal output.
 #'
 #' @export
-validate_abc <- function(model, priors, functions, observed,
+validate_abc <- function(model, priors, functions, observed, model_args = NULL,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0, ...) {
   if (length(setdiff(names(functions), names(observed))))
     stop("Lists of summary functions and observed statistics must have the same names",
@@ -43,7 +43,7 @@ validate_abc <- function(model, priors, functions, observed,
            call. = FALSE)
     }
 
-    missing_args <- setdiff(formalArgs(model), c(prior_names, names(list(...))))
+    missing_args <- setdiff(formalArgs(model), c(prior_names, names(model_args)))
     if (length(missing_args) > 0) {
       cat(" \u274C\n\n")
       stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
@@ -138,14 +138,11 @@ validate_abc <- function(model, priors, functions, observed,
 
   if (is.function(model)) {
     # collect prior model function arguments
-    arguments <- lapply(prior_samples, `[[`, "value")
-    names(arguments) <- lapply(prior_samples, `[[`, "variable")
-
-    # append additional non-prior arguments supplied via `...`
-    arguments <- c(arguments, list(...))
+    prior_args <- lapply(prior_samples, `[[`, "value")
+    names(prior_args) <- lapply(prior_samples, `[[`, "variable")
 
     cat("Running the model function with sampled prior values...")
-    new_model <- do.call(model, arguments)
+    new_model <- do.call(model, c(prior_args, model_args))
   } else {
     cat("Modifying the scaffold model with sampled prior values...")
     prior_samples <- list(
@@ -227,11 +224,14 @@ validate_abc <- function(model, priors, functions, observed,
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param model_args Optional arguments for the scaffold model generating function
+#' @param engine_args Optional arguments for the slendr simulation back ends
 #'
 #' @export
 simulate_ts <- function(
   model, priors,
-  sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0, ...
+  sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
+  samples = NULL, engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -254,7 +254,8 @@ simulate_ts <- function(
     )
   }
 
-  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate, ...)
+  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
+                       samples = samples, engine = engine, model_args = model_args, engine_args = engine_args)
 
   ts
 }
@@ -269,8 +270,12 @@ simulate_ts <- function(
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param pieces If \code{TRUE}, the function returns a list of individual ABC components used
-#'   by the function \code{abc} from the abc package as input
+#' @param engine Which simulation engine to use? Values "msprime" and "SLiM" will use the
+#'   built-in slendr simulation back ends.
+#' @param model_args Optional arguments for the scaffold model generating function
+#' @param engine_args Optional arguments for the slendr simulation back ends
+#' @param packages A character vector with package names used by user-defined summary statistic
+#'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
 #' @param debug Only perform a single ABC simulation run, skipping parallelization
 #' @param ... Additional parameters used in the model generating function \code{model} (ignored
 #'   if a standard slendr model is used as a scaffold model)
@@ -279,10 +284,15 @@ simulate_ts <- function(
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  pieces = FALSE, debug = FALSE, ...
+  samples = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
+  engine = c("msprime", "SLiM", "custom"), debug = FALSE, ...
 ) {
-  # check the presence of all arguments to avoid cryptic errors when running simulations
-  # in parallel
+  # make sure warnings are reported immediately before simulations are even started
+  opts <- options(warn = 1)
+  on.exit(options(opts))
+
+  # check the presence of all arguments to avoid cryptic errors when running
+  # simulations in parallel
   if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||
       !check_arg(iterations))
     stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
@@ -291,14 +301,35 @@ simulate_abc <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  # validate the ABC setup
-  capture.output(validate_abc(model, priors, functions, observed,
-                              sequence_length, recombination_rate, mutation_rate, ...))
+  engine <- match.arg(engine)
 
+  # validate the ABC setup
+  capture.output(validate_abc(
+    model, priors, functions, observed,
+    sequence_length = sequence_length, recombination_rate = recombination_rate,
+    mutation_rate = mutation_rate, model_args = model_args
+  ))
+
+  if (!is.function(model)) {
+    if (engine == "msprime" && !is.null(model$path)) {
+      warning("Model is serialized to disk which is unnecessary and inefficient\n",
+              "for msprime ABC simulations. The engine will skip the serialized\n",
+              "model files and use the in-memory representation instead.",
+              call. = FALSE)
+      model$path <- NULL
+    }
+    if (engine == "SLiM" && is.null(model$path))
+      stop("Non-serialized slendr model cannot be used as a scaffold for SLiM ABC\n",
+          "simulations. Make sure your model is not compiled with `serialized = FALSE`.",
+          call. = FALSE)
+  }
+
+  # collect all required global objects, in case the ABC simulations will run in
+  # multiple parallel sessions
   globals <- c(
     lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
-    names(list(...)),
-    "run_simulation"
+    names(model_args),
+    names(engine_args)
   ) %>%
     unlist()
 
@@ -312,17 +343,20 @@ simulate_abc <- function(
       sequence_length = sequence_length,
       recombination_rate = recombination_rate,
       mutation_rate = mutation_rate,
+      engine = engine,
+      samples = samples,
+      model_args = model_args,
+      engine_args = engine_args,
       future.seed = TRUE,
       future.globals = globals,
-      future.packages = c("slendr", "dplyr"),
-      ...
+      future.packages = c("slendr", "dplyr", packages)
     )
   } else {
     results <- list(
       run_iteration(
         it = 1, model = model, priors = priors, functions = functions,
-        sequence_length = sequence_length, recombination_rate = recombination_rate, mutation_rate = mutation_rate,
-        ...
+        engine = engine, samples = samples, engine_args = engine_args, model_args = model_args,
+        sequence_length = sequence_length, recombination_rate = recombination_rate, mutation_rate = mutation_rate
       )
     )
   }
@@ -348,23 +382,15 @@ simulate_abc <- function(
     values
   }) %>% do.call(cbind, .)
 
-  if (pieces) {
-    result <- list(
-      param = parameters,
-      target = observed,
-      sumstats = simulated
-    )
-  } else {
-    result <- list(
-      parameters = parameters,
-      simulated = simulated,
-      observed = observed,
-      functions = functions,
-      priors = priors,
-      model = model
-    )
-    class(result) <- "demografr_sims"
-  }
+  result <- list(
+    parameters = parameters,
+    simulated = simulated,
+    observed = observed,
+    functions = functions,
+    priors = priors,
+    model = model
+  )
+  class(result) <- "demografr_sims"
 
   result
 }
@@ -386,10 +412,11 @@ simulate_abc <- function(
 #' vignette and the manpage which you can access by typing \code{?abc::abc}.
 #'
 #' @param data Simulated data set produced by \code{simulate_abc}
+#' @param tolerance The proportion of simulated samples to accept
 #' @inheritParams abc::abc
 #'
 #' @export
-perform_abc <- function(data, tol, method, hcorr = TRUE, transf = "none",
+perform_abc <- function(data, tolerance, method, hcorr = TRUE, transf = "none",
                         logit.bounds, subset = NULL, kernel = "epanechnikov",
                         numnet = 10, sizenet = 5, lambda = c(0.0001, 0.001, 0.01),
                         race = FALSE, maxit = 500, ...) {
@@ -609,21 +636,27 @@ modify_model <- function(model, prior_samples) {
 
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
-run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate, ...) {
+run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
+                           engine = c("msprime", "slim"), samples = NULL, model_args = NULL, engine_args = NULL) {
   if (is.function(model)) {
-    arguments <- lapply(prior_samples$custom, `[[`, "value")
-    names(arguments) <- lapply(prior_samples$custom, `[[`, "variable")
-    arguments <- c(arguments, list(...))
-    new_model <- do.call(model, arguments)
+    prior_args <- lapply(prior_samples$custom, `[[`, "value")
+    names(prior_args) <- lapply(prior_samples$custom, `[[`, "variable")
+    new_model <- do.call(model, c(prior_args, model_args))
   } else {
     new_model <- modify_model(model, prior_samples)
   }
 
-  ts <- slendr::msprime(
-    new_model,
+  # pick an appropriate simulation engine (msprime or SLiM)
+  engine <- match.arg(engine)
+  # compose a list of required and optional arguments
+  engine_args <- list(
+    model = new_model,
     sequence_length = sequence_length,
-    recombination_rate = recombination_rate
-  )
+    recombination_rate = recombination_rate,
+    samples = samples
+  ) %>% c(., engine_args)
+
+  ts <- do.call(engine, engine_args)
 
   if (mutation_rate != 0)
     ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
@@ -634,7 +667,7 @@ run_simulation <- function(model, prior_samples, sequence_length, recombination_
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
 run_iteration <- function(it, model, priors, functions,
                           sequence_length, recombination_rate, mutation_rate,
-                          ...) {
+                          engine, samples, model_args, engine_args, ...) {
   slendr::setup_env(quiet = TRUE)
 
   # sample parameters from appropriate priors
@@ -649,7 +682,8 @@ run_iteration <- function(it, model, priors, functions,
     )
   }
 
-  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate, ...)
+  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
+                       engine, samples, model_args, engine_args)
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
