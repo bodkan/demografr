@@ -2,7 +2,7 @@ Package: demografr
 Type: Package
 Title: Fitting population genetic demographic models using Approximate Bayesian Computation
 Version: 0.0.9000
-Authors@R: 
+Authors@R:
     person(given = "Martin",
            family = "Petr",
            role = c("aut", "cre"),
@@ -10,24 +10,27 @@ Authors@R:
            comment = c(ORCID = "0000-0003-4879-8421"))
 Description: An Approximate Bayesian Computation (ABC) framework for fitting parameters
     of demographic models in population genetics.
+Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: 
+Imports:
+    ape,
     dplyr,
     abc,
     future,
     future.apply,
     ggplot2,
     slendr,
-    magrittr
+    magrittr,
+    phangorn
 Remotes: bodkan/slendr
-Suggests: 
+Suggests:
     combinat,
     knitr,
     microbenchmark,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr

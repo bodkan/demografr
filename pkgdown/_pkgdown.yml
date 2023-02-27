@@ -1,0 +1,67 @@
+title: demografr
+url: https://bodkan.github.io/demografr
+
+navbar:
+  structure:
+    left:  [home, reference, articles, news]
+    right: [github, twitter]
+  components:
+    home:
+      icon: fa-home
+      href: index.html
+    reference:
+      icon: fa-question-circle
+      text: Reference
+      href: reference/index.html
+    articles:
+      icon: fa-book
+      text: Articles
+      menu:
+        - text: A basic ABC analysis
+          href: articles/vignette-01-basic-abc.html
+        - text: Defining scaffold models
+          href: articles/vignette-02-scaffold-models.html
+    twitter:
+      icon: fa-twitter
+      href: https://twitter.com/dr_bodkan
+
+reference:
+  - title: Helpers for building scaffold models
+    contents:
+    - tree_populations
+    - tree_model
+
+  - title: ABC simulations and inference
+    contents:
+    - simulate_abc
+    - combine_abc
+    - perform_abc
+
+  - title: Helper functions
+    contents:
+    - sample_names
+    - validate_abc
+    - simulate_ts
+    - sample_prior
+
+  - title: Visualization of priors and posteriors
+    contents:
+    - plot_prior
+    - plot_posterior
+    - plot.demografr_abc
+    - hist.demografr_abc
+
+  - title: Extracting posteriors
+    contents:
+    - extract_summary
+    - extract_posterior
+    - extract_model
+
+news:
+  one_page: true
+
+# template:
+#   params:
+#     docsearch:
+#       api_key: a895c93f0e9eda05eb10b29a9921d586
+#       index_name: slendr

@@ -1,0 +1,241 @@
+---
+title: "A basic ABC analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A basic ABC analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center"
+)
+
+devtools::install(".", upgrade = FALSE)
+```
+
+This vignette contains an expanded version of the basic ABC inference example from the homepage of _demografr_.
+
+## Introduction
+
+Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
+
+Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
+
+```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
+opar <- par(no.readonly = TRUE)
+par(mar = c(0, 0, 0, 0))
+tree <- ape::read.tree(text = "(popA,(popB,(popC,popD)));")
+plot(tree)
+par(opar)
+```
+
+After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
+
+```{r, echo=FALSE}
+diversity_df <- read.table(system.file("examples/01_diversity.tsv", package = "demografr"), header = TRUE)
+
+divergence_df <- read.table(system.file("examples/01_divergence.tsv", package = "demografr"), header = TRUE)
+```
+
+1. Nucleotide diversity in each population:
+
+```{r}
+diversity_df
+```
+
+2. Pairwise divergence d_X_Y between populations X and Y:
+
+```{r}
+divergence_df
+```
+
+**Now let's develop a simple ABC pipeline which will infer the posterior distributions of two sets of parameters we are interested in: $N_e$ of each population lineage, as well as split times between our populations of interest.**
+
+## Developing the ABC pipeline
+
+Let's begin by loading _demografr_ together with two helper R packages. First is _dplyr_, which we use for convenient table munging, the other is [_slendr_](https://www.slendr.net/) which is required for building and simulating demographic models.
+
+```{r, message=FALSE}
+library(dplyr)
+library(slendr)
+
+library(demografr)
+```
+
+```{r, echo=FALSE}
+data_file <- system.file("examples/01_data.rds", package = "demografr")
+```
+
+For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here "diversity" and "divergence") have meaning and are quite important for later steps:
+
+```{r}
+observed <- list(diversity = diversity_df, divergence = divergence_df)
+```
+
+### Setting up a "scaffold" model
+
+The first step in a _demografr_ ABC analysis is setting up a "scaffold" model for which we will estimate the posterior parameters of interest.
+
+One way to do this is by building a normal _slendr_ model (for instance, a model such as [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)). However, for simpler models like ours, it can be easier to input the scaffold as a standard phylogenetic tree (here we use the function `tree_model()` to input a tree in the [Newick format](https://en.wikipedia.org/wiki/Newick_format)).
+
+```{r}
+model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
+```
+
+(Note that the parameter `time_span` indicates how much evolutionary time does of our model cover, in units of generations. Support for arbitrary units such as years will be supported soon.)
+
+Because the `model` object contains a standard _slendr_ demographic model, we can inspect it as such, to make sure everything is set up correctly:
+
+```{r}
+model
+```
+
+```{r, slendr_model, fig.width=5, fig.height=3, fig.align="center"}
+plot_model(model)
+```
+
+ Note that we don't pay attention to the split times or population sizes of this model because we will be fitting those parameters with the ABC procedure below&mdash;the model we just constructed is really just a _scaffold_ capturing some prior information we have about the phylogenetic relationship between populations, the values of other model parameters ($N_e$, split times) are arbitrary.
+
+ That said, we have the option to fix some aspects of our model by building and fine-tuning the model using standard _slendr_ features for defining models rather than importing the model as a phylogenetic tree (see [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html) _slendr_ vignette).
+
+### Setting up priors
+
+We are interested in estimating the $N_e$ of all populations and their split times. _demografr_ makes this very easy using a familiar symbolic formula syntax in R:
+
+```{r}
+priors <- list(
+  Ne_popA ~ runif(1, 10000),
+  Ne_popB ~ runif(1, 10000),
+  Ne_popC ~ runif(1, 10000),
+  Ne_popD ~ runif(1, 10000),
+
+  Tsplit_popA_popB ~ runif(1, 3000),
+  Tsplit_popB_popC ~ runif(3000, 6000),
+  Tsplit_popC_popD ~ runif(6000, 9000)
+)
+```
+
+In an ABC simulation step below, the formulas are used to draw the values of each parameter from specified distributions (in this case, all uniform distributions across a wide range of parameter values).
+
+### Defining summary functions
+
+Each run of a _demografr_ ABC simulation internally produces a tree sequence as an output. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save each simulation output to disk for computation in different software. Thanks to _slendr_'s library of [tree-sequence functions](https://www.slendr.net/reference/index.html#tree-sequence-statistics) serving as an R interface to the [_tskit_ module](https://tskit.dev/tskit/docs/stable/stats.html), you can specify summary statistics to be computed for ABC using plain and simple R code.
+
+In our example, because we computed nucleotide diversity and pairwise divergence in the individuals sequenced from populations "p1", "p2", and "p3", we will define the following functions. Crucially, when run on a tree-sequence object, they will produce an output data frame in the format analogous to the empirical statistics shown in data frames `diversity` and `divergence` above:
+
+```{r}
+compute_diversity <- function(ts) {
+  samples <- sample_names(ts, split = TRUE)
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    select(stat, value = diversity)
+}
+
+compute_divergence <- function(ts) {
+  samples <- sample_names(ts, split = TRUE)
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+```
+
+Crucially, the outputs of these summary functions _must_ match the format of the observed summary statistics (i.e., the data frames produced must have the same format). This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.
+
+### ABC simulations
+
+Having defined the scaffold model, a set of priors for our parameters of interest ($N_e$ and split times), as well as two summary statistic functions, we can plug all this information into the function `simulate_abc()`.
+
+Before we run a potentially computationally costly simulations, it is a good idea to validate the ABC components we have so far assembled using the function `validate_abc()`:
+
+```{r}
+validate_abc(model, priors, functions, observed)
+```
+
+Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using _demografr_'s function `simulate_abc()`:
+
+ <!-- #eval=!file.exists("inst/extdata/data.rds")} -->
+
+```{r, eval=!file.exists(data_file)}
+data <- simulate_abc(
+  model, priors, functions, observed, iterations = 10000,
+  sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
+```
+
+Because running the full ABC on thousands of simulation replicates would take too long, we will cheat a little bit here and load the ABC simulation data directly from a file distributed with the package:
+
+```{r, eval=file.exists(data_file)}
+data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
+```
+
+At this point we have generated summary statistics for simulations of models using parameters drawn from our priors. In the next step, we can finally do inference of our parameters.
+
+### ABC inference
+
+Having all the information about observed and simulated data bound in a single R object `abc_data`, we can finally perform the ABC inference. _demografr_ includes a convenient function `perform_abc()` which reformats the simulated and observed data in a format required by the R package [_abc_](https://cran.r-project.org/package=abc) and internally calls [the function `abc()`](https://cran.r-project.org/web/packages/abc/abc.pdf) of that package.
+
+Note that `perform_abc` is just convenience wrapper around the `abc()` function in the package _abc_`, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function `abc()` can be provided to `perform_abc()`, which will then pass them on appropriately.
+
+```{r}
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+```
+
+### Inspecting the posteriors
+
+#### Extracting posterior summary tables
+
+Now that we have the ABC output object ready, we can get a data frame with summary statistics of the posterior distributions of our parameters. For instance, we can easily read the maximum a posteriori probability (MAP) of the parameters in the row labelled "Weighted Mode:":
+
+```{r}
+extract_summary(abc)
+```
+
+Because large tables can get a little hard to read, it is possible to subset to only a specific _type_ of parameter:
+
+```{r}
+extract_summary(abc, type = "Ne")
+```
+
+```{r}
+extract_summary(abc, type = "Tsplit")
+```
+
+Alternatively, we can also extract the posterior summary for a single parameter like this:
+
+```{r}
+extract_summary(abc, param = "Ne_popD")
+```
+
+#### Visualizing posterior distributions of parameters
+
+Because a chart is always more informative than a table, we can easily get a visualization of our posteriors using the function `plot_posterior()`:
+
+```{r, posterior_Ne, fig.width=8, fig.height=5}
+plot_posterior(abc, type = "Ne")
+```
+
+Excellent! It looks like we got really nice and informative posterior distributions of $N_e$ values!
+
+In contrast, it looks like the posterior distributions for split times are not as informative compared to the priors that we specified:
+
+```{r, posterior_Tsplit, fig.width=8, fig.height=5}
+plot_posterior(abc, type = "Tsplit")
+```
+
+Because the internals of _demografr_ ABC objects are represented by standard objects created by the _abc_ package, we have many of the standard diagnostics functions of the _abc_ R package at our disposal. For instance, we can use the standard function `plot()` to verify that the posterior (red line) for one of the split times matches the prior (dashed line), suggesting that the data we provided (nucleotide diversity and pairwise divergence) are not sufficient statistics to capture enough information about population divergences.
+
+```{r, diagnostic_Tsplit, fig.width=10, fig.height=7}
+plot(abc, param = "Tsplit_popB_popC")
+```
+
+In contrast, we can see that there most definitely is sufficient information encoded in the summary statistics to tell us quite a bit about the $N_e$ of our populations:
+
+```{r, diagnostic_Ne, fig.width=10, fig.height=7}
+plot(abc, param = "Ne_popB")
+```

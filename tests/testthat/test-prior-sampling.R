@@ -1,4 +1,4 @@
-test_that("Nonexistent function cannot bbe used for sampling", {
+test_that("Nonexistent function cannot be used for sampling", {
   expect_error(sample_prior(pop ~ qwerty(1, 10)), "An unknown function")
   expect_true(is.list(sample_prior(pop ~ runif(1, 10))))
 })
