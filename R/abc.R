@@ -397,9 +397,17 @@ simulate_abc <- function(
     rbind,
     {
       lapply(results, `[[`, "simulated") %>% lapply(function(it) {
-        df <- it[[stat]]
-        values <- matrix(df[, 2, drop = TRUE], nrow = 1)
-        colnames(values) <- df[, 1, drop = TRUE]
+        x <- it[[stat]]
+        # convert simulated statistics to a matrix, either from a normal data frame
+        # result (with each statistic named), or from a simple vector
+        if (is.data.frame(x)) {
+          values <- matrix(x[, 2, drop = TRUE], nrow = 1)
+          names <- x[, 1, drop = TRUE]
+        } else {
+          values <- matrix(x, nrow = 1)
+          names <- paste0(stat, "_", seq_along(x))
+        }
+        colnames(values) <- names
         values
       })
     }
@@ -407,9 +415,17 @@ simulate_abc <- function(
 
   # and to the same for the observed statistics as well
   observed <- lapply(names(functions), function(stat) {
-    df <- observed[[stat]]
-    values <- matrix(df[, 2, drop = TRUE], nrow = 1)
-    colnames(values) <- df[, 1, drop = TRUE]
+    # convert observed statistics to a matrix, either from a normal data frame
+    # result (with each statistic named), or from a simple vector
+    x <- observed[[stat]]
+    if (is.data.frame(x)) {
+      values <- matrix(x[, 2, drop = TRUE], nrow = 1)
+      names <- x[, 1, drop = TRUE]
+    } else {
+      values <- matrix(x, nrow = 1)
+      names <- paste0(stat, "_", seq_along(x))
+    }
+    colnames(values) <- names
     values
   }) %>% do.call(cbind, .)
 
