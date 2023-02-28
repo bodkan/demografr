@@ -1,4 +1,4 @@
-#' Validate the individual components of an ABC model
+#' Validate individual components of an ABC model
 #'
 #' Validates the ABC setup by checking that all priors can be correctly sampled from,
 #' that a slendr model resulting from those priors can simulate a tree sequence,
@@ -17,21 +17,23 @@
 validate_abc <- function(model, priors, functions, observed, model_args = NULL,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0, ...) {
   if (length(setdiff(names(functions), names(observed))))
-    stop("Lists of summary functions and observed statistics must have the same names",
+    stop("Elements of lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
   cat("============================================================\n")
 
   prior_samples <- list()
   if (inherits(model, "slendr_model"))
-    cat("Standard slendr model provided as a scaffold\n")
+    cat("A compiled slendr model object provided as a scaffold\n")
   else
-    cat("A generating function was provided as a scaffold\n")
+    cat("A model generating function was provided as a scaffold\n")
 
   cat("============================================================\n")
 
   prior_names <- sapply(seq_along(priors), function(i) as.character(as.list(priors[[i]])[[2]]))
 
+  # check that a prior for each argument of a model generating function is provided
+  # (and that other function arguments are also provided)
   if (is.function(model)) {
     cat("Checking the presence of required function arguments... ")
 
@@ -54,11 +56,14 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
     cat(" \u2713\n")
   }
 
+  # check requirements for scaffold models given as normal slendr model objects
   if (inherits(model, "slendr_model")) {
     population_names <- model$splits$pop
 
     cat("Checking the correct syntax of population names... ")
 
+    # check that all populations have synactically appropriate names (must be alphanumeric
+    # so that prior variable names can be specified according to standard R syntax restrictions)
     non_alphanum <- grepl("[^[:alnum:]]", population_names)
     if (any(non_alphanum)) {
       cat(" \u274c\n\n")
@@ -66,7 +71,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
            "Invalid names are: ", population_names[non_alphanum], call. = FALSE)
     }
 
-    cat(" \u2713\n")
+    cat(" \u2705\n")
 
     cat("Checking the correctness of prior parameter names... ")
 
@@ -112,7 +117,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       }
     }
 
-    cat(" \u2713\n")
+    cat(" \u2705\n")
   }
 
   cat("------------------------------------------------------------\n")
@@ -131,7 +136,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       }
     )
 
-    cat(" \u2713\n")
+    cat(" \u2705\n")
     prior_samples <- append(prior_samples, list(prior_sample))
   }
 
@@ -154,7 +159,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
     )
     new_model <- modify_model(model, prior_samples)
   }
-  cat(" \u2713\n")
+  cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")
 
@@ -165,7 +170,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
     recombination_rate = recombination_rate
   ) %>%
     slendr::ts_mutate(mutation_rate = mutation_rate)
-  cat(" \u2713\n")
+  cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")
 
@@ -179,7 +184,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)
       })
-    cat(" \u2713\n")
+    cat(" \u2705\n")
   }
 
   cat("------------------------------------------------------------\n")
@@ -188,25 +193,42 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
   for (stat in names(functions)) {
     cat(sprintf("  * %s", stat))
-    sim_df <- simulated_stats[[stat]]
-    obs_df <- observed[[stat]]
-    if (!all(dim(sim_df) == dim(obs_df))) {
+    sim <- simulated_stats[[stat]]
+    obs <- observed[[stat]]
+
+    obs_type <- if (is.data.frame(obs)) "data frame" else if (is.vector(obs)) "vector" else "invalid"
+    sim_type <- if (is.data.frame(sim)) "data frame" else if (is.vector(sim)) "vector" else "invalid"
+    if (obs_type == "invalid" || sim_type == "invalid" || obs_type != sim_type) {
       error_msg <- paste(
-        "Dimensions of observed and simulated statistics differ\n",
-        sprintf("    observed: %d rows, %d columns\n", nrow(obs_df), ncol(obs_df)),
-        sprintf("    simulated: %d rows, %d columns\n", nrow(sim_df), ncol(sim_df))
+        "Observed and simulated statistics must be data frames or vectors\n",
+        sprintf(" observed data is a %s (%s)\n", obs_type, paste(class(obs), sep = ", ")),
+        sprintf(" simulated data is a %s (%s)\n", sim_type, paste(class(sim), sep = ", "))
+      )
+      cat(" \u274c\n\n")
+      stop(error_msg, call. = FALSE)
+    }
+    if (!all(dim(sim == dim(obs)))) {
+      error_msg <- paste(
+        "\n\nDimensions of observed and simulated statistics differ\n",
+        sprintf("  observed: %d rows, %d columns\n", nrow(obs), ncol(obs)),
+        sprintf("  simulated: %d rows, %d columns\n", nrow(sim), ncol(sim))
       )
       stop(error_msg, call. = FALSE)
     }
-    if (length(intersect(sim_df[[1]], obs_df[[1]])) != nrow(sim_df)) {
-      error_msg <- paste(
-        "Names of observed and simulated statistics differ\n",
-        "    observed:", paste(sort(obs_df[[1]]), collapse = ", "), "\n",
-        "    simulated:", paste(sort(sim_df[[1]]), collapse = ", "), "\n"
-      )
-      stop(error_msg, call. = FALSE)
+    if (obs_type == "data frame") {
+      if (length(intersect(sim[[1]], obs[[1]])) != nrow(sim)) {
+        error_msg <- paste(
+          "\n\nNames of observed and simulated statistics differ\n",
+          "  observed:", paste(sort(obs[[1]]), collapse = ", "), "\n",
+          "  simulated:", paste(sort(sim[[1]]), collapse = ", "), "\n"
+        )
+        stop(error_msg, call. = FALSE)
+      }
+      msg <- ""
+    } else {
+      msg <- "(but can't verify names)"
     }
-    cat(" \u2713\n")
+    cat(" \u2705", msg, "\n")
   }
 
   cat("============================================================\n")
