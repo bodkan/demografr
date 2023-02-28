@@ -57,6 +57,14 @@ devtools::install_github("bodkan/demografr")
 
 Note that this requires an R package _devtools_, which you can obtain simply by running `install.packages("devtools")`.
 
+Because _demografr_ is tightly linked to the _slendr_ simulation package (in fact, new developments
+in _slendr_ ale currently driven by requirements of _demografr_), you will also need the
+development version of _slendr_ itself:
+
+``` r
+devtools::install_github("bodkan/slendr")
+```
+
 ### Note on stability
 
 _demografr_ is very much in an early experimental stage at this point. Although ABC fitting of "standard" demographic models (i.e. estimating $N_e$, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher. As such, please be aware that the interface might change significantly on a short notice to accomodate features for estimating parameters of more complex custom models such as spatial models etc.
@@ -110,6 +118,9 @@ library(slendr)
 
 library(demografr)
 init_env()
+
+library(future)
+plan(multicore, workers = 80)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
