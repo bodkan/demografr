@@ -247,7 +247,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param model_args Optional arguments for the scaffold model generating function
+#' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #'
 #' @export
@@ -285,7 +285,11 @@ simulate_ts <- function(
 
 #' Simulate data for ABC inference using specified priors
 #'
-#' @param model A compiled slendr model object
+#' This is a core function for ABC inference using demografr. It generates simulation
+#' replicates and computes summary statistic for the next step of an inference procedure,
+#' which is the ABC estimation itself.
+#'
+#' @param model A compiled slendr model object or a model generating function
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
@@ -295,7 +299,7 @@ simulate_ts <- function(
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param engine Which simulation engine to use? Values "msprime" and "SLiM" will use the
 #'   built-in slendr simulation back ends.
-#' @param model_args Optional arguments for the scaffold model generating function
+#' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
 #'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
@@ -384,8 +388,11 @@ simulate_abc <- function(
     )
   }
 
+  # convert values of sampled priors (one element of a list for each replicate) into
+  # a normal R matrix object
   parameters <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% as.matrix
 
+  # similarly, convert computed simulation summary statistics into a matrix
   simulated <- lapply(names(functions), function(stat) do.call(
     rbind,
     {
@@ -398,6 +405,7 @@ simulate_abc <- function(
     }
   )) %>% do.call(cbind, .)
 
+  # and to the same for the observed statistics as well
   observed <- lapply(names(functions), function(stat) {
     df <- observed[[stat]]
     values <- matrix(df[, 2, drop = TRUE], nrow = 1)
