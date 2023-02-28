@@ -226,7 +226,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       }
       msg <- ""
     } else {
-      msg <- "(but can't verify names)"
+      msg <- "(but could not verify names!)"
     }
     cat(" \u2705", msg, "\n")
   }
