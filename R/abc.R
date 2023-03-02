@@ -191,6 +191,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
   cat("Checking the format of simulated summary statistics:\n")
 
+  missing_names <- FALSE
   for (stat in names(functions)) {
     cat(sprintf("  * %s", stat))
     sim <- simulated_stats[[stat]]
@@ -227,8 +228,19 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       msg <- ""
     } else {
       msg <- "(but could not verify names!)"
+      missing_names <- TRUE
     }
     cat(" \u2705", msg, "\n")
+  }
+
+  if (missing_names) {
+    cat("\nSome summary statistics have been provided as plain numeric vectors\n")
+    cat("without names. It is much better to provide each statistic as two column\n")
+    cat("data frame, with the first column 'stat' giving a statistic's name,\n")
+    cat("and the second column 'value' containing its value, both for observed\n")
+    cat("and simulated statistics.\n\n")
+    cat("This bit of additional work makes inference much more robust to bugs and\n")
+    cat("typos, as demografr can catch problems before running costly simulations.\n")
   }
 
   cat("============================================================\n")
