@@ -1,34 +1,97 @@
 library(dplyr)
 library(slendr)
+
 devtools::load_all(".")
+init_env()
+
+future::plan("multicore", workers = 80)
 
 SEED <- 42
+set.seed(SEED)
 
-# build a small slendr demographic model
-p1 <- population("popA", time = 1, N = 1000)
-p2 <- population("popB", time = 2000, N = 3000, parent = p1)
-p3 <- population("popC", time = 4000, N = 10000, parent = p2)
-p4 <- population("popD", time = 6000, N = 5000, parent = p3)
+# ----------------------------------------------------------------------
+# define demographic model to generate the truth
+popA <- population("popA", time = 1, N = 2000)
+popB <- population("popB", time = 2000, N = 800, parent = popA)
+popC <- population("popC", time = 6000, N = 9000, parent = popB)
+popD <- population("popD", time = 8000, N = 4000, parent = popC)
 
 example_model <- compile_model(
-  populations = list(p1, p2, p3, p4),
+  populations = list(popA, popB, popC, popD),
   generation_time = 1,
-  simulation_length = 10000, serialize = FALSE
+  simulation_length = 10000
 )
 
-# simulate tree sequence from the model
+# ----------------------------------------------------------------------
+# simulate 'empirical' genomes
 ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
-# compute a couple of summary statistics
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name")
+# ----------------------------------------------------------------------
+# compute 'empirical' summary statistics -- divergence and diversity
+samples <- sample_names(ts, split = TRUE)
 
-pi_df <- ts_diversity(ts, sample_sets = samples) %>%
+diversity_df <- ts_diversity(ts, sample_sets = samples) %>%
   mutate(stat = paste0("pi_", set)) %>% select(stat, value = diversity)
 
-div_df <- ts_divergence(ts, sample_sets = samples) %>%
+divergence_df <- ts_divergence(ts, sample_sets = samples) %>%
   mutate(stat = sprintf("d_%s_%s", x, y)) %>% select(stat, value = divergence)
 
-# save the summary statistics data into the examples directory
-write.table(pi_df, file = here::here("inst/examples/01_diversity.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(div_df, file = here::here("inst/examples/01_divergence.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+observed <- list(
+  diversity = diversity_df,
+  divergence = divergence_df
+)
+
+# ----------------------------------------------------------------------
+# define a model for the data, used to infer parameters via ABC
+model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
+
+# ----------------------------------------------------------------------
+# define prior distributions
+priors <- list(
+  Ne_popA ~ runif(100, 10000),
+  Ne_popB ~ runif(100, 10000),
+  Ne_popC ~ runif(100, 10000),
+  Ne_popD ~ runif(100, 10000),
+
+  Tsplit_popA_popB ~ runif(1, 3000),
+  Tsplit_popB_popC ~ runif(3000, 6000),
+  Tsplit_popC_popD ~ runif(6000, 9000)
+)
+
+# ----------------------------------------------------------------------
+# define functions computing simulated summary statistics
+compute_diversity <- function(ts) {
+  samples <- sample_names(ts, split = TRUE)
+  ts_diversity(ts, sample_sets = samples) %>%
+    mutate(stat = paste0("pi_", set)) %>%
+    select(stat, value = diversity)
+}
+compute_divergence <- function(ts) {
+  samples <- sample_names(ts, split = TRUE)
+  ts_divergence(ts, sample_sets = samples) %>%
+    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
+    select(stat, value = divergence)
+}
+
+functions <- list(
+  diversity = compute_diversity,
+  divergence = compute_divergence
+)
+
+# ----------------------------------------------------------------------
+# simulate data
+data <- simulate_abc(
+  model, priors, functions, observed, iterations = 10000,
+  sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
+
+# ----------------------------------------------------------------------
+# infer posterior distributions of parameters via ABC
+abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+
+# ----------------------------------------------------------------------
+# save example data sets for use in manual pages
+write.table(diversity_df, file = here::here("inst/examples/01_diversity.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(divergence_df, file = here::here("inst/examples/01_divergence.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+saveRDS(data, file = here::here("inst/examples/01_data.rds"))
