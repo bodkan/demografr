@@ -75,23 +75,59 @@ If you want to follow updates on _demografr_, you can do this also on my [Twitte
 
 
 ```{r, echo=FALSE, message=FALSE}
+# this simulates the entire example data set (also used in the ProbGen23 poster)
+library(dplyr)
+library(slendr)
+
 devtools::load_all(".")
+init_env()
 
-data_file <- system.file("examples/01_data.rds", package = "demografr")
+SEED <- 42
+set.seed(SEED)
 
-diversity_df <- read.table(system.file("examples/01_diversity.tsv", package = "demografr"), header = TRUE)
+popA <- population("popA", time = 1, N = 2000)
+popB <- population("popB", time = 2000, N = 800, parent = popA)
+popC <- population("popC", time = 6000, N = 9000, parent = popB)
+popD <- population("popD", time = 8000, N = 4000, parent = popC)
 
-divergence_df <- read.table(system.file("examples/01_divergence.tsv", package = "demografr"), header = TRUE)
+gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.05)
+
+example_model <- compile_model(
+  populations = list(popA, popB, popC, popD), gene_flow = gf,
+  generation_time = 1,
+  simulation_length = 10000
+)
+
+ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
+  ts_mutate(1e-8, random_seed = SEED)
+
+samples <- sample_names(ts, split = TRUE)
+
+observed_diversity <- ts_diversity(ts, sample_sets = samples)
+observed_divergence <- ts_divergence(ts, sample_sets = samples)
+observed_f4 <- ts_f4(ts,
+                     W = list(popA = samples$popA),
+                     X = list(popB = samples$popB),
+                     Y = list(popC = samples$popC),
+                     Z = list(popD = samples$popD))
+
+write.table(observed_diversity, file = here::here("inst/examples/observed_diversity.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(observed_divergence, file = here::here("inst/examples/observed_divergence.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
 Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
-Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
+Let's also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
 ```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5, fig.align="center"}
 par(mar = c(0, 0, 0, 0))
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree)
+arrows(2.5, 2, 2.5, 3, col="blue")
 ```
 
 After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
@@ -99,48 +135,73 @@ After sequencing the genomes of individuals from these populations, we computed 
 1. Nucleotide diversity in each population:
 
 ```{r}
-diversity_df
+observed_diversity
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
-divergence_df
+observed_divergence
+```
+
+#. Value of a following $f_4$-statistic:
+
+```{r}
+observed_f4
 ```
 
 ### A complete ABC analysis in a single R script
 
-This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations with Approximate Bayesian Computation in a single R script. You will find a more detailed explanation of each step below.
+This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
-```{r, eval=FALSE, warning=FALSE, message=FALSE}
+```{r, eval=!file.exists(here::here("inst/examples/data.rds"))}
 library(dplyr)
 library(slendr)
 
 library(demografr)
 init_env()
 
-library(future)
-plan(multicore, workers = 80)
+future::plan("multicore", workers = 80) # sets up parallelization across 80 CPUs
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
-observed <- list(diversity = diversity_df, divergence = divergence_df)
+observed <- list(
+  diversity  = observed_diversity,
+  divergence = observed_divergence,
+  f4         = observed_f4
+)
 
 #--------------------------------------------------------------------------------
-# create a "scaffold model" to be used for fitting parameters
-model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
+# define a model generating function using the slendr interface
+# (each of the function parameters correspond to a parameter we want to infer)
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  popA <- population("popA", time = 1,    N = Ne_A)
+  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_CD, N = Ne_D, parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
+
+  compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    serialize = FALSE
+  )
+}
 
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
 priors <- list(
-  Ne_popA ~ runif(1, 10000),
-  Ne_popB ~ runif(1, 10000),
-  Ne_popC ~ runif(1, 10000),
-  Ne_popD ~ runif(1, 10000),
+  Ne_A ~ runif(100, 10000),
+  Ne_B ~ runif(100, 10000),
+  Ne_C ~ runif(100, 10000),
+  Ne_D ~ runif(100, 10000),
 
-  Tsplit_popA_popB ~ runif(1, 3000),
-  Tsplit_popB_popC ~ runif(3000, 6000),
-  Tsplit_popC_popD ~ runif(6000, 9000)
+  T_AB ~ runif(1, 3000),
+  T_BC ~ runif(3000, 6000),
+  T_CD ~ runif(6000, 9000),
+
+  gf_BC ~ runif(0, 1)
 )
 
 #--------------------------------------------------------------------------------
@@ -148,19 +209,31 @@ priors <- list(
 # same format as the summary statistics computed on empirical data)
 compute_diversity <- function(ts) {
   samples <- sample_names(ts, split = TRUE)
-  ts_diversity(ts, sample_sets = samples) %>%
-    mutate(stat = paste0("pi_", set)) %>%
-    select(stat, value = diversity)
+  ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
   samples <- sample_names(ts, split = TRUE)
-  ts_divergence(ts, sample_sets = samples) %>%
-    mutate(stat = sprintf("d_%s_%s", x, y)) %>%
-    select(stat, value = divergence)
+  ts_divergence(ts, sample_sets = samples)
+}
+compute_f4 <- function(ts) {
+  samples <- sample_names(ts, split = TRUE)
+  ts_f4(ts,
+        W = list(popA = samples$popA),
+        X = list(popB = samples$popB),
+        Y = list(popC = samples$popC),
+        Z = list(popD = samples$popD))
 }
 # the summary functions must be also bound to an R list named in the same
 # way as the empirical summary statistics
-functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+functions <- list(
+  diversity  = compute_diversity,
+  divergence = compute_divergence,
+  f4         = compute_f4
+)
+
+#--------------------------------------------------------------------------------
+# validate the individual ABC components for correctness and consistency
+validate_abc(model, priors, functions, observed)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations
@@ -171,11 +244,16 @@ data <- simulate_abc(
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters
+# (accepts all parameters of the abc() function from the R package abc)
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=file.exists(data_file), warning=FALSE, message=FALSE, results="hide"}
-data <- readRDS(system.file("examples/01_data.rds", package = "demografr"))
+```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/data.rds"))}
+saveRDS(data, here::here("inst/examples/data.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/data.rds")), warning=FALSE, message=FALSE, results="hide"}
+data <- readRDS(system.file("examples/data.rds", package = "demografr"))
 abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 ```
 
@@ -192,17 +270,17 @@ extract_summary(abc)
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
 
 ```{r, posterior_Ne, fig.width=8, fig.height=5}
-plot_posterior(abc, type = "Ne")
+plot_posterior(abc, prefix = "Ne")
 ```
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
 ```{r, posterior_Tsplit, fig.width=8, fig.height=5}
-plot_posterior(abc, type = "Tsplit")
+plot_posterior(abc, prefix = "T")
 ```
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
 
 ```{r, diagnostic_Ne, fig.width=10, fig.height=8}
-plot(abc, param = "Ne_popC")
+plot(abc, param = "Ne_C")
 ```
