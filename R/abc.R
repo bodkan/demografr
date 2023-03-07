@@ -53,7 +53,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
            call. = FALSE)
     }
 
-    cat(" \u2713\n")
+    cat(" \u2705\n")
   }
 
   # check requirements for scaffold models given as normal slendr model objects
