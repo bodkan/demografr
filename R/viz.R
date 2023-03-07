@@ -29,17 +29,16 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
 #' Plot posterior distribution(s)
 #' @import ggplot2
 #' @export
-plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", "unadj"),
+plot_posterior <- function(abc, param = NULL, prefix = NULL, posterior = c("adj", "unadj"),
                            summary = c("mode", "mean", "median"),
                            geom = ggplot2::geom_density, facets = TRUE, xlim = NULL, ...) {
   df <- extract_posterior(abc, posterior)
-  df$type <- gsub("(Ne|Tgf|Tsplit|gf)_.*", "\\1", df$param) %>% as.factor()
 
-  # subset to a given type of parameters
-  if (!is.null(type)) {
-    type <- match.arg(type, c("Ne", "Tgf", "Tsplit", "gf"))
-    df <- df[df$type == type, ]
-    param <- unique(df$param)
+  if (!is.null(prefix)) {
+    prefix_match <- grepl(prefix, df$param)
+    df <- df[prefix_match, ]
+    if (!nrow(df))
+      stop("No parameter matchin the given prefix", call. = FALSE)
   }
 
   # if requested, subset to a given set of parameters
@@ -55,13 +54,11 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
   summary_df <- extract_posterior_summary(abc, summary)
   summary_df <- summary_df[summary_df$param %in% param, ]
 
-  legend <- if (length(unique(as.character(df$type))) == 1) "none" else guide_legend("type")
-
   p <- ggplot(df[df$param %in% param, ]) +
-    geom(aes(value, fill = type, color = type), alpha = 0.5, ...) +
+    geom(aes(value), alpha = 0.5, ...) +
     # geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
     scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
-    guides(color = legend, fill = legend) +
+    # guides(color = legend, fill = legend) +
     scale_fill_discrete(drop = FALSE) +
     scale_color_discrete(drop = FALSE) +
     theme_minimal() +
@@ -69,8 +66,8 @@ plot_posterior <- function(abc, param = NULL, type = NULL, posterior = c("adj", 
     coord_cartesian(xlim = xlim)
 
   if (facets) {
-    scales <- if (length(unique(as.character(df$type))) == 1) "fixed" else "free"
-    p <- p + facet_wrap(~ param, scales = scales)
+    # scales <- if (length(unique(as.character(df$type))) == 1) "fixed" else "free"
+    p <- p + facet_wrap(~ param) #, scales = scales)
   }
 
   p
