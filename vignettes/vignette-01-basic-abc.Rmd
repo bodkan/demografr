@@ -80,7 +80,7 @@ observed <- list(diversity = diversity_df, divergence = divergence_df)
 
 The first step in a _demografr_ ABC analysis is setting up a "scaffold" model for which we will estimate the posterior parameters of interest.
 
-One way to do this is by building a normal _slendr_ model (for instance, a model such as [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)). However, for simpler models like ours, it can be easier to input the scaffold as a standard phylogenetic tree (here we use the function `tree_model()` to input a tree in the [Newick format](https://en.wikipedia.org/wiki/Newick_format)).
+One way to do this is by building a normal _slendr_ model (for instance, a model such as [this](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)), representing
 
 ```{r}
 model <- tree_model(tree = "(popA,(popB,(popC,popD)));", time_span = 10000)
