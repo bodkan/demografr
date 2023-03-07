@@ -76,10 +76,10 @@ If you want to follow updates on _demografr_, you can do this also on my [Twitte
 
 ```{r, echo=FALSE, message=FALSE}
 # this simulates the entire example data set (also used in the ProbGen23 poster)
-library(dplyr)
-library(slendr)
 
 devtools::load_all(".")
+library(slendr)
+
 init_env()
 
 SEED <- 42
@@ -155,10 +155,9 @@ observed_f4
 This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
 ```{r, eval=!file.exists(here::here("inst/examples/data.rds"))}
-library(dplyr)
+library(demografr)
 library(slendr)
 
-library(demografr)
 init_env()
 
 future::plan("multicore", workers = 80) # sets up parallelization across 80 CPUs
