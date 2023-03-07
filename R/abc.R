@@ -208,7 +208,8 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       cat(" \u274c\n\n")
       stop(error_msg, call. = FALSE)
     }
-    if (!all(dim(sim == dim(obs)))) {
+
+    if (!all(dim(sim) == dim(obs))) {
       error_msg <- paste(
         "\n\nDimensions of observed and simulated statistics differ\n",
         sprintf("  observed: %d rows, %d columns\n", nrow(obs), ncol(obs)),
@@ -216,18 +217,42 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
       )
       stop(error_msg, call. = FALSE)
     }
+
     if (obs_type == "data frame") {
-      if (length(intersect(sim[[1]], obs[[1]])) != nrow(sim)) {
+      numeric_cols_obs <- sapply(names(obs), function(i) is.numeric(obs[[i]]))
+      numeric_cols_sim <- sapply(names(sim), function(i) is.numeric(sim[[i]]))
+
+      # check that only one column with a value of a summary statistic is present
+      if (sum(numeric_cols_obs) > 1) {
+        stop("Multiple numeric value columns present in the observed summary statistic\n",
+             "'", stat, "' but only one such column is allowed.", call. = FALSE)
+      }
+      if (sum(numeric_cols_sim) > 1) {
+        stop("Multiple numeric value columns present in the simulated summary statistic\n",
+             "'", stat, "' but only one such column is allowed.", call. = FALSE)
+      }
+
+      # if a summary statistic is given as a data frame, all columns except for the
+      # column with its numerical value must be the same (i.e., same statistic name,
+      # same population labels, any identifiers) -- this ensures that the observed
+      # statistic data frame and the data computed from a simulation is comparable
+      str_cols_obs <- obs[, !numeric_cols_obs]
+      str_cols_sim <- sim[, !numeric_cols_sim]
+      if (!all(str_cols_obs == str_cols_sim)) {
+        mismatch_rows <- which(str_cols_obs != str_cols_sim)
+        cat("\n")
         error_msg <- paste(
-          "\n\nNames of observed and simulated statistics differ\n",
-          "  observed:", paste(sort(obs[[1]]), collapse = ", "), "\n",
-          "  simulated:", paste(sort(sim[[1]]), collapse = ", "), "\n"
+          "\n\nSome columns do not match between observed and simulated data.\n",
+          "  Problem occured on rows:", paste(mismatch_rows, collapse = ", "), "\n",
+          "  Example of the first observed mismatch at row:\n",
+          "    observed:", paste(str_cols_obs[mismatch_rows[1], ], collapse = "\t"), "\n",
+          "    simulated:", paste(str_cols_sim[mismatch_rows[1], ], collapse = "\t"), "\n"
         )
         stop(error_msg, call. = FALSE)
       }
       msg <- ""
     } else {
-      msg <- "(but could not verify names!)"
+      msg <- "(but could not verify names of some statistics!)"
       missing_names <- TRUE
     }
     cat(" \u2705", msg, "\n")
@@ -413,8 +438,11 @@ simulate_abc <- function(
         # convert simulated statistics to a matrix, either from a normal data frame
         # result (with each statistic named), or from a simple vector
         if (is.data.frame(x)) {
-          values <- matrix(x[, 2, drop = TRUE], nrow = 1)
-          names <- x[, 1, drop = TRUE]
+          # find the column with the value of a statistic `stat`
+          value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+          values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
+          names <- x[, !value_col, drop = FALSE] %>%
+            apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
         } else {
           values <- matrix(x, nrow = 1)
           names <- paste0(stat, "_", seq_along(x))
@@ -430,9 +458,13 @@ simulate_abc <- function(
     # convert observed statistics to a matrix, either from a normal data frame
     # result (with each statistic named), or from a simple vector
     x <- observed[[stat]]
+
     if (is.data.frame(x)) {
-      values <- matrix(x[, 2, drop = TRUE], nrow = 1)
-      names <- x[, 1, drop = TRUE]
+      # find the column with the value of a statistic `stat`
+      value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
+      names <- x[, !value_col, drop = FALSE] %>%
+        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
     } else {
       values <- matrix(x, nrow = 1)
       names <- paste0(stat, "_", seq_along(x))
