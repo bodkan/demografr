@@ -208,10 +208,9 @@ indicated gene-flow event) with Approximate Bayesian Computation in a
 single R script:
 
 ``` r
-library(dplyr)
+library(demografr)
 library(slendr)
 
-library(demografr)
 init_env()
 
 future::plan("multicore", workers = 80) # sets up parallelization across 80 CPUs
