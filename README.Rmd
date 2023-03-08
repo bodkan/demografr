@@ -25,22 +25,9 @@ The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Comp
 
 Unlike traditional ABC approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform simulation, data analysis, and ABC inference itself entirely in R within a single reproducible analysis script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
 
-### What are the issues with standard ABC?
+### How does _demografr_ help with ABC?
 
-A traditional ABC analysis in population genetics generally involves:
-
-1. Writing a simulation script tailor-made for the demographic model of species in question using tools such as [ms](http://home.uchicago.edu/rhudson1/source/mksamples.html), [scrm](https://github.com/scrm/scrm/), [msprime](https://github.com/tskit-dev/msprime/), or [SLiM](https://github.com/MesserLab/SLiM/). For most realistic demographic models this presents a significant obstacle unless one is well versed in software development.
-2. Developing a pipeline which will draw model parameters from a set of priors, and simulate output data in an appropriate format. Saving output files to disk can be very slow, especially for large genome-scale simulations across thousands of simulation replicates.
-3. Computing summary statistics on the simulated data using appropriate software (often a combination of ADMIXTOOLS, PLINK, vcftools, or various custom scripts). This usually requires conversion of simulated outputs to an appropriate file format. In addition to the cost of disk-access, computing summary statistics can be quite slow depending on the statistic or program in question.
-4. Feeding (and often re-formatting) the outputs of summary statistics in the right format to use with the appropriate ABC inference engine, such as the R package [_abc_](https://cran.r-project.org/package=abc).
-
-Given the range of disparate tools required for the steps above, traditional ABC pipelines end up being quite complex, require a large amount of programming work and, because of the specifics of each demographic model, the whole procedure is usually re-invented from scratch for each study.
-
-All in all, **an unnecessary amount of time spent on ABC analyses is dedicated to software development&mdash;programming, debugging, and data munging&mdash;work that would be better spent doing research**.
-
-### How does _demografr_ help?
-
-_demografr_ streamlines every step of a typical ABC pipeline by leveraging the [_slendr_](https://github.com/bodkan/slendr/) framework as a building block for simulation and data analysis, making it possible to perform an entire ABC analysis in R. Taking the steps above one by one, here is how _demografr_ makes life easier:
+_demografr_ streamlines every step of a typical ABC pipeline by leveraging the [_slendr_](https://github.com/bodkan/slendr/) framework as a building block for simulation and data analysis, making it possible to write complete ABC workflows in R. Specifically:
 
 1. _slendr_'s intuitive, interactive [interface for definning population genetic models](https://www.slendr.net/articles/vignette-04-nonspatial-models.html) makes it easy to encode even complex demographic models with only bare minimum of R knowledge needed.
 2. _demografr_ makes it possible to encode prior distributions of parameters using familiar R interface resembling standard probabilistic statements, and provides an automated function which simulates ABC replicates drawing parameters from priors in a trivial, one-step manner.
@@ -73,9 +60,7 @@ If you want to follow updates on _demografr_, you can do this also on my [Twitte
 
 ## An example ABC analysis
 
-
 ```{r, echo=FALSE, message=FALSE}
-# this simulates the entire example data set (also used in the ProbGen23 poster)
 
 devtools::load_all(".")
 library(slendr)
@@ -84,7 +69,10 @@ init_env()
 
 SEED <- 42
 set.seed(SEED)
+```
 
+```{r, eval=!file.exists(system.file("examples/observed_diversity.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_divergence.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_f4.tsv", package = "demografr")), echo=FALSE, message=FALSE}
+# this simulates the entire example data set (also used in the ProbGen23 poster)
 popA <- population("popA", time = 1, N = 2000)
 popB <- population("popB", time = 2000, N = 800, parent = popA)
 popC <- population("popC", time = 6000, N = 9000, parent = popB)
@@ -135,18 +123,24 @@ After sequencing the genomes of individuals from these populations, we computed 
 1. Nucleotide diversity in each population:
 
 ```{r}
+observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
 observed_diversity
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
+observed_divergence <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
 observed_divergence
 ```
 
-#. Value of a following $f_4$-statistic:
+3. Value of a following $f_4$-statistic:
 
 ```{r}
+observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+
 observed_f4
 ```
 
@@ -158,9 +152,11 @@ This is how we would use _demografr_ to estimate the $N_e$ and split times for a
 library(demografr)
 library(slendr)
 
+# set up the internal tskit/msprime environment
 init_env()
 
-future::plan("multicore", workers = 80) # sets up parallelization across 80 CPUs
+# set up parallelization across 80 CPUs
+future::plan("multicore", workers = 80)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list

@@ -32,50 +32,12 @@ barrier to entry for new users and facilitates reproducibility for all
 users regardless of their level of experience by eliminating many common
 sources of bugs.
 
-### What are the issues with standard ABC?
-
-A traditional ABC analysis in population genetics generally involves:
-
-1.  Writing a simulation script tailor-made for the demographic model of
-    species in question using tools such as
-    [ms](http://home.uchicago.edu/rhudson1/source/mksamples.html),
-    [scrm](https://github.com/scrm/scrm/),
-    [msprime](https://github.com/tskit-dev/msprime/), or
-    [SLiM](https://github.com/MesserLab/SLiM/). For most realistic
-    demographic models this presents a significant obstacle unless one
-    is well versed in software development.
-2.  Developing a pipeline which will draw model parameters from a set of
-    priors, and simulate output data in an appropriate format. Saving
-    output files to disk can be very slow, especially for large
-    genome-scale simulations across thousands of simulation replicates.
-3.  Computing summary statistics on the simulated data using appropriate
-    software (often a combination of ADMIXTOOLS, PLINK, vcftools, or
-    various custom scripts). This usually requires conversion of
-    simulated outputs to an appropriate file format. In addition to the
-    cost of disk-access, computing summary statistics can be quite slow
-    depending on the statistic or program in question.
-4.  Feeding (and often re-formatting) the outputs of summary statistics
-    in the right format to use with the appropriate ABC inference
-    engine, such as the R package
-    [*abc*](https://cran.r-project.org/package=abc).
-
-Given the range of disparate tools required for the steps above,
-traditional ABC pipelines end up being quite complex, require a large
-amount of programming work and, because of the specifics of each
-demographic model, the whole procedure is usually re-invented from
-scratch for each study.
-
-All in all, **an unnecessary amount of time spent on ABC analyses is
-dedicated to software development—programming, debugging, and data
-munging—work that would be better spent doing research**.
-
-### How does *demografr* help?
+### How does *demografr* help with ABC?
 
 *demografr* streamlines every step of a typical ABC pipeline by
 leveraging the [*slendr*](https://github.com/bodkan/slendr/) framework
 as a building block for simulation and data analysis, making it possible
-to perform an entire ABC analysis in R. Taking the steps above one by
-one, here is how *demografr* makes life easier:
+to write complete ABC workflows in R. Specifically:
 
 1.  *slendr*’s intuitive, interactive [interface for definning
     population genetic
@@ -158,14 +120,14 @@ saved in two standard R data frames:
 <!-- end list -->
 
 ``` r
+observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
 observed_diversity
-#> # A tibble: 4 × 2
-#>   set   diversity
-#>   <chr>     <dbl>
-#> 1 popA  0.0000808
-#> 2 popB  0.0000332
-#> 3 popC  0.000102 
-#> 4 popD  0.0000902
+#>    set    diversity
+#> 1 popA 8.079807e-05
+#> 2 popB 3.324979e-05
+#> 3 popC 1.024510e-04
+#> 4 popD 9.024937e-05
 ```
 
 2.  Pairwise divergence d\_X\_Y between populations X and Y:
@@ -173,30 +135,28 @@ observed_diversity
 <!-- end list -->
 
 ``` r
+observed_divergence <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
 observed_divergence
-#> # A tibble: 6 × 3
-#>   x     y     divergence
-#>   <chr> <chr>      <dbl>
-#> 1 popA  popB    0.000241
-#> 2 popA  popC    0.000241
-#> 3 popA  popD    0.000241
-#> 4 popB  popC    0.000111
-#> 5 popB  popD    0.000115
-#> 6 popC  popD    0.000111
+#>    set    diversity
+#> 1 popA 8.079807e-05
+#> 2 popB 3.324979e-05
+#> 3 popC 1.024510e-04
+#> 4 popD 9.024937e-05
 ```
 
-1.  Value of a following
+3.  Value of a following
     ![f\_4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;f_4
     "f_4")-statistic:
 
 <!-- end list -->
 
 ``` r
+observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+
 observed_f4
-#> # A tibble: 1 × 5
-#>   W     X     Y     Z              f4
-#>   <chr> <chr> <chr> <chr>       <dbl>
-#> 1 popA  popB  popC  popD  -0.00000196
+#>      W    X    Y    Z            f4
+#> 1 popA popB popC popD -1.959654e-06
 ```
 
 ### A complete ABC analysis in a single R script
@@ -211,9 +171,11 @@ single R script:
 library(demografr)
 library(slendr)
 
+# set up the internal tskit/msprime environment
 init_env()
 
-future::plan("multicore", workers = 80) # sets up parallelization across 80 CPUs
+# set up parallelization across 80 CPUs
+future::plan("multicore", workers = 80)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
