@@ -145,7 +145,7 @@ observed_divergence
 #> 4 popD 9.024937e-05
 ```
 
-3.  Value of a following
+3.  Value of the following
     ![f\_4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;f_4
     "f_4")-statistic:
 

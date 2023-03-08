@@ -136,7 +136,7 @@ observed_divergence <- read.table(system.file("examples/observed_diversity.tsv",
 observed_divergence
 ```
 
-3. Value of a following $f_4$-statistic:
+3. Value of the following $f_4$-statistic:
 
 ```{r}
 observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
