@@ -9,8 +9,16 @@
 
 <img src="man/figures/logo.png" align="right" />
 
-⚠️ **This package is under active development and things often change on
-short notice.** ⚠️
+⚠️⚠️⚠️
+
+**This package is under active development and things often change (and break) on
+short notice! You probably shouldn't be using _demografr_ in your own modeling projects
+at this point.**
+
+**A more stable version and a preprint will be ready sometime in summer 2023.
+Feedback is most welcome!**
+
+⚠️⚠️⚠️
 
 The goal of *demografr* is to simplify and streamline [Approximate
 Bayesian
