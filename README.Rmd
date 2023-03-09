@@ -19,7 +19,16 @@ knitr::opts_chunk$set(
 
 <img src="man/figures/logo.png" align="right" />
 
-⚠️&nbsp;**This package is under active development and things often change on short notice.**&nbsp;⚠️
+⚠️⚠️⚠️
+
+**This package is under active development and things often change (and break) on
+short notice! You probably shouldn't be using _demografr_ in your own modeling projects
+at this point.**
+
+**A more stable version and a preprint will be ready sometime in summer 2023.
+Feedback is most welcome!**
+
+⚠️⚠️⚠️
 
 The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics and make it more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
