@@ -151,7 +151,7 @@ observed_diversity
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
-observed_divergence <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
 
 observed_divergence
 ```
