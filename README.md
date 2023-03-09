@@ -96,6 +96,16 @@ If you want to follow updates on *demografr*, you can do this also on my
 [Twitter](https://twitter.com/fleventy5). I am not very active there but
 I do use it to post notes about all my software projects.
 
+## Important pieces missing so far
+
+Currently in progress:
+
+1. Support for temporal sampling via _slendr_'s [schedule_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
+
+2. Implement flexible time units for model parameters as supported by _slendr_ (years ago, generations forwards in time, years into the future, etc.).
+
+3. Implement rejection of non-sensical parameter combinations (daughter populations existing before parent populations, etc.). Easy to solve internally in `simulate_abc()`, it just hasn't happened yet.
+
 ## An example ABC analysis
 
 Imagine that we sequenced genomes of individuals from populations
