@@ -122,7 +122,7 @@ Currently in progress:
 Imagine that we sequenced genomes of individuals from populations
 “popA”, “popB”, “popC”, and “popD”.
 
-Let’s also assume that we know that the three populations are
+Let’s also assume that we know that the populations are
 phylogenetically related in the following way with an indicated
 gene-flow event at a certain time in the past, but we don’t know
 anything else (i.e., we have no idea about their $N_e$ or split times):
