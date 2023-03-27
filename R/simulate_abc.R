@@ -91,7 +91,7 @@ simulate_abc <- function(
       engine_args = engine_args,
       future.seed = TRUE,
       future.globals = globals,
-      future.packages = c("slendr", "dplyr", packages)
+      future.packages = c("slendr", packages)
     )
   } else {
     results <- list(
