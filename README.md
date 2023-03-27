@@ -4,13 +4,20 @@
 # *demografr*: A simple and efficient ABC toolkit for R
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 <img src="man/figures/logo.png" align="right" />
 
-⚠️ **This package is under active development and things often change on
-short notice.** ⚠️
+⚠️⚠️⚠️
+
+**This package is under active development and things often change (and
+break) on short notice! You probably shouldn’t be using *demografr* in
+your own modeling projects at this point.**
+
+**A more stable version and a preprint will be ready sometime in summer
+2023. Feedback is most welcome!**
+
+⚠️⚠️⚠️
 
 The goal of *demografr* is to simplify and streamline [Approximate
 Bayesian
@@ -85,8 +92,7 @@ devtools::install_github("bodkan/slendr")
 
 *demografr* is very much in an early experimental stage at this point.
 Although ABC fitting of “standard” demographic models (i.e. estimating
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e"), split times and gene-flow parameters for non-spatial models)
+$N_e$, split times and gene-flow parameters for non-spatial models)
 already works very nicely, our long-term ambitions for the project are
 much higher. As such, please be aware that the interface might change
 significantly on a short notice to accomodate features for estimating
@@ -96,17 +102,30 @@ If you want to follow updates on *demografr*, you can do this also on my
 [Twitter](https://twitter.com/fleventy5). I am not very active there but
 I do use it to post notes about all my software projects.
 
+## Important pieces missing so far
+
+Currently in progress:
+
+1.  Support for temporal sampling via *slendr*’s
+    [schedule_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
+
+2.  Implement flexible time units for model parameters as supported by
+    *slendr* (years ago, generations forwards in time, years into the
+    future, etc.).
+
+3.  Implement rejection of non-sensical parameter combinations (daughter
+    populations existing before parent populations, etc.). Easy to solve
+    internally in `simulate_abc()`, it just hasn’t happened yet.
+
 ## An example ABC analysis
 
 Imagine that we sequenced genomes of individuals from populations
 “popA”, “popB”, “popC”, and “popD”.
 
-Let’s also assume that we know that the three populations are
+Let’s also assume that we know that the populations are
 phylogenetically related in the following way with an indicated
 gene-flow event at a certain time in the past, but we don’t know
-anything else (i.e., we have no idea about their
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") or split times):
+anything else (i.e., we have no idea about their $N_e$ or split times):
 
 <img src="man/figures/README-ape_tree-1.png" style="display: block; margin: auto;" />
 
@@ -116,8 +135,6 @@ pairwise genetic divergence, and observed the following values which we
 saved in two standard R data frames:
 
 1.  Nucleotide diversity in each population:
-
-<!-- end list -->
 
 ``` r
 observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
@@ -130,26 +147,22 @@ observed_diversity
 #> 4 popD 9.024937e-05
 ```
 
-2.  Pairwise divergence d\_X\_Y between populations X and Y:
-
-<!-- end list -->
+2.  Pairwise divergence d_X\_Y between populations X and Y:
 
 ``` r
-observed_divergence <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
 
 observed_divergence
-#>    set    diversity
-#> 1 popA 8.079807e-05
-#> 2 popB 3.324979e-05
-#> 3 popC 1.024510e-04
-#> 4 popD 9.024937e-05
+#>      x    y   divergence
+#> 1 popA popB 0.0002413010
+#> 2 popA popC 0.0002409678
+#> 3 popA popD 0.0002407488
+#> 4 popB popC 0.0001114809
+#> 5 popB popD 0.0001151775
+#> 6 popC popD 0.0001114729
 ```
 
-3.  Value of the following
-    ![f\_4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;f_4
-    "f_4")-statistic:
-
-<!-- end list -->
+3.  Value of the following $f_4$-statistic:
 
 ``` r
 observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
@@ -161,11 +174,9 @@ observed_f4
 
 ### A complete ABC analysis in a single R script
 
-This is how we would use *demografr* to estimate the
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") and split times for all populations (and the rate of the
-indicated gene-flow event) with Approximate Bayesian Computation in a
-single R script:
+This is how we would use *demografr* to estimate the $N_e$ and split
+times for all populations (and the rate of the indicated gene-flow
+event) with Approximate Bayesian Computation in a single R script:
 
 ``` r
 library(demografr)
@@ -267,42 +278,38 @@ abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
 After we run this R script, we end up with an object called `abc` here.
 This object contains the complete information about the results of our
 inference. In particular, it carries the posterior samples for our
-parameters of interest
-(![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") of populations and their split times).
+parameters of interest ($N_e$ of populations and their split times).
 
 For instance, we can get a table of all posterior values with the
 function `extract_summary()`:
 
 ``` r
 extract_summary(abc)
-#>                             Ne_A      Ne_B      Ne_C      Ne_D      T_AB
-#> Min.:                  -166.5011 -166.2640  6606.080  1102.067  990.0113
-#> Weighted 2.5 % Perc.:   395.3732  307.9277  7123.106  2492.582 1325.9283
-#> Weighted Median:       1410.6402 1054.7174  8371.790  4426.443 1859.6069
-#> Weighted Mean:         1560.3379 1202.1757  8507.864  4447.745 1868.1861
-#> Weighted Mode:          986.5018  783.9835  8108.631  4677.661 1781.7904
-#> Weighted 97.5 % Perc.: 3328.8049 2302.3348 10324.983  6831.807 2421.3862
-#> Max.:                  4308.9055 3443.0826 13387.865 10908.349 3137.7642
-#>                            T_BC     T_CD       gf_BC
-#> Min.:                  3505.754 6488.413 -0.01287937
-#> Weighted 2.5 % Perc.:  4631.061 7128.536  0.06136431
-#> Weighted Median:       5639.941 7687.900  0.26326374
-#> Weighted Mean:         5584.446 7699.348  0.27586821
-#> Weighted Mode:         5707.551 7708.075  0.20626579
-#> Weighted 97.5 % Perc.: 6300.978 8319.426  0.55192910
-#> Max.:                  6469.499 8820.620  0.87096779
+#>                             Ne_A      Ne_B      Ne_C     Ne_D     T_AB     T_BC
+#> Min.:                  -154.4357 -160.5012  6598.914 1985.970 1025.790 3484.310
+#> Weighted 2.5 % Perc.:   335.6717  369.1727  7089.719 2998.958 1310.410 4645.530
+#> Weighted Median:       1424.7351 1076.7693  8390.820 4426.852 1866.135 5641.544
+#> Weighted Mean:         1567.8079 1208.1039  8503.661 4421.920 1869.542 5593.608
+#> Weighted Mode:          987.7037  777.8807  8112.488 4615.830 1773.348 5704.552
+#> Weighted 97.5 % Perc.: 3483.0220 2301.1048 10317.553 6156.445 2431.848 6327.303
+#> Max.:                  4549.4227 3901.0760 13381.965 9293.825 3249.039 6508.854
+#>                            T_CD       gf_BC
+#> Min.:                  6531.469 -0.01748597
+#> Weighted 2.5 % Perc.:  7206.961  0.05997223
+#> Weighted Median:       7694.990  0.26453025
+#> Weighted Mean:         7698.733  0.27380456
+#> Weighted Mode:         7702.070  0.20913922
+#> Weighted 97.5 % Perc.: 8232.677  0.53079048
+#> Max.:                  8741.145  0.81055566
 ```
 
 We can also visualize the posterior distributions. Rather than plotting
 many different distributions at once, let’s first check out the
-posterior distributions of inferred
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") values:
+posterior distributions of inferred $N_e$ values:
 
 ``` r
 plot_posterior(abc, prefix = "Ne")
-#> Warning: Removed 3 rows containing non-finite values (`stat_density()`).
+#> Warning: Removed 2 rows containing non-finite values (`stat_density()`).
 ```
 
 ![](man/figures/README-posterior_Ne-1.png)<!-- -->
