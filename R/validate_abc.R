@@ -35,7 +35,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   # check that a prior for each argument of a model generating function is provided
   # (and that other function arguments are also provided)
   if (is.function(model)) {
-    cat("Checking the presence of required function arguments... ")
+    cat("Checking the presence of required function arguments...")
 
     missing_priors <- setdiff(prior_names, formalArgs(model))
     if (length(missing_priors) > 0) {
@@ -60,7 +60,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   if (inherits(model, "slendr_model")) {
     population_names <- model$splits$pop
 
-    cat("Checking the correct syntax of population names... ")
+    cat("Checking the correct syntax of population names...")
 
     # check that all populations have synactically appropriate names (must be alphanumeric
     # so that prior variable names can be specified according to standard R syntax restrictions)
@@ -73,7 +73,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
     cat(" \u2705\n")
 
-    cat("Checking the correctness of prior parameter names... ")
+    cat("Checking the correctness of prior parameter names...")
 
     # ensure that all populations with given Ne priors really exist in the model
     Ne_pops <- grep("^Ne_", prior_names, value = TRUE) %>% gsub("Ne_", "", .)
