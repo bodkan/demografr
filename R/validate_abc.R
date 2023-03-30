@@ -148,7 +148,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
     names(prior_args) <- lapply(prior_samples, `[[`, "variable")
 
     cat("Running the model function with sampled prior values...")
-    new_model <- do.call(model, c(prior_args, model_args))
+    new_model <- generate_model(model, prior_args, model_args, max_attempts = 1000)
   } else {
     cat("Modifying the scaffold model with sampled prior values...")
     prior_samples <- list(

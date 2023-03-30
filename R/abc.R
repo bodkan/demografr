@@ -13,6 +13,47 @@ simulate_priors <- function(priors, replicates = 1000) {
   samples_df
 }
 
+# Generate a new slendr model from prior samples and a provided generating function
+generate_model <- function(fun, prior_args, model_args, max_attempts) {
+  # only a well-defined slendr errors are allowed to be ignored during ABC simulations
+  # (i.e. split time of a daughter population sampled from a prior at an older time than
+  # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
+  # are considered real errors on the part of the user and will be reported as such
+  errors <- c(
+    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)"
+  )
+
+  n_tries <- 0
+
+  repeat {
+    if (n_tries == max_attempts)
+      stop("\n\nGenerating a valid slendr model using the provided generation function\n",
+           "and priors failed even after ", max_attempts, " repetitions. Please make sure\n",
+           "that your model function can produce a valid model assuming the specified\n",
+           "prior distributions.", call. = FALSE)
+
+    n_tries <- n_tries + 1
+    model <- try(do.call(fun, c(prior_args, model_args)), silent = TRUE)
+
+    if (class(model) == "try-error") {
+      msg <- geterrmessage()
+      # check that the received error is one of the valid, potentially expected slendr
+      # errors
+      if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
+        next
+      } else {
+        cat(" \u274C\n\n")
+        stop("An unknown error message was raised while generating a slendr model\n",
+             "using the provided slendr function.\n\nThe error message received was:\n",
+             msg, "\nPrior parameters values that were sampled at the time of the error:\n",
+             paste(vapply(names(prior_args), function(p) sprintf("%s = %f", p, prior_args[p]), FUN.VALUE = character(1)), collapse = ", "), call. = FALSE)
+      }
+    }
+  }
+
+  model
+}
+
 # Modify slendr model object with prior parameter values
 modify_model <- function(model, prior_samples) {
   # replace Ne values in the model object with the prior samples
