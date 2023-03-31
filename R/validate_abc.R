@@ -82,7 +82,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   cat("------------------------------------------------------------\n")
 
   cat("Running the model function with sampled prior values...")
-  new_model <- generate_model(model, priors, model_args, max_attempts = 1000)
+  new_model <- generate_model(model, priors, model_args, max_attempts = 1000)$model
   cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")

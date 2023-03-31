@@ -63,7 +63,7 @@ generate_model <- function(fun, priors, model_args, max_attempts) {
              paste(vapply(names(prior_args), function(p) sprintf("%s = %f", p, prior_args[p]), FUN.VALUE = character(1)), collapse = ", "), call. = FALSE)
       }
     } else
-      return(model)
+      return(list(model = model, prior_values = prior_args))
   }
 }
 
@@ -72,7 +72,9 @@ generate_model <- function(fun, priors, model_args, max_attempts) {
 run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
                            engine = c("msprime", "slim"), samples = NULL, model_args = NULL,
                            engine_args = NULL, max_attempts = 1000) {
-  new_model <- generate_model(model, priors, model_args, max_attempts)
+  sampled <- generate_model(model, priors, model_args, max_attempts)
+  new_model <- sampled$model
+  prior_values <- sampled$prior_values
 
   # pick an appropriate simulation engine (msprime or SLiM)
   engine <- match.arg(engine)
@@ -89,7 +91,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
   if (mutation_rate != 0)
     ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
 
-  ts
+  list(ts = ts, prior_values = prior_values)
 }
 
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
@@ -98,17 +100,16 @@ run_iteration <- function(it, model, priors, functions,
                           engine, samples, model_args, engine_args, ...) {
   init_env(quiet = TRUE)
 
-  # sample parameters from appropriate priors
-  prior_samples <- list(custom = lapply(priors, sample_prior))
-
-  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
-                       engine, samples, model_args, engine_args)
+  sim_result <- run_simulation(model, priors, sequence_length, recombination_rate, mutation_rate,
+                               engine, samples, model_args, engine_args)
+  ts <- sim_result$ts
+  prior_values <- sim_result$prior_values
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
   simulated_stats <- lapply(functions, function(f) f(ts))
   #   2. collect all sampled prior values into a single parameter matrix
-  prior_values <- collect_prior_matrix(prior_samples)
+  prior_values <- collect_prior_matrix(prior_values)
 
   list(
     parameters = prior_values,
@@ -140,19 +141,10 @@ subset_priors <- function(priors, type) {
   Filter(function(p) match_prior_type(p, type), priors)
 }
 
-collect_prior_matrix <- function(prior_samples) {
-  # 1. iterate over the list of all prior samples (Ne priors, T_split priors, etc.)
-  # represented by lists (<variable name>, <value>)
-  # 2. convert those lists into matrices
-  # 3. bind columns of those individual per-prior matrices together in a single matrix
-  lapply(prior_samples, function(type) {
-    if (!length(type)) return(NULL)
-    values <- matrix(sapply(type, `[[`, "value"), nrow = 1)
-    colnames(values) <- sapply(type, `[[`, "variable")
-    values
-  }) %>%
-    Filter(Negate(is.null), .) %>%
-    do.call(cbind, .)
+collect_prior_matrix <- function(prior_values) {
+  m <- matrix(prior_values, nrow = 1)
+  colnames(m) <- names(prior_values)
+  m
 }
 
 check_param_presence <- function(params, p) {
