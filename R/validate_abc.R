@@ -5,7 +5,7 @@
 #' and that the user-defined summary functions produce output compatible with
 #' the provided empirical summary statistics.
 #'
-#' @param model A compiled slendr model object
+#' @param model A slendr model generating functions
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
@@ -31,10 +31,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   cat("============================================================\n")
 
   prior_samples <- list()
-  if (inherits(model, "slendr_model"))
-    cat("A compiled slendr model object provided as a scaffold\n")
-  else
-    cat("A model generating function was provided as a scaffold\n")
+  cat("A model generating function was provided as a scaffold\n")
 
   cat("============================================================\n")
 
@@ -42,91 +39,25 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
   # check that a prior for each argument of a model generating function is provided
   # (and that other function arguments are also provided)
-  if (is.function(model)) {
-    cat("Checking the presence of required function arguments...")
+  cat("Checking the presence of required function arguments...")
 
-    missing_priors <- setdiff(prior_names, formalArgs(model))
-    if (length(missing_priors) > 0) {
-      cat(" \u274C\n\n")
-      stop("The following priors are not present in the model interface:\n    ",
-           paste(missing_priors, collapse = ", "), "\n\n",
-           "Each prior must correspond to a model function argument.\n",
-           call. = FALSE)
-    }
-
-    missing_args <- setdiff(formalArgs(model), c(prior_names, names(model_args)))
-    if (length(missing_args) > 0) {
-      cat(" \u274C\n\n")
-      stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
-           call. = FALSE)
-    }
-
-    cat(" \u2705\n")
+  missing_priors <- setdiff(prior_names, formalArgs(model))
+  if (length(missing_priors) > 0) {
+    cat(" \u274C\n\n")
+    stop("The following priors are not present in the model interface:\n    ",
+          paste(missing_priors, collapse = ", "), "\n\n",
+          "Each prior must correspond to a model function argument.\n",
+          call. = FALSE)
   }
 
-  # check requirements for scaffold models given as normal slendr model objects
-  if (inherits(model, "slendr_model")) {
-    population_names <- model$splits$pop
-
-    cat("Checking the correct syntax of population names...")
-
-    # check that all populations have synactically appropriate names (must be alphanumeric
-    # so that prior variable names can be specified according to standard R syntax restrictions)
-    non_alphanum <- grepl("[^[:alnum:]]", population_names)
-    if (any(non_alphanum)) {
-      cat(" \u274c\n\n")
-      stop("Parameter syntax requires alphanumeric population names.\n\n",
-           "Invalid names are: ", population_names[non_alphanum], call. = FALSE)
-    }
-
-    cat(" \u2705\n")
-
-    cat("Checking the correctness of prior parameter names...")
-
-    # ensure that all populations with given Ne priors really exist in the model
-    Ne_pops <- grep("^Ne_", prior_names, value = TRUE) %>% gsub("Ne_", "", .)
-    missing_pops <- setdiff(Ne_pops, population_names)
-    if (length(missing_pops) > 0) {
-      cat(" \u274c\n\n")
-      stop("Unknown population(s) among Ne priors: ", missing_pops, call. = FALSE)
-    }
-
-    # ensure that no poopulations' Ne priors are duplicated
-    if (any(duplicated(Ne_pops))) {
-      cat(" \u274c\n\n")
-      stop("Duplicated Ne priors for population(s): ", Ne_pops[duplicated(Ne_pops)], call. = FALSE)
-    }
-
-    # make sure that multiple priors for a single split event are not specified
-    split_pairs <- grep("^Tsplit_", prior_names, value = TRUE) %>% gsub("Tsplit_", "", .)
-
-    split_pops <- unique(unlist(strsplit(split_pairs, "_")))
-    missing_pops <- setdiff(split_pops, population_names)
-    if (length(missing_pops) > 0) {
-      cat(" \u274c\n\n")
-      stop("Unknown population(s) among split time priors: ", missing_pops, call. = FALSE)
-    }
-
-    if (any(duplicated(split_pairs))) {
-      cat(" \u274c\n\n")
-      stop("Duplicated split time priors for pair(s): ",
-           gsub("_", "-", split_pairs[duplicated(splir_priors)]), call. = FALSE)
-    }
-
-    for (i in seq_along(split_pairs)) {
-      # peek into the splits table for the corresponding parent-daughter population pair
-      pair <- strsplit(split_pairs[i], "_")[[1]]
-      split_row <- model$splits %>% { .[.$parent == pair[1] & .$pop == pair[2], ] }
-      # write an informative error if the split doesn't exist in the model configuration
-      if (nrow(split_row) == 0) {
-        cat(" \u274c\n\n")
-        stop("Split of '", pair[2], "' from '", pair[1], "' is not encoded in the model.\n",
-             call. = FALSE)
-      }
-    }
-
-    cat(" \u2705\n")
+  missing_args <- setdiff(formalArgs(model), c(prior_names, names(model_args)))
+  if (length(missing_args) > 0) {
+    cat(" \u274C\n\n")
+    stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
+          call. = FALSE)
   }
+
+  cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")
 
@@ -150,19 +81,8 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
   cat("------------------------------------------------------------\n")
 
-  if (is.function(model)) {
-    cat("Running the model function with sampled prior values...")
-    new_model <- generate_model(model, priors, model_args, max_attempts = 1000)
-  } else {
-    cat("Modifying the scaffold model with sampled prior values...")
-    prior_samples <- list(
-      Ne     = Filter(function(pair) grepl("Ne",     pair$variable), prior_samples),
-      Tsplit = Filter(function(pair) grepl("Tsplit", pair$variable), prior_samples),
-      gf     = Filter(function(pair) grepl("gf",     pair$variable), prior_samples),
-      Tgf    = Filter(function(pair) grepl("Tgf",    pair$variable), prior_samples)
-    )
-    new_model <- modify_model(model, prior_samples)
-  }
+  cat("Running the model function with sampled prior values...")
+  new_model <- generate_model(model, priors, model_args, max_attempts = 1000)
   cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")

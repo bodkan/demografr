@@ -67,61 +67,12 @@ generate_model <- function(fun, priors, model_args, max_attempts) {
   }
 }
 
-# Modify slendr model object with prior parameter values
-modify_model <- function(model, priors) {
-  prior_samples <- generate_prior_args(priors)
-
-  # replace Ne values in the model object with the prior samples
-  if (length(prior_samples[["Ne"]]) > 0) {
-    for (Ne in prior_samples[["Ne"]]) {
-      # split variable symbol name into tokens ("Ne", "population name")
-      var_tokens <- strsplit(as.character(Ne$variable), "_")[[1]]
-      model$splits[model$splits$pop == var_tokens[2], "N"] <- as.integer(Ne$value)
-    }
-  }
-
-  # replace split time values in the model object with the prior samples
-  if (length(prior_samples[["Tsplit"]]) > 0) {
-    for (split in prior_samples[["Tsplit"]]) {
-      # split variable symbol name into tokens ("T_split", "ancestor pop", "daughter pop")
-      var_tokens <- strsplit(as.character(split$variable), "_")[[1]]
-      model$splits[
-        model$splits$parent == var_tokens[2] &
-        model$splits$pop == var_tokens[3],
-        "tsplit_gen"
-      ] <- as.integer(split$value)
-    }
-  }
-
-  # replace gene flow proportions in the model object with the prior samples
-  if (length(prior_samples[["gf"]]) > 0) {
-    for (gf in prior_samples[["gf"]]) {
-      # split variable symbol name into tokens ("gf", "from pop", "to pop")
-      var_tokens <- strsplit(as.character(gf$variable), "_")[[1]]
-      model$geneflow[
-        model$geneflow$from == var_tokens[2] &
-        model$geneflow$to == var_tokens[3],
-        "rate"
-      ] <- gf$value
-    }
-  }
-
-  # just to be sure there's no confusion, drop the populations list because
-  # it is not meaningful anymore at this point
-  model$populations <- NULL
-
-  model
-}
-
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
-run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
+run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
                            engine = c("msprime", "slim"), samples = NULL, model_args = NULL,
                            engine_args = NULL, max_attempts = 1000) {
-  if (is.function(model))
-    new_model <- generate_model(model, priors, model_args, max_attempts)
-  else
-    new_model <- modify_model(model, priors, max_attempts)
+  new_model <- generate_model(model, priors, model_args, max_attempts)
 
   # pick an appropriate simulation engine (msprime or SLiM)
   engine <- match.arg(engine)
@@ -148,16 +99,7 @@ run_iteration <- function(it, model, priors, functions,
   init_env(quiet = TRUE)
 
   # sample parameters from appropriate priors
-  if (is.function(model)) {
-    prior_samples <- list(custom = lapply(priors, sample_prior))
-  } else {
-    prior_samples <- list(
-      Ne     = subset_priors(priors, "Ne")     %>% lapply(sample_prior),
-      Tsplit = subset_priors(priors, "Tsplit") %>% lapply(sample_prior),
-      gf     = subset_priors(priors, "gf")     %>% lapply(sample_prior),
-      Tgf    = subset_priors(priors, "Tgf")    %>% lapply(sample_prior)
-    )
-  }
+  prior_samples <- list(custom = lapply(priors, sample_prior))
 
   ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
                        engine, samples, model_args, engine_args)

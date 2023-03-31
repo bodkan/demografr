@@ -4,7 +4,7 @@
 #' replicates and computes summary statistic for the next step of an inference procedure,
 #' which is the ABC estimation itself.
 #'
-#' @param model A compiled slendr model object or a model generating function
+#' @param model A slendr model generating function
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
@@ -54,19 +54,7 @@ simulate_abc <- function(
     mutation_rate = mutation_rate, model_args = model_args
   ))
 
-  if (!is.function(model)) {
-    if (engine == "msprime" && !is.null(model$path)) {
-      warning("Model is serialized to disk which is unnecessary and inefficient\n",
-              "for msprime ABC simulations. The engine will skip the serialized\n",
-              "model files and use the in-memory representation instead.",
-              call. = FALSE)
-      model$path <- NULL
-    }
-    if (engine == "SLiM" && is.null(model$path))
-      stop("Non-serialized slendr model cannot be used as a scaffold for SLiM ABC\n",
-          "simulations. Make sure your model is not compiled with `serialized = FALSE`.",
-          call. = FALSE)
-  }
+  # TODO: make sure the model is not serialized if it's to be run with msprime
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions

@@ -29,18 +29,7 @@ simulate_ts <- function(
 
   init_env(quiet = TRUE)
 
-  if (is.function(model)) {
-    prior_samples <- list(custom = lapply(priors, sample_prior))
-  } else {
-    prior_samples <- list(
-      Ne     = subset_priors(priors, "Ne")     %>% lapply(sample_prior),
-      Tsplit = subset_priors(priors, "Tsplit") %>% lapply(sample_prior),
-      gf     = subset_priors(priors, "gf")     %>% lapply(sample_prior),
-      Tgf    = subset_priors(priors, "Tgf")    %>% lapply(sample_prior)
-    )
-  }
-
-  ts <- run_simulation(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
+  ts <- run_simulation(model, priors, sequence_length, recombination_rate, mutation_rate,
                        samples = samples, engine = engine, model_args = model_args, engine_args = engine_args)
 
   ts
