@@ -10,12 +10,20 @@
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
+#' @param model_args Optional non-prior arguments for the model generating function
+#'   (specified as a named list)
+#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
+#' @param recombination_rate Recombination rate to use for the simulation
+#' @param mutation_rate Mutation rate to use for the simulation
+#' @param max_attempts Maximum number of attempts to generate prior values for a valid demographic
+#'   model (default is 1000)
 #'
 #' @return No return value. The function is ran for its terminal output.
 #'
 #' @export
 validate_abc <- function(model, priors, functions, observed, model_args = NULL,
-                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0, ...) {
+                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
+                         max_attempts = 1000, ...) {
   if (length(setdiff(names(functions), names(observed))))
     stop("Elements of lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
@@ -143,12 +151,8 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   cat("------------------------------------------------------------\n")
 
   if (is.function(model)) {
-    # collect prior model function arguments
-    prior_args <- lapply(prior_samples, `[[`, "value")
-    names(prior_args) <- lapply(prior_samples, `[[`, "variable")
-
     cat("Running the model function with sampled prior values...")
-    new_model <- generate_model(model, prior_args, model_args, max_attempts = 1000)
+    new_model <- generate_model(model, priors, model_args, max_attempts = 1000)
   } else {
     cat("Modifying the scaffold model with sampled prior values...")
     prior_samples <- list(
@@ -164,6 +168,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
   cat("------------------------------------------------------------\n")
 
   cat("Simulating a tree sequence from the constructed model...")
+
   ts <- slendr::msprime(
     new_model,
     sequence_length = sequence_length,

@@ -19,6 +19,8 @@
 #' @param packages A character vector with package names used by user-defined summary statistic
 #'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
 #' @param debug Only perform a single ABC simulation run, skipping parallelization
+#' @param max_attempts Maximum number of attempts to generate prior values for a valid demographic
+#'   model (default is 1000)
 #' @param ... Additional parameters used in the model generating function \code{model} (ignored
 #'   if a standard slendr model is used as a scaffold model)
 #'
@@ -27,7 +29,7 @@ simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   samples = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "SLiM", "custom"), debug = FALSE, ...
+  engine = c("msprime", "SLiM", "custom"), debug = FALSE, max_attempts = 1000, ...
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)

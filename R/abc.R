@@ -13,18 +13,28 @@ simulate_priors <- function(priors, replicates = 1000) {
   samples_df
 }
 
+# Generate a named list of prior samples to be used in model generating functions
+generate_prior_args <- function(priors) {
+  prior_samples <- lapply(seq_along(priors), function(i) sample_prior(priors[[i]]))
+
+  prior_args <- lapply(prior_samples, `[[`, "value")
+  names(prior_args) <- lapply(prior_samples, `[[`, "variable")
+
+  prior_args
+}
+
 # Generate a new slendr model from prior samples and a provided generating function
-generate_model <- function(fun, prior_args, model_args, max_attempts) {
+generate_model <- function(fun, priors, model_args, max_attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
   # are considered real errors on the part of the user and will be reported as such
   errors <- c(
-    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)"
+    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)",
+    "Specified times are not consistent with the assumed direction of\ntime \\(gene flow .* -> .* in the time window \\d+-\\d+\\)"
   )
 
   n_tries <- 0
-
   repeat {
     if (n_tries == max_attempts)
       stop("\n\nGenerating a valid slendr model using the provided generation function\n",
@@ -32,30 +42,35 @@ generate_model <- function(fun, prior_args, model_args, max_attempts) {
            "that your model function can produce a valid model assuming the specified\n",
            "prior distributions.", call. = FALSE)
 
+    # collect prior model function arguments
+    prior_args <- generate_prior_args(priors)
+
     n_tries <- n_tries + 1
     model <- try(do.call(fun, c(prior_args, model_args)), silent = TRUE)
 
-    if (class(model) == "try-error") {
-      msg <- geterrmessage()
-      # check that the received error is one of the valid, potentially expected slendr
-      # errors
+    if (inherits(model, "try-error")) {
+      msg <- gsub("Error : ", "", geterrmessage())
+
+      # check that the received error is one of the valid, potentially expected slendr errors
       if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
         next
       } else {
         cat(" \u274C\n\n")
-        stop("An unknown error message was raised while generating a slendr model\n",
+        stop("An unexpected error was raised while generating a slendr model\n",
              "using the provided slendr function.\n\nThe error message received was:\n",
-             msg, "\nPrior parameters values that were sampled at the time of the error:\n",
+             msg, "\nMake sure that you can successfully run your model function on its own.\n",
+             "\nPrior parameters values that were sampled at the time of the error:\n",
              paste(vapply(names(prior_args), function(p) sprintf("%s = %f", p, prior_args[p]), FUN.VALUE = character(1)), collapse = ", "), call. = FALSE)
       }
-    }
+    } else
+      return(model)
   }
-
-  model
 }
 
 # Modify slendr model object with prior parameter values
-modify_model <- function(model, prior_samples) {
+modify_model <- function(model, priors) {
+  prior_samples <- generate_prior_args(priors)
+
   # replace Ne values in the model object with the prior samples
   if (length(prior_samples[["Ne"]]) > 0) {
     for (Ne in prior_samples[["Ne"]]) {
@@ -101,14 +116,12 @@ modify_model <- function(model, prior_samples) {
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, prior_samples, sequence_length, recombination_rate, mutation_rate,
-                           engine = c("msprime", "slim"), samples = NULL, model_args = NULL, engine_args = NULL) {
-  if (is.function(model)) {
-    prior_args <- lapply(prior_samples$custom, `[[`, "value")
-    names(prior_args) <- lapply(prior_samples$custom, `[[`, "variable")
-    new_model <- do.call(model, c(prior_args, model_args))
-  } else {
-    new_model <- modify_model(model, prior_samples)
-  }
+                           engine = c("msprime", "slim"), samples = NULL, model_args = NULL,
+                           engine_args = NULL, max_attempts = 1000) {
+  if (is.function(model))
+    new_model <- generate_model(model, priors, model_args, max_attempts)
+  else
+    new_model <- modify_model(model, priors, max_attempts)
 
   # pick an appropriate simulation engine (msprime or SLiM)
   engine <- match.arg(engine)
