@@ -19,11 +19,12 @@ simulate_abc(
   packages = NULL,
   engine = c("msprime", "SLiM", "custom"),
   debug = FALSE,
+  max_attempts = 1000,
   ...
 )
 }
 \arguments{
-\item{model}{A compiled slendr model object or a model generating function}
+\item{model}{A slendr model generating function}
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
@@ -49,6 +50,9 @@ functions. Only relevant when \code{future::plan("multisession", ...)} was initi
 built-in slendr simulation back ends.}
 
 \item{debug}{Only perform a single ABC simulation run, skipping parallelization}
+
+\item{max_attempts}{Maximum number of attempts to generate prior values for a valid demographic
+model (default is 1000)}
 
 \item{...}{Additional parameters used in the model generating function \code{model} (ignored
 if a standard slendr model is used as a scaffold model)}

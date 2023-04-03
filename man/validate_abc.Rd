@@ -13,11 +13,12 @@ validate_abc(
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,
+  max_attempts = 1000,
   ...
 )
 }
 \arguments{
-\item{model}{A compiled slendr model object}
+\item{model}{A slendr model generating functions}
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
@@ -25,6 +26,18 @@ validate_abc(
 tree sequences}
 
 \item{observed}{A named list of observed summary statistics}
+
+\item{model_args}{Optional non-prior arguments for the model generating function
+(specified as a named list)}
+
+\item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
+
+\item{recombination_rate}{Recombination rate to use for the simulation}
+
+\item{mutation_rate}{Mutation rate to use for the simulation}
+
+\item{max_attempts}{Maximum number of attempts to generate prior values for a valid demographic
+model (default is 1000)}
 }
 \value{
 No return value. The function is ran for its terminal output.
