@@ -12,6 +12,8 @@
 #' @param observed A named list of observed summary statistics
 #' @param model_args Optional non-prior arguments for the model generating function
 #'   (specified as a named list)
+#' @param engine_args Optional arguments to the simulation engine function (currently
+#'   either \code{msprime} or \code{slim})
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
@@ -21,7 +23,7 @@
 #' @return No return value. The function is ran for its terminal output.
 #'
 #' @export
-validate_abc <- function(model, priors, functions, observed, model_args = NULL,
+validate_abc <- function(model, priors, functions, observed, model_args = NULL, engine_args = NULL,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
                          max_attempts = 1000, ...) {
   if (length(setdiff(names(functions), names(observed))))
@@ -81,20 +83,10 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL,
 
   cat("------------------------------------------------------------\n")
 
-  cat("Running the model function with sampled prior values...")
-  new_model <- generate_model(model, priors, model_args, max_attempts = 1000)$model
-  cat(" \u2705\n")
-
-  cat("------------------------------------------------------------\n")
-
-  cat("Simulating a tree sequence from the constructed model...")
-
-  ts <- slendr::msprime(
-    new_model,
-    sequence_length = sequence_length,
-    recombination_rate = recombination_rate
-  ) %>%
-    slendr::ts_mutate(mutation_rate = mutation_rate)
+  cat("Generating model from sampled priors and simulating tree sequence...")
+  ts <- run_simulation(model, priors, sequence_length, recombination_rate,
+                       mutation_rate, engine = "msprime", model_args = model_args,
+                       engine_args = engine_args, max_attempts = 1000)$ts
   cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")
