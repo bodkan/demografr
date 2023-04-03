@@ -44,3 +44,13 @@ plot_posterior <- function(abc, param = NULL, prefix = NULL, posterior = c("adj"
 
   p
 }
+
+extract_posterior_summary <- function(abc, summary = c("mode", "mean", "median")) {
+  summary <- match.arg(summary) %>% tools::toTitleCase()
+  summary_wide <- quiet(summary(abc))[sprintf("Weighted %s:", summary), ]
+  data.frame(
+    param = names(summary_wide),
+    value = as.vector(summary_wide),
+    stringsAsFactors = FALSE
+  )
+}

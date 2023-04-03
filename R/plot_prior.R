@@ -23,3 +23,32 @@ plot_prior <- function(x, type = NULL, replicates = 10000, geom = ggplot2::geom_
 
   p
 }
+
+simulate_priors <- function(priors, replicates = 1000) {
+  if (!is.list(priors)) priors <- list(priors)
+
+  vars <- prior_variables(priors)
+
+  samples_list <- lapply(seq_along(priors), \(i) data.frame(
+    param = vars[i],
+    value = replicate(n = replicates, sample_prior(priors[[i]])$value),
+    stringsAsFactors = FALSE
+  ))
+
+  samples_df <- dplyr::as_tibble(do.call(rbind, samples_list))
+  samples_df
+}
+
+# Subset prior formulas to just those of a given type
+subset_priors <- function(priors, type) {
+  Filter(function(p) match_prior_type(p, type), priors)
+}
+
+# Check if the provided prior formula contains the specified parameter type
+# (i.e. "Ne", "T_split", etc.)
+match_prior_type <- function(formula, type) {
+  if (!length(formula)) return(FALSE)
+
+  variable <- as.list(formula)[[2]]
+  grepl(type, variable)
+}

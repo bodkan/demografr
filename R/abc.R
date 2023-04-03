@@ -1,16 +1,62 @@
-simulate_priors <- function(priors, replicates = 1000) {
-  if (!is.list(priors)) priors <- list(priors)
+# Generate a new slendr model from prior samples and a provided generating function
+generate_model <- function(fun, priors, model_args, max_attempts) {
+  # only a well-defined slendr errors are allowed to be ignored during ABC simulations
+  # (i.e. split time of a daughter population sampled from a prior at an older time than
+  # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
+  # are considered real errors on the part of the user and will be reported as such
+  errors <- c(
+    # invalid split order implied by sampled split times
+    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)",
+    # invalid gene-flow window
+    "Specified times are not consistent with the assumed direction of\ntime \\(gene flow .* -> .* in the time window \\d+-\\d+\\)",
+    # gene-flow participants not existing
+    "Both .* and .* must be present within the gene-flow window \\d+-\\d+"
+  )
 
-  vars <- prior_variables(priors)
+  n_tries <- 0
+  repeat {
+    if (n_tries == max_attempts)
+      stop("\n\nGenerating a valid slendr model using the provided generation function\n",
+           "and priors failed even after ", max_attempts, " repetitions. Please make sure\n",
+           "that your model function can produce a valid model assuming the specified\n",
+           "prior distributions.", call. = FALSE)
+    else
+      n_tries <- n_tries + 1
 
-  samples_list <- lapply(seq_along(priors), \(i) data.frame(
-    param = vars[i],
-    value = replicate(n = replicates, sample_prior(priors[[i]])$value),
-    stringsAsFactors = FALSE
-  ))
+    # collect prior model function arguments
+    prior_args <- generate_prior_args(priors)
 
-  samples_df <- dplyr::as_tibble(do.call(rbind, samples_list))
-  samples_df
+    fun_args <- c(prior_args, model_args)
+    model <- try(do.call(fun, fun_args), silent = TRUE)
+
+    if (inherits(model, "try-error")) {
+      msg <- gsub("Error : ", "", geterrmessage())
+
+      # check that the received error is one of the valid, potentially expected slendr errors
+      if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
+        next
+      } else {
+        cat(" \u274C\n\n")
+        # compose parameters for the complete model function call (priors and non-prior arguments)
+        fun_params <- paste(
+          vapply(names(fun_args),
+                function(x) sprintf("%s = %s", x, ifelse(is.numeric(fun_args[[x]]),
+                                                         fun_args[[x]],
+                                                         sprintf("\"%s\"", fun_args[[x]]))),
+                FUN.VALUE = character(1)),
+          collapse = ", "
+        )
+        stop("An unexpected error was raised while generating a slendr model\n",
+             "using the provided slendr function.\n\nThe error message received was:\n",
+             msg,
+             "\nPerhaps re-running the model function with the sampled parameters will\n",
+             "identify the problem. You can do so by calling:\n\n",
+             paste0(as.character(substitute(fun)), "(", fun_params, ")"),
+            call. = FALSE)
+      }
+    } else
+      return(list(model = model, prior_values = prior_args))
+  }
 }
 
 # Generate a named list of prior samples to be used in model generating functions
@@ -23,49 +69,6 @@ generate_prior_args <- function(priors) {
   prior_args
 }
 
-# Generate a new slendr model from prior samples and a provided generating function
-generate_model <- function(fun, priors, model_args, max_attempts) {
-  # only a well-defined slendr errors are allowed to be ignored during ABC simulations
-  # (i.e. split time of a daughter population sampled from a prior at an older time than
-  # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
-  # are considered real errors on the part of the user and will be reported as such
-  errors <- c(
-    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)",
-    "Specified times are not consistent with the assumed direction of\ntime \\(gene flow .* -> .* in the time window \\d+-\\d+\\)"
-  )
-
-  n_tries <- 0
-  repeat {
-    if (n_tries == max_attempts)
-      stop("\n\nGenerating a valid slendr model using the provided generation function\n",
-           "and priors failed even after ", max_attempts, " repetitions. Please make sure\n",
-           "that your model function can produce a valid model assuming the specified\n",
-           "prior distributions.", call. = FALSE)
-
-    # collect prior model function arguments
-    prior_args <- generate_prior_args(priors)
-
-    n_tries <- n_tries + 1
-    model <- try(do.call(fun, c(prior_args, model_args)), silent = TRUE)
-
-    if (inherits(model, "try-error")) {
-      msg <- gsub("Error : ", "", geterrmessage())
-
-      # check that the received error is one of the valid, potentially expected slendr errors
-      if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
-        next
-      } else {
-        cat(" \u274C\n\n")
-        stop("An unexpected error was raised while generating a slendr model\n",
-             "using the provided slendr function.\n\nThe error message received was:\n",
-             msg, "\nMake sure that you can successfully run your model function on its own.\n",
-             "\nPrior parameters values that were sampled at the time of the error:\n",
-             paste(vapply(names(prior_args), function(p) sprintf("%s = %f", p, prior_args[p]), FUN.VALUE = character(1)), collapse = ", "), call. = FALSE)
-      }
-    } else
-      return(list(model = model, prior_values = prior_args))
-  }
-}
 
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
@@ -117,30 +120,6 @@ run_iteration <- function(it, model, priors, functions,
   )
 }
 
-extract_posterior_summary <- function(abc, summary = c("mode", "mean", "median")) {
-  summary <- match.arg(summary) %>% tools::toTitleCase()
-  summary_wide <- quiet(summary(abc))[sprintf("Weighted %s:", summary), ]
-  data.frame(
-    param = names(summary_wide),
-    value = as.vector(summary_wide),
-    stringsAsFactors = FALSE
-  )
-}
-
-# Check if the provided prior formula contains the specified parameter type
-# (i.e. "Ne", "T_split", etc.)
-match_prior_type <- function(formula, type) {
-  if (!length(formula)) return(FALSE)
-
-  variable <- as.list(formula)[[2]]
-  grepl(type, variable)
-}
-
-# Subset prior formulas to just those of a given type
-subset_priors <- function(priors, type) {
-  Filter(function(p) match_prior_type(p, type), priors)
-}
-
 collect_prior_matrix <- function(prior_values) {
   m <- matrix(prior_values, nrow = 1)
   colnames(m) <- names(prior_values)
@@ -166,18 +145,3 @@ identical_functions <- function(run1_functions, run2_functions) {
   run2_sources <- lapply(run2_functions, function(x) capture.output(print(x)) %>% .[-length(.)])
   identical(run1_sources, run2_sources)
 }
-
-#' Pipe operator
-#'
-#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
-#'
-#' @name %>%
-#' @rdname pipe
-#' @keywords internal
-#' @export
-#' @importFrom magrittr %>%
-#' @usage lhs \%>\% rhs
-#' @param lhs A value or the magrittr placeholder.
-#' @param rhs A function call using the magrittr semantics.
-#' @return The result of calling `rhs(lhs)`.
-NULL

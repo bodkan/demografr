@@ -81,7 +81,6 @@ Currently in progress:
 ## An example ABC analysis
 
 ```{r, echo=FALSE, message=FALSE}
-
 devtools::load_all(".")
 library(slendr)
 
@@ -92,6 +91,11 @@ set.seed(SEED)
 ```
 
 ```{r, eval=!file.exists(system.file("examples/observed_diversity.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_divergence.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_f4.tsv", package = "demografr")), echo=FALSE, message=FALSE}
+devtools::load_all(".")
+devtools::load_all("~/projects/slendr")
+
+init_env()
+
 # this simulates the entire example data set (also used in the ProbGen23 poster)
 popA <- population("popA", time = 1, N = 2000)
 popB <- population("popB", time = 2000, N = 800, parent = popA)
@@ -176,7 +180,7 @@ library(slendr)
 init_env()
 
 # set up parallelization across 80 CPUs
-future::plan("multicore", workers = 80)
+future::plan("multicore", workers = 50)
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
@@ -207,14 +211,14 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
 priors <- list(
-  Ne_A ~ runif(100, 10000),
-  Ne_B ~ runif(100, 10000),
-  Ne_C ~ runif(100, 10000),
-  Ne_D ~ runif(100, 10000),
+  Ne_A ~ runif(1, 10000),
+  Ne_B ~ runif(1, 10000),
+  Ne_C ~ runif(1, 10000),
+  Ne_D ~ runif(1, 10000),
 
-  T_AB ~ runif(1, 3000),
-  T_BC ~ runif(3000, 6000),
-  T_CD ~ runif(6000, 9000),
+  T_AB ~ runif(1, 10000),
+  T_BC ~ runif(1, 10000),
+  T_CD ~ runif(1, 10000),
 
   gf_BC ~ runif(0, 1)
 )
