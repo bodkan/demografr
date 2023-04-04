@@ -29,7 +29,7 @@ simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   samples = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "SLiM", "custom"), debug = FALSE, attempts = 1000, ...
+  engine = c("msprime", "SLiM"), debug = FALSE, attempts = 1000, ...
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -49,11 +49,11 @@ simulate_abc <- function(
   engine <- match.arg(engine)
 
   # validate the ABC setup
-  # capture.output(validate_abc(
-  #   model, priors, functions, observed,
-  #   sequence_length = sequence_length, recombination_rate = recombination_rate,
-  #   mutation_rate = mutation_rate, model_args = model_args
-  # ))
+  capture.output(validate_abc(
+    model, priors, functions, observed,
+    sequence_length = sequence_length, recombination_rate = recombination_rate,
+    mutation_rate = mutation_rate, model_args = model_args
+  ))
 
   # TODO: make sure the model is not serialized if it's to be run with msprime
 

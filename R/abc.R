@@ -1,7 +1,9 @@
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
-run_iteration <- function(it, model, priors, functions,
+run_iteration <- function(it,
+                          model, priors, functions,
                           sequence_length, recombination_rate, mutation_rate,
-                          engine, samples, model_args, engine_args, model_name, attempts) {
+                          engine, samples, model_args, engine_args,
+                          model_name, attempts) {
   init_env(quiet = TRUE)
 
   sim_result <- run_simulation(
@@ -29,11 +31,8 @@ run_iteration <- function(it, model, priors, functions,
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
-                           model_name, engine, samples = NULL,
-                           model_args, engine_args, attempts) {
-  # pick an appropriate simulation engine (msprime or SLiM)
-  engine <- match.arg(engine)
-
+                           engine, samples = NULL, model_args, engine_args,
+                           model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
@@ -104,7 +103,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
               msg,
               "\n\nPerhaps re-running the model function with the sampled parameters will\n",
               "identify the problem. You can do so by calling:\n\n",
-              paste0(as.character(model_name), "(", fun_params, ")"),
+              paste0(model_name, "(", fun_params, ")"),
               call. = FALSE)
         }
       }
