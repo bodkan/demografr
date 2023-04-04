@@ -17,7 +17,7 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param max_attempts Maximum number of attempts to generate prior values for a valid demographic
+#' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
 #'
 #' @return No return value. The function is ran for its terminal output.
@@ -25,7 +25,12 @@
 #' @export
 validate_abc <- function(model, priors, functions, observed, model_args = NULL, engine_args = NULL,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
-                         max_attempts = 1000, ...) {
+                         attempts = 1000, ...) {
+  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed))
+    stop("A model generating function, priors, summary functions, and observed\n",
+         "statistics must be provided (check that the variables that you provided\n",
+         "really do contain what you think)", call. = FALSE)
+
   if (length(setdiff(names(functions), names(observed))))
     stop("Elements of lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
@@ -83,10 +88,11 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
 
   cat("------------------------------------------------------------\n")
 
-  cat("Generating model from sampled priors and simulating tree sequence...")
+  cat("Generating model and simulating tree sequence...")
   ts <- run_simulation(model, priors, sequence_length, recombination_rate,
                        mutation_rate, engine = "msprime", model_args = model_args,
-                       engine_args = engine_args, max_attempts = 1000)$ts
+                       engine_args = engine_args, attempts = 1000,
+                       model_name = substitute(model))$ts
   cat(" \u2705\n")
 
   cat("------------------------------------------------------------\n")

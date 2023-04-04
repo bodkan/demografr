@@ -19,7 +19,7 @@
 #' @param packages A character vector with package names used by user-defined summary statistic
 #'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
 #' @param debug Only perform a single ABC simulation run, skipping parallelization
-#' @param max_attempts Maximum number of attempts to generate prior values for a valid demographic
+#' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
 #' @param ... Additional parameters used in the model generating function \code{model} (ignored
 #'   if a standard slendr model is used as a scaffold model)
@@ -29,7 +29,7 @@ simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   samples = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "SLiM", "custom"), debug = FALSE, max_attempts = 1000, ...
+  engine = c("msprime", "SLiM", "custom"), debug = FALSE, attempts = 1000, ...
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -39,8 +39,9 @@ simulate_abc <- function(
   # simulations in parallel
   if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||
       !check_arg(iterations))
-    stop(paste0("A scaffold model, priors, summary functions, observed statistics,\n",
-              "the number of iterations, and sequence information must be provided."), call. = FALSE)
+    stop("A model generating function, priors, summary functions, observed\n",
+         "statistics, and the number of iterations must be provided (check\n",
+         "that the variables that you provided really do contain what you think", call. = FALSE)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
@@ -48,11 +49,11 @@ simulate_abc <- function(
   engine <- match.arg(engine)
 
   # validate the ABC setup
-  capture.output(validate_abc(
-    model, priors, functions, observed,
-    sequence_length = sequence_length, recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate, model_args = model_args
-  ))
+  # capture.output(validate_abc(
+  #   model, priors, functions, observed,
+  #   sequence_length = sequence_length, recombination_rate = recombination_rate,
+  #   mutation_rate = mutation_rate, model_args = model_args
+  # ))
 
   # TODO: make sure the model is not serialized if it's to be run with msprime
 
@@ -79,6 +80,8 @@ simulate_abc <- function(
       samples = samples,
       model_args = model_args,
       engine_args = engine_args,
+      model_name = substitute(model),
+      attempts = attempts,
       future.seed = TRUE,
       future.globals = globals,
       future.packages = c("slendr", packages)
@@ -88,7 +91,8 @@ simulate_abc <- function(
       run_iteration(
         it = 1, model = model, priors = priors, functions = functions,
         engine = engine, samples = samples, engine_args = engine_args, model_args = model_args,
-        sequence_length = sequence_length, recombination_rate = recombination_rate, mutation_rate = mutation_rate
+        sequence_length = sequence_length, recombination_rate = recombination_rate,
+        mutation_rate = mutation_rate, model_name = substitute(model), attempts = attempts
       )
     )
   }
