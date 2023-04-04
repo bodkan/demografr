@@ -115,7 +115,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
   if (mutation_rate != 0)
     ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
 
-  list(ts = ts, prior_values = prior_args)
+  list(ts = ts, prior_values = unlist(prior_args))
 }
 
 collect_prior_matrix <- function(prior_values) {
