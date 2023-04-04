@@ -29,8 +29,8 @@ run_iteration <- function(it, model, priors, functions,
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
-                           model_name, engine = c("msprime", "slim"), samples = NULL,
-                           model_args = NULL, engine_args = NULL, attempts = 1000) {
+                           model_name, engine, samples = NULL,
+                           model_args, engine_args, attempts) {
   # pick an appropriate simulation engine (msprime or SLiM)
   engine <- match.arg(engine)
 
@@ -66,10 +66,11 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
         # collect prior model function arguments
         prior_args <- generate_prior_args(priors)
 
+        # generate a compiled slendr model from a provided function
         fun_args <- c(prior_args, model_args)
         slendr_model <- do.call(model, fun_args)
 
-        # compose a list of required and optional arguments
+        # compose a list of required and optional arguments for msprime / SLiM engine
         engine_args <- list(
           model = slendr_model,
           sequence_length = sequence_length,
@@ -77,6 +78,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
           samples = samples
         ) %>% c(., engine_args)
 
+        # simulate a tree sequence
         do.call(engine, engine_args)
       },
       error = function(cond) {
@@ -85,9 +87,10 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
         # check that the received error is one of the valid, potentially expected slendr errors
         if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
           return(NULL)
-        } else {
+        } else { # if an unexpected error ocurred, report it in full
           cat(" \u274C\n\n")
-          # compose parameters for the complete model function call (priors and non-prior arguments)
+          # compose parameters for the complete model function call
+          # (i.e. priors and non-prior arguments to the model generating function)
           fun_params <- paste(
             vapply(names(fun_args),
                   function(x) sprintf("%s = %s", x, ifelse(is.numeric(fun_args[[x]]),
@@ -120,14 +123,6 @@ collect_prior_matrix <- function(prior_values) {
   m <- matrix(prior_values, nrow = 1)
   colnames(m) <- names(prior_values)
   m
-}
-
-check_param_presence <- function(params, p) {
-  if (length(intersect(params, p)) != length(p)) {
-    missing <- setdiff(p, params)
-    stop(paste(missing, collapse = ", "), " not among the estimated model parameters",
-         call. = FALSE)
-  }
 }
 
 # This seems like a horrible hack but unless it turns out this is completely

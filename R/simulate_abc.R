@@ -80,7 +80,7 @@ simulate_abc <- function(
       samples = samples,
       model_args = model_args,
       engine_args = engine_args,
-      model_name = substitute(model),
+      model_name = as.character(substitute(model)),
       attempts = attempts,
       future.seed = TRUE,
       future.globals = globals,
