@@ -31,7 +31,7 @@ run_iteration <- function(it,
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
-                           engine, samples = NULL, model_args, engine_args,
+                           engine, samples, model_args, engine_args,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
@@ -66,11 +66,11 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
         prior_args <- generate_prior_args(priors)
 
         # generate a compiled slendr model from a provided function
-        fun_args <- c(prior_args, model_args)
-        slendr_model <- do.call(model, fun_args)
+        model_fun_args <- c(prior_args, model_args)
+        slendr_model <- do.call(model, model_fun_args)
 
         # compose a list of required and optional arguments for msprime / SLiM engine
-        engine_args <- list(
+        engine_fun_args <- list(
           model = slendr_model,
           sequence_length = sequence_length,
           recombination_rate = recombination_rate,
@@ -78,7 +78,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
         ) %>% c(., engine_args)
 
         # simulate a tree sequence
-        do.call(engine, engine_args)
+        do.call(engine, engine_fun_args)
       },
       error = function(cond) {
         msg <- conditionMessage(cond)
@@ -90,11 +90,11 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
           cat(" \u274C\n\n")
           # compose parameters for the complete model function call
           # (i.e. priors and non-prior arguments to the model generating function)
-          fun_params <- paste(
-            vapply(names(fun_args),
-                  function(x) sprintf("%s = %s", x, ifelse(is.numeric(fun_args[[x]]),
-                                                          fun_args[[x]],
-                                                          sprintf("\"%s\"", fun_args[[x]]))),
+          model_fun_params <- paste(
+            vapply(names(model_fun_args),
+                  function(x) sprintf("%s = %s", x, ifelse(is.numeric(model_fun_args[[x]]),
+                                                          model_fun_args[[x]],
+                                                          sprintf("\"%s\"", model_fun_args[[x]]))),
                   FUN.VALUE = character(1)),
             collapse = ", "
           )
@@ -103,7 +103,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
               msg,
               "\n\nPerhaps re-running the model function with the sampled parameters will\n",
               "identify the problem. You can do so by calling:\n\n",
-              paste0(model_name, "(", fun_params, ")"),
+              paste0(model_name, "(", model_fun_params, ")"),
               call. = FALSE)
         }
       }

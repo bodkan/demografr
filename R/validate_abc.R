@@ -90,7 +90,8 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
 
   cat("Generating model and simulating tree sequence...")
   ts <- run_simulation(model, priors, sequence_length, recombination_rate,
-                       mutation_rate, engine = "msprime", model_args = model_args,
+                       mutation_rate, engine = "msprime", samples = NULL,
+                       model_args = model_args,
                        engine_args = engine_args, attempts = 1000,
                        model_name = substitute(model))$ts
   cat(" \u2705\n")
