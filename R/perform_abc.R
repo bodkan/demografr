@@ -19,22 +19,24 @@
 #' @inheritParams abc::abc
 #'
 #' @export
-perform_abc <- function(data, tolerance, method, hcorr = TRUE, transf = "none",
-                        logit.bounds, subset = NULL, kernel = "epanechnikov",
-                        numnet = 10, sizenet = 5, lambda = c(0.0001, 0.001, 0.01),
-                        race = FALSE, maxit = 500, ...) {
+perform_abc <- function(data, abc_engine = c("abc", "ABC_mcmc"), ...) {
+  abc_engine <- match.arg(abc_engine)
+
   # as can be seen, this function simply unpacks the conveniently wrapped individual
   # pieces of an ABC simulation run (parameter matrix, appropriately bound data frames
   # with observed and simulated summary statistics) and plugs them into the abc
   # inference engine
-  result <- abc::abc(
-    param = data$parameters,
-    target = data$observed,
-    sumstat = data$simulated,
-    tol = tolerance,
-    method = method,
-    ...
-  )
+
+  if (abc_engine == "abc") {
+    result <- abc::abc(
+      param = data$parameters,
+      target = data$observed,
+      sumstat = data$simulated,
+      ...
+    )
+  } else if (abc_engine == "ABC_mcmc") {
+
+  }
 
   # the result of the abc analysis is a standard object produced by the R package abc,
   # but additional annotation is added so that demografr's own functions can be used
@@ -43,7 +45,7 @@ perform_abc <- function(data, tolerance, method, hcorr = TRUE, transf = "none",
   attr(result, "priors") <- data$priors
   attr(result, "model") <- data$model
   # ... which is why the result is annotated with another class
-  class(result) <- c("demografr_abc", "abc")
+  class(result) <- c("demografr_abc", abc_engine)
 
   result
 }

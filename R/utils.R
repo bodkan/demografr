@@ -28,3 +28,14 @@ quiet <- function(x) {
 prior_variables <- function(priors) {
   sapply(priors, function(p) as.character(as.list(p)[[2]]))
 }
+
+subset_parameters <- function(subset, all) {
+  params <- all
+  if (!is.null(subset)) {
+    param_re <- paste0(subset, collapse = "|")
+    params <- grep(param_re, params, value = TRUE)
+    if (length(params) == 0)
+      stop("No parameters fit the provided parameter subset", call. = FALSE)
+  }
+  params
+}

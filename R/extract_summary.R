@@ -12,14 +12,3 @@ extract_summary <- function(abc, param = NULL) {
 
   posterior_df[, params, drop = FALSE]
 }
-
-subset_parameters <- function(subset, all) {
-  params <- all
-  if (!is.null(subset)) {
-    param_re <- paste0(subset, collapse = "|")
-    params <- grep(param_re, params, value = TRUE)
-    if (length(params) == 0)
-      stop("No parameters fit the provided parameter subset", call. = FALSE)
-  }
-  params
-}
