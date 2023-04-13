@@ -8,13 +8,18 @@
 extract_summary <- function(abc, param = NULL) {
   posterior_df <- as.data.frame.matrix(quiet(summary(abc)))
 
-  params <- colnames(posterior_df)
-  if (!is.null(param)) {
+  params <- subset_parameters(subset = param, all = colnames(posterior_df))
+
+  posterior_df[, params, drop = FALSE]
+}
+
+subset_parameters <- function(subset, all) {
+  params <- all
+  if (!is.null(subset)) {
     param_re <- paste0(param, collapse = "|")
     params <- grep(param_re, params, value = TRUE)
     if (length(params) == 0)
       stop("No parameters fit the provided parameter subset", call. = FALSE)
   }
-
-  posterior_df[, params, drop = FALSE]
+  params
 }
