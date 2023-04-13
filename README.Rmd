@@ -91,11 +91,6 @@ set.seed(SEED)
 ```
 
 ```{r, eval=!file.exists(system.file("examples/observed_diversity.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_divergence.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_f4.tsv", package = "demografr")), echo=FALSE, message=FALSE}
-devtools::load_all(".")
-devtools::load_all("~/projects/slendr")
-
-init_env()
-
 # this simulates the entire example data set (also used in the ProbGen23 poster)
 popA <- population("popA", time = 1, N = 2000)
 popB <- population("popB", time = 2000, N = 800, parent = popA)
@@ -179,8 +174,9 @@ library(slendr)
 # set up the internal tskit/msprime environment
 init_env()
 
-# set up parallelization across 80 CPUs
-future::plan("multicore", workers = 50)
+# set up parallelization across all CPUs
+library(future)
+plan(multicore, workers = availableCores())
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
@@ -204,7 +200,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
     generation_time = 1, simulation_length = 10000,
-    serialize = FALSE
+    direction = "forward", serialize = FALSE
   )
 }
 
@@ -264,7 +260,7 @@ data <- simulate_abc(
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters
 # (accepts all parameters of the abc() function from the R package abc)
-abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+abc <- perform_abc(data, tol = 0.03, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/data.rds"))}
@@ -273,7 +269,7 @@ saveRDS(data, here::here("inst/examples/data.rds"))
 
 ```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/data.rds")), warning=FALSE, message=FALSE, results="hide"}
 data <- readRDS(system.file("examples/data.rds", package = "demografr"))
-abc <- perform_abc(data, tolerance = 0.05, method = "neuralnet")
+abc <- perform_abc(data, tolerance = 0.03, method = "neuralnet")
 ```
 
 ## Analysing posterior distributions of parameters
@@ -289,13 +285,19 @@ extract_summary(abc)
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
 
 ```{r, posterior_Ne, fig.width=8, fig.height=5}
-plot_posterior(abc, prefix = "Ne")
+plot_posterior(abc, param = "Ne")
 ```
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
 ```{r, posterior_Tsplit, fig.width=8, fig.height=5}
-plot_posterior(abc, prefix = "T")
+plot_posterior(abc, param = "T")
+```
+
+And, finally, the rate of gene flow:
+
+```{r, posterior_Tsplit, fig.width=8, fig.height=5}
+plot_posterior(abc, param = "gf")
 ```
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
