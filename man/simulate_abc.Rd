@@ -17,9 +17,9 @@ simulate_abc(
   model_args = NULL,
   engine_args = NULL,
   packages = NULL,
-  engine = c("msprime", "SLiM", "custom"),
+  engine = c("msprime", "SLiM"),
   debug = FALSE,
-  max_attempts = 1000,
+  attempts = 1000,
   ...
 )
 }
@@ -51,7 +51,7 @@ built-in slendr simulation back ends.}
 
 \item{debug}{Only perform a single ABC simulation run, skipping parallelization}
 
-\item{max_attempts}{Maximum number of attempts to generate prior values for a valid demographic
+\item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
 
 \item{...}{Additional parameters used in the model generating function \code{model} (ignored

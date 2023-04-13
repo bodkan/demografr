@@ -10,10 +10,11 @@ validate_abc(
   functions,
   observed,
   model_args = NULL,
+  engine_args = NULL,
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,
-  max_attempts = 1000,
+  attempts = 1000,
   ...
 )
 }
@@ -30,13 +31,16 @@ tree sequences}
 \item{model_args}{Optional non-prior arguments for the model generating function
 (specified as a named list)}
 
+\item{engine_args}{Optional arguments to the simulation engine function (currently
+either \code{msprime} or \code{slim})}
+
 \item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
 
 \item{recombination_rate}{Recombination rate to use for the simulation}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
-\item{max_attempts}{Maximum number of attempts to generate prior values for a valid demographic
+\item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
 }
 \value{
