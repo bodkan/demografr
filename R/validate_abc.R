@@ -42,7 +42,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
 
   cat("============================================================\n")
 
-  prior_names <- sapply(seq_along(priors), function(i) as.character(as.list(priors[[i]])[[2]]))
+  prior_names <- get_prior_names(priors)
 
   # check that a prior for each argument of a model generating function is provided
   # (and that other function arguments are also provided)

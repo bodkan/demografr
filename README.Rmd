@@ -258,9 +258,8 @@ data <- simulate_abc(
 )
 
 #--------------------------------------------------------------------------------
-# infer posterior distributions of parameters
-# (accepts all parameters of the abc() function from the R package abc)
-abc <- perform_abc(data, tol = 0.03, method = "neuralnet")
+# infer posterior distributions of parameters using the abc R package
+abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/data.rds"))}
@@ -269,7 +268,7 @@ saveRDS(data, here::here("inst/examples/data.rds"))
 
 ```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/data.rds")), warning=FALSE, message=FALSE, results="hide"}
 data <- readRDS(system.file("examples/data.rds", package = "demografr"))
-abc <- perform_abc(data, tolerance = 0.03, method = "neuralnet")
+abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
 ## Analysing posterior distributions of parameters
@@ -280,6 +279,12 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```{r}
 extract_summary(abc)
+```
+
+We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
+
+```{r}
+extract_summary(abc, param = "Ne")
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -304,4 +309,33 @@ Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-proj
 
 ```{r, diagnostic_Ne, fig.width=10, fig.height=8}
 plot(abc, param = "Ne_C")
+```
+
+## Additional functionality
+
+_demografr_ also provides a couple of functions designed to make troubleshooting a little easier.
+
+For instance, assuming we have `priors` set up as above, we can visualize the prior distribution(s) like this:
+
+```{r, echo=FALSE}
+priors <- list(
+  Ne_A ~ runif(1, 10000),
+  Ne_B ~ runif(1, 10000),
+  Ne_C ~ runif(1, 10000),
+  Ne_D ~ runif(1, 10000),
+
+  T_AB ~ runif(1, 10000),
+  T_BC ~ runif(1, 10000),
+  T_CD ~ runif(1, 10000),
+
+  gf_BC ~ runif(0, 1)
+)
+```
+
+```{r, prior_Ne}
+plot_prior(priors, "Ne")
+```
+
+```{r, prior_T_gf}
+plot_prior(priors, c("^T", "^gf"), facet = TRUE)
 ```

@@ -4,7 +4,24 @@
 \alias{plot_prior}
 \title{Plot prior distribution(s)}
 \usage{
-plot_prior(x, type = NULL, replicates = 10000, geom = ggplot2::geom_histogram)
+plot_prior(
+  x,
+  param = NULL,
+  replicates = 10000,
+  geom = ggplot2::geom_density,
+  facets = FALSE
+)
+}
+\arguments{
+\item{x}{Either an object of the class \code{demografr_abc}, or a list of prior
+sampling statements}
+
+\item{param}{A character vector containing either parameter names to summarize,
+or a regex-like matches to be used for subsetting.}
+
+\item{replicates}{How many samples to simulate from each prior for plotting?}
+
+\item{geom}{Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}}
 }
 \description{
 Plot prior distribution(s)

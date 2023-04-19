@@ -8,12 +8,9 @@ check_arg <- function(x) {
   tryCatch({!is.null(x); TRUE}, error = function(e) FALSE)
 }
 
-check_param_presence <- function(params, p) {
-  if (length(intersect(params, p)) != length(p)) {
-    missing <- setdiff(p, params)
-    stop(paste(missing, collapse = ", "), " not among the estimated model parameters",
-         call. = FALSE)
-  }
+# Extract prior variable names as a character vector
+get_prior_names <- function(priors) {
+  sapply(seq_along(priors), function(i) as.character(as.list(priors[[i]])[[2]]))
 }
 
 # a function to silence the unnecessary summary() output on abc objects
@@ -22,11 +19,6 @@ quiet <- function(x) {
   sink(tempfile())
   on.exit(sink())
   invisible(force(x))
-}
-
-# Extract prior variable names as a character vector
-prior_variables <- function(priors) {
-  sapply(priors, function(p) as.character(as.list(p)[[2]]))
 }
 
 subset_parameters <- function(subset, all) {
