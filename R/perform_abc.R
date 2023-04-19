@@ -15,27 +15,28 @@
 #' vignette and the manpage which you can access by typing \code{?abc::abc}.
 #'
 #' @param data Simulated data set produced by \code{simulate_abc}
-#' @param tolerance The proportion of simulated samples to accept
-#' @inheritParams abc::abc
+#' @param engine Which ABC engine to use? As of the current version of demografr, the
+#'   valid choices are either "abc" or "ABC_mcmc".
 #'
 #' @export
-perform_abc <- function(data, abc_engine = c("abc", "ABC_mcmc"), ...) {
-  abc_engine <- match.arg(abc_engine)
-
-  # as can be seen, this function simply unpacks the conveniently wrapped individual
-  # pieces of an ABC simulation run (parameter matrix, appropriately bound data frames
-  # with observed and simulated summary statistics) and plugs them into the abc
-  # inference engine
-
-  if (abc_engine == "abc") {
+perform_abc <- function(data, engine, ...) {
+  engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))
+  args <- match.call()
+  if (engine == "abc") {
+    if (!"tol" %in% names(args))
+      stop("The `tol` argument must be provided to use the abc() inference engine.\n",
+           "See `?abc::abc` for more details.", call. = FALSE)
+    if (!"method" %in% names(args))
+      stop("The `method` argument must be provided to use the abc() inference engine.\n",
+           "See `?abc::abc` for more details.", call. = FALSE)
     result <- abc::abc(
       param = data$parameters,
       target = data$observed,
       sumstat = data$simulated,
       ...
     )
-  } else if (abc_engine == "ABC_mcmc") {
-
+  } else if (engine == "ABC_mcmc") {
+    stop("ABC_mcmc engine not yet supported", call. = FALSE)
   }
 
   # the result of the abc analysis is a standard object produced by the R package abc,
@@ -45,7 +46,7 @@ perform_abc <- function(data, abc_engine = c("abc", "ABC_mcmc"), ...) {
   attr(result, "priors") <- data$priors
   attr(result, "model") <- data$model
   # ... which is why the result is annotated with another class
-  class(result) <- c("demografr_abc", abc_engine)
+  class(result) <- c(paste0("demografr_abc.", engine), engine)
 
   result
 }

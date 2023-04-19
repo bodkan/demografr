@@ -35,7 +35,7 @@ subset_parameters <- function(subset, all) {
     param_re <- paste0(subset, collapse = "|")
     params <- grep(param_re, params, value = TRUE)
     if (length(params) == 0)
-      stop("No parameters fit the provided parameter subset", call. = FALSE)
+      stop("No parameters fit the provided parameter subset or regular expression", call. = FALSE)
   }
   params
 }

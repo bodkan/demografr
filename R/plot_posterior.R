@@ -6,9 +6,7 @@
 #'
 #' @import ggplot2
 #' @export
-plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"),
-                           summary = c("mode", "mean", "median"),
-                           geom = ggplot2::geom_density, facets = TRUE, xlim = NULL, ...) {
+plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), facets = FALSE) {
   df <- extract_posterior(abc, posterior)
 
   param <- subset_parameters(subset = param, all = colnames(attr(abc, "parameters")))
@@ -16,34 +14,33 @@ plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"),
 
   # compute a given summary statistic of the posterior which will be added
   # as a vertical line overlaid on top of the distribution plot
-  summary_df <- extract_posterior_summary(abc, summary)
-  summary_df <- summary_df[summary_df$param %in% param, ]
+  # summary_df <- extract_posterior_summary(abc, summary)
+  # summary_df <- summary_df[summary_df$param %in% param, ]
 
-  p <- ggplot(df[df$param %in% param, ]) +
-    geom(aes(value), alpha = 0.5, ...) +
-    # geom_vline(data = summary_df, aes(xintercept = value), linetype = 2) +
-    scale_x_continuous(expand = c(0, 0), limits = c(0, NA)) +
-    # guides(color = legend, fill = legend) +
+  priors <- attr(abc, "priors")
+  prior_samples <- simulate_priors(priors, 10000) %>% .[.$param %in% param, ]
+  xlim <- c(floor(min(prior_samples$value)), round(max(prior_samples$value)))
+
+  p_facet <- if (facets) facet_wrap(~ param, scales = "free") else NULL
+
+  p <- ggplot(df) +
+    geom_density(aes(value, color = param, fill = param), alpha = 0.5) +
     scale_fill_discrete(drop = FALSE) +
     scale_color_discrete(drop = FALSE) +
     theme_minimal() +
+    coord_cartesian(xlim = xlim) +
     theme(strip.text.x = element_text(face = "bold", size = 13)) +
-    coord_cartesian(xlim = xlim)
-
-  if (facets) {
-    # scales <- if (length(unique(as.character(df$type))) == 1) "fixed" else "free"
-    p <- p + facet_wrap(~ param) #, scales = scales)
-  }
+    p_facet
 
   p
 }
 
-extract_posterior_summary <- function(abc, summary = c("mode", "mean", "median")) {
-  summary <- match.arg(summary) %>% tools::toTitleCase()
-  summary_wide <- quiet(summary(abc))[sprintf("Weighted %s:", summary), ]
-  data.frame(
-    param = names(summary_wide),
-    value = as.vector(summary_wide),
-    stringsAsFactors = FALSE
-  )
-}
+# extract_posterior_summary <- function(abc, summary = c("mode", "mean", "median")) {
+#   summary <- match.arg(summary) %>% tools::toTitleCase()
+#   summary_wide <- quiet(summary(abc))[sprintf("Weighted %s:", summary), ]
+#   data.frame(
+#     param = names(summary_wide),
+#     value = as.vector(summary_wide),
+#     stringsAsFactors = FALSE
+#   )
+# }

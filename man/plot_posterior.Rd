@@ -8,11 +8,7 @@ plot_posterior(
   abc,
   param = NULL,
   posterior = c("adj", "unadj"),
-  summary = c("mode", "mean", "median"),
-  geom = ggplot2::geom_density,
-  facets = TRUE,
-  xlim = NULL,
-  ...
+  facets = FALSE
 )
 }
 \arguments{
