@@ -301,7 +301,7 @@ plot_posterior(abc, param = "T")
 
 And, finally, the rate of gene flow:
 
-```{r, posterior_Tsplit, fig.width=8, fig.height=5}
+```{r, posterior_gf, fig.width=8, fig.height=5}
 plot_posterior(abc, param = "gf")
 ```
 
