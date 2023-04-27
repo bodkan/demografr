@@ -27,6 +27,9 @@ simulate_ts(
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
+\item{engine}{Which simulation engine to use? Values "msprime" and "SLiM" will use the
+built-in slendr simulation back ends.}
+
 \item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
 
 \item{engine_args}{Optional arguments for the slendr simulation back ends}

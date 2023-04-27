@@ -10,6 +10,8 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param engine Which simulation engine to use? Values "msprime" and "SLiM" will use the
+#'   built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #'
@@ -30,7 +32,8 @@ simulate_ts <- function(
   init_env(quiet = TRUE)
 
   ts <- run_simulation(model, priors, sequence_length, recombination_rate, mutation_rate,
-                       samples = samples, engine = engine, model_args = model_args, engine_args = engine_args)
-
+                       engine = "msprime", samples = NULL,
+                       model_args = model_args, engine_args = engine_args, attempts = 1000,
+                       model_name = substitute(model))$ts
   ts
 }
