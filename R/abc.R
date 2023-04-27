@@ -45,7 +45,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
     # invalid gene-flow window
     "Specified times are not consistent with the assumed direction of\ntime \\(gene flow .* -> .* in the time window \\d+-\\d+\\)",
     # gene-flow participants not existing
-    "Both .* and .* must be present within the gene-flow window \\d+-\\d+",
+    "Both .* and .* must be already present within the gene-flow window \\d+-\\d+",
     # population is created right at the moment the simulation is about to be finished
     "msprime._msprime.InputError: Input error in initialise: Attempt to sample a lineage from an inactive population"
   )
