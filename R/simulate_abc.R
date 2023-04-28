@@ -28,7 +28,7 @@
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  samples = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
+  model_args = NULL, engine_args = NULL, packages = NULL,
   engine = c("msprime", "SLiM"), debug = FALSE, attempts = 1000, ...
 ) {
   # make sure warnings are reported immediately before simulations are even started
@@ -77,7 +77,6 @@ simulate_abc <- function(
       recombination_rate = recombination_rate,
       mutation_rate = mutation_rate,
       engine = engine,
-      samples = samples,
       model_args = model_args,
       engine_args = engine_args,
       model_name = as.character(substitute(model)),
@@ -90,7 +89,7 @@ simulate_abc <- function(
     results <- list(
       run_iteration(
         it = 1, model = model, priors = priors, functions = functions,
-        engine = engine, samples = samples, engine_args = engine_args, model_args = model_args,
+        engine = engine, engine_args = engine_args, model_args = model_args,
         sequence_length = sequence_length, recombination_rate = recombination_rate,
         mutation_rate = mutation_rate, model_name = substitute(model), attempts = attempts
       )

@@ -47,7 +47,10 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
     # gene-flow participants not existing
     "Both .* and .* must be already present within the gene-flow window \\d+-\\d+",
     # population is created right at the moment the simulation is about to be finished
-    "msprime._msprime.InputError: Input error in initialise: Attempt to sample a lineage from an inactive population"
+    "msprime._msprime.InputError: Input error in initialise: Attempt to sample a lineage from an inactive population",
+    # sampling schedule itself provides times which are hard requirements for valid priors
+    "A sampling event was scheduled outside of the simulation time window",
+    "Cannot schedule sampling for '.*' at time \\d+"
   )
 
   n_tries <- 0
@@ -67,14 +70,22 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
 
         # generate a compiled slendr model from a provided function
         model_fun_args <- c(prior_args, model_args)
-        slendr_model <- do.call(model, model_fun_args)
+        model_result <- do.call(model, model_fun_args)
+
+        if (length(model_result) == 1)
+          slendr_model <- model_result
+        else if (length(model_result) == 2) {
+          slendr_model <- model_result[[1]]
+          sample_schedule <- model_result[[2]]
+        } else
+          stop("Incorrent format of the returned result of the model function", call. = FALSE)
 
         # compose a list of required and optional arguments for msprime / SLiM engine
         engine_fun_args <- list(
           model = slendr_model,
           sequence_length = sequence_length,
           recombination_rate = recombination_rate,
-          samples = samples
+          samples = sample_schedule
         ) %>% c(., engine_args)
 
         # simulate a tree sequence

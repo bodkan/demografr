@@ -31,3 +31,30 @@ subset_parameters <- function(subset, all) {
   }
   params
 }
+
+# Extract the return expression from a given R function
+extract_return <- function(model) {
+  # get the AST of the model function
+  fun_body <- as.list(body(model))
+
+  pos <- which(sapply(fun_body, function(x) is.call(x) && x[[1]] == quote(return)))
+
+  if (length(pos) > 0) {
+    return_expr <- fun_body[pos]
+    return(return_expr)
+  } else {
+    return(NULL)
+  }
+}
+
+check_model_functions <- function(model) {
+  return_exprs <- extract_return(model)
+
+  if (length(return_expr) != 1)
+    stop("A demografr model function must have exactly one return statement", call. = FALSE)
+
+  # extract the content of the return statement itself (i.e. for return(<expr>) gives <expr>)
+  return_expr <- as.list(return_exprs[[1]])[[2]]
+
+  # unpack the expression
+}

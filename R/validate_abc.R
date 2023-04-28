@@ -90,9 +90,30 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
 
   cat("------------------------------------------------------------\n")
 
+  cat("Checking the return statement of the model function...")
+
+  return_expr <- extract_return(model)
+  if (length(return_expr) != 1) {
+    cat(" \u274C\n\n")
+    stop("A demografr model function must have exactly one return statement", call. = FALSE)
+  }
+
+  # extract the content of the return statement (i.e. for return(<expr>) gives <expr>)
+  inner_expr <- as.list(return_expr[[1]])[[2]]
+  if (!length(inner_expr) %in% c(1, 3) ||
+      (length(inner_expr) == 3 && inner_expr[[1]] != quote(list))) {
+    cat(" \u274C\n\n")
+    stop("A demografr model return statement must be:\n  - `return(<model object>)`, or\n",
+         "  - `return(list(<model object>, <sampling schedule>))`", call. = FALSE)
+  }
+
+  cat(" \u2705\n")
+
+  cat("------------------------------------------------------------\n")
+
   cat("Generating model and simulating tree sequence...")
   ts <- run_simulation(model, priors, sequence_length, recombination_rate,
-                       mutation_rate, engine = "msprime", samples = NULL,
+                       mutation_rate, engine = "msprime",
                        model_args = model_args,
                        engine_args = engine_args, attempts = 1000,
                        model_name = substitute(model))$ts

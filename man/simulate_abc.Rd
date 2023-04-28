@@ -13,7 +13,6 @@ simulate_abc(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
-  samples = NULL,
   model_args = NULL,
   engine_args = NULL,
   packages = NULL,

@@ -19,7 +19,7 @@
 simulate_ts <- function(
   model, priors,
   sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  samples = NULL, engine = NULL, model_args = NULL, engine_args = NULL
+  engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -32,7 +32,7 @@ simulate_ts <- function(
   init_env(quiet = TRUE)
 
   ts <- run_simulation(model, priors, sequence_length, recombination_rate, mutation_rate,
-                       engine = "msprime", samples = NULL,
+                       engine = "msprime",
                        model_args = model_args, engine_args = engine_args, attempts = 1000,
                        model_name = substitute(model))$ts
   ts

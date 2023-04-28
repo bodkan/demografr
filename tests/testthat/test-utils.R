@@ -19,10 +19,10 @@ test_that("sample_names() returns data in a correct format", {
 
   slim(model, sequence_length = 100000, recombination_rate = 0, output = slim_ts,
       method = "batch", random_seed = 314159,
-      samples = samples, verbose = FALSE)
+      verbose = FALSE)
 
   msprime(model, sequence_length = 100000, recombination_rate = 0, output = msprime_ts,
-          random_seed = 314159, samples = samples, verbose = FALSE)
+          random_seed = 314159, verbose = FALSE)
 
   ts_msprime <- ts_load(model, file = msprime_ts)
   ts_slim <- ts_load(model, file = slim_ts)

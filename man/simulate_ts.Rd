@@ -10,7 +10,6 @@ simulate_ts(
   sequence_length = 1e+06,
   recombination_rate = 0,
   mutation_rate = 0,
-  samples = NULL,
   engine = NULL,
   model_args = NULL,
   engine_args = NULL
