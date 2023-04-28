@@ -189,7 +189,7 @@ observed <- list(
 #--------------------------------------------------------------------------------
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
@@ -197,11 +197,21 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
 
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
 
-  compile_model(
+  model <- compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
     generation_time = 1, simulation_length = 10000,
     direction = "forward", serialize = FALSE
   )
+
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(popA, 2), list(popB, 2), list(popC, 2), list(popD, 2),
+    strict = TRUE
+  )
+
+  # a return statement is mandatory!
+  # if a sampling schedule is not generated, use return(model)
+  return(list(model, samples))
 }
 
 #--------------------------------------------------------------------------------
@@ -214,9 +224,7 @@ priors <- list(
 
   T_AB ~ runif(1, 10000),
   T_BC ~ runif(1, 10000),
-  T_CD ~ runif(1, 10000),
-
-  gf_BC ~ runif(0, 1)
+  T_CD ~ runif(1, 10000)
 )
 
 #--------------------------------------------------------------------------------
@@ -249,6 +257,8 @@ functions <- list(
 #--------------------------------------------------------------------------------
 # validate the individual ABC components for correctness and consistency
 validate_abc(model, priors, functions, observed)
+
+simulate_ts(model, priors)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations
