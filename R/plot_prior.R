@@ -4,12 +4,15 @@
 #'   sampling statements
 #' @param param A character vector containing either parameter names to summarize,
 #'   or a regex-like matches to be used for subsetting.
+#' @param facets Should individual parameters be plotting on a facet each?
+#' @param file Output file for a figure saved via \code{ggsave}
 #' @param replicates How many samples to simulate from each prior for plotting?
 #' @param geom Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}
+#' @param ... Optional argument which will be passed to \code{ggsave}
 #'
 #' @export
-plot_prior <- function(x, param = NULL, replicates = 10000, geom = ggplot2::geom_density,
-                       facets = FALSE, file = NULL, ...) {
+plot_prior <- function(x, param = NULL, facets = FALSE, file = NULL,
+                       replicates = 10000, geom = ggplot2::geom_density, ...) {
   priors <- if (inherits(x, "demografr_abc.abc")) attr(x, "priors") else x
   all_params <- get_prior_names(priors); names(priors) <- all_params
   subset_params <- subset_parameters(subset = param, all = all_params)
