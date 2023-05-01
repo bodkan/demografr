@@ -8,7 +8,9 @@ plot_posterior(
   abc,
   param = NULL,
   posterior = c("adj", "unadj"),
-  facets = FALSE
+  facets = FALSE,
+  file = NULL,
+  ...
 )
 }
 \arguments{
@@ -16,6 +18,10 @@ plot_posterior(
 
 \item{param}{A character vector containing either parameter names to summarize,
 or a regex-like matches to be used for subsetting.}
+
+\item{file}{Output file for a figure saved via \code{ggsave}}
+
+\item{...}{Optional argument which will be passed to \code{ggsave}}
 }
 \description{
 Plot posterior distribution of given parameters

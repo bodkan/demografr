@@ -9,7 +9,9 @@ plot_prior(
   param = NULL,
   replicates = 10000,
   geom = ggplot2::geom_density,
-  facets = FALSE
+  facets = FALSE,
+  file = NULL,
+  ...
 )
 }
 \arguments{
