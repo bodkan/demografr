@@ -19,9 +19,9 @@ plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), fac
   # summary_df <- extract_posterior_summary(abc, summary)
   # summary_df <- summary_df[summary_df$param %in% param, ]
 
-  priors <- attr(abc, "priors")
-  prior_samples <- simulate_priors(priors, 10000) %>% .[.$param %in% param, ]
-  xlim <- c(floor(min(prior_samples$value)), round(max(prior_samples$value)))
+  # priors <- attr(abc, "priors")
+  # prior_samples <- simulate_priors(priors, 10000) %>% .[.$param %in% param, ]
+  # xlim <- c(floor(min(prior_samples$value)), round(max(prior_samples$value)))
 
   p_facet <- if (facets) ggplot2::facet_wrap(~ param, scales = "free") else NULL
 
@@ -30,7 +30,7 @@ plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), fac
     ggplot2::scale_fill_discrete(drop = FALSE) +
     ggplot2::scale_color_discrete(drop = FALSE) +
     ggplot2::theme_minimal() +
-    ggplot2::coord_cartesian(xlim = xlim) +
+    # ggplot2::coord_cartesian(xlim = xlim) +
     ggplot2::theme(strip.text.x = ggplot2::element_text(face = "bold", size = 13)) +
     p_facet
 
