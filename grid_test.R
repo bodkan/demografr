@@ -1,19 +1,22 @@
+library(future)
+nodes <- c("racimocomp01fl", "racimocomp02fl", "racimocomp03fl", "racimocomp04fl")
+plan(cluster, workers = nodes, homogeneous = FALSE)
+# plan(list(tweak(cluster, workers = nodes, homogeneous = FALSE), multisession))
 devtools::load_all(".")
+
 library(slendr)
+init_env()
 
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-# set up the internal tskit/msprime environment
-init_env()
-
 # set up parallelization across all CPUs
-library(future)
-plan(multicore, workers = availableCores())
+# library(future)
+# plan(multicore, workers = availableCores())
 
 model <- function(rate_ea, rate_aa, rate_ae) {
-  Ne <- 10000
+  Ne <- 10000 # constant Ne of all populations
 
   chimp   <- population("chimp", time = 7e6,   N = Ne)
   anc     <- population("anc",   time = 6e6,   N = Ne, parent = chimp)
@@ -23,14 +26,18 @@ model <- function(rate_ea, rate_aa, rate_ae) {
   eur     <- population("eur",   time = 60e3,  N = Ne, parent = afr2)
 
   gf <- list(
+    # Neanderthal introgression
     gene_flow(from = neand, to = eur, start = 50e3, end = 45e3, rate = 0.03),
 
+    # gene flow within Africa
     gene_flow(from = afr1, to = afr2, start = 50e3, end = 0, rate = rate_aa),
     gene_flow(from = afr2, to = afr1, start = 50e3, end = 0, rate = rate_aa),
 
+    # back flow from Eurasia into Africa
     gene_flow(from = eur, to = afr1, start = 5e3, end = 0, rate = rate_ea),
     gene_flow(from = eur, to = afr2, start = 5e3, end = 0, rate = rate_ea),
 
+    # gene flow from Africa into Eurasia ('dilution' of Neanderthal ancestry)
     gene_flow(from = afr1, to = eur, start = 5e3, end = 0, rate = rate_ea),
     gene_flow(from = afr1, to = eur, start = 5e3, end = 0, rate = rate_ea)
   )
@@ -41,9 +48,14 @@ model <- function(rate_ea, rate_aa, rate_ae) {
   )
 
   samples <- rbind(
+    # Altai (70 kya) and Vindija (40 kya) Neanderthals
+    schedule_sampling(model, times = c(70e3, 40e3), list(neand, 1)),
+
+    # time series of Europeans from 40 kya to the present
     schedule_sampling(model, times = seq(40e3, 0, by = -1e3), list(eur, 1)),
-    schedule_sampling(model, times = 0, list(afr1, 1), list(afr2, 1), list(chimp, 1)),
-    schedule_sampling(model, times = c(70e3, 40e3), list(neand, 1))
+
+    # two Africans and a Chimpanzee outgroup
+    schedule_sampling(model, times = 0, list(afr1, 1), list(afr2, 1), list(chimp, 1))
   )
 
   return(list(model, samples))
@@ -62,23 +74,19 @@ indirect_f4ratio <- function(ts) {
 functions <- list(direct_f4ratio = direct_f4ratio, indirect_f4ratio = indirect_f4ratio)
 
 grid <- crossing(
-  rate_aa = seq(0, 0.2, 0.02),
-  rate_ea = seq(0, 0.2, 0.02),
-  rate_ae = seq(0, 0.2, 0.02)
+  rate_aa = seq(0, 0.2, 0.01),
+  rate_ea = seq(0, 0.2, 0.01),
+  rate_ae = seq(0, 0.2, 0.01)
 )
 
-ts <- simulate_ts(model, grid[4, ], sequence_length = 10e6, mutation_rate = 1e-8, recombination_rate = 1e-8)
+# ts <- simulate_ts(model, grid[4, ], sequence_length = 10e6, mutation_rate = 1e-8, recombination_rate = 1e-8)
 
-indirect_f4ratio(ts)
+# indirect_f4ratio(ts)
 
-params = grid[1, ]; sequence_length = 1e6; recombination_rate = 0; mutation_rate = 0; engine = "msprime"; model_args=NULL; engine_args=NULL; model_name="asdf"; attempts=1
+# params = grid[1, ]; sequence_length = 1e6; recombination_rate = 0; mutation_rate = 0; engine = "msprime"; model_args=NULL; engine_args=NULL; model_name="asdf"; attempts=1
 
 x = Sys.time()
-res <- simulate_grid(
-  model, grid, functions, replicates = 1,
-  sequence_length = 1e6, mutation_rate = 1e-8, recombination_rate = 1e-8
-)
-res
+res <- simulate_grid(model, grid, functions, replicates = 20, sequence_length = 10e6, mutation_rate = 1e-8, recombination_rate = 1e-8)
 y = Sys.time()
 y - x
 

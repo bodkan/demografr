@@ -60,44 +60,52 @@ simulate_grid <- function(
     unlist()
   if (is.null(globals)) globals <- TRUE
 
-  results <- lapply(seq_len(replicates), function(rep_i) {
-    iter_results <- future.apply::future_lapply(
-      X = seq_len(nrow(grid)),
-      FUN = function(grid_i) {
-        run_iteration(
-          grid_i,
-          model = model,
-          params = as.list(grid[grid_i, ]),
-          functions = functions,
-          sequence_length = sequence_length,
-          recombination_rate = recombination_rate,
-          mutation_rate = mutation_rate,
-          engine = engine,
-          model_args = model_args,
-          engine_args = engine_args,
-          model_name = as.character(substitute(model)),
-          attempts = 1
-        )
-      },
-      future.seed = TRUE,
-      future.globals = globals,
-      future.packages = c("slendr", "dplyr", "tidyr", packages)
-    )
-    # collect values of grid parameters from each simulation run back in a data frame format
-    # (doing this instead of adding result columns to the original grid because simulations
-    # could, in principle, be run in an arbitrary order due to parallelization)
-    iter_results_df <- lapply(iter_results, `[[`, "parameters") %>% do.call(rbind, .) %>% dplyr::as_tibble()
-
-    # similarly, convert computed simulation summary statistics into a matrix
-    for (stat in names(functions)) {
-      iter_results_df[[stat]] <- lapply(iter_results, `[[`, "simulated") %>% lapply(`[[`, stat)
-    }
-
-    iter_results_df$rep <- rep_i
-
-    iter_results_df %>% dplyr::select(rep, dplyr::everything())
-  }) %>%
+  # prepare the grid data frame for storing the results
+  grid <- lapply(
+    seq_len(replicates),
+    function(rep_i) dplyr::mutate(grid, rep = rep_i)
+  ) %>%
     do.call(rbind, .)
 
-  results
+  results <- future.apply::future_lapply(
+    X = seq_len(nrow(grid)),
+    FUN = function(grid_i) {
+      params <- as.list(dplyr::select(grid[grid_i, ], -rep))
+      iter_result <- run_iteration(
+        grid_i,
+        model = model,
+        params = params,
+        functions = functions,
+        sequence_length = sequence_length,
+        recombination_rate = recombination_rate,
+        mutation_rate = mutation_rate,
+        engine = engine,
+        model_args = model_args,
+        engine_args = engine_args,
+        model_name = as.character(substitute(model)),
+        attempts = 1
+      )
+      iter_result$rep <- grid[grid_i, ]$rep
+      iter_result
+    },
+    future.seed = TRUE,
+    future.globals = globals,
+    future.packages = c("slendr", "dplyr", "tidyr", packages)
+  )
+
+  # collect values of grid parameters from each simulation run back in a data frame format
+  # (doing this instead of adding result columns to the original grid because simulations
+  # could, in principle, be run in an arbitrary order due to parallelization)
+  results_df <- lapply(results, `[[`, "parameters") %>% do.call(rbind, .) %>% dplyr::as_tibble()
+  # pull out the replicate number of each simulation run
+  results_df$rep <- vapply(results, `[[`, "rep", FUN.VALUE = integer(1))
+
+  # similarly, convert computed simulation summary statistics into a matrix
+  for (stat in names(functions)) {
+    results_df[[stat]] <- lapply(results, `[[`, "simulated") %>% lapply(`[[`, stat)
+  }
+
+  results_df <- dplyr::select(results_df, rep, dplyr::everything())
+
+  results_df
 }
