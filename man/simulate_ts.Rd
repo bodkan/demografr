@@ -6,7 +6,7 @@
 \usage{
 simulate_ts(
   model,
-  priors,
+  params,
   sequence_length = 1e+06,
   recombination_rate = 0,
   mutation_rate = 0,
@@ -17,8 +17,6 @@ simulate_ts(
 }
 \arguments{
 \item{model}{A compiled slendr model object}
-
-\item{priors}{A list of prior distributions to use for sampling of model parameters}
 
 \item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
 
@@ -32,6 +30,8 @@ built-in slendr simulation back ends.}
 \item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
 
 \item{engine_args}{Optional arguments for the slendr simulation back ends}
+
+\item{priors}{A list of prior distributions to use for sampling of model parameters}
 }
 \description{
 Simulates a tree sequence object from a model with parameters sampled from priors
