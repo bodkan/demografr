@@ -1,13 +1,15 @@
 #' Plan resize events for the given population
 #'
 #' @param pop A slendr population object
-#' @param epochs The number of resize epochs to schedule
+#' @param epochs The number of resize events to schedule either at specified \code{times},
+#'   or between the last encoded event in a population's history and a specified \code{until}
+#'   time point
 #' @param sizes A vector of population sizes (one element of the vector for each epoch)
 #' @param times A vector of times of each resize event (one element of the vector for each epoch).
 #'   If \code{NULL}, the times are computed by dividing the time between the last given slendr
 #'   event in the population's history and the last resize time \code{until}.
-#' @param until If \code{times} is not given, this argument gives the time of the last resize event.
-#'   See \code{times}.
+#' @param until If \code{times} is not given, this argument gives the time at which the last
+#'   resize event will end. See \code{times} for additional timing options.
 #'
 #' @export
 resize_epochs <- function(pop, epochs, sizes, until = NULL, times = NULL) {
@@ -15,7 +17,7 @@ resize_epochs <- function(pop, epochs, sizes, until = NULL, times = NULL) {
     stop("The number of resize epochs must be a non-negative integer number", call. = FASE)
 
   if (length(sizes) != epochs)
-    stop("the vector of population sizes must be of the same length as the number of epochs", call. = false)
+    stop("The vector of population sizes must be of the same length as the number of epochs", call. = FALSE)
 
   if (is.null(until) && is.null(times))
     stop("The end of the time window for resizes or the time of each resize must be given", call. = FALSE)
@@ -32,7 +34,7 @@ resize_epochs <- function(pop, epochs, sizes, until = NULL, times = NULL) {
   if (is.null(times)) {
     last_event <- attr(pop, "history") %>% .[length(.)] %>% .[[1]]
     last_time <- last_event[, intersect(c("time", "tresize"), colnames(last_event))]
-    times <- round(seq(last_time, until, length.out = epochs + 1))[-1]
+    times <- round(seq(last_time, until, length.out = 1 + epochs + 1)) %>% .[-c(1, length(.))]
   }
 
   # generate intermediate population resize events

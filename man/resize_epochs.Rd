@@ -9,12 +9,14 @@ resize_epochs(pop, epochs, sizes, until = NULL, times = NULL)
 \arguments{
 \item{pop}{A slendr population object}
 
-\item{epochs}{The number of resize epochs to schedule}
+\item{epochs}{The number of resize events to schedule either at specified \code{times},
+or between the last encoded event in a population's history and a specified \code{until}
+time point}
 
 \item{sizes}{A vector of population sizes (one element of the vector for each epoch)}
 
-\item{until}{If \code{times} is not given, this argument gives the time of the last resize event.
-See \code{times}.}
+\item{until}{If \code{times} is not given, this argument gives the time at which the last
+resize event will end. See \code{times} for additional timing options.}
 
 \item{times}{A vector of times of each resize event (one element of the vector for each epoch).
 If \code{NULL}, the times are computed by dividing the time between the last given slendr
