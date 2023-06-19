@@ -1,36 +1,37 @@
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
 run_iteration <- function(it,
-                          model, priors, functions,
+                          model, params, functions,
                           sequence_length, recombination_rate, mutation_rate,
                           engine, samples, model_args, engine_args,
                           model_name, attempts) {
   init_env(quiet = TRUE)
 
   sim_result <- run_simulation(
-    model = model, priors = priors, sequence_length = sequence_length,
+    model = model, params = params, sequence_length = sequence_length,
     recombination_rate = recombination_rate, mutation_rate = mutation_rate,
     model_name = model_name, engine = engine, samples = samples,
     model_args = model_args, engine_args = engine_args,
     attempts = attempts
   )
   ts <- sim_result$ts
-  prior_values <- sim_result$prior_values
+  param_values <- sim_result$param_values
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
   simulated_stats <- lapply(functions, function(f) f(ts))
-  #   2. collect all sampled prior values into a single parameter matrix
-  prior_values <- collect_prior_matrix(prior_values)
+  #   2. collect all parameter values (sampled from priors or given) into a single parameter matrix
+  if (contains_priors(params))
+    param_values <- collect_param_matrix(param_values)
 
   list(
-    parameters = prior_values,
+    parameters = param_values,
     simulated = simulated_stats
   )
 }
 
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
-run_simulation <- function(model, priors, sequence_length, recombination_rate, mutation_rate,
+run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
                            engine, samples, model_args, engine_args,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
@@ -53,9 +54,11 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
     "Cannot schedule sampling for '.*' at time \\d+"
   )
 
+  model_is_sampled <- contains_priors(params)
+
   n_tries <- 0
   repeat {
-    if (n_tries == attempts)
+    if (n_tries == attempts && model_is_sampled)
       stop("\n\nGenerating a valid slendr model using the provided generation function\n",
            "and priors failed even after ", attempts, " repetitions. Please make sure\n",
            "that your model function can produce a valid model assuming the specified\n",
@@ -65,11 +68,14 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
 
     ts <- tryCatch(
       {
-        # collect prior model function arguments
-        prior_args <- generate_prior_args(priors)
+        # sample model parameters from the prior or use the parameters as given
+        if (model_is_sampled)
+          param_args <- generate_prior_args(params)
+        else
+          param_args <- params
 
         # generate a compiled slendr model from a provided function
-        model_fun_args <- c(prior_args, model_args)
+        model_fun_args <- c(param_args, model_args)
         model_result <- do.call(model, model_fun_args)
 
         if (length(model_result) == 1)
@@ -94,8 +100,10 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
       error = function(cond) {
         msg <- conditionMessage(cond)
 
-        # check that the received error is one of the valid, potentially expected slendr errors
-        if (any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
+        # check that the received error is one of the valid, potentially expected slendr errors,
+        # but only in situations where sampling from priors is used -- all parameters given as
+        # a parameter grid must lead to a valid simulation, so any error is reported
+        if (model_is_sampled && any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
           return(NULL)
         } else { # if an unexpected error ocurred, report it in full
           cat(" \u274C\n\n")
@@ -126,7 +134,7 @@ run_simulation <- function(model, priors, sequence_length, recombination_rate, m
   if (mutation_rate != 0)
     ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
 
-  list(ts = ts, prior_values = unlist(prior_args))
+  list(ts = ts, param_values = unlist(param_args))
 }
 
 collect_prior_matrix <- function(prior_values) {
@@ -155,4 +163,9 @@ generate_prior_args <- function(priors) {
   names(prior_args) <- lapply(prior_samples, `[[`, "variable")
 
   prior_args
+}
+
+# Does the given list contain prior sampling formulas?
+contains_priors <- function(l) {
+  all(vapply(l, function(f) inherits(f, "formula"), logical(1)))
 }

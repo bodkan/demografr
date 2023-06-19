@@ -9,6 +9,7 @@
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
+#' @param iterations How many simulation replicates to run?
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
@@ -21,15 +22,13 @@
 #' @param debug Only perform a single ABC simulation run, skipping parallelization
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
-#' @param ... Additional parameters used in the model generating function \code{model} (ignored
-#'   if a standard slendr model is used as a scaffold model)
 #'
 #' @export
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "SLiM"), debug = FALSE, attempts = 1000, ...
+  engine = c("msprime", "SLiM"), debug = FALSE, attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -71,7 +70,7 @@ simulate_abc <- function(
       X = seq_len(iterations),
       FUN = run_iteration,
       model = model,
-      priors = priors,
+      params = priors,
       functions = functions,
       sequence_length = sequence_length,
       recombination_rate = recombination_rate,
@@ -83,12 +82,12 @@ simulate_abc <- function(
       attempts = attempts,
       future.seed = TRUE,
       future.globals = globals,
-      future.packages = c("slendr", packages)
+      future.packages = c("slendr", "dplyr", "tidyr", packages)
     )
   } else {
     results <- list(
       run_iteration(
-        it = 1, model = model, priors = priors, functions = functions,
+        it = 1, model = model, params = priors, functions = functions,
         engine = engine, engine_args = engine_args, model_args = model_args,
         sequence_length = sequence_length, recombination_rate = recombination_rate,
         mutation_rate = mutation_rate, model_name = substitute(model), attempts = attempts
