@@ -1,10 +1,10 @@
 ---
-title: Meeting notes on "epochs"
+title: Meeting notes on modelling "Ne epochs"
 output:
   md_document:
     variant: gfm
 vignette: >
-  %\VignetteIndexEntry{Meeting notes on "epochs"}
+  %\VignetteIndexEntry{Meeting notes on modelling "Ne epochs"}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,10 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Meeting notes on "epochs"
-
 ```{r, echo=FALSE, message=FALSE}
-devtools::install(".")
 library(demografr)
 library(slendr)
 
@@ -32,14 +29,17 @@ SEED <- 42
 set.seed(SEED)
 ```
 
-```{r, eval=!file.exists(system.file("examples/exp_observed_diversity.tsv", package = "demografr")), echo=FALSE, message=FALSE}
+```{r, echo=FALSE}
 pop <- population("pop", time = 1, N = 100) %>%
   resize(time = 3000, N = 1000, how = "step") %>%
   resize(time = 6000, N = 5000, how = "step") %>%
-  resize(time = 8000, N = 20000, how = "step")
+  resize(time = 8000, N = 20000, how = "step") %>%
+  resize(time = 9000, N = 8000, how = "step")
 
 example_model <- compile_model(pop, generation_time = 1, simulation_length = 10000)
+```
 
+```{r, eval=!file.exists(system.file("examples/exp_observed_diversity.tsv", package = "demografr")), echo=FALSE, message=FALSE}
 samples <- schedule_sampling(example_model, times = seq(1000, 10000, 1000), list(pop, 50))
 
 ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8,
@@ -54,11 +54,11 @@ write.table(observed_diversity, file = here::here("inst/examples/exp_observed_di
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
-Imagine the following demographic model:
+**Imagine the following demographic model:**
 
 ```{r, echo=FALSE}
 library(ggplot2)
-plot_model(example_model) + ggtitle("Ne = 100 --> 1.000 --> 5.000 --> 20.000")
+plot_model(example_model) + ggtitle("Ne = 100 --> 1000 --> 5000 --> 20000 --> 2000")
 ```
 
 With the following "observed" values of nucleotide diversity at different time slices from groups of 50 diploid individuals at each time point:
@@ -71,11 +71,43 @@ observed_diversity <- read.table(system.file("examples/exp_observed_diversity.ts
 observed_diversity
 ```
 
-### A complete ABC analysis in a single R script
+### How to fit variable $N_e$ with _demografr_ and _slendr_?
 
-This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
+#### Encoding epochs manually
 
-```{r, eval=!file.exists(here::here("inst/examples/exp_data.rds"))}
+The users always have the option to specify Ne epochs like this, manually:
+
+```{r, eval=FALSE}
+model <- function(Ne_start, Ne_epoch1, Ne_epoch2, ...) {
+  pop <-
+    population("pop", time = 1, N = Ne_start) %>%
+    resize(N = Ne_epoch1, time = <T_epoch1>, how = "step") %>%
+    resize(N = Ne_epoch2, time = <T_epoch2>, how = "step") %>%
+    # <more resizes>
+
+  model <- compile_model(pop, generation_time = 1, simulation_length = 10000, direction = "forward")
+
+  model
+}
+```
+
+With the priors perhaps like this:
+
+```{r, eval=FALSE}
+priors <- list(
+  Ne_start  ~ runif(1, 30000),
+  Ne_epoch1 ~ runif(1, 30000),
+  Ne_epoch2 ~ runif(1, 30000),
+  # <more resizes>
+)
+```
+
+**But this seems very cumbersome, arbitrary, and error-prone?**
+
+<!--
+Standard setup of the pipeline first:
+
+```{r}
 library(demografr)
 library(slendr)
 
@@ -86,23 +118,17 @@ init_env()
 library(future)
 plan(multicore, workers = availableCores())
 
-# (3)
-# nodes <- c("racimocomp02fl", "racimocomp03fl", "racimocomp04fl")
-# plan(list(tweak(cluster, workers = nodes),
-#           tweak(multicore, workers = 90)))
-
-# # works in parallel (2)
-# nodes <- c("racimocomp02fl", "racimocomp03fl", "racimocomp04fl")
-# plan(cluster, workers = c(
-#   rep(nodes[1], times = 30),
-#   rep(nodes[2], times = 30),
-#   rep(nodes[3], times = 30)
-# ))
-
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
 observed <- list(diversity = observed_diversity)
+```
+-->
 
+#### New function `resize_epochs()`?
+
+**We have a new function `resize_epochs()` designed to fit variable Ne trajectories:**
+
+```{r}
 #--------------------------------------------------------------------------------
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
@@ -111,25 +137,27 @@ model <- function(Ne_start, Ne_epochs) {
     population("pop", time = 1, N = Ne_start) %>%
     resize_epochs(epochs = 9, sizes = Ne_epochs, until = 10000)
 
-  model <- compile_model(
-    pop, generation_time = 1, simulation_length = 10000,
-    direction = "forward", serialize = FALSE
-  )
+  model <- compile_model(pop, generation_time = 1, simulation_length = 10000, direction = "forward")
 
-  samples <- schedule_sampling(model, times = seq(1000, 10000, 1000), list(pop, 50))
-
-  # a return statement is mandatory!
-  # if a sampling schedule is not generated, use return(model)
-  return(list(model, samples))
+  model
 }
+```
 
+This function utilizes the new vectorized prior sampling (see `Ne_epochs[9]` below):
+
+```{r}
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
 priors <- list(
   Ne_start     ~ runif(1, 30000),
   Ne_epochs[9] ~ runif(1, 30000)
 )
+```
 
+<!--
+The rest of the analysis looks exactly the same...
+
+```{r, eval=!file.exists(here::here("inst/examples/exp_data.rds"))}
 #--------------------------------------------------------------------------------
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
@@ -150,24 +178,10 @@ validate_abc(model, priors, functions, observed)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations
-x <- Sys.time()
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 1000,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
-y <- Sys.time()
-y-x
-
-# (1) 1000 reps multicore Time difference of 7.356978 mins
-
-# (2) 1000 reps cluster manual Time difference of 7.089413 mins
-
-# (3) 1000 reps cluster manual Time difference of 7.089413 mins
-
-x <- Sys.time()
-data <- simulate_abc(model, priors, functions, observed, iterations = 100, sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8, debug=T)
-y <- Sys.time()
-y-x
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters using the abc R package
@@ -182,35 +196,4 @@ saveRDS(data, here::here("inst/examples/exp_data.rds"))
 data <- readRDS(system.file("examples/exp_data.rds", package = "demografr"))
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
-
-## Analysing posterior distributions of parameters
-
-After we run this R script, we end up with an object called `abc` here. This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest ($N_e$ of populations and their split times).
-
-For instance, we can get a table of all posterior values with the function `extract_summary()`:
-
-```{r}
-extract_summary(abc)
-```
-
-We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
-
-```{r}
-extract_summary(abc, param = "Ne")
-```
-
-We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
-
-```{r, posterior_Ne, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "Ne") + geom_vline(xintercept = 100)
-```
-
-```{r}
-library(dplyr)
-library(ggplot2)
-
-extract_posterior(abc) %>%
-  mutate(param = factor(param, levels = paste0("Ne", 1:10))) %>%
-  ggplot(aes(param, value)) +
-    geom_boxplot()
-```
+-->
