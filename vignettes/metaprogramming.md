@@ -3,11 +3,11 @@ the code be as close as possible to normal mathematical notation?
 
 I.e., things like:
 
-\[N_e \sim Unif(1000, 10000)\]
+$$N_e \sim Unif(1000, 10000)$$
 
-\[\textrm{geneflow} \sim Unif(0, 1)\]
+$$\textrm{geneflow} \sim Unif(0, 1)$$
 
-\[T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}\]
+$$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}$
 
 ## One trivial option
 
@@ -50,7 +50,7 @@ metaprogramming options.
 > programs have the ability to treat other programs as their data**. It
 > means that a program can be designed to read, generate, analyze or
 > transform other programs, and even modify itself while running.
-> 
+>
 > In other words, **metaprogramming is when code is writing other
 > code.**
 
@@ -72,12 +72,12 @@ head(mtcars)
 lm(cyl ~ mpg, data = mtcars)
 ```
 
-    #> 
+    #>
     #> Call:
     #> lm(formula = cyl ~ mpg, data = mtcars)
-    #> 
+    #>
     #> Coefficients:
-    #> (Intercept)          mpg  
+    #> (Intercept)          mpg
     #>     11.2607      -0.2525
 
 The **`~` operator creates a so-called “formula object”**, which
@@ -143,10 +143,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #> 
+    #>
     #> [[2]]
     #> Ne
-    #> 
+    #>
     #> [[3]]
     #> runif(1000, 10000)
 
@@ -167,16 +167,16 @@ metaprogramming tool:
 lobstr::ast((a + b) * (c - d / e))
 ```
 
-    #> █─`*` 
-    #> ├─█─`(` 
-    #> │ └─█─`+` 
-    #> │   ├─a 
-    #> │   └─b 
-    #> └─█─`(` 
-    #>   └─█─`-` 
-    #>     ├─c 
-    #>     └─█─`/` 
-    #>       ├─d 
+    #> █─`*`
+    #> ├─█─`(`
+    #> │ └─█─`+`
+    #> │   ├─a
+    #> │   └─b
+    #> └─█─`(`
+    #>   └─█─`-`
+    #>     ├─c
+    #>     └─█─`/`
+    #>       ├─d
     #>       └─e
 
 ## Back to *demografr*
@@ -197,10 +197,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #> 
+    #>
     #> [[2]]
     #> Ne
-    #> 
+    #>
     #> [[3]]
     #> runif(1000, 10000)
 
@@ -233,7 +233,7 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #> 
+    #>
     #> $value
     #> [1] 8724.988
 
@@ -243,7 +243,7 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #> 
+    #>
     #> $value
     #> [1] 6651.011
 
@@ -253,7 +253,7 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #> 
+    #>
     #> $value
     #> [1] 5318.861
 
@@ -275,10 +275,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #> 
+    #>
     #> [[2]]
     #> T_split[10]
-    #> 
+    #>
     #> [[3]]
     #> runif(10, 10000)
 
@@ -301,10 +301,10 @@ as.list(variable)
 
     #> [[1]]
     #> `[`
-    #> 
+    #>
     #> [[2]]
     #> T_split
-    #> 
+    #>
     #> [[3]]
     #> [1] 10
 
@@ -316,7 +316,7 @@ sample_prior(T_split[10] ~ runif(10, 10000))
 
     #> $variable
     #> [1] "T_split"
-    #> 
+    #>
     #> $value
     #>  [1]  519.4349 2090.2553 6629.0542 5651.4096  255.6859 4876.1447 7336.7094
     #>  [8] 2107.1281 7924.6542 4743.1582
@@ -347,23 +347,23 @@ lapply(priors, sample_prior) # iterate over the list of priors, sample from each
     #> [[1]]
     #> [[1]]$variable
     #> [1] "Ne"
-    #> 
+    #>
     #> [[1]]$value
     #> [1] 1000
-    #> 
-    #> 
+    #>
+    #>
     #> [[2]]
     #> [[2]]$variable
     #> [1] "geneflow"
-    #> 
+    #>
     #> [[2]]$value
     #> [1] 0.3172069
-    #> 
-    #> 
+    #>
+    #>
     #> [[3]]
     #> [[3]]$variable
     #> [1] "T_split"
-    #> 
+    #>
     #> [[3]]$value
     #>  [1] 662.92317 984.27174 858.11574  31.45234 912.07427 739.95854 932.88907
     #>  [8] 752.20514 586.05837  18.86225
@@ -400,7 +400,7 @@ samples
 
     #> $variable
     #> [1] "rolls"
-    #> 
+    #>
     #> $value
     #>   [1] 6 6 1 1 3 3 4 6 2 2 4 1 4 2 2 1 6 6 1 6 1 1 6 5 4 6 1 6 1 6 3 2 6 6 6 6 1
     #>  [38] 2 4 6 6 6 1 3 2 4 5 6 3 6 2 3 5 5 1 1 2 6 6 3 1 3 1 1 2 5 5 6 4 6 4 4 5 1
@@ -410,6 +410,6 @@ samples
 table(samples$value)
 ```
 
-    #> 
-    #>  1  2  3  4  5  6 
+    #>
+    #>  1  2  3  4  5  6
     #> 19 16 11 15 12 27
