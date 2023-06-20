@@ -218,7 +218,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_CD, N = Ne_D, parent = popC)
+  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
 
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
 
@@ -282,8 +282,6 @@ functions <- list(
 #--------------------------------------------------------------------------------
 # validate the individual ABC components for correctness and consistency
 validate_abc(model, priors, functions, observed)
-
-simulate_ts(model, priors)
 
 #--------------------------------------------------------------------------------
 # run ABC simulations
