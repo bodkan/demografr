@@ -82,7 +82,7 @@ simulate_abc <- function(
       attempts = attempts,
       future.seed = TRUE,
       future.globals = globals,
-      future.packages = c("slendr", "dplyr", "tidyr", packages)
+      future.packages = c("slendr", packages)
     )
   } else {
     results <- list(
@@ -131,7 +131,9 @@ simulate_abc <- function(
 
     if (is.data.frame(x)) {
       # find the column with the value of a statistic `stat`
-      value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+      # TODO: the last column will be numeric
+      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+      value_col <- ncol(x)
       values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
       names <- x[, !value_col, drop = FALSE] %>%
         apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))

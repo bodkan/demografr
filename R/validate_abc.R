@@ -166,18 +166,23 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
     }
 
     if (obs_type == "data frame") {
-      numeric_cols_obs <- sapply(names(obs), function(i) is.numeric(obs[[i]]))
-      numeric_cols_sim <- sapply(names(sim), function(i) is.numeric(sim[[i]]))
+      # numeric_cols_obs <- sapply(names(obs), function(i) is.numeric(obs[[i]]))
+      # numeric_cols_sim <- sapply(names(sim), function(i) is.numeric(sim[[i]]))
 
-      # check that only one column with a value of a summary statistic is present
-      if (sum(numeric_cols_obs) > 1) {
-        stop("Multiple numeric value columns present in the observed summary statistic\n",
-             "'", stat, "' but only one such column is allowed.", call. = FALSE)
-      }
-      if (sum(numeric_cols_sim) > 1) {
-        stop("Multiple numeric value columns present in the simulated summary statistic\n",
-             "'", stat, "' but only one such column is allowed.", call. = FALSE)
-      }
+      # TODO: use the last column by default if there are multiple numeric columns
+      # but raise a warning in that case, and raise an error if the last column is
+      # not numeric
+      numeric_cols_obs <- ncol(obs)
+      numeric_cols_sim <- ncol(sim)
+      # # check that only one column with a value of a summary statistic is present
+      # if (sum(numeric_cols_obs) > 1) {
+      #   stop("Multiple numeric value columns present in the observed summary statistic\n",
+      #        "'", stat, "' but only one such column is allowed.", call. = FALSE)
+      # }
+      # if (sum(numeric_cols_sim) > 1) {
+      #   stop("Multiple numeric value columns present in the simulated summary statistic\n",
+      #        "'", stat, "' but only one such column is allowed.", call. = FALSE)
+      # }
 
       # if a summary statistic is given as a data frame, all columns except for the
       # column with its numerical value must be the same (i.e., same statistic name,

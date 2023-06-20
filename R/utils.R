@@ -10,7 +10,15 @@ check_arg <- function(x) {
 
 # Extract prior variable names as a character vector
 get_prior_names <- function(priors) {
-  sapply(seq_along(priors), function(i) as.character(as.list(priors[[i]])[[2]]))
+  sapply(seq_along(priors), function(i) {
+    ast <- as.list(priors[[i]])
+    variable_tokens <- as.character(as.list(ast[[2]]))
+    if (length(variable_tokens) == 1)
+      variable_index <- 1
+    else
+      variable_index <- 2
+    variable_tokens[[variable_index]]
+  })
 }
 
 # a function to silence the unnecessary summary() output on abc objects

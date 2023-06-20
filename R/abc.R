@@ -76,6 +76,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
 
         # generate a compiled slendr model from a provided function
         model_fun_args <- c(param_args, model_args)
+
         model_result <- do.call(model, model_fun_args)
 
         if (length(model_result) == 1)
@@ -137,7 +138,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
   list(ts = ts, param_values = unlist(param_args))
 }
 
-collect_prior_matrix <- function(prior_values) {
+collect_param_matrix <- function(prior_values) {
   m <- matrix(prior_values, nrow = 1)
   colnames(m) <- names(prior_values)
   m
