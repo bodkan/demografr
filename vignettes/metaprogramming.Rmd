@@ -26,11 +26,11 @@ How can we let the user define probabilistic statements in R and have the code b
 
 I.e., things like:
 
-$$N_e \sim Unif(1000, 10000)$$
+$N_e \sim Unif(1000, 10000)$
 
-$$\textrm{geneflow} \sim Unif(0, 1)$$
+$\textrm{geneflow} \sim Unif(0, 1)$
 
-$$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}$$
+$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}$
 
 ## One trivial option
 
