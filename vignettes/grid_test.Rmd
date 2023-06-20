@@ -1,0 +1,304 @@
+---
+title: Notes on support for grid simulations
+# output: rmarkdown::html_vignette
+output:
+  md_document:
+    variant: gfm
+vignette: >
+  %\VignetteIndexEntry{Notes on support for grid simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 100
+)
+```
+
+```{r, echo=FALSE, message=FALSE}
+devtools::load_all()
+library(slendr)
+
+init_env()
+
+SEED <- 42
+set.seed(SEED)
+```
+
+ABC is not the only useful application for massive, lightning-fast tree-sequence based simulation inference!
+
+## Use-cases
+
+### Neanderthal ancestry "decline"
+
+![](images/fu_2016.png)
+![](images/petr_2018a.png)
+
+### Fancier grid simulations
+
+![](images/prantoni_2022.png)
+
+## The idea is the same though
+
+```{r, message=FALSE}
+library(demografr)
+library(slendr)
+init_env()
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# setup parallelization across all CPUs
+library(future)
+plan(multicore, workers = availableCores())
+```
+
+1. **Define a _slendr_ model function capturing the "scaffold" topology of a model**
+
+```{r}
+model <- function(rate_ea, rate_aa, rate_ae) {
+  chimp <- population("chimp", time = 7e6,   N = 10000)
+  anc   <- population("anc",   time = 6e6,   N = 10000, parent = chimp)
+  neand <- population("neand", time = 600e3, N = 2000,  parent = anc)
+  afr1  <- population("afr1",  time = 600e3, N = 15000, parent = anc)
+  afr2  <- population("afr2",  time = 150e3, N = 15000, parent = afr1)
+  eur   <- population("eur",   time = 75e3,  N = 5000,  parent = afr2)
+
+  gf <- list(
+    # Neanderthal introgression
+    gene_flow(from = neand, to = eur, start = 60e3, end = 50e3, rate = 0.03),
+
+    # back flow from Eurasia into Africa
+    gene_flow(from = eur, to = afr1, start = 5e3, end = 0, rate = rate_ea),
+    gene_flow(from = eur, to = afr2, start = 5e3, end = 0, rate = rate_ea),
+
+    # gene flow within Africa
+    gene_flow(from = afr1, to = afr2, start = 50e3, end = 0, rate = rate_aa),
+    gene_flow(from = afr2, to = afr1, start = 50e3, end = 0, rate = rate_aa),
+
+    # gene flow from Africa into Eurasia ('dilution' of Neanderthal ancestry)
+    gene_flow(from = afr1, to = eur, start = 5e3, end = 0, rate = rate_ae),
+    gene_flow(from = afr2, to = eur, start = 5e3, end = 0, rate = rate_ae)
+  )
+
+  model <- compile_model(
+    populations = list(chimp, anc, neand, afr1, afr2, eur), gene_flow = gf,
+    generation_time = 30, serialize = FALSE
+  )
+
+  samples <- rbind(
+    # Altai (70 kya) and Vindija (40 kya) Neanderthals
+    schedule_sampling(model, times = c(70e3, 40e3), list(neand, 1)),
+
+    # time series of Europeans from 40 kya to the present
+    schedule_sampling(model, times = seq(40e3, 0, by = -1e3), list(eur, 1)),
+
+    # two Africans and a Chimpanzee outgroup
+    schedule_sampling(model, times = 0, list(afr1, 1), list(afr2, 1), list(chimp, 1))
+  )
+
+  return(list(model, samples))
+}
+```
+
+```{r, echo=FALSE}
+m <- model(0.1, 0.1, 0.1)[[1]]
+cowplot::plot_grid(plot_model(m), plot_model(m, log = TRUE))
+```
+
+2. **Define a bunch of informative summary statistics**
+
+```{r}
+direct_f4ratio <- function(ts) {
+  result <- ts_samples(ts) %>% filter(pop == "eur")
+  result$alpha <- ts_f4ratio(ts,
+                             X = result$name,
+                             A = "neand_2", B = "neand_1",
+                             C = "afr1_1", O = "chimp_1")$alpha
+  result
+}
+
+indirect_f4ratio <- function(ts) {
+  result <- ts_samples(ts) %>% filter(pop == "eur")
+  result$alpha <- 1 - ts_f4ratio(ts,
+                                 X = result$name,
+                                 A = "afr1_1", B = "afr2_1",
+                                 C = "neand_2", O = "chimp_1")$alpha
+  result
+}
+
+functions <- list(
+  direct_f4ratio = direct_f4ratio,
+  indirect_f4ratio = indirect_f4ratio
+)
+```
+
+3. **Define a parameter grid**
+
+One column for each parameter of the _slendr_ model function (names must match!).
+
+```{r}
+grid <- crossing(
+  rate_aa = seq(0, 0.25, 0.05),
+  rate_ea = seq(0, 0.25, 0.05),
+  rate_ae = seq(0, 0.25, 0.05)
+)
+
+head(grid)
+```
+
+4. **Run parallel grid simulation replicates, automatically computing tree-sequence summary statistics**
+
+```{r, eval=!file.exists(here::here("grid_results.rds"))}
+x=Sys.time(); x
+results <- simulate_grid(
+  model, grid, functions, replicates = 25,
+  sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
+)
+y=Sys.time(); y
+y - x
+```
+
+```{r, eval=!file.exists(here::here("grid_results.rds")), echo=FALSE}
+saveRDS(results, "grid_results.rds")
+```
+
+```{r, eval=file.exists(here::here("grid_results.rds")), echo=FALSE}
+results <- readRDS(here::here("grid_results.rds"))
+```
+
+5. **Analyze data**
+
+```{r}
+print(results, n = 20)
+```
+
+For conciseness, computer tree-sequence summary statistics are stored along the original parameter grid as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html):
+
+```{r}
+results$direct_f4ratio[1:2]
+```
+
+They are efficient and concise, but in order to be able to analyze data stored in them, we need a function `unnest()` from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed:
+
+**Direct f4-ratio:**
+
+```{r}
+results %>% unnest(direct_f4ratio)
+```
+
+**Indirect f4-ratio:**
+
+```{r}
+results %>% unnest(indirect_f4ratio)
+```
+
+For downstream analysis, we can then use all the _tidyverse_ functionality at our disposal:
+
+### Within-African gene flow vs inference of Neanderthal ancestry
+
+```{r}
+results %>%
+  unnest(indirect_f4ratio) %>%
+  filter(rate_ea == 0, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_aa, group = rate_aa)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+```{r}
+results %>%
+  unnest(direct_f4ratio) %>%
+  filter(rate_ea == 0, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_aa, group = rate_aa)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+### Eurasia -> Africa gene flow vs inference of Neanderthal ancestry
+
+```{r}
+results %>%
+  unnest(indirect_f4ratio) %>%
+  filter(rate_aa == 0, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'indirect f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+```{r}
+results %>%
+  unnest(direct_f4ratio) %>%
+  filter(rate_aa == 0, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_point() +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+
+
+
+
+
+```{r}
+results %>%
+  unnest(indirect_f4ratio) %>%
+  filter(rate_aa == 0.2, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+
+
+```{r}
+results %>%
+  unnest(direct_f4ratio) %>%
+  filter(rate_aa == 0.2, rate_ae == 0) %>%
+  ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "darkgray", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
