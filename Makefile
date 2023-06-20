@@ -19,7 +19,9 @@ docs:
 
 README.md: README.Rmd
 	R -e 'devtools::install(upgrade = "never")'
-	R -e 'devtools::build_readme()'
+	R -e 'knitr::knit("README.Rmd", output = "README.md")'
+	#R -e 'devtools::install(upgrade = "never")'
+	#R -e 'devtools::build_readme()'
 
 $(pkg): README.md
 	R -e 'devtools::document()'

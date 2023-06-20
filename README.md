@@ -1,89 +1,51 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# *demografr*: A simple and efficient ABC toolkit for R
+
+
+# _demografr_: A simple and efficient ABC toolkit for R
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 <img src="man/figures/logo.png" align="right" />
 
 ⚠️⚠️⚠️
 
-**This package is under active development and things often change (and
-break) on short notice\! You probably shouldn’t be using *demografr* in
-your own modeling projects at this point.**
+**This package is under active development and things often change (and break) on
+short notice! You probably shouldn't be using _demografr_ in your own modeling projects
+at this point.**
 
-**A more stable version and a preprint will be ready sometime in summer
-2023. Feedback is most welcome\!**
+**A more stable version and a preprint will be ready sometime in summer 2023.
+Feedback is most welcome!**
 
 ⚠️⚠️⚠️
 
-The goal of *demografr* is to simplify and streamline [Approximate
-Bayesian
-Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation)
-(ABC) in population genetics and make it more reproducible.
-Additionally, *demografr* aims to make ABC orders of magnitude faster
-and more efficient by leveraging the [tree
-sequences](https://tskit.dev/learn/) as an internal data structure and
-computation engine.
+The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics and make it more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
-Unlike traditional ABC approaches, which generally involve custom-built
-pipelines and scripts for population genetic simulation and computation
-of summary statistics, *demografr* makes it possible to perform
-simulation, data analysis, and ABC inference itself entirely in R within
-a single reproducible analysis script. By eliminating the need to write
-custom simulation code and scripting for integration of various
-population genetic tools for computing summary statistics, it lowers the
-barrier to entry for new users and facilitates reproducibility for all
-users regardless of their level of experience by eliminating many common
-sources of bugs.
+Unlike traditional ABC approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform simulation, data analysis, and ABC inference itself entirely in R within a single reproducible analysis script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
 
-### How does *demografr* help with ABC?
+### How does _demografr_ help with ABC?
 
-*demografr* streamlines every step of a typical ABC pipeline by
-leveraging the [*slendr*](https://github.com/bodkan/slendr/) framework
-as a building block for simulation and data analysis, making it possible
-to write complete ABC workflows in R. Specifically:
+_demografr_ streamlines every step of a typical ABC pipeline by leveraging the [_slendr_](https://github.com/bodkan/slendr/) framework as a building block for simulation and data analysis, making it possible to write complete ABC workflows in R. Specifically:
 
-1.  *slendr*’s intuitive, interactive [interface for definning
-    population genetic
-    models](https://www.slendr.net/articles/vignette-04-nonspatial-models.html)
-    makes it easy to encode even complex demographic models with only
-    bare minimum of R knowledge needed.
-2.  *demografr* makes it possible to encode prior distributions of
-    parameters using familiar R interface resembling standard
-    probabilistic statements, and provides an automated function which
-    simulates ABC replicates drawing parameters from priors in a
-    trivial, one-step manner.
-3.  Because *slendr*’s simulation output is a [tree
-    sequence](https://tskit.dev/learn/), most population genetic
-    statistics can be computed directly on such tree sequences using R
-    functions which are part of *slendr*’s statistical library. A tree
-    sequence is never saved to disk and no conversion between file
-    formats is required.
-4.  *demografr* facilitates tight integration with the powerful R
-    package [*abc*](https://cran.r-project.org/package=abc) by
-    automatically feeding its simulation data to the *abc* package for
-    inference and analysis.
+1. _slendr_'s intuitive, interactive [interface for definning population genetic models](https://www.slendr.net/articles/vignette-04-nonspatial-models.html) makes it easy to encode even complex demographic models with only bare minimum of R knowledge needed.
+2. _demografr_ makes it possible to encode prior distributions of parameters using familiar R interface resembling standard probabilistic statements, and provides an automated function which simulates ABC replicates drawing parameters from priors in a trivial, one-step manner.
+3. Because _slendr_'s simulation output is a [tree sequence](https://tskit.dev/learn/), most population genetic statistics can be computed directly on such tree sequences using R functions which are part of _slendr_'s statistical library. A tree sequence is never saved to disk and no conversion between file formats is required.
+4. _demografr_ facilitates tight integration with the powerful R package [_abc_](https://cran.r-project.org/package=abc) by automatically feeding its simulation data to the _abc_ package for inference and analysis.
 
 ## Installation
 
-You can install the development version of *demografr* from
-[GitHub](https://github.com/) with:
+You can install the development version of _demografr_ from [GitHub](https://github.com/) with:
 
 ``` r
 devtools::install_github("bodkan/demografr")
 ```
 
-Note that this requires an R package *devtools*, which you can obtain
-simply by running `install.packages("devtools")`.
+Note that this requires an R package _devtools_, which you can obtain simply by running `install.packages("devtools")`.
 
-Because *demografr* is tightly linked to the *slendr* simulation package
-(in fact, new developments in *slendr* ale currently driven by
-requirements of *demografr*), you will also need the development version
-of *slendr* itself:
+Because _demografr_ is tightly linked to the _slendr_ simulation package (in fact, new developments
+in _slendr_ ale currently driven by requirements of _demografr_), you will also need the
+development version of _slendr_ itself:
 
 ``` r
 devtools::install_github("bodkan/slendr")
@@ -91,58 +53,39 @@ devtools::install_github("bodkan/slendr")
 
 ### Note on stability
 
-*demografr* is very much in an early experimental stage at this point.
-Although ABC fitting of “standard” demographic models (i.e. estimating
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e"), split times and gene-flow parameters for non-spatial models)
-already works very nicely, our long-term ambitions for the project are
-much higher. As such, please be aware that the interface might change
-significantly on a short notice to accomodate features for estimating
-parameters of more complex custom models such as spatial models etc.
+_demografr_ is very much in an early experimental stage at this point. Although ABC fitting of "standard" demographic models (i.e. estimating $N_e$, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher. As such, please be aware that the interface might change significantly on a short notice to accomodate features for estimating parameters of more complex custom models such as spatial models etc.
 
-If you want to follow updates on *demografr*, you can do this also on my
-[Twitter](https://twitter.com/fleventy5). I am not very active there but
-I do use it to post notes about all my software projects.
+If you want to follow updates on _demografr_, you can do this also on my [Twitter](https://twitter.com/fleventy5). I am not very active there but I do use it to post notes about all my software projects.
 
 ## Important pieces missing so far
 
 Currently in progress:
 
-1.  Support for temporal sampling via *slendr*’s
-    [schedule\_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
+1. Support for temporal sampling via _slendr_'s [schedule_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
 
-2.  Implement flexible time units for model parameters as supported by
-    *slendr* (years ago, generations forwards in time, years into the
-    future, etc.).
+2. Implement flexible time units for model parameters as supported by _slendr_ (years ago, generations forwards in time, years into the future, etc.).
 
-3.  Implement rejection of non-sensical parameter combinations (daughter
-    populations existing before parent populations, etc.). Easy to solve
-    internally in `simulate_abc()`, it just hasn’t happened yet.
+3. Implement rejection of non-sensical parameter combinations (daughter populations existing before parent populations, etc.). Easy to solve internally in `simulate_abc()`, it just hasn't happened yet.
+
 
 ## An example ABC analysis
 
-Imagine that we sequenced genomes of individuals from populations
-“popA”, “popB”, “popC”, and “popD”.
 
-Let’s also assume that we know that the three populations are
-phylogenetically related in the following way with an indicated
-gene-flow event at a certain time in the past, but we don’t know
-anything else (i.e., we have no idea about their
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") or split times):
 
-<img src="man/figures/README-ape_tree-1.png" style="display: block; margin: auto;" />
 
-After sequencing the genomes of individuals from these populations, we
-computed the nucleotide diversity in these populations as well as their
-pairwise genetic divergence, and observed the following values which we
-saved in two standard R data frames:
 
-1.  Nucleotide diversity in each population:
+Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
-<!-- end list -->
+Let's also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
-``` r
+<img src="man/figures/README-ape_tree-1.png" alt="plot of chunk ape_tree" style="display: block; margin: auto;" />
+
+After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
+
+1. Nucleotide diversity in each population:
+
+
+```r
 observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
 
 observed_diversity
@@ -153,11 +96,10 @@ observed_diversity
 #> 4 popD 9.024937e-05
 ```
 
-2.  Pairwise divergence d\_X\_Y between populations X and Y:
+2. Pairwise divergence d_X_Y between populations X and Y:
 
-<!-- end list -->
 
-``` r
+```r
 observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
 
 observed_divergence
@@ -170,13 +112,10 @@ observed_divergence
 #> 6 popC popD 0.0001114729
 ```
 
-3.  Value of the following
-    ![f\_4](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;f_4
-    "f_4")-statistic:
+3. Value of the following $f_4$-statistic:
 
-<!-- end list -->
 
-``` r
+```r
 observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
 
 observed_f4
@@ -186,13 +125,10 @@ observed_f4
 
 ### A complete ABC analysis in a single R script
 
-This is how we would use *demografr* to estimate the
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") and split times for all populations (and the rate of the
-indicated gene-flow event) with Approximate Bayesian Computation in a
-single R script:
+This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
-``` r
+
+```r
 library(demografr)
 library(slendr)
 
@@ -295,19 +231,18 @@ data <- simulate_abc(
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
+
+
+
+
 ## Analysing posterior distributions of parameters
 
-After we run this R script, we end up with an object called `abc` here.
-This object contains the complete information about the results of our
-inference. In particular, it carries the posterior samples for our
-parameters of interest
-(![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") of populations and their split times).
+After we run this R script, we end up with an object called `abc` here. This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest ($N_e$ of populations and their split times).
 
-For instance, we can get a table of all posterior values with the
-function `extract_summary()`:
+For instance, we can get a table of all posterior values with the function `extract_summary()`:
 
-``` r
+
+```r
 extract_summary(abc)
 #>                             Ne_A      Ne_B       Ne_C       Ne_D      T_AB
 #> Min.:                   131.0602  326.5349   419.6357 -1240.4912  981.1159
@@ -327,10 +262,10 @@ extract_summary(abc)
 #> Max.:                  6362.867 9875.401  0.80173911
 ```
 
-We can also specify a subset of model parameters to select, or provide a
-regular expression for this subsetting:
+We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
 
-``` r
+
+```r
 extract_summary(abc, param = "Ne")
 #>                             Ne_A      Ne_B       Ne_C       Ne_D
 #> Min.:                   131.0602  326.5349   419.6357 -1240.4912
@@ -342,61 +277,60 @@ extract_summary(abc, param = "Ne")
 #> Max.:                  3747.5379 1683.1578 12599.8615  6726.5713
 ```
 
-We can also visualize the posterior distributions. Rather than plotting
-many different distributions at once, let’s first check out the
-posterior distributions of inferred
-![N\_e](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_e
-"N_e") values:
+We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
 
-``` r
+
+```r
 plot_posterior(abc, param = "Ne")
 ```
 
-![](man/figures/README-posterior_Ne-1.png)<!-- -->
+![plot of chunk posterior_Ne](man/figures/README-posterior_Ne-1.png)
 
-Similarly, we can take a look at the inferred posteriors of the split
-times:
+Similarly, we can take a look at the inferred posteriors of the split times:
 
-``` r
+
+```r
 plot_posterior(abc, param = "T")
 ```
 
-![](man/figures/README-posterior_Tsplit-1.png)<!-- -->
+![plot of chunk posterior_Tsplit](man/figures/README-posterior_Tsplit-1.png)
 
 And, finally, the rate of gene flow:
 
-``` r
+
+```r
 plot_posterior(abc, param = "gf")
 ```
 
-![](man/figures/README-posterior_gf-1.png)<!-- -->
+![plot of chunk posterior_gf](man/figures/README-posterior_gf-1.png)
 
-Finally, we have the diagnostic functionality of the
-[*abc*](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf)
-R package at our disposal:
+Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
 
-``` r
+
+```r
 plot(abc, param = "Ne_C")
 ```
 
-![](man/figures/README-diagnostic_Ne-1.png)<!-- -->
+![plot of chunk diagnostic_Ne](man/figures/README-diagnostic_Ne-1.png)
 
 ## Additional functionality
 
-*demografr* also provides a couple of functions designed to make
-troubleshooting a little easier.
+_demografr_ also provides a couple of functions designed to make troubleshooting a little easier.
 
-For instance, assuming we have `priors` set up as above, we can
-visualize the prior distribution(s) like this:
+For instance, assuming we have `priors` set up as above, we can visualize the prior distribution(s) like this:
 
-``` r
+
+
+
+```r
 plot_prior(priors, "Ne")
 ```
 
-![](man/figures/README-prior_Ne-1.png)<!-- -->
+![plot of chunk prior_Ne](man/figures/README-prior_Ne-1.png)
 
-``` r
+
+```r
 plot_prior(priors, c("^T", "^gf"), facet = TRUE)
 ```
 
-![](man/figures/README-prior_T_gf-1.png)<!-- -->
+![plot of chunk prior_T_gf](man/figures/README-prior_T_gf-1.png)
