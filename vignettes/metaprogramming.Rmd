@@ -22,45 +22,73 @@ knitr::opts_chunk$set(
 devtools::load_all()
 ```
 
-# Cool metaprogramming tricks in R
-
 How can we let the user define probabilistic statements in R and have the code be as close as possible to normal mathematical notation?
 
-$N_e \sim \mathcal{U}(1000, 10000)$
+I.e., things like:
 
-$\textrm{geneflow} \sim \mathcal{U}(0, 1)$
+$$N_e \sim Unif(1000, 10000)$$
 
-$T_{\textrm{split}}^i \sim \mathcal{N}(10, 10000)$ for $i \isin \{1, 2, ..., 10\}$
+$$\textrm{geneflow} \sim Unif(0, 1)$$
+
+$$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}$$
 
 ## One trivial option
 
-Something like is used by EasyABC R package:
+Something like this is used by EasyABC R package:
 
 ```{r, eval=FALSE}
 list(
-  c("Ne", "runif", 1000, 1000),
-  c("geneflow", "runif", 0, 1),
+  list("Ne", "runif", 1000, 10000),
+  list("geneflow", "runif", 0, 1),
   # (not sure how would one create a vector like T_i)
 )
 ```
 
+In Python, you might create some objects like:
+
+```{python, eval=FALSE}
+import tensorflow_probability as tfp
+
+# define random variables
+Ne = tfp.distributions.Uniform(low=1000., high=10000.)
+geneflow = tfp.distributions.Uniform(low=0., high=1.)
+T_split = tfp.distributions.Uniform(low=10., high=10000.)
+
+# sample from the distributions
+Ne_sample = Ne.sample()
+geneflow_sample = geneflow.sample()
+T_split_sample = T_split.sample(10)
+```
+
+**Can we do this more "elegantly" with less code and closer to actual mathematical notation?**
+
 ## Fancier metaprogramming solution
 
-Despite being a _"stupid calculator language"_ (quote by Graham), R is a very powerful functional programming language with advanced metaprogramming options.
+Despite being _"a stupid calculator language"_ (quote by Graham), R is a very powerful functional programming language with advanced metaprogramming options.
 
 > Metaprogramming is a **programming technique in which computer programs have the ability to treat other programs as their data**. It means that a program can be designed to read, generate, analyze or transform other programs, and even modify itself while running.
+>
+> In other words, **metaprogramming is when code is writing other code.**
 
 You might be familiar with the syntax for fitting linear models in R:
 
-```{r, eval=FALSE}
+```{r}
+head(mtcars)
+```
+
+```{r}
 lm(cyl ~ mpg, data = mtcars)
 ```
 
-The `~` operator creates a so-called "formula object", which captures the expression provided by the user, and can then be manipulated or interpreted by the function that the formula is passed to.
+The **`~` operator creates a so-called "formula object"**, which captures the expression provided by the user, and can then be manipulated or interpreted by the function that the formula is passed to.
 
 ## How to use this for the problem above?
 
-We have functions such as `runif`, `rnorm`, etc., which generate a number from a distribution:
+Imagine then that we want to write an R interface for doing something like this:
+
+$$N_e \sim Unif(1000, 10000).$$
+
+Obviously, we have functions such as `runif`, `rnorm`, etc., which generate a number from a distribution:
 
 ```{r}
 runif(n = 1, min = 1000, max = 10000)
@@ -78,7 +106,7 @@ prior
 
 This is important, because the `runif(1000, 10000)` on the right is not a valid R code.
 
-**This is called "lazy evaluation".** R does not evaluate something at the time unless it's "needed" at that time.
+**This is called "lazy evaluation".** R does not evaluate something at the time unless it's "needed" at that time. The opposite to this is "eager evaluation" done by something like Python or C.
 
 ## Metaprogramming in R
 
@@ -90,7 +118,7 @@ How can we "manipulate" code and give it our own meaning?
 prior
 ```
 
-When given a formula, the R function `as.list` parses the language expression into smallest possible "atomic pieces":
+When given a formula, the R function **`as.list` parses the language expression into smallest possible "atomic pieces"**:
 
 ```{r}
 as.list(prior)
@@ -124,6 +152,8 @@ which we can parse like this:
 as.list(prior)
 ```
 
+And which we hope to interpret in a way that's compatible with something like $N_e \sim Unif(1000, 10000)$.
+
 _demografr_ parses each such prior sampling statement, and automatically converts the "invalid" expression:
 
 ```{r, eval=FALSE}
@@ -156,9 +186,9 @@ sample_prior(Ne ~ runif(1000, 10000))
 
 ## Sampling random vectors
 
-To provide support for random vectors, _demografr_ uses a similar metaprogramming trick as above:
+To provide support for random vectors, _demografr_ uses a similar metaprogramming trick as above.
 
-Imagine this syntax for vectorized statements:
+Imagine this syntax for vectorized statements (the `T_split[10]` is my made up syntax, not R syntax!):
 
 ```{r}
 prior <- T_split[10] ~ runif(10, 10000)
@@ -168,7 +198,7 @@ prior <- T_split[10] ~ runif(10, 10000)
 as.list(prior)
 ```
 
-Note that this expression is one layer deeper than would be with a plain `T_split ~ runif(10, 10000)`.
+Note that this expression is one layer "deeper" than would be with a plain `T_split ~ runif(10, 10000)`.
 
 This means that for "vector variables" of _demografr_, we need to take care of the nesting:
 
@@ -187,6 +217,8 @@ as.list(variable)
 sample_prior(T_split[10] ~ runif(10, 10000))
 ```
 
+Which internally turns the prior expression into `runif(n = 10, min = 10, max = 10000)`.
+
 ## A list of all priors
 
 ```{r}
@@ -197,10 +229,12 @@ priors <- list(
 )
 ```
 
-In each ABC replicate simulation, _demografr_ then effectively performs this:
+**The point of this is that this is _declarative_! It defines the priors, but doesn't sample any numbers!**
+
+But, during each ABC replicate simulation, _demografr_ then internally performs the equivalent of this:
 
 ```{r}
-lapply(priors, sample_prior)
+lapply(priors, sample_prior) # iterate over the list of priors, sample from each
 ```
 
 **But this is something the user never has to do or care about**, it is done automatically and internally when they call:
@@ -211,15 +245,14 @@ data <- simulate_abc(model, <priors>, functions, observed, ...)
 
 ## Custom functions
 
-The above also allows custom-defined prior distribution functions.
+The above also allows custom-defined prior distribution functions, not just built-in `runif`, `rnorm`, etc.
 
-Imagine this function simulating a loaded casino die:
+For instance, imagine this function simulating a loaded casino die:
 
 ```{r}
 casino_d6 <- function(n = 1) {
-  outcomes      <- c(1, 2, 3, 4, 5, 6)
-  probabilities <- c(1, 1, 1, 1, 1, 3)
-  weights       <- probabilities / sum(probabilities)
+  outcomes      <- c(1, 2, 3, 4, 5, 6) # six sides of a die
+  probabilities <- c(1, 1, 1, 1, 1, 3) # rolling a 6 is 3x more likely!
 
   sample(outcomes, size = n, prob = probabilities, replace = TRUE)
 }
