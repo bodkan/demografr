@@ -3,11 +3,11 @@ the code be as close as possible to normal mathematical notation?
 
 I.e., things like:
 
-$$N_e \sim Unif(1000, 10000)$$
+\[N_e \sim Unif(1000, 10000)\]
 
-$$\textrm{geneflow} \sim Unif(0, 1)$$
+\[\textrm{geneflow} \sim Unif(0, 1)\]
 
-$$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}$
+\[T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 10\}\]
 
 ## One trivial option
 
@@ -50,7 +50,7 @@ metaprogramming options.
 > programs have the ability to treat other programs as their data**. It
 > means that a program can be designed to read, generate, analyze or
 > transform other programs, and even modify itself while running.
->
+> 
 > In other words, **metaprogramming is when code is writing other
 > code.**
 
@@ -72,12 +72,12 @@ head(mtcars)
 lm(cyl ~ mpg, data = mtcars)
 ```
 
-    #>
+    #> 
     #> Call:
     #> lm(formula = cyl ~ mpg, data = mtcars)
-    #>
+    #> 
     #> Coefficients:
-    #> (Intercept)          mpg
+    #> (Intercept)          mpg  
     #>     11.2607      -0.2525
 
 The **`~` operator creates a so-called “formula object”**, which
@@ -99,7 +99,7 @@ generate a number from a distribution:
 runif(n = 1, min = 1000, max = 10000)
 ```
 
-    #> [1] 5957.106
+    #> [1] 5561.706
 
 We can also do this in R, “for free”, without doing anything else.
 
@@ -143,10 +143,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #>
+    #> 
     #> [[2]]
     #> Ne
-    #>
+    #> 
     #> [[3]]
     #> runif(1000, 10000)
 
@@ -167,16 +167,16 @@ metaprogramming tool:
 lobstr::ast((a + b) * (c - d / e))
 ```
 
-    #> █─`*`
-    #> ├─█─`(`
-    #> │ └─█─`+`
-    #> │   ├─a
-    #> │   └─b
-    #> └─█─`(`
-    #>   └─█─`-`
-    #>     ├─c
-    #>     └─█─`/`
-    #>       ├─d
+    #> █─`*` 
+    #> ├─█─`(` 
+    #> │ └─█─`+` 
+    #> │   ├─a 
+    #> │   └─b 
+    #> └─█─`(` 
+    #>   └─█─`-` 
+    #>     ├─c 
+    #>     └─█─`/` 
+    #>       ├─d 
     #>       └─e
 
 ## Back to *demografr*
@@ -197,10 +197,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #>
+    #> 
     #> [[2]]
     #> Ne
-    #>
+    #> 
     #> [[3]]
     #> runif(1000, 10000)
 
@@ -233,9 +233,9 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #>
+    #> 
     #> $value
-    #> [1] 8724.988
+    #> [1] 2373.757
 
 ``` r
 sample_prior(Ne ~ runif(1000, 10000))
@@ -243,9 +243,9 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #>
+    #> 
     #> $value
-    #> [1] 6651.011
+    #> [1] 4686.138
 
 ``` r
 sample_prior(Ne ~ runif(1000, 10000))
@@ -253,9 +253,9 @@ sample_prior(Ne ~ runif(1000, 10000))
 
     #> $variable
     #> [1] "Ne"
-    #>
+    #> 
     #> $value
-    #> [1] 5318.861
+    #> [1] 7782.721
 
 ## Sampling random vectors
 
@@ -275,10 +275,10 @@ as.list(prior)
 
     #> [[1]]
     #> `~`
-    #>
+    #> 
     #> [[2]]
     #> T_split[10]
-    #>
+    #> 
     #> [[3]]
     #> runif(10, 10000)
 
@@ -301,10 +301,10 @@ as.list(variable)
 
     #> [[1]]
     #> `[`
-    #>
+    #> 
     #> [[2]]
     #> T_split
-    #>
+    #> 
     #> [[3]]
     #> [1] 10
 
@@ -316,10 +316,10 @@ sample_prior(T_split[10] ~ runif(10, 10000))
 
     #> $variable
     #> [1] "T_split"
-    #>
+    #> 
     #> $value
-    #>  [1]  519.4349 2090.2553 6629.0542 5651.4096  255.6859 4876.1447 7336.7094
-    #>  [8] 2107.1281 7924.6542 4743.1582
+    #>  [1] 6865.538 1158.708 3399.170 5892.636 2524.915 7340.769 5579.003 4556.291
+    #>  [9] 9709.853 8154.563
 
 Which internally turns the prior expression into `runif(n = 10, min
 = 10, max = 10000)`.
@@ -347,26 +347,26 @@ lapply(priors, sample_prior) # iterate over the list of priors, sample from each
     #> [[1]]
     #> [[1]]$variable
     #> [1] "Ne"
-    #>
+    #> 
     #> [[1]]$value
     #> [1] 1000
-    #>
-    #>
+    #> 
+    #> 
     #> [[2]]
     #> [[2]]$variable
     #> [1] "geneflow"
-    #>
+    #> 
     #> [[2]]$value
-    #> [1] 0.3172069
-    #>
-    #>
+    #> [1] 0.07340013
+    #> 
+    #> 
     #> [[3]]
     #> [[3]]$variable
     #> [1] "T_split"
-    #>
+    #> 
     #> [[3]]$value
-    #>  [1] 662.92317 984.27174 858.11574  31.45234 912.07427 739.95854 932.88907
-    #>  [8] 752.20514 586.05837  18.86225
+    #>  [1] 149.59859 864.97434 878.56274  96.31780  22.31949 662.86381 983.78494
+    #>  [8] 570.75274 272.24457 854.65535
 
 **But this is something the user never has to do or care about**, it is
 done automatically and internally when they call:
@@ -400,16 +400,16 @@ samples
 
     #> $variable
     #> [1] "rolls"
-    #>
+    #> 
     #> $value
-    #>   [1] 6 6 1 1 3 3 4 6 2 2 4 1 4 2 2 1 6 6 1 6 1 1 6 5 4 6 1 6 1 6 3 2 6 6 6 6 1
-    #>  [38] 2 4 6 6 6 1 3 2 4 5 6 3 6 2 3 5 5 1 1 2 6 6 3 1 3 1 1 2 5 5 6 4 6 4 4 5 1
-    #>  [75] 3 5 1 6 4 4 4 2 2 5 3 2 5 4 5 6 4 2 2 6 6 3 2 5 1 4
+    #>   [1] 4 6 3 3 1 2 2 4 5 1 4 3 6 6 6 1 6 6 1 2 6 2 6 4 2 5 4 5 6 2 6 6 2 6 6 2 6
+    #>  [38] 5 2 6 6 6 1 2 6 2 6 4 5 6 6 6 4 4 6 5 5 6 2 6 3 6 3 1 5 6 4 6 2 6 6 3 6 6
+    #>  [75] 6 1 3 6 5 6 6 1 4 5 6 6 6 6 5 6 1 2 2 6 5 5 6 5 3 5
 
 ``` r
 table(samples$value)
 ```
 
-    #>
-    #>  1  2  3  4  5  6
-    #> 19 16 11 15 12 27
+    #> 
+    #>  1  2  3  4  5  6 
+    #>  9 15  8 10 15 43
