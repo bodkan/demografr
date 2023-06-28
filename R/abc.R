@@ -1,3 +1,8 @@
+#######################################################
+# internal functions used for batch simulations in
+# functions simulate_abc() and simulate_grid()
+#######################################################
+
 # Get parameters from the priors, simulate a tree sequence, compute summary statistics
 run_iteration <- function(it,
                           model, params, functions,
@@ -32,8 +37,7 @@ run_iteration <- function(it,
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
-                           engine, samples, model_args, engine_args,
-                           model_name, attempts) {
+                           engine, samples, model_args, engine_args, model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
@@ -79,13 +83,14 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
 
         model_result <- do.call(model, model_fun_args)
 
-        if (length(model_result) == 1)
+        if (inherits(model_result, "slendr_model")) {
           slendr_model <- model_result
-        else if (length(model_result) == 2) {
+          sample_schedule <- NULL
+        } else if (length(model_result) == 2) {
           slendr_model <- model_result[[1]]
           sample_schedule <- model_result[[2]]
         } else
-          stop("Incorrent format of the returned result of the model function", call. = FALSE)
+          stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
         # compose a list of required and optional arguments for msprime / SLiM engine
         engine_fun_args <- list(
@@ -118,7 +123,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
                   FUN.VALUE = character(1)),
             collapse = ", "
           )
-          stop("An unexpected error was raised while generating a slendr model\n",
+          stop("An unexpected error was raised when generating data from a slendr model\n",
               "using the provided slendr function.\n\nThe error message received was:\n",
               msg,
               "\n\nPerhaps re-running the model function with the sampled parameters will\n",
