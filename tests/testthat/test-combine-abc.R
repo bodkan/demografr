@@ -1,83 +1,86 @@
-skip_if(!slendr:::check_env_present())
+library(slendr)
+
+skip_if(!slendr:::is_slendr_env_present())
 init_env(quiet = TRUE)
 
 SEED <- 42
 
-p1 <- slendr::population("popA", time = 1, N = 1000)
-p2 <- slendr::population("popB", time = 2000, N = 3000, parent = p1)
-p3 <- slendr::population("popC", time = 4000, N = 10000, parent = p2)
-p4 <- slendr::population("popD", time = 6000, N = 5000, parent = p3)
+model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
+  p1 <- population("p1", time = 1, N = 1000)
+  p2 <- population("p2", time = 2000, N = 3000, parent = p1)
+  p3 <- population("p3", time = 4000, N = 10000, parent = p2)
+  p4 <- population("p4", time = 6000, N = 5000, parent = p3)
 
-model <- slendr::compile_model(
-  populations = list(p1, p2, p3, p4),
-  generation_time = 1,
-  simulation_length = 10000, serialize = FALSE
+  model <- compile_model(
+    populations = list(p1, p2, p3, p4),
+    generation_time = 1,
+    simulation_length = 10000, serialize = FALSE
+  )
+
+  return(model)
+}
+
+samples <- list(
+  p1 = paste0("p1_", 1:10),
+  p2 = paste0("p2_", 1:10),
+  p3 = paste0("p3_", 1:10),
+  p4 = paste0("p4_", 1:10)
 )
 
-ts <- slendr::msprime(model, sequence_length = 1e6, recombination_rate = 0, random_seed = SEED)
+m <- model(100, 2000, 5000, 800)
 
-samples <- slendr::ts_samples(ts, split = TRUE)
+ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = 42)
 
-pi_df <- slendr::ts_diversity(ts, sample_sets = samples) %>%
-  dplyr::mutate(stat = paste0("pi_", set)) %>% dplyr::select(stat, value = diversity)
+set.seed(SEED)
 
-div_df <- slendr::ts_divergence(ts, sample_sets = samples) %>%
-  dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>% dplyr::select(stat, value = divergence)
+samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
 
-observed <- list(diversity = pi_df, divergence = div_df)
+pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
+
+observed <- list(diversity = pi_df)
 
 priors <- list(
-  Ne_popA ~ runif(1, 10000),
-  Ne_popB ~ runif(1, 10000),
-  Ne_popC ~ runif(1, 10000),
-  Ne_popD ~ runif(1, 10000),
-
-  Tsplit_popA_popB ~ runif(1, 3000),
-  Tsplit_popB_popC ~ runif(3000, 6000),
-  Tsplit_popC_popD ~ runif(6000, 9000)
+  Ne_p1 ~ runif(10, 10000),
+  Ne_p2 ~ runif(10, 10000),
+  Ne_p3 ~ runif(10, 10000),
+  Ne_p4 ~ runif(10, 10000)
 )
 
 compute_diversity <- function(ts) {
-  samples <- slendr::ts_samples(ts, split = TRUE)
-  slendr::ts_diversity(ts, sample_sets = samples) %>%
-    dplyr::mutate(stat = paste0("pi_", set)) %>%
-    dplyr::select(stat, value = diversity)
+  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
+  ts_diversity(ts, sample_sets = samples, mode = "branch")
 }
-compute_divergence <- function(ts) {
-  samples <- slendr::ts_samples(ts, split = TRUE)
-  slendr::ts_divergence(ts, sample_sets = samples) %>%
-    dplyr::mutate(stat = sprintf("d_%s_%s", x, y)) %>%
-    dplyr::select(stat, value = divergence)
-}
-functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+functions <- list(diversity = compute_diversity)
 
-run1 <- simulate_abc(model, priors, functions, observed, iterations = 3, sequence_length = 10000, recombination_rate = 0)
-run2 <- simulate_abc(model, priors, functions, observed, iterations = 3, sequence_length = 10000, recombination_rate = 0)
-run3 <- simulate_abc(model, priors, functions, observed, iterations = 3, sequence_length = 10000, recombination_rate = 0)
+validate_abc(model, priors, functions, observed)
 
-test_that("model scaffolds must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but scaffolds\ndiffer"
+run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
+run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
+run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
+
+test_that("model functions must be consistent between runs", {
+  error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"
   xrun1 <- run1
-  xrun1$model$splits[1, ] <- -42
+  xrun1$model <- ls
   expect_error(combine_abc(xrun1, run2, run3), error_msg)
 })
 
 test_that("priors must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but priors\ndiffer"
+  error_msg <- "Simulation runs must originate from the same ABC setup but priors differ"
   xrun1 <- run1
   xrun1$priors[[1]] <- NULL
   expect_error(combine_abc(xrun1, run2, run3), error_msg)
 })
 
 test_that("summary functions must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but summary functions\ndiffer"
+  error_msg <- "Simulation runs must originate from the same ABC setup but summary functions differ"
   xrun1 <- run1
   xrun1$functions[[1]] <- lm
   expect_error(combine_abc(xrun1, run2, run3), error_msg)
 })
 
 test_that("observed statistics must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but observed statistics\ndiffer"
+  error_msg <- "Simulation runs must originate from the same ABC setup but observed statistics differ"
   xrun1 <- run1
   xrun1$observed[1] <- 42
   expect_error(combine_abc(xrun1, run2, run3), error_msg)
@@ -184,14 +187,4 @@ test_that("missing serialized files are correctly handled", {
   unlink(f1)
   expect_error(combine_abc(f1, f2, f3), "File .* does not exist")
   expect_error(combine_abc(list(f1, f2, f3)), "File .* does not exist")
-})
-
-test_that("the function comparison hack works as intended", {
-  funs1 <- list(mean, lm, print)
-  funs2 <- list(mean, lm, print)
-  expect_true(identical_functions(funs1, funs2))
-
-  funs1 <- list(function() 1 + 2, function(x, y) print(x^y), function(z) hist(z))
-  funs2 <- list(function() (1 + 2) - 1, function(x, y) print(x^y), function(z) hist(z))
-  expect_false(identical_functions(funs1, funs2))
 })
