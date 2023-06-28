@@ -144,18 +144,6 @@ collect_param_matrix <- function(prior_values) {
   m
 }
 
-# This seems like a horrible hack but unless it turns out this is completely
-# broken, it seems better to keep the ability to compare summary functions
-# between ABC simulation runs rather than not. Either way, all functions *will*
-# be identical between runs unless the user messes up in some way, so being
-# potentially overly conservative here seems appropriate.
-identical_functions <- function(run1_functions, run2_functions) {
-  # get sources of both functions, stripping the address line
-  run1_sources <- lapply(run1_functions, function(x) capture.output(print(x)) %>% .[-length(.)])
-  run2_sources <- lapply(run2_functions, function(x) capture.output(print(x)) %>% .[-length(.)])
-  identical(run1_sources, run2_sources)
-}
-
 # Generate a named list of prior samples to be used in model generating functions
 generate_prior_args <- function(priors) {
   prior_samples <- lapply(seq_along(priors), function(i) sample_prior(priors[[i]]))
