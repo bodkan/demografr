@@ -34,26 +34,36 @@ sample_prior <- function(f) {
   } else
     stop("Invalid prior sampling statement", call. = FALSE)
 
-  if (is.numeric(call_tokens[[1]])) { # a fixed-value "prior"
+  if (is.numeric(call_tokens[[1]])) { # a fixed scalar-value "prior"
     value <- call_tokens[[1]]
-  } else { # a proper prior
+  } else { # a function-call prior (either fixed or random)
     # get the random-generation function name
     fun_symbol <- call_tokens[[1]]
-    if (!exists(fun_symbol)) stop("An unknown function ", fun_symbol, " given for sampling", call. = FALSE)
+    if (!exists(fun_symbol))
+      stop("An unknown function ", fun_symbol, " given for sampling", call. = FALSE)
     fun <- get(fun_symbol)
 
-    # compose arguments for the function, forcing n = 1 as its first argument
-    args <- c(n = n, call_tokens[-1])
+    # if the function symbol is `c` or `list`, simply evaluate the call
+    if (identical(fun_symbol, as.name("c")) || identical(fun_symbol, as.name("list"))) {
+      args <- c(call_tokens[-1])
+      value <- do.call(fun, args)
+    } else { # compose arguments for the function, forcing n = 1 as its first argument
+      args <- c(n = n, call_tokens[-1])
 
-    # call the random-generation function, getting a single value
-    error_msg <- sprintf("%%s was raised when internally sampling from a prior as\n%s(%s). Please check the validity of the prior expression.\n\nThe message was: %%s",
-                         as.character(fun_symbol), paste("n = 1,", paste(args[-1], collapse = ", ")))
-    tryCatch(value <- do.call(fun, args),
-             error = function(e) stop(sprintf(error_msg, "An error", e$message), call. = FALSE),
-             warning = function(w) stop(sprintf(error_msg, "A warning", w$message), call. = FALSE))
-    if (any(is.na(value)) || any(is.nan(value)) || any(is.infinite(value)))
-      stop("Invalid prior value %s", value, call. = FALSE)
+      # call the random-generation function, getting a single value
+      error_msg <- sprintf("%%s was raised when internally sampling from a prior as\n%s(%s). Please check the validity of the prior expression.\n\nThe message was: %%s",
+                          as.character(fun_symbol), paste("n = 1,", paste(args[-1], collapse = ", ")))
+      tryCatch(value <- do.call(fun, args),
+              error = function(e) stop(sprintf(error_msg, "An error", e$message), call. = FALSE),
+              warning = function(w) stop(sprintf(error_msg, "A warning", w$message), call. = FALSE))
+      if (any(is.na(value)) || any(is.nan(value)) || any(is.infinite(value)))
+        stop("Invalid prior value %s", value, call. = FALSE)
+    }
   }
+
+  if (n != length(value))
+    stop("A vector of length ", length(value), " was produced for ", n, "-dimensional parameter '", variable, "'.\nMake sure to specify the correct N when defining '", variable, "[N]'.",
+          call. = FALSE)
 
   list(variable = variable, value = value)
 }
