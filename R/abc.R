@@ -92,6 +92,8 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
         } else
           stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
+        if (engine == "msprime") slendr_model$path <- NULL
+
         # compose a list of required and optional arguments for msprime / SLiM engine
         engine_fun_args <- list(
           model = slendr_model,

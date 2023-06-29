@@ -54,8 +54,6 @@ simulate_abc <- function(
     mutation_rate = mutation_rate, model_args = model_args
   ))
 
-  # TODO: make sure the model is not serialized if it's to be run with msprime
-
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   globals <- c(
