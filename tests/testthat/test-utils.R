@@ -1,41 +1,59 @@
-test_that("sample_names() returns data in a correct format", {
-  skip_if(!slendr:::check_env_present())
+devtools::load_all("~/projects/slendr/")
+devtools::load_all()
+skip_if(!slendr:::is_slendr_env_present())
+slendr::init_env(quiet = TRUE)
 
-  p1 <- population("pop1", time = 1, N = 123)
-  p2 <- population("pop2", parent = p1, time = 2, N = 456)
+p1 <- slendr::population("pop1", time = 1, N = 123)
+p2 <- slendr::population("pop2", parent = p1, time = 2, N = 456)
 
-  model <- compile_model(
-    populations = list(p1, p2),
-    generation_time = 1, simulation_length = 300,
-  )
+model <- slendr::compile_model(list(p1, p2), generation_time = 1, simulation_length = 100)
 
-  samples <- rbind(
-    schedule_sampling(model, times = 10, list(p1, 2), list(p2, 2)),
-    schedule_sampling(model, times = 250, list(p1, 10), list(p2, 10))
-  )
+samples <- rbind(
+  slendr::schedule_sampling(model, times = c(3, 10), list(p1, 2), list(p2, 2), strict = TRUE),
+  slendr::schedule_sampling(model, times = 101, list(p1, 10), list(p2, 10), strict = TRUE)
+)
 
-  slim_ts <- tempfile(fileext = ".trees")
-  msprime_ts <- tempfile(fileext = ".trees")
+slim_ts <- tempfile(fileext = ".trees")
+msprime_ts <- tempfile(fileext = ".trees")
 
-  slim(model, sequence_length = 100000, recombination_rate = 0, output = slim_ts,
-      method = "batch", random_seed = 314159,
-      verbose = FALSE)
+slendr::slim(model, sequence_length = 100000, recombination_rate = 0, output = slim_ts,
+    method = "batch", random_seed = 314159, samples = samples, verbose = FALSE, load = FALSE)
 
-  msprime(model, sequence_length = 100000, recombination_rate = 0, output = msprime_ts,
-          random_seed = 314159, verbose = FALSE)
+slendr::msprime(model, sequence_length = 100000, recombination_rate = 0, output = msprime_ts,
+        random_seed = 314159, verbose = FALSE, load = FALSE, samples = samples)
 
-  ts_msprime <- ts_load(model, file = msprime_ts)
-  ts_slim <- ts_load(model, file = slim_ts)
+ts_slim <- slendr::ts_load(model, file = slim_ts)
+ts_msprime <- slendr::ts_load(model, file = msprime_ts)
 
+# check correctness of recorded sampling times:
+# library(dplyr)
+# unique(ts_samples(ts_slim)$time)
+# ts_nodes(ts_slim) %>% filter(sampled) %>% .$time %>% unique
+# ts_nodes(ts_slim) %>% filter(sampled) %>% .$time_tskit %>% unique
+# unique(ts_samples(ts_msprime)$time)
+# ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time %>% unique
+# ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time_tskit %>% unique
+
+test_that("sample_names(ts) returns a simple character vector", {
   expect_type(sample_names(ts_msprime), "character")
   expect_type(sample_names(ts_slim), "character")
 
-  expect_type(sample_names(ts_msprime, split = TRUE), "list")
-  expect_type(sample_names(ts_slim, split = TRUE), "list")
-
-  expect_true(length(sample_names(ts_msprime, split = TRUE)) == length(unique(samples$pop)))
-  expect_true(length(sample_names(ts_slim, split = TRUE)) == length(unique(samples$pop)))
-
   expect_true(length(sample_names(ts_msprime)) == sum(samples$n))
   expect_true(length(sample_names(ts_slim)) == sum(samples$n))
+})
+
+test_that("sample_names(ts, split = 'pop') returns a list of character vectors", {
+  expect_type(sample_names(ts_msprime, split = "pop"), "list")
+  expect_type(sample_names(ts_slim, split = "pop"), "list")
+
+  expect_true(length(sample_names(ts_msprime, split = "pop")) == 2)
+  expect_true(length(sample_names(ts_slim, split = "pop")) == 2)
+})
+
+test_that("sample_names(ts, split = 'time') returns a list of character vectors", {
+  expect_type(sample_names(ts_msprime, split = "time"), "list")
+  expect_type(sample_names(ts_slim, split = "time"), "list")
+
+  expect_true(length(sample_names(ts_msprime, split = "time")) == length(unique(samples$time)))
+  expect_true(length(sample_names(ts_slim, split = "time")) == length(unique(samples$time)))
 })

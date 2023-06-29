@@ -4,16 +4,19 @@
 \alias{sample_names}
 \title{Extract names of individuals in a tree sequence}
 \usage{
-sample_names(ts, split = FALSE)
+sample_names(ts, split = NULL)
 }
 \arguments{
 \item{ts}{Tree-sequence object simulated by a slendr back-end engine}
 
-\item{split}{Should sample names be split by population? Default is \code{FALSE}}
+\item{split}{Should sample names in the tree sequence be split by a column
+(a population or time column)? Default is \code{NULL} and all names of
+samples will be returned.}
 }
 \value{
-A vector of character sample names. If \code{split} is \code{TRUE},
-  a list of such vectors is returned, one element of the list per population.
+A vector of character sample names. If \code{split} is specified,
+  a list of such vectors is returned, one element of the list per population
+  or sampling time.
 }
 \description{
 Extract names of individuals in a tree sequence
