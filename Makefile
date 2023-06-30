@@ -6,6 +6,9 @@ logo := man/figures/logo.png
 
 build: $(pkg)
 
+test:
+	R -e 'devtools::test()'
+
 web: README.md $(logo)
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'

@@ -1,5 +1,3 @@
-devtools::load_all("~/projects/slendr/")
-devtools::load_all()
 skip_if(!slendr:::is_slendr_env_present())
 slendr::init_env(quiet = TRUE)
 
