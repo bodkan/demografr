@@ -50,7 +50,9 @@ compute_diversity <- function(ts) {
 }
 functions <- list(diversity = compute_diversity)
 
-validate_abc(model, priors, functions, observed)
+test_that("validation passes", {
+  expect_output(validate_abc(model, priors, functions, observed))
+})
 
 run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
 run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)

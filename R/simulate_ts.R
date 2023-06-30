@@ -10,7 +10,7 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param engine Which simulation engine to use? Values "slendr::msprime" and "slendr::slim"
+#' @param engine Which simulation engine to use? Values "msprime" and "slim"
 #'   will use the built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends

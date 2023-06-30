@@ -13,7 +13,7 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param engine Which simulation engine to use? Values "slendr::msprime" and "slendr::"
+#' @param engine Which simulation engine to use? Values "msprime" and "slendr::"
 #'   will use the built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
@@ -28,7 +28,7 @@ simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
   model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("slendr::msprime", "slendr::slim"), debug = FALSE, attempts = 1000
+  engine = c("msprime", "slim"), debug = FALSE, attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)

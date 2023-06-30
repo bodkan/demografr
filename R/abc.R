@@ -102,8 +102,10 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           samples = sample_schedule
         ) %>% c(., engine_args)
 
+        engine_fun <- get(engine, envir = asNamespace("slendr"))
+
         # simulate a tree sequence
-        do.call(engine, engine_fun_args)
+        do.call(engine_fun, engine_fun_args)
       },
       error = function(cond) {
         msg <- conditionMessage(cond)
