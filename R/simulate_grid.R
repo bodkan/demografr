@@ -12,8 +12,8 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param engine Which simulation engine to use? Values "msprime" and "SLiM" will use the
-#'   built-in slendr simulation back ends.
+#' @param engine Which simulation engine to use? Values "slendr::msprime" and "slendr::"
+#'   will use the built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
@@ -25,7 +25,7 @@ simulate_grid <- function(
   sequence_length, recombination_rate, mutation_rate = 0,
   split = FALSE,
   model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "SLiM")
+  engine = c("slendr::msprime", "slendr::slim")
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)

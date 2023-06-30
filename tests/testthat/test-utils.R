@@ -25,12 +25,12 @@ ts_msprime <- slendr::ts_load(model, file = msprime_ts)
 
 # check correctness of recorded sampling times:
 # library(dplyr)
-# unique(ts_samples(ts_slim)$time)
-# ts_nodes(ts_slim) %>% filter(sampled) %>% .$time %>% unique
-# ts_nodes(ts_slim) %>% filter(sampled) %>% .$time_tskit %>% unique
-# unique(ts_samples(ts_msprime)$time)
-# ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time %>% unique
-# ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time_tskit %>% unique
+# unique(slendr::ts_samples(ts_slim)$time)
+# slendr::ts_nodes(ts_slim) %>% filter(sampled) %>% .$time %>% unique
+# slendr::ts_nodes(ts_slim) %>% filter(sampled) %>% .$time_tskit %>% unique
+# unique(slendr::ts_samples(ts_msprime)$time)
+# slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time %>% unique
+# slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time_tskit %>% unique
 
 test_that("sample_names(ts) returns a simple character vector", {
   expect_type(sample_names(ts_msprime), "character")
