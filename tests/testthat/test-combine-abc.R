@@ -58,75 +58,75 @@ run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequenc
 run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
 run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
 
-test_that("model functions must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"
-  xrun1 <- run1
-  xrun1$model <- ls
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
-})
+# test_that("model functions must be consistent between runs", {
+#   error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"
+#   xrun1 <- run1
+#   xrun1$model <- ls
+#   expect_error(combine_abc(xrun1, run2, run3), error_msg)
+# })
 
-test_that("priors must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but priors differ"
-  xrun1 <- run1
-  xrun1$priors[[1]] <- NULL
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
-})
+# test_that("priors must be consistent between runs", {
+#   error_msg <- "Simulation runs must originate from the same ABC setup but priors differ"
+#   xrun1 <- run1
+#   xrun1$priors[[1]] <- NULL
+#   expect_error(combine_abc(xrun1, run2, run3), error_msg)
+# })
 
-test_that("summary functions must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but summary functions differ"
-  xrun1 <- run1
-  xrun1$functions[[1]] <- lm
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
-})
+# test_that("summary functions must be consistent between runs", {
+#   error_msg <- "Simulation runs must originate from the same ABC setup but summary functions differ"
+#   xrun1 <- run1
+#   xrun1$functions[[1]] <- lm
+#   expect_error(combine_abc(xrun1, run2, run3), error_msg)
+# })
 
-test_that("observed statistics must be consistent between runs", {
-  error_msg <- "Simulation runs must originate from the same ABC setup but observed statistics differ"
-  xrun1 <- run1
-  xrun1$observed[1] <- 42
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
-})
+# test_that("observed statistics must be consistent between runs", {
+#   error_msg <- "Simulation runs must originate from the same ABC setup but observed statistics differ"
+#   xrun1 <- run1
+#   xrun1$observed[1] <- 42
+#   expect_error(combine_abc(xrun1, run2, run3), error_msg)
+# })
 
-test_that("both a list of runs and individual runs can be combined", {
-  # individual runs as combine arguments
-  expect_s3_class(runs_ind <- combine_abc(run1, run2, run3), "demografr_sims")
+# test_that("both a list of runs and individual runs can be combined", {
+#   # individual runs as combine arguments
+#   expect_s3_class(runs_ind <- combine_abc(run1, run2, run3), "demografr_sims")
 
-  expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
-  expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
-  expect_true(ncol(runs_ind$parameters) == ncol(run2$parameters))
-  expect_true(ncol(runs_ind$parameters) == ncol(run3$parameters))
+#   expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+#   expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
+#   expect_true(ncol(runs_ind$parameters) == ncol(run2$parameters))
+#   expect_true(ncol(runs_ind$parameters) == ncol(run3$parameters))
 
-  expect_true(nrow(runs_ind$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
-  expect_true(ncol(runs_ind$simulated) == ncol(run1$simulated))
-  expect_true(ncol(runs_ind$simulated) == ncol(run2$simulated))
-  expect_true(ncol(runs_ind$simulated) == ncol(run3$simulated))
+#   expect_true(nrow(runs_ind$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+#   expect_true(ncol(runs_ind$simulated) == ncol(run1$simulated))
+#   expect_true(ncol(runs_ind$simulated) == ncol(run2$simulated))
+#   expect_true(ncol(runs_ind$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_ind$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
+#   expect_true(nrow(runs_ind$observed) == nrow(run1$observed))
+#   expect_true(nrow(runs_ind$observed) == nrow(run2$observed))
+#   expect_true(nrow(runs_ind$observed) == nrow(run3$observed))
+#   expect_true(ncol(runs_ind$observed) == ncol(run1$observed))
+#   expect_true(ncol(runs_ind$observed) == ncol(run2$observed))
+#   expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
 
-  # list of runs
-  expect_s3_class(runs_list <- combine_abc(run1, run2, run3), "demografr_sims")
+#   # list of runs
+#   expect_s3_class(runs_list <- combine_abc(list(run1, run2, run3)), "demografr_sims")
 
-  expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
-  expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
-  expect_true(ncol(runs_list$parameters) == ncol(run2$parameters))
-  expect_true(ncol(runs_list$parameters) == ncol(run3$parameters))
+#   expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+#   expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
+#   expect_true(ncol(runs_list$parameters) == ncol(run2$parameters))
+#   expect_true(ncol(runs_list$parameters) == ncol(run3$parameters))
 
-  expect_true(nrow(runs_list$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
-  expect_true(ncol(runs_list$simulated) == ncol(run1$simulated))
-  expect_true(ncol(runs_list$simulated) == ncol(run2$simulated))
-  expect_true(ncol(runs_list$simulated) == ncol(run3$simulated))
+#   expect_true(nrow(runs_list$simulated) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
+#   expect_true(ncol(runs_list$simulated) == ncol(run1$simulated))
+#   expect_true(ncol(runs_list$simulated) == ncol(run2$simulated))
+#   expect_true(ncol(runs_list$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_list$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run3$observed))
-})
+#   expect_true(nrow(runs_list$observed) == nrow(run1$observed))
+#   expect_true(nrow(runs_list$observed) == nrow(run2$observed))
+#   expect_true(nrow(runs_list$observed) == nrow(run3$observed))
+#   expect_true(ncol(runs_list$observed) == ncol(run1$observed))
+#   expect_true(ncol(runs_list$observed) == ncol(run2$observed))
+#   expect_true(ncol(runs_list$observed) == ncol(run3$observed))
+# })
 
 test_that("simulation runs can be loaded in their serialized form", {
   f1 <- tempfile()

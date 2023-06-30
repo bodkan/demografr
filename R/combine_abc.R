@@ -1,4 +1,3 @@
-
 #' Combine multiple individual ABC simulation runs into one
 #'
 #' @param ... Either a list of objects of the class \code{demografr_sims} as produced
@@ -29,7 +28,7 @@ combine_abc <- function(...) {
   if (length(unique(lapply(runs, `[[`, "model"))) > 1)
     stop("Simulation runs must originate from the same ABC setup but model functions differ", call. = FALSE)
 
-  if (length(unique(lapply(runs, `[[`, "priors"))) > 1)
+  if (length(unique(lapply(runs, function(run) priors_to_strings(run$priors)))) > 1)
     stop("Simulation runs must originate from the same ABC setup but priors differ", call. = FALSE)
 
   if (length(unique(lapply(runs, `[[`, "functions"))) > 1)
@@ -53,4 +52,12 @@ combine_abc <- function(...) {
   class(result) <- "demografr_sims"
 
   result
+}
+
+# Formula objects we use for priors are stored alongside their environments, which
+# effectively means that each run has a 'unique' prior, so the unique() calls above
+# don't do what we need. This helper function converts each prior to their raw
+# character representation purely for comparing the code of each prior formula.
+priors_to_strings <- function(priors) {
+  lapply(priors, function(p) paste(deparse(p[[2]]), "~", deparse(p[[3]]), collapse = " "))
 }
