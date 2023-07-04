@@ -93,7 +93,7 @@ popB <- population("popB", time = 2000, N = 800, parent = popA)
 popC <- population("popC", time = 6000, N = 9000, parent = popB)
 popD <- population("popD", time = 8000, N = 4000, parent = popC)
 
-gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.05)
+gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.1)
 
 example_model <- compile_model(
   populations = list(popA, popB, popC, popD), gene_flow = gf,
@@ -282,7 +282,7 @@ saveRDS(data, here::here("inst/examples/abc_data.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/abc_data.rds")), warning=FALSE, message=FALSE, results="hide"}
-data <- readRDS(system.file("examples/abc_data.rds", package = "demografr"))
+data <- readRDS(here::here("inst/examples/abc_data.rds"))
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
