@@ -179,7 +179,7 @@ This is then used during the ABC simulation process.
 
 ### `sample_prior()` function
 
-The above feature of _demografr_ is implemented by an internal function `sample_prior`. This function is internal because it is not exported to the user space in your R console (when you use _demografr_, you don't have to concern yourself with this level of detail so there's no reason for exporting it):
+The above feature of _demografr_ is implemented by a function `sample_prior`. Although this function is exported to the user space in your R console, you shouldn't need to use it for any of your work besides simple debugging of your priors:
 
 ```{r, echo=FALSE}
 sample_prior <- demografr:::sample_prior

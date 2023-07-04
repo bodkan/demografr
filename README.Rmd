@@ -104,7 +104,7 @@ example_model <- compile_model(
 ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
-samples <- sample_names(ts, split = TRUE)
+samples <- sample_names(ts, split = "pop")
 
 observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
@@ -170,7 +170,7 @@ library(slendr)
 # set up the internal tskit/msprime environment
 init_env()
 
-# set up parallelization across all CPUs
+# set up parallelization across all CPUs on the current machine
 library(future)
 plan(multicore, workers = availableCores())
 
@@ -185,20 +185,26 @@ observed <- list(
 #--------------------------------------------------------------------------------
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
+
 model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
+  # define populations
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
   popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
 
+  # define gene-flow events
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
 
+  # compile a slendr model
   model <- compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
     generation_time = 1, simulation_length = 10000,
     direction = "forward", serialize = FALSE
   )
 
+  # set up sampling schedule (2 diploid individuals from each population at
+  # the end of the simulation) -- this step is optional
   samples <- schedule_sampling(
     model, times = 10000,
     list(popA, 2), list(popB, 2), list(popC, 2), list(popD, 2),
@@ -212,6 +218,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
 
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
+
 priors <- list(
   Ne_A ~ runif(1, 10000),
   Ne_B ~ runif(1, 10000),
@@ -226,22 +233,24 @@ priors <- list(
 #--------------------------------------------------------------------------------
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
+
 compute_diversity <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),
         Y = list(popC = samples$popC),
         Z = list(popD = samples$popD))
 }
+
 # the summary functions must be also bound to an R list named in the same
 # way as the empirical summary statistics
 functions <- list(
