@@ -163,7 +163,7 @@ observed_f4
 
 This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
-```{r, eval=!file.exists(here::here("inst/examples/data.rds"))}
+```{r, eval=!file.exists(here::here("inst/examples/abc_data.rds"))}
 library(demografr)
 library(slendr)
 
@@ -266,12 +266,12 @@ data <- simulate_abc(
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/data.rds"))}
-saveRDS(data, here::here("inst/examples/data.rds"))
+```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/abc_data.rds"))}
+saveRDS(data, here::here("inst/examples/abc_data.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/data.rds")), warning=FALSE, message=FALSE, results="hide"}
-data <- readRDS(system.file("examples/data.rds", package = "demografr"))
+```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/abc_data.rds")), warning=FALSE, message=FALSE, results="hide"}
+data <- readRDS(system.file("examples/abc_data.rds", package = "demografr"))
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 

@@ -1,0 +1,347 @@
+---
+title: Support for grid simulations
+output: rmarkdown::html_vignette
+resource_files:
+  - images/fu_2016.png
+  - images/petr_2018a.png
+  - images/petr_2018b.png
+vignette: >
+  %\VignetteIndexEntry{Support for grid simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 100
+)
+
+data_path <- here::here("inst/examples/grid_data.rds")
+
+devtools::load_all()
+```
+
+Although Approximate Bayesian Computation is arguably the most popular method for simulation-based inference, it's certainly not the only one. Another useful method for exploring the behavior of statistics under given combination of model parameters, and perhaps even very simple model parameter fitting are grid simulations. Briefly, we define a set of parameters of a model, run simulation replicates for each combination of parameters, computing summary statistics of interest for each replicat, and then&mdash;for instance&mdash;inspect which parameter combinations lead to the values of summary statistics closes to those we observed in the data, or simply inspect how do different parameter values affect the statistics in general.
+
+## Example analysis
+
+To demonstrate the features of _demografr_ for grid-based simulation inference, let's try to reproduce (at least qualitatively) the result from [Petr _et al._, 2018](https://www.pnas.org/doi/10.1073/pnas.1814338116). Briefly, this paper made an attempt to explain discrepancies between two different ways to estimate the proportion of Neanderthal ancestry in Europe over tens of thousands of years.
+
+1. The first statistic (dubbed the "indirect $f_4$-ratio" statistic) showed the following pattern of Neanderthal ancestry significantly declining over time (figure from [Fu _et al., Nature 2016](https://www.nature.com/articles/nature17993))
+
+![](images/fu_2016.png){width="80%"}
+
+2. An alternative statistic (called "direct $f_4$-ratio" statistic, shown in the figure below in solid line in contrast to the "indirect $f_4$-statistic" as dashed line) did not find any significant decline at all (figure from [Petr _et al._, PNAS 2018](https://www.pnas.org/doi/10.1073/pnas.1814338116))
+
+![](images/petr_2018a.png){width="80%"}
+
+**The question was, why are these two measures of Neanderthal ancestry leading to different conclusions?** Could some violations of their assumptions (such as unnacounted-for gene-flow events between modern human populations) break one of them?
+
+The way the PNAS 2018 study approached the problem was tu run many simulation replicates across a large parameter grid. This required writing custom coalescent simulations, orchestrating running them across the parameter grid, collecting outputs, and computing population genetic statistics (here direct and indirect $f_4$-ratios)&mdash;all in all, a couple of hundred lines of Python, R, and bash.
+
+This vignette shows how to use _demografr_ to perform this kind of analyses in a much more straightforward and reproducible manner, entirely in R.
+
+## Grid simulation with _demografr_
+
+```{r, echo=FALSE, message=FALSE}
+library(demografr)
+library(slendr)
+init_env()
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# setup parallelization across all CPUs
+library(future)
+plan(multicore, workers = availableCores())
+```
+
+### 1. Define a _slendr_ model function capturing the demographic history
+
+As in any standard ABC pipeline using _demografr_, we leverage the _slendr_ R package to first define a demografic model, encoding it as a simple R function. Again, as with standard ABC, **the arguments of this function correspond to model parameters**. Note that those will come from the parameter grid, not via sampling from priors as with ABC!
+
+In our example, because the research question of interest involved various gene-flow rates between populations in the model, we fix split times and $N_e$ values because they are not that interesting or important for this simple analysis (we ignore the Eurasia to Africa "backflow" for the same reason):
+
+```{r}
+model <- function(rate_ea, rate_aa) {
+  # create populations
+  chimp <- population("chimp", time = 7e6,   N = 10000)
+  anc   <- population("anc",   time = 6e6,   N = 10000, parent = chimp)
+  nea   <- population("nea",   time = 600e3, N = 2000,  parent = anc)
+  afr1  <- population("afr1",  time = 600e3, N = 15000, parent = anc)
+  afr2  <- population("afr2",  time = 150e3, N = 15000, parent = afr1)
+  eur   <- population("eur",   time = 75e3,  N = 5000,  parent = afr2)
+
+  # define gene-flow events
+  gf <- list(
+    # back flow from Eurasia into Africa -- one parameter of interest
+    gene_flow(from = eur, to = afr1, start = 5e3, end = 0, rate = rate_ea),
+    gene_flow(from = eur, to = afr2, start = 5e3, end = 0, rate = rate_ea),
+
+    # gene flow within Africa -- another parameter of interest
+    gene_flow(from = afr1, to = afr2, start = 50e3, end = 0, rate = rate_aa),
+    gene_flow(from = afr2, to = afr1, start = 50e3, end = 0, rate = rate_aa),
+
+    # Neanderthal introgression (fixed to 3%)
+    gene_flow(from = nea, to = eur, start = 60e3, end = 50e3, rate = 0.03)
+  )
+
+  # generate a slendr model
+  model <- compile_model(
+    populations = list(chimp, anc, nea, afr1, afr2, eur), gene_flow = gf,
+    generation_time = 30, serialize = FALSE
+  )
+
+  # specify sampling events
+  samples <- rbind(
+    # Altai (70 kya) and Vindija (40 kya) Neanderthals
+    schedule_sampling(model, times = c(70e3, 40e3), list(nea, 1)),
+    # Europeans from 40 kya to the present
+    schedule_sampling(model, times = seq(40000, 0, -2000), list(eur, 1)),
+    # two African populations
+    schedule_sampling(model, times = 0, list(afr1, 1), list(afr2, 1)),
+    # Chimpanzee outgroup
+    schedule_sampling(model, times = 0, list(chimp, 1))
+  )
+
+  return(list(model, samples))
+}
+```
+
+Let's check the model function by visualizing it (we set the gene-flow rates to arbitrary values, because this is purely a visualization test):
+
+```{r}
+test_model <- model(rate_ea = 0.42, rate_aa = 0.42)[[1]]
+
+# we don't plot the gene flow arrows here for clarity
+cowplot::plot_grid(
+  plot_model(test_model, gene_flow = FALSE),
+  plot_model(test_model, log = TRUE, gene_flow = FALSE)
+)
+```
+
+The model looks OK, so in the next step we define tree-sequence popgen summary statistics we are interested in (again, just as we would for an ABC pipeline).
+
+### 2. Define summary statistics
+
+Recall that we want to explore the impact of modern-human gene flow on Neanderthal ancestry as inferred using two ways of computing it: "indirect" and "direct" $f_4$-ratio statistics.
+
+Because our model samples `r length(seq(40000, 0, -2000))` European individuals across the last 40 thousand years, we will compute the $f_4$-ratio statistics on all of these individuals in sequence.
+
+_demografr_ uses the R package _slendr_ not just for encoding demographic models and popgen simulations, but also for analysis of tree sequences via its interface to the powerful library [_tskit_](https://tskit.dev/tskit/docs/stable/introduction.html). One advantage of _slendr_ is that it allows referring to simulated samples via their "symbolic names". This means that, for instance, the first individual sampled from a population "eur" is named "eur_1", the second is named as "eur_2", etc. Therefore, we can capture the names of every European individual in a vector `X` by running:
+
+```{r}
+X <- paste0("eur_", 1:21)
+X
+```
+
+and use this vector as input for any tree-sequence function of _slendr_/_tskit_. Specifically, we can define the "indirect" and "direct" $f_4$-ratio statistics in this way (using the equations defined in the figure above):
+
+```{r}
+# compute the "indirect" f4-ratio statistic via slendr/tskit function ts_f4ratio,
+# returning its data frame output as it is
+indirect <- function(ts) {
+  X <- paste0("eur_", 1:21)
+  ts_f4ratio(ts, X = X, A = "afr1_1", B = "afr2_1", C = "nea_2", O = "chimp_1")
+}
+
+# compute the "direct" f4-ratio statistic via slendr/tskit function ts_f4ratio,
+# returning its data frame output as it is
+direct <- function(ts) {
+  X <- paste0("eur_", 1:21)
+  ts_f4ratio(ts, X = X, A = "nea_2", B = "nea_1", C = "afr1_1", O = "chimp_1")
+}
+```
+
+Exactly as it's the case for ABC, for the purposes of grid-based simulations we have to
+```{r}
+# bind both functions in a named list
+functions <- list(direct = direct, indirect = indirect)
+```
+
+This looks quite neat and tidy, but how can we make sure that our tree-sequence summary functions really work? We need a tree-sequence object as an input first! _demografr_ provides an easy way to get an arbitrary tree sequence from a model function via its helper function `simulate_ts`. The simples way to use it is like this:
+
+```{r}
+# we don't care about the parameter values, as we only want to get *some* tree sequence
+# (also, note we did not specify sequence length, recombination rate, etc.)
+ts <- simulate_ts(model, params = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
+```
+
+With the tiny tree sequence for testing, we can now check if our tree-sequence functions work as they're supposed to:
+
+```{r}
+functions$direct(ts)
+functions$indirect(ts)
+```
+
+Excellent, we get the output tables from `ts_f4ratio` functions as we're supposed to (and get one estimate for each of the `r length(seq(40000, 0, -2000))`):
+
+```{r}
+functions$direct(ts) %>% nrow
+functions$indirect(ts) %>% nrow
+```
+
+### 3. Define a parameter grid
+
+Finally (and yet again, analogously to an equivalent ABC pipeline) we define parameters. Specifically, for a grid simulation, we define a data frame with one column for each parameter of the _slendr_ model function (the names of parameter columns must match the model function arguments!). For this purpose, the function `crossing` from the _tidyr_ R package is particularly helpful, so let's use it here:
+
+```{r}
+grid <- tidyr::crossing(
+  rate_aa = seq(0, 0.25, 0.025),
+  rate_ea = seq(0, 0.25, 0.025)
+)
+
+head(grid)
+```
+
+In this way, we defined `r nrow(grid)` parameter combinations and can finally proceed to the simulation inference.
+
+### 4. Perform grid-based simulations, compute summary statistics for each
+
+In a final analogy to the ABC inference with _demografr_, we have a function `simulate_grid()` which performs the equivalent to `simulate_abc()`. In fact, the function has a nearly identical interface&mdash;we plug in the model function, our parameter grid, the list of summary tree-sequence functions, the number of simulation replicates to perform for each parameter combination (and a few other obvious parameters shown here).
+
+First, we will set up an automated parallelization scheme using the _future_ R package:
+
+```{r}
+library(future)
+
+# parallelize simulations across all CPUs of the machine
+plan(multicore, workers = availableCores())
+```
+
+(See much more detail on parallelization of _demografr_ inference pipelines in [this vignette]()).
+
+```{r, eval=!file.exists(data_path)}
+results <- simulate_grid(
+  model, grid, functions, replicates = 1,
+  sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
+)
+```
+
+```{r, eval=!file.exists(data_path), echo=FALSE}
+saveRDS(results, data_path)
+```
+
+```{r, eval=file.exists(data_path), echo=FALSE}
+results <- readRDS(data_path)
+```
+
+### 5. Analyze data
+
+```{r}
+print(results, n = 20)
+```
+
+For conciseness, computer tree-sequence summary statistics are stored along the original parameter grid as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html):
+
+```{r}
+results$direct[1:2]
+```
+
+They are efficient and concise, but in order to be able to analyze data stored in them, we need a function `unnest()` from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed:
+
+**Direct f4-ratio:**
+
+```{r}
+results %>% unnest(direct)
+```
+
+**Indirect f4-ratio:**
+
+```{r}
+results %>% unnest(indirect)
+```
+
+For downstream analysis, we can then use all the _tidyverse_ functionality at our disposal:
+
+```{r}
+samples <- tibble(
+  X = paste0("eur_", 1:21),
+  time = seq(40000, 0, -2000)
+)
+```
+
+### Within-African gene flow vs inference of Neanderthal ancestry
+
+```{r, aa_indirect}
+results %>%
+  unnest(indirect) %>%
+  filter(rate_ea == 0) %>%
+  inner_join(samples, by = "X") %>%
+  ggplot(aes(time, 1 - alpha, color = rate_aa, group = rate_aa)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'indirect f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+```{r, aa_direct}
+results %>%
+  unnest(direct) %>%
+  filter(rate_ea == 0) %>%
+  inner_join(samples, by = "X") %>%
+  ggplot(aes(time, alpha, color = rate_aa, group = rate_aa)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+**We can see that increasing rates of gene flows _within Africa_ shifts apparent Neanderthal ancestry proportions inferred using "indirect" $f_4$-ratio increasingly upwards** (compare the estimated trajectories to the true proportion shown as dashed line). However, the "direct" $f_4$-ratio remains stable.
+
+### Eurasia -> Africa gene flow vs inference of Neanderthal ancestry
+
+```{r, ea_indirect}
+results %>%
+  unnest(indirect) %>%
+  filter(rate_aa == 0.2) %>%
+  inner_join(samples, by = "X") %>%
+  ggplot(aes(time, 1 - alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'indirect f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+
+```{r, ea_direct}
+results %>%
+  unnest(direct) %>%
+  filter(rate_aa == 0.2) %>%
+  inner_join(samples, by = "X") %>%
+  ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
+    geom_line(stat = "smooth", se = FALSE) +
+    geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    labs(x = "years before present", y = "Neanderthal ancestry proportion") +
+    xlim(40000, 0) +
+    coord_cartesian(y = c(0, 0.1)) +
+    ggtitle("The effect of Eurasia -> Africa gene flow on 'direct f4-ratio'",
+            "Red line indicates the true Neanderthal ancestry proportion")
+```
+
+**Even more importantly, gene flow from Eurasia back into Africa creates an artificial decline of Neanderthal ancestry if measured via "indirect" $f_4$-ratio statistic!** However, the "direct" $f_4$-ratio remains stable.
+
+## Comparison with the result by Petr _et al._, PNAS 2018
+
+As we can see, the very simple analysis described in this code (worth a couple of dozen lines of easy-to-read R code) can qualitatively replicate the much more elaborate original result:
+
+![](images/petr_2018b.png){width="80%"}
