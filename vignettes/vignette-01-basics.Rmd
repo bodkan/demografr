@@ -132,14 +132,16 @@ We are interested in estimating the $N_e$ of all populations and their split tim
 
 ```{r}
 priors <- list(
-  Ne_A ~ runif(1, 10000),
-  Ne_B ~ runif(1, 10000),
-  Ne_C ~ runif(1, 10000),
-  Ne_D ~ runif(1, 10000),
+  Ne_A  ~ runif(1, 10000),
+  Ne_B  ~ runif(1, 10000),
+  Ne_C  ~ runif(1, 10000),
+  Ne_D  ~ runif(1, 10000),
 
-  T_AB ~ runif(1, 10000),
-  T_BC ~ runif(1, 10000),
-  T_CD ~ runif(1, 10000)
+  T_AB  ~ runif(1, 10000),
+  T_BC  ~ runif(1, 10000),
+  T_CD  ~ runif(1, 10000),
+
+  gf_BC ~ runif(0, 1)
 )
 ```
 

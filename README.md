@@ -90,10 +90,10 @@ observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", 
 
 observed_diversity
 #>    set    diversity
-#> 1 popA 8.079807e-05
-#> 2 popB 3.324979e-05
-#> 3 popC 1.024510e-04
-#> 4 popD 9.024937e-05
+#> 1 popA 8.017526e-05
+#> 2 popB 3.291639e-05
+#> 3 popC 1.015601e-04
+#> 4 popD 8.995622e-05
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
@@ -104,12 +104,12 @@ observed_divergence <- read.table(system.file("examples/observed_divergence.tsv"
 
 observed_divergence
 #>      x    y   divergence
-#> 1 popA popB 0.0002413010
-#> 2 popA popC 0.0002409678
-#> 3 popA popD 0.0002407488
-#> 4 popB popC 0.0001114809
-#> 5 popB popD 0.0001151775
-#> 6 popC popD 0.0001114729
+#> 1 popA popB 0.0002370556
+#> 2 popA popC 0.0002385690
+#> 3 popA popD 0.0002388364
+#> 4 popB popC 0.0001112956
+#> 5 popB popD 0.0001155166
+#> 6 popC popD 0.0001105615
 ```
 
 3. Value of the following $f_4$-statistic:
@@ -120,7 +120,7 @@ observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "de
 
 observed_f4
 #>      W    X    Y    Z            f4
-#> 1 popA popB popC popD -1.959654e-06
+#> 1 popA popB popC popD -1.977049e-06
 ```
 
 ### A complete ABC analysis in a single R script
@@ -135,7 +135,7 @@ library(slendr)
 # set up the internal tskit/msprime environment
 init_env()
 
-# set up parallelization across all CPUs
+# set up parallelization across all CPUs on the current machine
 library(future)
 plan(multicore, workers = availableCores())
 
@@ -150,20 +150,26 @@ observed <- list(
 #--------------------------------------------------------------------------------
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
+
 model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
+  # define populations
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
   popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
 
+  # define gene-flow events
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
 
+  # compile a slendr model
   model <- compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
     generation_time = 1, simulation_length = 10000,
     direction = "forward", serialize = FALSE
   )
 
+  # set up sampling schedule (2 diploid individuals from each population at
+  # the end of the simulation) -- this step is optional
   samples <- schedule_sampling(
     model, times = 10000,
     list(popA, 2), list(popB, 2), list(popC, 2), list(popD, 2),
@@ -177,6 +183,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
 
 #--------------------------------------------------------------------------------
 # setup priors for model parameters
+
 priors <- list(
   Ne_A ~ runif(1, 10000),
   Ne_B ~ runif(1, 10000),
@@ -191,22 +198,24 @@ priors <- list(
 #--------------------------------------------------------------------------------
 # define summary functions to be computed on simulated data (must be of the
 # same format as the summary statistics computed on empirical data)
+
 compute_diversity <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- sample_names(ts, split = TRUE)
+  samples <- sample_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),
         Y = list(popC = samples$popC),
         Z = list(popD = samples$popD))
 }
+
 # the summary functions must be also bound to an R list named in the same
 # way as the empirical summary statistics
 functions <- list(
@@ -244,22 +253,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                             Ne_A      Ne_B       Ne_C       Ne_D      T_AB
-#> Min.:                   131.0602  326.5349   419.6357 -1240.4912  981.1159
-#> Weighted 2.5 % Perc.:   654.2305  564.8395  1735.3387   543.2424 1321.4739
-#> Weighted Median:       1789.7170  883.1900  5210.7704  2721.9058 1961.5485
-#> Weighted Mean:         1773.0775  933.2370  5424.4416  2884.5651 1938.9777
-#> Weighted Mode:         1419.8437  764.8161  4641.8267  2416.2203 2001.3811
-#> Weighted 97.5 % Perc.: 3113.7142 1291.6402  9652.2323  5435.2615 2554.0757
-#> Max.:                  3747.5379 1683.1578 12599.8615  6726.5713 3068.6103
-#>                            T_BC     T_CD       gf_BC
-#> Min.:                  1709.853 2983.732 -0.11000244
-#> Weighted 2.5 % Perc.:  3315.077 6825.789  0.02278014
-#> Weighted Median:       5191.074 8338.294  0.24766471
-#> Weighted Mean:         5094.215 8266.331  0.27152584
-#> Weighted Mode:         5402.882 8424.407  0.16155855
-#> Weighted 97.5 % Perc.: 6114.467 9334.816  0.66591385
-#> Max.:                  6362.867 9875.401  0.80173911
+#>                             Ne_A      Ne_B       Ne_C      Ne_D      T_AB
+#> Min.:                   726.2542  163.8594 -1017.3406 -3433.837  927.4872
+#> Weighted 2.5 % Perc.:  1320.0719  378.2407   194.9113 -1564.857 1224.1380
+#> Weighted Median:       1656.3107  872.8798  3017.9671  1340.711 1886.0861
+#> Weighted Mean:         1647.9974  931.5978  3067.8114  1362.002 1927.7553
+#> Weighted Mode:         1458.4148  689.4098  2992.5771  1041.201 1803.2012
+#> Weighted 97.5 % Perc.: 1991.1578 1613.3712  6315.2782  4211.055 2688.1677
+#> Max.:                  2179.7458 2154.9233  9161.2290  8606.179 3218.2239
+#>                            T_BC      T_CD
+#> Min.:                  1291.719  7359.889
+#> Weighted 2.5 % Perc.:  3620.575  8300.836
+#> Weighted Median:       4621.168  9193.167
+#> Weighted Mean:         4588.311  9195.958
+#> Weighted Mode:         4706.233  8859.321
+#> Weighted 97.5 % Perc.: 5413.628 10050.445
+#> Max.:                  6025.282 10528.238
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -267,14 +276,14 @@ We can also specify a subset of model parameters to select, or provide a regular
 
 ```r
 extract_summary(abc, param = "Ne")
-#>                             Ne_A      Ne_B       Ne_C       Ne_D
-#> Min.:                   131.0602  326.5349   419.6357 -1240.4912
-#> Weighted 2.5 % Perc.:   654.2305  564.8395  1735.3387   543.2424
-#> Weighted Median:       1789.7170  883.1900  5210.7704  2721.9058
-#> Weighted Mean:         1773.0775  933.2370  5424.4416  2884.5651
-#> Weighted Mode:         1419.8437  764.8161  4641.8267  2416.2203
-#> Weighted 97.5 % Perc.: 3113.7142 1291.6402  9652.2323  5435.2615
-#> Max.:                  3747.5379 1683.1578 12599.8615  6726.5713
+#>                             Ne_A      Ne_B       Ne_C      Ne_D
+#> Min.:                   726.2542  163.8594 -1017.3406 -3433.837
+#> Weighted 2.5 % Perc.:  1320.0719  378.2407   194.9113 -1564.857
+#> Weighted Median:       1656.3107  872.8798  3017.9671  1340.711
+#> Weighted Mean:         1647.9974  931.5978  3067.8114  1362.002
+#> Weighted Mode:         1458.4148  689.4098  2992.5771  1041.201
+#> Weighted 97.5 % Perc.: 1991.1578 1613.3712  6315.2782  4211.055
+#> Max.:                  2179.7458 2154.9233  9161.2290  8606.179
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -300,9 +309,8 @@ And, finally, the rate of gene flow:
 
 ```r
 plot_posterior(abc, param = "gf")
+#> Error: No parameters fit the provided parameter subset or regular expression
 ```
-
-![plot of chunk posterior_gf](man/figures/README-posterior_gf-1.png)
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
 

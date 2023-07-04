@@ -26,36 +26,34 @@ navbar:
       href: https://twitter.com/dr_bodkan
 
 reference:
-  - title: Helpers for building scaffold models
+  - title: Approximate Bayesian Computation
     contents:
-    - tree_populations
-    - tree_model
-
-  - title: ABC simulations and inference
-    contents:
+    - validate_abc
     - simulate_abc
     - combine_abc
     - perform_abc
 
-  - title: Helper functions
+  - title: Grid-based inference
     contents:
-    - sample_names
-    - validate_abc
-    - simulate_ts
-    - sample_prior
+    - simulate_grid
 
   - title: Visualization of priors and posteriors
     contents:
     - plot_prior
     - plot_posterior
-    - plot.demografr_abc
-    - hist.demografr_abc
+    - plot.demografr_abc.abc
+    - hist.demografr_abc.abc
 
   - title: Extracting posteriors
     contents:
     - extract_summary
     - extract_posterior
-    - extract_model
+
+  - title: Helper functions
+    contents:
+    - sample_names
+    - simulate_ts
+    - sample_prior
 
 news:
   one_page: true

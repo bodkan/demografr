@@ -186,7 +186,7 @@ observed <- list(
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
 
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   # define populations
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
@@ -227,7 +227,9 @@ priors <- list(
 
   T_AB ~ runif(1, 10000),
   T_BC ~ runif(1, 10000),
-  T_CD ~ runif(1, 10000)
+  T_CD ~ runif(1, 10000),
+
+  gf_BC ~ runif(0, 1)
 )
 
 #--------------------------------------------------------------------------------
