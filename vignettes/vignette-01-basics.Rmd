@@ -192,6 +192,10 @@ validate_abc(model, priors, functions, observed)
 
 Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using _demografr_'s function `simulate_abc()`:
 
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+tstart <- Sys.time()
+```
+
 ```{r, eval=!file.exists(data_path)}
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,
@@ -199,13 +203,34 @@ data <- simulate_abc(
 )
 ```
 
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+tend <- Sys.time()
+
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+saveRDS(tdelta, here::here("inst/examples/abc_tdelta.rds"))
+ncores <- future::availableCores()
+saveRDS(ncores, here::here("inst/examples/abc_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(data_path)}
+tdelta <- readRDS(here::here("inst/examples/abc_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/abc_ncores.rds"))
+```
+
+```{r, echo=FALSE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+
+
 ```{r, eval=!file.exists(data_path), echo=FALSE}
 saveRDS(data, data_path)
 ```
 
-Because running the full ABC on thousands of simulation replicates would take too long, we will cheat a little bit here and load the ABC simulation data directly from a file distributed with the package:
-
-```{r, eval=file.exists(data_path)}
+```{r, eval=file.exists(data_path), echo=FALSE}
 data <- readRDS(data_path)
 ```
 

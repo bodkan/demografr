@@ -217,12 +217,38 @@ plan(multicore, workers = availableCores())
 
 (See much more detail on parallelization of _demografr_ inference pipelines in [this vignette]()).
 
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+tstart <- Sys.time()
+```
+
 ```{r, eval=!file.exists(data_path)}
 results <- simulate_grid(
-  model, grid, functions, replicates = 1,
-  sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
+  model, grid, functions, replicates = 50,
+  sequence_length = 20e6, mutation_rate = 1e-8, recombination_rate = 1e-8
 )
 ```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+tend <- Sys.time()
+
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+saveRDS(tdelta, here::here("inst/examples/grid_tdelta.rds"))
+ncores <- future::availableCores()
+saveRDS(ncores, here::here("inst/examples/grid_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(data_path)}
+tdelta <- readRDS(here::here("inst/examples/grid_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/grid_ncores.rds"))
+```
+
+```{r, echo=FALSE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the grid simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
 ```{r, eval=!file.exists(data_path), echo=FALSE}
 saveRDS(results, data_path)
@@ -232,19 +258,21 @@ saveRDS(results, data_path)
 results <- readRDS(data_path)
 ```
 
-### 5. Analyze data
+### 5. Analyze results
+
+The function `simulate_grid()` returns all results in a data frame object in the following format:
 
 ```{r}
-print(results, n = 20)
+print(results, n = 10)
 ```
 
-For conciseness, computer tree-sequence summary statistics are stored along the original parameter grid as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html):
+The first column indicates a replicate number, the following few columns are the values of the parameter grid. Most important are the last columns, though, each named after a single summary statistics. For conciseness, these summary statistics are stored as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html)&mdash;for each replicate and each parameter combination, these columns store the summary statistics as "nested" data frames like this:
 
 ```{r}
 results$direct[1:2]
 ```
 
-They are efficient and concise, but in order to be able to analyze data stored in them, we need a function `unnest()` from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed:
+List columns are very efficient and concise for storing complex data like this, but in order to be able to analyze data stored in them, we need a function [`unnest()`](https://tidyr.tidyverse.org/reference/unnest.html) from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed. In this example:
 
 **Direct f4-ratio:**
 
@@ -258,7 +286,9 @@ results %>% unnest(direct)
 results %>% unnest(indirect)
 ```
 
-For downstream analysis, we can then use all the _tidyverse_ functionality at our disposal:
+**Note that unnesting each results column creates a plain old data frame which can be analyzed by whatever means you find convenient.**
+
+Because we were interested in the behavior of trajectories of indirect and direct estimates of Neanderthal ancestry over time, we will first create a small data frame indicating the times of sampling of each simulated European individual. We will use this small data frame for join operations for the purpose of plotting below:
 
 ```{r}
 samples <- tibble(
@@ -272,8 +302,8 @@ samples <- tibble(
 ```{r, aa_indirect}
 results %>%
   unnest(indirect) %>%
-  filter(rate_ea == 0) %>%
-  inner_join(samples, by = "X") %>%
+  filter(rate_ea == 0) %>%          # ignore models with Eurasian -> African gene flow
+  inner_join(samples, by = "X") %>% # join the samples table to add time information
   ggplot(aes(time, 1 - alpha, color = rate_aa, group = rate_aa)) +
     geom_line(stat = "smooth", se = FALSE) +
     geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
