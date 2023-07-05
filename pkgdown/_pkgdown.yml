@@ -18,9 +18,11 @@ navbar:
       text: Articles
       menu:
         - text: A basic ABC analysis
-          href: articles/vignette-01-basic-abc.html
-        - text: Defining scaffold models
-          href: articles/vignette-02-scaffold-models.html
+          href: articles/vignette-01-basics.html
+        - text: How does specification of priors work?
+          href: articles/vignette-02-priors.html
+        - text: Support for grid simulations
+          href: articles/vignette-03-grids.html
     twitter:
       icon: fa-twitter
       href: https://twitter.com/dr_bodkan
