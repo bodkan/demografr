@@ -16,7 +16,7 @@ simulate_grid(
   model_args = NULL,
   engine_args = NULL,
   packages = NULL,
-  engine = c("msprime", "SLiM")
+  engine = c("msprime", "slim")
 )
 }
 \arguments{
@@ -43,8 +43,8 @@ tree sequences}
 \item{packages}{A character vector with package names used by user-defined summary statistic
 functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.}
 
-\item{engine}{Which simulation engine to use? Values "msprime" and "SLiM" will use the
-built-in slendr simulation back ends.}
+\item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
+will use the built-in slendr simulation back ends.}
 }
 \description{
 For a given data frame (each column a parameter of a slendr model function) simulates
