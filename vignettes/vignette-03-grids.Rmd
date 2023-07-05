@@ -116,7 +116,7 @@ model <- function(rate_ea, rate_aa) {
 
 Let's check the model function by visualizing it (we set the gene-flow rates to arbitrary values, because this is purely a visualization test):
 
-```{r}
+```{r, plot_model}
 test_model <- model(rate_ea = 0.42, rate_aa = 0.42)[[1]]
 
 # we don't plot the gene flow arrows here for clarity
