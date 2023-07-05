@@ -248,7 +248,7 @@ Having all the information about observed and simulated data bound in a single R
 Note that `perform_abc` is just convenience wrapper around the `abc()` function in the package _abc_`, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function `abc()` can be provided to `perform_abc()`, which will then pass them on appropriately.
 
 ```{r}
-abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet", seed = 42)
 ```
 
 ### 6. Posterior analysis

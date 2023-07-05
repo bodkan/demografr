@@ -227,7 +227,7 @@ like this:</p>
 distribution:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, min <span class="op">=</span> <span class="fl">1000</span>, max <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; [1] 2014.403</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; [1] 4416.053</span></span></code></pre>
 <p>We can also do this in R, “for free”, without doing anything
 else.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -345,21 +345,21 @@ your work besides simple debugging of your priors:</p>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 6418.327</span></span></code></pre>
+<span><span class="co">#&gt; [1] 6867.068</span></span></code></pre>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 3014.225</span></span></code></pre>
+<span><span class="co">#&gt; [1] 5148.481</span></span></code></pre>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 9423.288</span></span></code></pre>
+<span><span class="co">#&gt; [1] 1334.429</span></span></code></pre>
 <p>This function takes in a formula statement (our DLS for encoding
 prior sampling events), parses it into individual components, and
 simulates a value of a random variable from a provided distribution
@@ -412,7 +412,7 @@ to take care of the nesting:</p>
 <span><span class="co">#&gt; [1] "T_split"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt; [1] 1251.076 3215.557 6550.518 9495.662 3401.588</span></span></code></pre>
+<span><span class="co">#&gt; [1] 5590.5103  125.8106 9765.7496 4813.9518 5688.8948</span></span></code></pre>
 <p>Which internally turns the prior expression into
 <code>runif(n = 10, min = 10, max = 10000)</code>.</p>
 </div>
@@ -473,16 +473,16 @@ automatically) via its function <code><a href="../reference/sample_prior.html">s
 <span><span class="co">#&gt; [1] "rolls"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
-<span><span class="co">#&gt;   [1] 1 4 6 4 5 5 5 6 1 1 1 2 2 4 5 6 6 5 2 6 6 3 5 4 2 5 2 6 6 6 4 1 1 6 2 6 6</span></span>
-<span><span class="co">#&gt;  [38] 4 6 6 3 6 6 6 3 6 5 5 3 4 6 2 2 5 6 3 3 6 1 4 2 1 6 5 2 3 1 4 6 5 1 3 6 5</span></span>
-<span><span class="co">#&gt;  [75] 3 4 4 6 6 5 6 4 6 5 6 5 2 6 6 6 6 3 6 6 5 3 3 1 2 6</span></span></code></pre>
+<span><span class="co">#&gt;   [1] 5 6 6 6 5 2 5 6 3 4 4 6 2 6 6 5 3 3 5 4 6 6 6 6 3 2 6 3 4 4 4 1 3 5 2 6 6</span></span>
+<span><span class="co">#&gt;  [38] 1 6 2 6 4 4 4 6 2 6 6 3 1 2 4 1 6 5 2 1 3 6 3 4 6 6 2 1 6 6 5 4 6 1 2 6 6</span></span>
+<span><span class="co">#&gt;  [75] 3 6 1 1 6 1 2 6 4 5 6 1 6 2 4 3 6 6 1 3 5 4 3 1 6 5</span></span></code></pre>
 <p>Finally, we can verify that the sampled values really correspond to a
 loaded die which throws a six much more often than others:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">samples</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2  3  4  5  6 </span></span>
-<span><span class="co">#&gt; 11 12 12 12 17 36</span></span></code></pre>
+<span><span class="co">#&gt; 13 12 13 15 11 36</span></span></code></pre>
 </div>
   </div>
 

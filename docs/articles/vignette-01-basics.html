@@ -369,7 +369,7 @@ the <code>abc()</code> function in the package
 <em>abc</em><code>, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function</code>abc()<code>can be provided to</code>perform_abc()`,
 which will then pass them on appropriately.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span>, seed <span class="op">=</span> <span class="fl">42</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning: All parameters are "none" transformed.</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; 12345678910</span></span>
 <span><span class="co">#&gt; 12345678910</span></span></code></pre>
@@ -387,56 +387,56 @@ probability (MAP) of the parameters in the row labelled “Weighted
 Mode:”:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B       Ne_C        Ne_D      T_AB</span></span>
-<span><span class="co">#&gt; Min.:                  1634.541  -41.1075   128.0258 -1201.87320  785.1032</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1688.595  160.9663  2347.2475    91.61448 1149.2542</span></span>
-<span><span class="co">#&gt; Weighted Median:       2020.915  764.3806  5671.1889  3577.80145 1720.4718</span></span>
-<span><span class="co">#&gt; Weighted Mean:         2063.313  803.6907  5881.9029  3661.65821 1758.4000</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1823.065  598.2068  5220.3481  2825.72308 1644.9476</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2547.440 1529.5717 10114.2879  7589.47030 2590.9064</span></span>
-<span><span class="co">#&gt; Max.:                  2777.279 2126.8058 11895.4356 10924.63312 2990.6666</span></span>
-<span><span class="co">#&gt;                            T_BC      T_CD        gf_BC</span></span>
-<span><span class="co">#&gt; Min.:                  -329.237  6217.252 -0.165759762</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  2897.071  6854.290  0.005654321</span></span>
-<span><span class="co">#&gt; Weighted Median:       5169.180  8488.238  0.217725540</span></span>
-<span><span class="co">#&gt; Weighted Mean:         5028.332  8416.099  0.245033374</span></span>
-<span><span class="co">#&gt; Weighted Mode:         5445.949  8745.707  0.180857834</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6531.748  9809.811  0.567953594</span></span>
-<span><span class="co">#&gt; Max.:                  6864.518 12622.496  0.926747945</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                            Ne_A       Ne_B       Ne_C       Ne_D      T_AB</span></span>
+<span><span class="co">#&gt; Min.:                  1497.836   80.07382   147.1071 -1161.0909  897.3547</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1588.703  362.18994  1871.7299   139.2869 1212.1856</span></span>
+<span><span class="co">#&gt; Weighted Median:       2012.700  786.83694  5548.6739  3571.3934 1749.2002</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2096.945  840.84188  5847.6049  3722.6263 1787.1138</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1795.650  592.58296  5166.8847  2922.6747 1702.7770</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2769.156 1547.84633 10101.0448  7065.5808 2513.7038</span></span>
+<span><span class="co">#&gt; Max.:                  3065.780 2326.37292 12115.5790 10688.6340 2923.9918</span></span>
+<span><span class="co">#&gt;                            T_BC      T_CD       gf_BC</span></span>
+<span><span class="co">#&gt; Min.:                  2074.920  5875.988 -0.05967225</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  3156.435  6899.766  0.01441897</span></span>
+<span><span class="co">#&gt; Weighted Median:       5248.983  8511.492  0.21808678</span></span>
+<span><span class="co">#&gt; Weighted Mean:         5117.871  8430.145  0.24072733</span></span>
+<span><span class="co">#&gt; Weighted Mode:         5414.530  8781.120  0.18401843</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6228.075  9741.140  0.52483490</span></span>
+<span><span class="co">#&gt; Max.:                  6587.012 12117.271  0.84862457</span></span></code></pre>
 <p>Because large tables can get a little hard to read, it is possible to
 subset to only a specific <em>type</em> of parameter:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B       Ne_C        Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                  1634.541  -41.1075   128.0258 -1201.87320</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1688.595  160.9663  2347.2475    91.61448</span></span>
-<span><span class="co">#&gt; Weighted Median:       2020.915  764.3806  5671.1889  3577.80145</span></span>
-<span><span class="co">#&gt; Weighted Mean:         2063.313  803.6907  5881.9029  3661.65821</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1823.065  598.2068  5220.3481  2825.72308</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2547.440 1529.5717 10114.2879  7589.47030</span></span>
-<span><span class="co">#&gt; Max.:                  2777.279 2126.8058 11895.4356 10924.63312</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                            Ne_A       Ne_B       Ne_C       Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                  1497.836   80.07382   147.1071 -1161.0909</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1588.703  362.18994  1871.7299   139.2869</span></span>
+<span><span class="co">#&gt; Weighted Median:       2012.700  786.83694  5548.6739  3571.3934</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2096.945  840.84188  5847.6049  3722.6263</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1795.650  592.58296  5166.8847  2922.6747</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2769.156 1547.84633 10101.0448  7065.5808</span></span>
+<span><span class="co">#&gt; Max.:                  3065.780 2326.37292 12115.5790 10688.6340</span></span></code></pre>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                             T_AB     T_BC      T_CD</span></span>
-<span><span class="co">#&gt; Min.:                   785.1032 -329.237  6217.252</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1149.2542 2897.071  6854.290</span></span>
-<span><span class="co">#&gt; Weighted Median:       1720.4718 5169.180  8488.238</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1758.4000 5028.332  8416.099</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1644.9476 5445.949  8745.707</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2590.9064 6531.748  9809.811</span></span>
-<span><span class="co">#&gt; Max.:                  2990.6666 6864.518 12622.496</span></span></code></pre>
+<span><span class="co">#&gt; Min.:                   897.3547 2074.920  5875.988</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1212.1856 3156.435  6899.766</span></span>
+<span><span class="co">#&gt; Weighted Median:       1749.2002 5248.983  8511.492</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1787.1138 5117.871  8430.145</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1702.7770 5414.530  8781.120</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2513.7038 6228.075  9741.140</span></span>
+<span><span class="co">#&gt; Max.:                  2923.9918 6587.012 12117.271</span></span></code></pre>
 <p>Alternatively, we can also extract the posterior summary for a single
 parameter like this:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_D"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;                               Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                  -1201.87320</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:     91.61448</span></span>
-<span><span class="co">#&gt; Weighted Median:        3577.80145</span></span>
-<span><span class="co">#&gt; Weighted Mean:          3661.65821</span></span>
-<span><span class="co">#&gt; Weighted Mode:          2825.72308</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.:  7589.47030</span></span>
-<span><span class="co">#&gt; Max.:                  10924.63312</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                              Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                  -1161.0909</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:    139.2869</span></span>
+<span><span class="co">#&gt; Weighted Median:        3571.3934</span></span>
+<span><span class="co">#&gt; Weighted Mean:          3722.6263</span></span>
+<span><span class="co">#&gt; Weighted Mode:          2922.6747</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.:  7065.5808</span></span>
+<span><span class="co">#&gt; Max.:                  10688.6340</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="visualizing-posterior-distributions-of-parameters">Visualizing posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-parameters"></a>

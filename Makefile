@@ -13,6 +13,11 @@ website: README.md $(logo)
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_site()'
+	git checkout \
+		docs/articles/vignette-01-basics_files/figure-html/diagnostic_Ne-1.png \
+		docs/articles/vignette-01-basics_files/figure-html/diagnostic_Tsplit-1.png \
+		docs/articles/vignette-01-basics_files/figure-html/posterior_Ne-1.png \
+		docs/articles/vignette-01-basics_files/figure-html/posterior_Tsplit-1.png
 
 docs:
 	R -e 'devtools::install(upgrade = "never")'
