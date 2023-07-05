@@ -274,12 +274,19 @@ rcasino <- function(n = 1) {
 }
 ```
 
-```{r}
-prior <- rolls[100] ~ rcasino()
+We can use our custom function in exactly the same way as standard R sampling functions. First, we define a prior for sampling a parameter value from the loaded die casino die (actually, do demonstrate that `rcasino` really works as it should, let's sample a vector of 100 random die rolls):
 
-samples <- sample_prior(prior)
+```{r}
+par <- rolls[100] ~ rcasino()
+```
+
+During a hypothetical ABC sampling process, _demografr_ would then sample the parameter `par` (internally and automatically) via its function `sample_prior()`:
+```{r}
+samples <- sample_prior(par)
 samples
 ```
+
+Finally, we can verify that the sampled values really correspond to a loaded die which throws a six much more often than others:
 
 ```{r}
 table(samples$value)

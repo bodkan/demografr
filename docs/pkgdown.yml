@@ -1,0 +1,12 @@
+pandoc: '2.18'
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  vignette-01-basics: vignette-01-basics.html
+  vignette-02-priors: vignette-02-priors.html
+  vignette-03-grids: vignette-03-grids.html
+last_built: 2023-07-05T12:52Z
+urls:
+  reference: https://bodkan.github.io/demografr/reference
+  article: https://bodkan.github.io/demografr/articles
+
