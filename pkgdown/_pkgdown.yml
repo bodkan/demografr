@@ -51,8 +51,9 @@ reference:
 
   - title: Helper functions
     contents:
-    - sample_names
     - simulate_ts
+    - run_script
+    - sample_names
     - sample_prior
 
 news:
