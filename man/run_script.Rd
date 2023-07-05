@@ -16,3 +16,10 @@ This function will take as input a path to a SLiM or Python script (detecting
 which one of the two it is based on the script's contents) and run it on the
 command line with model arguments formatted on the command line automatically.
 }
+\details{
+The simulation engine for the script is determined by simple heuristic: if the
+script contains the string 'treeSeqOutput(output_path' which is mandatory for
+any SLiM script usable by demografr, then the SLiM binary is chosen as a
+simulation engine. Otherwise, it is assumed the script is an msprime Python
+script.
+}
