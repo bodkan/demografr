@@ -74,11 +74,16 @@ Let's begin by loading _demografr_ together with the R package [_slendr_](https:
 ```{r, message=FALSE}
 library(demografr)
 library(slendr)
-library(ggplot2)
 
 # we also have to activate slendr's internal environment for tree sequences
 # simulation and analysis
 init_env()
+
+# setup parallelization across all CPUs
+library(future)
+plan(multicore, workers = availableCores())
+
+library(ggplot2)
 ```
 
 ```{r, echo=FALSE}
