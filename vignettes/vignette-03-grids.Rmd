@@ -223,8 +223,8 @@ tstart <- Sys.time()
 
 ```{r, eval=!file.exists(data_path)}
 results <- simulate_grid(
-  model, grid, functions, replicates = 25,
-  sequence_length = 10e6, mutation_rate = 1e-8, recombination_rate = 1e-8
+  model, grid, functions, replicates = 50,
+  sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
 )
 ```
 
