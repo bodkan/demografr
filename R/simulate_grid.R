@@ -20,6 +20,10 @@
 #'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 #'   sure that the parallelized tree-sequence summary statistic functions have all of their
 #'   packages available.
+#' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
+#'
+#' @return If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
+#'   does not return anything, saving an object to an .rds file instead.
 #'
 #' @export
 simulate_grid <- function(
@@ -27,7 +31,7 @@ simulate_grid <- function(
   sequence_length, recombination_rate, mutation_rate = 0,
   split = FALSE,
   model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "slim")
+  engine = c("msprime", "slim"), file = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -112,5 +116,8 @@ simulate_grid <- function(
   attr(results_df, "functions") <- functions
   attr(results_df, "model") <- model
 
-  results_df
+  if (is.null(file))
+    return(results_df)
+  else
+    saveRDS(results_df, file)
 }

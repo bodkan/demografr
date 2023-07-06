@@ -16,7 +16,8 @@ simulate_grid(
   model_args = NULL,
   engine_args = NULL,
   packages = NULL,
-  engine = c("msprime", "slim")
+  engine = c("msprime", "slim"),
+  file = NULL
 )
 }
 \arguments{
@@ -47,6 +48,12 @@ packages available.}
 
 \item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
 will use the built-in slendr simulation back ends.}
+
+\item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
+}
+\value{
+If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
+  does not return anything, saving an object to an .rds file instead.
 }
 \description{
 For a given data frame (each column a parameter of a slendr model function) simulates

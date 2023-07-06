@@ -13,6 +13,7 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
 #' @param engine Which simulation engine to use? Values "msprime" and "slendr::"
 #'   will use the built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
@@ -29,8 +30,9 @@
 simulate_abc <- function(
   model, priors, functions, observed,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
+  file = NULL, engine = c("msprime", "slim"),
   model_args = NULL, engine_args = NULL, packages = NULL,
-  engine = c("msprime", "slim"), debug = FALSE, attempts = 1000
+  debug = FALSE, attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -155,5 +157,8 @@ simulate_abc <- function(
   )
   class(result) <- "demografr_sims"
 
-  result
+  if (is.null(file))
+    return(result)
+  else
+    saveRDS(result)
 }

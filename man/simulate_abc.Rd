@@ -13,10 +13,11 @@ simulate_abc(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
+  file = NULL,
+  engine = c("msprime", "slim"),
   model_args = NULL,
   engine_args = NULL,
   packages = NULL,
-  engine = c("msprime", "slim"),
   debug = FALSE,
   attempts = 1000
 )
@@ -39,6 +40,11 @@ tree sequences}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
+\item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
+
+\item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
+will use the built-in slendr simulation back ends.}
+
 \item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
 
 \item{engine_args}{Optional arguments for the slendr simulation back ends}
@@ -47,9 +53,6 @@ tree sequences}
 functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.}
-
-\item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
-will use the built-in slendr simulation back ends.}
 
 \item{debug}{Only perform a single ABC simulation run, skipping parallelization}
 
