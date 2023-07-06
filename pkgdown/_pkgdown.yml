@@ -38,6 +38,7 @@ reference:
   - title: Grid-based inference
     contents:
     - simulate_grid
+    - combine_grid
 
   - title: Visualization of priors and posteriors
     contents:

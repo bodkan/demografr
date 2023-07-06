@@ -12,7 +12,7 @@ combine_abc <- function(...) {
   runs <- list(...)
   if (length(runs) == 1) runs <- runs[[1]]
 
-  if (all(sapply(runs, is.character))) {
+  if (all(vapply(runs, is.character, FUN.VALUE = logical(1)))) {
     for (i in seq_along(runs)) {
       if (file.exists(runs[[i]]))
         runs[[i]] <- readRDS(runs[[i]])
@@ -21,7 +21,7 @@ combine_abc <- function(...) {
     }
   }
 
-  if (!all(sapply(runs, inherits, "demografr_sims")))
+  if (!all(vapply(runs, inherits, "demografr_sims", FUN.VALUE = logical(1))))
     stop("All provided runs must be a product of the function `simulate_abc()`", call. = FALSE)
 
   # check that all individual demografr_sims objects are from the same model

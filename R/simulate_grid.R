@@ -17,7 +17,9 @@
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
-#'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
+#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+#'   sure that the parallelized tree-sequence summary statistic functions have all of their
+#'   packages available.
 #'
 #' @export
 simulate_grid <- function(
@@ -90,7 +92,7 @@ simulate_grid <- function(
     },
     future.seed = TRUE,
     future.globals = globals,
-    future.packages = c("slendr", "dplyr", "tidyr", packages)
+    future.packages = c("slendr", packages)
   )
 
   # collect values of grid parameters from each simulation run back in a data frame format
@@ -106,6 +108,9 @@ simulate_grid <- function(
   }
 
   results_df <- dplyr::select(results_df, rep, dplyr::everything())
+
+  attr(results_df, "functions") <- functions
+  attr(results_df, "model") <- model
 
   results_df
 }
