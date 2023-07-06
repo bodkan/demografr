@@ -1,0 +1,273 @@
+---
+title: Parallelization options
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Parallelization options}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 100
+)
+
+devtools::load_all()
+```
+
+One of the main selling points of _demografr_ is computational efficiency. Although R isn't exactly known for computational speed, by utilizing _msprime_ (and, optionally, SLiM) for simulation and the _tskit_ tree-sequence module for population genetic computation without having to rely on saving files to disk, _demografr_ is surprisingly fast and efficient for an R package.
+
+Still, optimized means of simulation and computation can only get us so far. Especially for computationally very heavy analyses such an ABC, parallelization is absolutely crucial. To this end, _demografr_ provides two ways of parallelizing analyses. One is more sophisticated and easier to do, but it does require a little bit of setup. Another is more straightforward but a little less convenient.
+
+In this vignette, we will briefly describe both methods, using the `simulate_grid()` function for simplicity and this trivial population genetic model:
+
+```{r}
+library(demografr)
+library(slendr); init_env(quiet = TRUE)
+```
+
+```{r}
+model <- function(Ne_p1, Ne_p2) {
+  p1 <- population("p1", time = 10000, N = Ne_p1)
+  p2 <- population("p2", time = 5000, N = Ne_p2, parent = p1)
+
+  model <- compile_model(populations = list(p1, p2), generation_time = 1)
+
+  return(model)
+}
+```
+
+Let's say we want to explore the levels of genetic diversity in both populations across the following parameter grid (note that this grid is extremely small in order to make this example easy and quick to run):
+
+```{r}
+grid <- tidyr::crossing(
+  Ne_p1 = c(100, 1000, 10000),
+  Ne_p2 = c(100, 1000, 10000)
+)
+
+grid
+```
+
+Here is our summary function:
+
+```{r}
+functions <- list(
+  diversity = function(ts) {
+    ts_diversity(ts, sample_sets = sample_names(ts, split = "pop"))
+  }
+)
+```
+
+Just to verify we have set up the components of our analysis correctly, let's quickly simulate a tree sequence and try to compute genetic diversity in both populations using our summary function:
+
+```{r}
+ts <- simulate_ts(model, params = list(Ne_p1 = 100, Ne_p2 = 10000), mutation_rate = 1e-8)
+
+functions$diversity(ts)
+```
+
+Everything works!
+
+**Now, how can we parallelize the computation of diversity across all parameters of the grid?**
+
+## 1. Implicit parallelization via _future_
+
+The simplest way to parallelize _demografr_ analyses is via the R package [_future_](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html).
+
+The magic of _future_ lies in its ability to set up parallelized schemes of arbitrary topologies by automatic scheduling of jobs across a given number of CPUs distributed even across several remote compute servers.
+
+Going into detail in setting up _future_-based parallelization would be too far out of scope of this simple vignette (or _demografr_'s documentation in general). Luckily, once _future_ parallelization is set up, it doesn't matter whether the computation is done by _demografr_ or anything else, as the _future_ architecture is completely general.
+
+In order to use _future_ effectively, you should study its documentation and tutorials (a good start would be [here](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)), but here is a brief introduction focused on parallelizing a toy _demografr_ analysis set up above:
+
+### Sequential run
+
+By default, if we would run `simulate_grid()`, all simulations would be run _sequentially_:
+
+```{r, echo=FALSE}
+tstart <- Sys.time()
+```
+
+```{r}
+data <- simulate_grid(model, grid, functions, replicates = 20, sequence_length = 10000, recombination_rate = 1e-8)
+
+data
+```
+
+```{r, echo=FALSE}
+tend <- Sys.time()
+
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the grid simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r future::availableCores()` CPUs.**
+
+### Parallelization across CPUs of one machine
+
+In order to distribute simulations across all (or some) available CPU cores of your machine, you only need to put the following bit of R code _before_ your call to `simulate_grid()`. For instance, on my personal laptop which has 10 CPUs, I can run the above analysis using all available CPUs like this:
+
+First we setup _future_:
+
+```{r}
+library(future)
+plan(multicore, workers = 10) # use all 10 available CPUs
+```
+
+Then we can run the simulations **without having to do anything else!** This last point is important: _demografr_ can automatically leverage whatever parallelization scheme you set up via _future_'s function `plan()`.
+
+```{r, echo=FALSE}
+tstart <- Sys.time()
+```
+
+```{r}
+data <- simulate_grid(model, grid, functions, replicates = 20, sequence_length = 100000, recombination_rate = 1e-8)
+
+data
+```
+
+```{r, echo=FALSE}
+tend <- Sys.time()
+
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the grid simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r future::availableCores()` CPUs.**
+
+Notice the speed up even for this trivial toy analysis!
+
+### Parallelization across CPUs of multiple machines
+
+If you read the documentation of the _future_ package (which you really [should](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)), you will discover many more options for parallelization giving you near limitless options for scheduling parallel simulations.
+
+For instance, imagine you have access to remote machines `server01`, `server02`, `server03`, all with available R as well as _demografr_ and _slendr_ R packages, with set up _slendr_ environments. In other words, you can start an R interpreter on each of these machines and eventually call:
+
+```{r}
+library(demografr)
+library(slendr)
+init_env()
+```
+
+Then, you can distribute the `simulate_grid()` run (but also `simulate_abc()`, of course!) simply by adjusting the `plan()` setup like this:
+
+```{r, eval=FALSE}
+hostnames <- c("server01", "server02", "server03")
+plan(multisession, workers = hostnames)
+```
+
+We won't be running this example here in practice because the "server01", etc., don't really exist, but you should get an idea.
+
+In short, the _future_ R package (and it's support provided by _demografr_) makes it very easy to set up arbitrary parallelization schemes without doing additional work beyond setting up the parallelization `plan()`.
+
+### For completeness
+
+By default, if you don't set up any `plan()` at all, the sequential simulation runs of _demografr_ are implicitly organized by:
+
+```{r}
+plan(sequential)
+```
+
+But this is just for completeness. It's not something that makes much sense to do in practice, perhaps beyond debugging parallelization issues.
+
+## 2. "Manual" parallelization
+
+In personal experience, it can be a bit of a hassle to distribute jobs across different machines, despite the conveniences of the _future_ R package. If you're having such problems, I first _highly_ encourage you to [read](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html) the basic overview and look up troubleshooting advice on Google.
+
+Still, _demografr_ provides rudimentary support for "manual" paralelization across multiple machines (each of those machines parallelizing on multiple CPUs), followed by merging simulation runs into a single data set.
+
+To demonstrate this, let's pretend we ran five simulation grid runs across five different computers like this (we were originally interested in distributing 20 replicates, so we'll run five times four replicates individually):
+
+```{r}
+library(future)
+plan(multicore, workers = 10)
+
+run1_file <- tempfile(fileext = ".rds")
+run2_file <- tempfile(fileext = ".rds")
+run3_file <- tempfile(fileext = ".rds")
+run4_file <- tempfile(fileext = ".rds")
+run5_file <- tempfile(fileext = ".rds")
+
+# on machine #1
+simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
+
+# on machine #2
+simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run2_file)
+
+# on machine #3
+simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run3_file)
+
+# on machine #4
+simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run4_file)
+
+# on machine #5
+simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run5_file)
+```
+
+Then, once we collected the individual `.rds` files on a single computer from the remote machines (perhaps using something like the `scp` unix command), we can use another _demografr_ function `combine_grid()` to merge all individual runs into a single result:
+
+```{r}
+data <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
+
+data
+```
+
+For each combination of parameters we ran four replicates across "five different machines", totalling `r nrow(grid)` x 4 x 5 = `r nrow(grid) * 4 * 5` so we should get the same number of rows in the merged data frame:
+
+```{r}
+nrow(data)
+```
+
+One thing to note that `simulate_grid()` as well as `simulate_abc()` really do save standard RDS files as one normally would using function `saveRDS()` (in fact, they use this function internally). An additional behefit of using this approach combined with `combine_grid()` (and `combine_abc()`) is that these functions provide additional sanity checks making sure that the simulation data sets being merged are consistent (coming from the same model function, with the same priors or summary statistics, etc.).
+
+For completeness, `combine_grid()` and `combine_abc()` do not only accept file paths as individual function arguments but also file names as vectors, as well as individual data frame objects generated by `simulate_grid()` and `simulate_abc()`. In other words, the following approaches will all result in the same combined data set:
+
+**Merging data from serialized data files:**
+
+```{r}
+data1 <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
+data2 <- combine_grid(list(run1_file, run2_file, run3_file, run4_file, run5_file))
+```
+
+
+**Merging data objects themselves directly:**
+
+```{r, echo=FALSE}
+run1 <- readRDS(run1_file)
+run2 <- readRDS(run2_file)
+run3 <- readRDS(run3_file)
+run4 <- readRDS(run4_file)
+run5 <- readRDS(run5_file)
+```
+
+```{r}
+data1 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+data2 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+data3 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+data4 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+data5 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+```
+
+```{r}
+data3 <- combine_grid(data1, data2, data3, data4, data5)
+data4 <- combine_grid(data1, data2, data3, data4, data5)
+```
+
+**All `combine_grid()` approaches give the same result:**
+
+```{r}
+all.equal(data1, data2)
+all.equal(data3, data4)
+all.equal(data2, data3)
+```
