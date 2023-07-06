@@ -41,7 +41,9 @@ tree sequences}
 \item{engine_args}{Optional arguments for the slendr simulation back ends}
 
 \item{packages}{A character vector with package names used by user-defined summary statistic
-functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.}
+functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.}
 
 \item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
 will use the built-in slendr simulation back ends.}

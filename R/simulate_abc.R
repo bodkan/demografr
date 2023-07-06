@@ -18,7 +18,9 @@
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
-#'   functions. Only relevant when \code{future::plan("multisession", ...)} was initialized.
+#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+#'   sure that the parallelized tree-sequence summary statistic functions have all of their
+#'   packages available.
 #' @param debug Only perform a single ABC simulation run, skipping parallelization
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
