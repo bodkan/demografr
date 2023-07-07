@@ -28,8 +28,9 @@ print.demografr_sims <- function(x, ...) {
   cat("\n")
 
   cat("Individual components of this object can be accessed as:\n")
-  cat("    <object>$parameters -- parameter matrix\n")
-  cat("    <object>$observed   -- observed summary statistics\n")
-  cat("    <object>$functions  -- summary functions\n")
   cat("    <object>$priors     -- prior expressions\n")
+  cat("    <object>$parameters -- sampled parameters\n")
+  cat("    <object>$functions  -- summary functions\n")
+  cat("    <object>$observed   -- observed summary statistics\n")
+  cat("    <object>$simulated  -- simulated summary statistics\n")
 }
