@@ -1,87 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://bodkan.github.io/demografr/404.html</loc>
+    <loc>https://bodkan.net/demografr/404.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/LICENSE-text.html</loc>
+    <loc>https://bodkan.net/demografr/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/LICENSE.html</loc>
+    <loc>https://bodkan.net/demografr/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/articles/index.html</loc>
+    <loc>https://bodkan.net/demografr/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/articles/vignette-01-basics.html</loc>
+    <loc>https://bodkan.net/demografr/articles/vignette-01-basics.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/articles/vignette-02-priors.html</loc>
+    <loc>https://bodkan.net/demografr/articles/vignette-02-priors.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/articles/vignette-03-grids.html</loc>
+    <loc>https://bodkan.net/demografr/articles/vignette-03-grids.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/authors.html</loc>
+    <loc>https://bodkan.net/demografr/articles/vignette-04-parallelization.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/index.html</loc>
+    <loc>https://bodkan.net/demografr/authors.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/combine_abc.html</loc>
+    <loc>https://bodkan.net/demografr/index.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/extract_posterior.html</loc>
+    <loc>https://bodkan.net/demografr/reference/combine_abc.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/extract_summary.html</loc>
+    <loc>https://bodkan.net/demografr/reference/combine_grid.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/hist.demografr_abc.abc.html</loc>
+    <loc>https://bodkan.net/demografr/reference/extract_posterior.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/index.html</loc>
+    <loc>https://bodkan.net/demografr/reference/extract_summary.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/perform_abc.html</loc>
+    <loc>https://bodkan.net/demografr/reference/hist.demografr_abc.abc.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/pipe.html</loc>
+    <loc>https://bodkan.net/demografr/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/plot.demografr_abc.abc.html</loc>
+    <loc>https://bodkan.net/demografr/reference/perform_abc.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/plot_posterior.html</loc>
+    <loc>https://bodkan.net/demografr/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/plot_prior.html</loc>
+    <loc>https://bodkan.net/demografr/reference/plot.demografr_abc.abc.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/print.demografr_sims.html</loc>
+    <loc>https://bodkan.net/demografr/reference/plot_posterior.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/reexports.html</loc>
+    <loc>https://bodkan.net/demografr/reference/plot_prior.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/run_script.html</loc>
+    <loc>https://bodkan.net/demografr/reference/print.demografr_sims.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/sample_names.html</loc>
+    <loc>https://bodkan.net/demografr/reference/reexports.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/sample_prior.html</loc>
+    <loc>https://bodkan.net/demografr/reference/run_script.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/simulate_abc.html</loc>
+    <loc>https://bodkan.net/demografr/reference/sample_names.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/simulate_grid.html</loc>
+    <loc>https://bodkan.net/demografr/reference/sample_prior.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/simulate_ts.html</loc>
+    <loc>https://bodkan.net/demografr/reference/simulate_abc.html</loc>
   </url>
   <url>
-    <loc>https://bodkan.github.io/demografr/reference/validate_abc.html</loc>
+    <loc>https://bodkan.net/demografr/reference/simulate_grid.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/simulate_ts.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/validate_abc.html</loc>
   </url>
 </urlset>

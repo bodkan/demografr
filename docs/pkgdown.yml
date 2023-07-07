@@ -5,8 +5,9 @@ articles:
   vignette-01-basics: vignette-01-basics.html
   vignette-02-priors: vignette-02-priors.html
   vignette-03-grids: vignette-03-grids.html
-last_built: 2023-07-05T13:18Z
+  vignette-04-parallelization: vignette-04-parallelization.html
+last_built: 2023-07-07T10:42Z
 urls:
-  reference: https://bodkan.github.io/demografr/reference
-  article: https://bodkan.github.io/demografr/articles
+  reference: https://bodkan.net/demografr/reference
+  article: https://bodkan.net/demografr/articles
 
