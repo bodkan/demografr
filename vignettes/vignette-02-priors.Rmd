@@ -1,8 +1,8 @@
 ---
-title: How does specification of priors work?
+title: Specifying priors
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{How does specification of priors work?}
+  %\VignetteIndexEntry{Specifying priors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

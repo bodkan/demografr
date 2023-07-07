@@ -34,6 +34,13 @@ Let's say we have the following two scripts which we want to use as simulation e
 **Example SLiM script**
 
 ```{bash, include = FALSE}
+slim_path=$(R --no-echo -e 'system.file("examples/script.slim", package = "demografr)')
+cat "$slim_path"
 ```
 
 **Example Python script**
+
+```{bash, include = FALSE}
+py_path=$(R --no-echo -e 'system.file("examples/script.py", package = "demografr)')
+cat "$py_path"
+```
