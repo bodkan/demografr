@@ -94,7 +94,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-data <- simulate_grid(model, grid, functions, replicates = 20, sequence_length = 10000, recombination_rate = 1e-8)
+data <- simulate_grid(model, grid, functions, replicates = 10, sequence_length = 10000, recombination_rate = 1e-8)
 
 data
 ```
@@ -129,7 +129,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-data <- simulate_grid(model, grid, functions, replicates = 20, sequence_length = 100000, recombination_rate = 1e-8)
+data <- simulate_grid(model, grid, functions, replicates = 10, sequence_length = 100000, recombination_rate = 1e-8)
 
 data
 ```
@@ -200,19 +200,19 @@ run4_file <- tempfile(fileext = ".rds")
 run5_file <- tempfile(fileext = ".rds")
 
 # on machine #1
-simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
 
 # on machine #2
-simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run2_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run2_file)
 
 # on machine #3
-simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run3_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run3_file)
 
 # on machine #4
-simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run4_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run4_file)
 
 # on machine #5
-simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 1e-80, file = run5_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run5_file)
 ```
 
 Then, once we collected the individual `.rds` files on a single computer from the remote machines (perhaps using something like the `scp` unix command), we can use another _demografr_ function `combine_grid()` to merge all individual runs into a single result:
@@ -223,7 +223,7 @@ data <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
 data
 ```
 
-For each combination of parameters we ran four replicates across "five different machines", totalling `r nrow(grid)` x 4 x 5 = `r nrow(grid) * 4 * 5` so we should get the same number of rows in the merged data frame:
+For each combination of parameters we ran four replicates across "five different machines", totalling `r nrow(grid)` x 2 x 5 = `r nrow(grid) * 2 * 5` so we should get the same number of rows in the merged data frame:
 
 ```{r}
 nrow(data)
