@@ -23,6 +23,8 @@ navbar:
           href: articles/vignette-02-priors.html
         - text: Support for grid simulations
           href: articles/vignette-03-grids.html
+        - test: Parallelization options
+          href: articles/vignette-04-parallelization.html
     twitter:
       icon: fa-twitter
       href: https://twitter.com/dr_bodkan
@@ -32,8 +34,8 @@ reference:
     contents:
     - validate_abc
     - simulate_abc
-    - combine_abc
     - perform_abc
+    - combine_abc
 
   - title: Grid-based inference
     contents:

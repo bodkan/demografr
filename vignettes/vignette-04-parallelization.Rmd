@@ -46,8 +46,8 @@ Let's say we want to explore the levels of genetic diversity in both populations
 
 ```{r}
 grid <- tidyr::crossing(
-  Ne_p1 = c(100, 1000, 10000),
-  Ne_p2 = c(100, 1000, 10000)
+  Ne_p1 = c(10, 100, 1000),
+  Ne_p2 = c(10, 100, 1000)
 )
 
 grid
@@ -66,7 +66,7 @@ functions <- list(
 Just to verify we have set up the components of our analysis correctly, let's quickly simulate a tree sequence and try to compute genetic diversity in both populations using our summary function:
 
 ```{r}
-ts <- simulate_ts(model, params = list(Ne_p1 = 100, Ne_p2 = 10000), mutation_rate = 1e-8)
+ts <- simulate_ts(model, params = list(Ne_p1 = 100, Ne_p2 = 1000), mutation_rate = 1e-8)
 
 functions$diversity(ts)
 ```
@@ -236,8 +236,8 @@ For completeness, `combine_grid()` and `combine_abc()` do not only accept file p
 **Merging data from serialized data files:**
 
 ```{r}
-data1 <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
-data2 <- combine_grid(list(run1_file, run2_file, run3_file, run4_file, run5_file))
+combined1 <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
+combined2 <- combine_grid(list(run1_file, run2_file, run3_file, run4_file, run5_file))
 ```
 
 
@@ -249,25 +249,26 @@ run2 <- readRDS(run2_file)
 run3 <- readRDS(run3_file)
 run4 <- readRDS(run4_file)
 run5 <- readRDS(run5_file)
+
+combined3 <- combine_grid(run1, run2, run3, run4, run5)
+combined4 <- combine_grid(list(run1, run2, run3, run4, run5))
 ```
 
-```{r}
-data1 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-data2 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-data3 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-data4 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-data5 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-```
+```{r, eval=FALSE}
+run1 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+run2 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+run3 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+run4 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+run5 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
 
-```{r}
-data3 <- combine_grid(data1, data2, data3, data4, data5)
-data4 <- combine_grid(data1, data2, data3, data4, data5)
+combined3 <- combine_grid(run1, run2, run3, run4, run5)
+combined4 <- combine_grid(list(run1, run2, run3, run4, run5))
 ```
 
 **All `combine_grid()` approaches give the same result:**
 
 ```{r}
-all.equal(data1, data2)
-all.equal(data3, data4)
-all.equal(data2, data3)
+all.equal(combined1, combined2)
+all.equal(combined3, combined4)
+all.equal(combined2, combined3)
 ```
