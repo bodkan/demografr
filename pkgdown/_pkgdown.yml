@@ -1,5 +1,5 @@
 title: demografr
-url: https://bodkan.github.io/demografr
+url: https://bodkan.net/demografr
 
 navbar:
   structure:
@@ -23,11 +23,11 @@ navbar:
           href: articles/vignette-02-priors.html
         - text: Support for grid simulations
           href: articles/vignette-03-grids.html
-        - test: Parallelization options
+        - text: Parallelization options
           href: articles/vignette-04-parallelization.html
-    twitter:
-      icon: fa-twitter
-      href: https://twitter.com/dr_bodkan
+    mastodon:
+      icon: fa-mastodon
+      href: https://fosstodon.org/bodkan
 
 reference:
   - title: Approximate Bayesian Computation
