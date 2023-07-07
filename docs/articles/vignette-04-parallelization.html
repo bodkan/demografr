@@ -72,7 +72,7 @@
       <a href="../articles/vignette-01-basics.html">A basic ABC analysis</a>
     </li>
     <li>
-      <a href="../articles/vignette-02-priors.html">How does specification of priors work?</a>
+      <a href="../articles/vignette-02-priors.html">Specifying prior distributions</a>
     </li>
     <li>
       <a href="../articles/vignette-03-grids.html">Support for grid simulations</a>
@@ -174,8 +174,8 @@ genetic diversity in both populations using our summary function:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">006</span>44</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">040</span>0</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">002</span>49</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">031</span>5</span></span></code></pre>
 <p>Everything works!</p>
 <p><strong>Now, how can we parallelize the computation of diversity
 across all parameters of the grid?</strong></p>
@@ -222,7 +222,7 @@ simulations would be run <em>sequentially</em>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
 <p><strong>The total runtime for the grid simulations was 0 hours 1
-minutes 35 seconds parallelized across 10 CPUs.</strong></p>
+minutes 36 seconds parallelized across 10 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>

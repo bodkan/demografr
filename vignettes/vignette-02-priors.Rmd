@@ -1,8 +1,8 @@
 ---
-title: Specifying priors
+title: Specifying prior distributions
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Specifying priors}
+  %\VignetteIndexEntry{Specifying prior distributions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

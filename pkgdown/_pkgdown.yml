@@ -19,7 +19,7 @@ navbar:
       menu:
         - text: A basic ABC analysis
           href: articles/vignette-01-basics.html
-        - text: How does specification of priors work?
+        - text: Specifying prior distributions
           href: articles/vignette-02-priors.html
         - text: Support for grid simulations
           href: articles/vignette-03-grids.html
