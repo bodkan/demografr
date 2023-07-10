@@ -10,6 +10,10 @@ knitr::opts_chunk$set(
   fig.cap = "",
   dpi = 80
 )
+
+data_path <- here::here("inst/examples/abc_data.rds")
+
+devtools::load_all()
 ```
 
 # _demografr_: A simple and efficient ABC toolkit for R
@@ -167,7 +171,7 @@ observed_f4
 
 This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
-```{r, eval=!file.exists(here::here("inst/examples/abc_data.rds"))}
+```{r, eval=!file.exists(data_path)}
 library(demografr)
 library(slendr)
 
@@ -281,12 +285,12 @@ data <- simulate_abc(
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(here::here("inst/examples/abc_data.rds"))}
-saveRDS(data, here::here("inst/examples/abc_data.rds"))
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(data, data_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(here::here("inst/examples/abc_data.rds")), warning=FALSE, message=FALSE, results="hide"}
-data <- readRDS(here::here("inst/examples/abc_data.rds"))
+```{r, echo=FALSE, eval=file.exists(data_path)}
+data <- readRDS(data_path)
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
