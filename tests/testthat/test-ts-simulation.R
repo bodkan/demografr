@@ -27,7 +27,7 @@ test_that("simulate_ts generates a tree sequence from priors", {
   )
   ts1 <- simulate_ts(model, priors)
   expect_s3_class(ts1, "slendr_ts")
-  ts2 <- simulate_ts(model, priors, slendr_engine = "msprime")
+  ts2 <- simulate_ts(model, priors, engine = "msprime")
   expect_s3_class(ts2, "slendr_ts")
 })
 

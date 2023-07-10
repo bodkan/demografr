@@ -23,22 +23,24 @@
 #'   packages available.
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
-#' @param slendr_engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
 #'   by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
 #'   custom user-defined model scripts will use the "custom" engine. Setting this argument
-#'   explicitly will change the back ends (where appropriate).
-#' @param slendr_model_args Optional (non-prior) arguments for the slendr model generating function
-#' @param slendr_engine_args Optional arguments for the slendr simulation back end
-#'   (see \code{slendr_engine})
+#'   explicitly will change the back ends (where appropriate). Setting this argument for custom
+#'   simulation script has no effect.
+#' @param model_args Optional (non-prior) arguments for the slendr model generating function.
+#'   Setting this argument for custom simulation script has no effect.
+#' @param engine_args Optional arguments for the slendr simulation back end. Setting this
+#'   argument for custom simulation script has no effect.
 #'
 #' @export
 simulate_abc <- function(
   model, priors, functions, observed, iterations,
   sequence_length, recombination_rate, mutation_rate = 0,
   file = NULL, packages = NULL, attempts = 1000,
-  slendr_engine = NULL, slendr_model_args = NULL, slendr_engine_args = NULL
+  engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -60,16 +62,16 @@ simulate_abc <- function(
     model, priors, functions, observed,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
     mutation_rate = mutation_rate,
-    slendr_engine = slendr_engine, slendr_model_args = slendr_model_args,
-    slendr_engine_args = slendr_engine_args
+    engine = engine, model_args = model_args,
+    engine_args = engine_args
   ))
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   globals <- c(
     lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
-    names(slendr_model_args),
-    names(slendr_engine_args)
+    names(model_args),
+    names(engine_args)
   ) %>%
     unlist()
 
@@ -82,9 +84,9 @@ simulate_abc <- function(
     sequence_length = sequence_length,
     recombination_rate = recombination_rate,
     mutation_rate = mutation_rate,
-    slendr_engine = slendr_engine,
-    slendr_model_args = slendr_model_args,
-    slendr_engine_args = slendr_engine_args,
+    engine = engine,
+    model_args = model_args,
+    engine_args = engine_args,
     model_name = as.character(substitute(model)),
     attempts = attempts,
     future.seed = TRUE,

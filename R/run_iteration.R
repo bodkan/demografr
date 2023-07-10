@@ -2,15 +2,15 @@
 run_iteration <- function(it,
                           model, params, functions,
                           sequence_length, recombination_rate, mutation_rate,
-                          samples, slendr_engine, slendr_model_args, slendr_engine_args,
+                          samples, engine, model_args, engine_args,
                           model_name, attempts) {
   init_env(quiet = TRUE)
 
   sim_result <- run_simulation(
     model = model, params = params, sequence_length = sequence_length,
     recombination_rate = recombination_rate, mutation_rate = mutation_rate,
-    model_name = model_name, slendr_engine = slendr_engine, samples = samples,
-    slendr_model_args = slendr_model_args, slendr_engine_args = slendr_engine_args,
+    model_name = model_name, engine = engine, samples = samples,
+    model_args = model_args, engine_args = engine_args,
     attempts = attempts
   )
   ts <- sim_result$ts

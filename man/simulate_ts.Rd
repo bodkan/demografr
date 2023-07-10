@@ -2,11 +2,11 @@
 % Please edit documentation in R/simulate_ts.R
 \name{simulate_ts}
 \alias{simulate_ts}
-\title{Simulate a single tree sequence from the given ABC setup}
+\title{Simulate a single tree sequence from the given inference setup}
 \usage{
 simulate_ts(
   model,
-  params,
+  parameters,
   sequence_length = 1e+06,
   recombination_rate = 0,
   mutation_rate = 0,
@@ -16,7 +16,12 @@ simulate_ts(
 )
 }
 \arguments{
-\item{model}{A compiled slendr model object}
+\item{model}{Either a slendr model generating function (in which case \code{engine} must
+be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+must be "custom").}
+
+\item{parameters}{A list of prior distributions to use for sampling of model parameters}
 
 \item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
 
@@ -24,19 +29,25 @@ simulate_ts(
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
-\item{engine}{Which simulation engine to use? Values "msprime" and "slim"
-will use the built-in slendr simulation back ends.}
+\item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.}
 
-\item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
+\item{model_args}{Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.}
 
-\item{engine_args}{Optional arguments for the slendr simulation back ends}
-
-\item{priors}{A list of prior distributions to use for sampling of model parameters}
+\item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.}
 }
 \description{
-Simulates a tree sequence object from a model with parameters sampled from priors
+Simulates a tree sequence object from a model with parameters as specified either
+by sampling from priors or by a given list of fixed parameter values
 }
 \details{
 This function is useful to generate a small tree sequence to be used when developing
-summary statistic functions for ABC inference using demografr.
+summary statistic functions inference using demografr.
 }

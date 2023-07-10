@@ -14,16 +14,18 @@ simulate_abc(
   recombination_rate,
   mutation_rate = 0,
   file = NULL,
-  engine = c("msprime", "slim"),
-  model_args = NULL,
-  engine_args = NULL,
   packages = NULL,
-  debug = FALSE,
-  attempts = 1000
+  attempts = 1000,
+  engine = NULL,
+  model_args = NULL,
+  engine_args = NULL
 )
 }
 \arguments{
-\item{model}{A slendr model generating function}
+\item{model}{Either a slendr model generating function (in which case \code{engine} must
+be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+must be "custom").}
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
@@ -42,22 +44,27 @@ tree sequences}
 
 \item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
 
-\item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
-will use the built-in slendr simulation back ends.}
-
-\item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
-
-\item{engine_args}{Optional arguments for the slendr simulation back ends}
-
 \item{packages}{A character vector with package names used by user-defined summary statistic
 functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.}
 
-\item{debug}{Only perform a single ABC simulation run, skipping parallelization}
-
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
+
+\item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.}
+
+\item{model_args}{Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.}
+
+\item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.}
 }
 \description{
 This is a core function for ABC inference using demografr. It generates simulation

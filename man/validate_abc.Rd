@@ -9,17 +9,20 @@ validate_abc(
   priors,
   functions,
   observed,
-  model_args = NULL,
-  engine_args = NULL,
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,
   attempts = 1000,
-  ...
+  engine = NULL,
+  model_args = NULL,
+  engine_args = NULL
 )
 }
 \arguments{
-\item{model}{A slendr model generating functions}
+\item{model}{Either a slendr model generating function (in which case \code{engine} must
+be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+must be "custom").}
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
@@ -27,12 +30,6 @@ validate_abc(
 tree sequences}
 
 \item{observed}{A named list of observed summary statistics}
-
-\item{model_args}{Optional non-prior arguments for the model generating function
-(specified as a named list)}
-
-\item{engine_args}{Optional arguments to the simulation engine function (currently
-either \code{msprime} or \code{slim})}
 
 \item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
 
@@ -42,6 +39,20 @@ either \code{msprime} or \code{slim})}
 
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
+
+\item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.}
+
+\item{model_args}{Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.}
+
+\item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.}
 }
 \value{
 No return value. The function is ran for its terminal output.

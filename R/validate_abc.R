@@ -18,17 +18,17 @@
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
-#' @param slendr_engine Which simulation engine to use? Values "msprime" and "slim" will use one of
-#'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
-#'   script as provided in the \code{model} argument. Which engine will be used is determined
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
 #'   by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
 #'   custom user-defined model scripts will use the "custom" engine. Setting this argument
-#'   explicitly will change the back ends (where appropriate).
-#' @param slendr_model_args Optional non-prior arguments for the model generating function
-#'   (specified as a named list)
-#' @param slendr_engine_args Optional arguments to the simulation engine function (currently
-#'   either \code{msprime} or \code{slim})
+#'   explicitly will change the back ends (where appropriate). Setting this argument for custom
+#'   simulation script has no effect.
+#' @param model_args Optional (non-prior) arguments for the slendr model generating function.
+#'   Setting this argument for custom simulation script has no effect.
+#' @param engine_args Optional arguments for the slendr simulation back end. Setting this
+#'   argument for custom simulation script has no effect.
 #'
 #' @return No return value. The function is ran for its terminal output.
 #'
@@ -36,7 +36,7 @@
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
                          attempts = 1000,
-                         slendr_engine = NULL, slendr_model_args = NULL, slendr_engine_args = NULL) {
+                         engine = NULL, model_args = NULL, engine_args = NULL) {
   if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed))
     stop("A model generating function, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
@@ -114,7 +114,7 @@ validate_abc <- function(model, priors, functions, observed,
 
     all_args <- names(formals(model))
     nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
-    missing_args <- setdiff(nonimpl_args, c(prior_names, names(slendr_model_args)))
+    missing_args <- setdiff(nonimpl_args, c(prior_names, names(model_args)))
     if (length(missing_args) > 0) {
       cat(" \u274C\n\n")
       stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
@@ -132,9 +132,9 @@ validate_abc <- function(model, priors, functions, observed,
 
   cat("Simulating tree sequence from the given model...")
   ts <- run_simulation(model, priors, sequence_length, recombination_rate,
-                       mutation_rate, slendr_engine = slendr_engine,
-                       slendr_model_args = slendr_model_args,
-                       slendr_engine_args = slendr_engine_args, attempts = 1000,
+                       mutation_rate, engine = engine,
+                       model_args = model_args,
+                       engine_args = engine_args, attempts = 1000,
                        model_name = substitute(model))$ts
   cat(" \u2705\n")
 

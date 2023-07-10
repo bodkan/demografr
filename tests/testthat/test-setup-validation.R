@@ -119,7 +119,7 @@ test_that("errors in prior sampling are correctly caught", {
 test_that("an error is raised with SLiM ABC on non-serialized models", {
   expect_error(
     capture.output(simulate_abc(model, priors, functions, observed, iterations = 1,
-                 sequence_length = 1e6, recombination_rate = 0, slendr_engine = "slim")),
+                 sequence_length = 1e6, recombination_rate = 0, engine = "slim")),
     "An unexpected error was raised when generating data from a slendr model
 using the provided slendr function.
 

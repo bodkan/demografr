@@ -12,12 +12,11 @@ simulate_grid(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
-  split = FALSE,
-  model_args = NULL,
-  engine_args = NULL,
   packages = NULL,
-  engine = c("msprime", "slim"),
-  file = NULL
+  file = NULL,
+  engine = NULL,
+  model_args = NULL,
+  engine_args = NULL
 )
 }
 \arguments{
@@ -37,19 +36,26 @@ tree sequences}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
-\item{model_args}{Optional (non-prior) arguments for the scaffold model generating function}
-
-\item{engine_args}{Optional arguments for the slendr simulation back ends}
-
 \item{packages}{A character vector with package names used by user-defined summary statistic
 functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.}
 
-\item{engine}{Which simulation engine to use? Values "msprime" and "slendr::"
-will use the built-in slendr simulation back ends.}
-
 \item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
+
+\item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.}
+
+\item{model_args}{Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.}
+
+\item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.}
 }
 \value{
 If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise

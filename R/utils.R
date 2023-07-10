@@ -79,9 +79,9 @@ check_model_engine <- function(model, engine) {
          call. = FALSE)
 }
 
-get_engine <- function(slendr_model, slendr_engine) {
-  if (!is.null(slendr_engine)) # if an engine was specified by the user, use that
-    engine <- match.arg(slendr_engine, c("msprime", "slim"))
+get_engine <- function(slendr_model, engine) {
+  if (!is.null(engine)) # if an engine was specified by the user, use that
+    engine <- match.arg(engine, c("msprime", "slim"))
   else if (is.null(slendr_model$world))
     engine <- "msprime" # nonspatial models should use the coalescent slendr/msprime engine
   else

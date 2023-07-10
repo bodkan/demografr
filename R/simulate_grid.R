@@ -17,15 +17,17 @@
 #'   sure that the parallelized tree-sequence summary statistic functions have all of their
 #'   packages available.
 #' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
-#' @param slendr_engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
 #'   by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
 #'   custom user-defined model scripts will use the "custom" engine. Setting this argument
-#'   explicitly will change the back ends (where appropriate).
-#' @param slendr_model_args Optional (non-prior) arguments for the slendr model generating function
-#' @param slendr_engine_args Optional arguments for the slendr simulation back end
-#'   (see \code{slendr_engine})
+#'   explicitly will change the back ends (where appropriate). Setting this argument for custom
+#'   simulation script has no effect.
+#' @param model_args Optional (non-prior) arguments for the slendr model generating function.
+#'   Setting this argument for custom simulation script has no effect.
+#' @param engine_args Optional arguments for the slendr simulation back end. Setting this
+#'   argument for custom simulation script has no effect.
 #'
 #' @return If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
 #'   does not return anything, saving an object to an .rds file instead.
@@ -35,7 +37,7 @@ simulate_grid <- function(
   model, grid, functions, replicates,
   sequence_length, recombination_rate, mutation_rate = 0,
   packages = NULL, file = NULL,
-  slendr_engine = NULL, slendr_model_args = NULL, slendr_engine_args = NULL
+  engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -60,8 +62,8 @@ simulate_grid <- function(
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   globals <- c(
-    names(slendr_model_args),
-    names(slendr_engine_args)
+    names(model_args),
+    names(engine_args)
   ) %>%
     unlist()
   if (is.null(globals)) globals <- TRUE
@@ -85,9 +87,9 @@ simulate_grid <- function(
         sequence_length = sequence_length,
         recombination_rate = recombination_rate,
         mutation_rate = mutation_rate,
-        slendr_engine = slendr_engine,
-        slendr_model_args = slendr_model_args,
-        slendr_engine_args = slendr_engine_args,
+        engine = engine,
+        model_args = model_args,
+        engine_args = engine_args,
         model_name = as.character(substitute(model)),
         attempts = 1
       )

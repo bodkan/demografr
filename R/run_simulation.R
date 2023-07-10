@@ -1,7 +1,7 @@
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
-                           samples, slendr_engine, slendr_model_args, slendr_engine_args,
+                           samples, engine, model_args, engine_args,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
@@ -46,7 +46,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
         # if a slendr model generating function is given as a model, generate a compiled model
         # from given parameters and simulate a tree sequence with a specified engine
         if (is.function(model)) {
-          model_fun_args <- c(param_args, slendr_model_args)
+          model_fun_args <- c(param_args, model_args)
           model_result <- do.call(model, model_fun_args)
 
           if (inherits(model_result, "slendr_model")) {
@@ -58,7 +58,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           } else
             stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
-          engine <- get_engine(slendr_model, slendr_engine)
+          engine <- get_engine(slendr_model, engine)
 
           # force no serialization for msprime runs
           if (engine == "msprime") slendr_model$path <- NULL
@@ -69,7 +69,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
             samples = sample_schedule
-          ) %>% c(., slendr_engine_args)
+          ) %>% c(., engine_args)
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
