@@ -13,9 +13,11 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.align = "center",
   fig.width = 8,
-  fig.height = 5,
-  dpi = 100
+  fig.height = 6,
+  dpi = 80
 )
+
+data_path <- here::here("inst/examples/custom_data.rds")
 
 devtools::load_all()
 ```
@@ -26,7 +28,9 @@ First, let's load _demografr_ itself and also _slendr_ (which, in this vignette,
 
 ```{r}
 library(demografr)
-library(slendr); init_env(quiet = TRUE)
+library(slendr)
+
+init_env(quiet = TRUE)
 ```
 
 ## Restrictions on user-defined simulation script
@@ -105,8 +109,8 @@ priors <- list(Ne ~ runif(10, 1000))
 observed <- list(diversity = observed_diversity)
 
 functions <- list(
-  # compute nucleotide diversity on 20 sampled chromosomes
   diversity = function(ts) {
+    # compute diversity on 20 sampled chromosomes
     ts_diversity(ts, list(pop = seq(0, 19)))
   }
 )
@@ -135,8 +139,8 @@ Oh no! We got an error! No reason to panic though&mdash;this is _demografr_ bein
 Because _demografr_ assumes that most users will be using _slendr_-defined models as inputs, if you want to use a custom-built SLiM or msprime model, you need to explicitly tell every simulation function (`simulate_ts()`, `simulate_abc()`, and `simulate_grid()`) that you intend to do this by setting `engine = "custom"`.
 
 ```{r}
-ts_s <- simulate_ts(slim_script, parameters = list(Ne = 123), mutation_rate = 1e-8, engine = "custom")
-ts_m <- simulate_ts(py_script, parameters = list(Ne = 123), mutation_rate = 1e-8, engine = "custom")
+ts_s <- simulate_ts(slim_script, parameters = list(Ne = 123), mutation_rate = 1e-8)
+ts_m <- simulate_ts(py_script, parameters = list(Ne = 123), mutation_rate = 1e-8)
 ```
 
 We can compare that we get a very similar tree sequence with both the SLiM and msprime engines:
@@ -153,21 +157,56 @@ functions$diversity(ts_s)
 functions$diversity(ts_m)
 ```
 
+The functions works as expected&mdash;we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.
+
 ### Running an ABC analysis
 
 Having all components of our pipeline set up we should, again, validate everything before we proceed to (potentially very costly) simulations. In the remainder of this vignette we'll only continue with the Python msprime custom script, in order to save some computational time. That said, it's important to realize that you could use this sort of workflow for any kind of SLiM script, including very elaborate spatial simulations, non-WF models, and all kinds of phenotypic simulations too!
 
+Let's first validate all components of our pipeline:
+
 ```{r}
-validate_abc(py_script, priors, functions, observed, engine = "custom")
+validate_abc(py_script, priors, functions, observed)
 ```
 
-```{r}
+Looking good! Now let's first run ABC simulations. Note the use of the script where we would normally plug in a slendr model function in place of the `model` argument:
+
+```{r, eval=!file.exists(data_path)}
 library(future)
-plan(multicore, workers = 10)
+plan(multicore, workers = 50) # parallelize across 50 CPUs
 
 data <- simulate_abc(
-  py_script, priors, functions, observed,
-  engine = "custom", iterations = 10000,
+  model = py_script, priors, functions, observed, iterations = 10000,
   sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
+```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(data, data_path)
+```
+
+```{r, echo=FALSE, eval=file.exists(data_path)}
+data <- readRDS(data_path)
+```
+
+Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, $N_e$:
+
+```{r}
+abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+```
+
+Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results:
+
+```{r}
+extract_summary(abc)
+```
+
+```{r, custom_Ne_posterior}
+plot_posterior(abc)
+```
+
+Again, in addition to _demografr_'s visualization functions (like `plot_posterior()` above) we have the full range of diagnostic plotting functions bundled with the _abc_ R package at our disposal:
+
+```{r, custom_Ne_diagnostic}
+plot(abc)
 ```
