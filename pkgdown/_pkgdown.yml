@@ -25,6 +25,8 @@ navbar:
           href: articles/vignette-03-grids.html
         - text: Parallelization options
           href: articles/vignette-04-parallelization.html
+        - text: Custom SLiM or Python simulations
+          href: articles/vignette-05-custom-engines.html
     mastodon:
       icon: fa-mastodon
       href: https://fosstodon.org/bodkan

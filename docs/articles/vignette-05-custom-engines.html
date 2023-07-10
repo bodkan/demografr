@@ -80,6 +80,9 @@
     <li>
       <a href="../articles/vignette-04-parallelization.html">Parallelization options</a>
     </li>
+    <li>
+      <a href="../articles/vignette-05-custom-engines.html">Custom SLiM or Python simulations</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -268,26 +271,26 @@ ts.dump(args.output_path)</code></pre>
 <span><span class="co">#&gt; ╟───────────────┼────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │     246║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │65.0 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │65.7 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤════╤════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows│Size    │Has Metadata║</span></span>
 <span><span class="co">#&gt; ╠═══════════╪════╪════════╪════════════╣</span></span>
-<span><span class="co">#&gt; ║Edges      │ 447│14.0 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Edges      │ 453│14.2 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Individuals│ 123│13.8 KiB│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Migrations │   0│ 8 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Mutations  │ 128│ 5.8 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Mutations  │ 132│ 6.0 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Nodes      │ 448│17.3 KiB│         Yes║</span></span>
+<span><span class="co">#&gt; ║Nodes      │ 454│17.5 KiB│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Populations│   1│ 2.3 KiB│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Provenances│   2│ 3.1 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Sites      │ 128│ 3.1 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Sites      │ 132│ 3.2 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧════╧════════╧════════════╝</span></span></code></pre>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ts_m</span></span></code></pre></div>
@@ -302,7 +305,7 @@ ts.dump(args.output_path)</code></pre>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │        246║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │   39.8 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │   39.7 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧═══════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤════╤═════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows│Size     │Has Metadata║</span></span>
@@ -313,7 +316,7 @@ ts.dump(args.output_path)</code></pre>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Migrations │   0│  8 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Mutations  │  32│  1.2 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Mutations  │  30│  1.1 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Nodes      │ 491│ 13.4 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
@@ -321,21 +324,21 @@ ts.dump(args.output_path)</code></pre>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Provenances│   2│  1.6 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Sites      │  32│816 Bytes│          No║</span></span>
+<span><span class="co">#&gt; ║Sites      │  30│766 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧════╧═════════╧════════════╝</span></span></code></pre>
 <p>Now we can finally test our little toy tree-sequence summary functions, verifying that we can indeed compute the summary statistic we want to:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">ts_s</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
-<span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>42</span></span></code></pre>
+<span><span class="co">#&gt;   set   diversity</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">014</span>6</span></span></code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">ts_m</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">006</span>94</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">007</span>82</span></span></code></pre>
 <p>The functions works as expected—we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.</p>
 </div>
 <div class="section level3">
@@ -380,13 +383,13 @@ ts.dump(args.output_path)</code></pre>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                              Ne</span></span>
-<span><span class="co">#&gt; Min.:                  258.3854</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  312.4582</span></span>
-<span><span class="co">#&gt; Weighted Median:       546.4880</span></span>
-<span><span class="co">#&gt; Weighted Mean:         560.5439</span></span>
-<span><span class="co">#&gt; Weighted Mode:         543.5098</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 869.9848</span></span>
-<span><span class="co">#&gt; Max.:                  980.6594</span></span></code></pre>
+<span><span class="co">#&gt; Min.:                  256.3535</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  315.6988</span></span>
+<span><span class="co">#&gt; Weighted Median:       547.7364</span></span>
+<span><span class="co">#&gt; Weighted Mean:         560.4660</span></span>
+<span><span class="co">#&gt; Weighted Mode:         544.4113</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 871.2669</span></span>
+<span><span class="co">#&gt; Max.:                  980.9817</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-05-custom-engines_files/figure-html/custom_Ne_posterior-1.png" width="640" style="display: block; margin: auto;"></p>
