@@ -51,12 +51,12 @@ compute_diversity <- function(ts) {
 functions <- list(diversity = compute_diversity)
 
 test_that("validation passes", {
-  expect_output(validate_abc(model, priors, functions, observed))
+  expect_output(validate_abc(model, priors, functions, observed, engine = "msprime"))
 })
 
-run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
-run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
-run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
+run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
+run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
+run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
 
 test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"

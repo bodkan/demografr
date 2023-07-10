@@ -26,9 +26,9 @@ compute_diversity <- function(ts) {
 functions <- list(diversity = compute_diversity)
 
 nreps <- 2
-run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
-run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
-run3 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
+run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
+run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
+run3 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0, engine = "msprime")
 
 test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same grid setup but model functions differ"

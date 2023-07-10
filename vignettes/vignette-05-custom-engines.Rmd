@@ -1,0 +1,173 @@
+---
+title: Custom SLiM or Python simulations
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Custom SLiM or Python simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 100
+)
+
+devtools::load_all()
+```
+
+By default, _demografr_ uses the [_slendr_](https://github.com/bodkan/slendr) simulation framework for defining models and simulating data from them. But what if you need to do inference using your own scripts? Perhaps _slendr_'s opinionated interface doesn't allow you to do all that you need to do, such as using all powerful simulation features and options of raw SLiM or msprime? This vignette explains how you can use any standard SLiM or msprime script which produces a tree sequence file as its output for standard _demografr_ analysis.
+
+First, let's load _demografr_ itself and also _slendr_ (which, in this vignette, will serve only for analyzing simulated tree-sequence data, but not simulations themselves).
+
+```{r}
+library(demografr)
+library(slendr); init_env(quiet = TRUE)
+```
+
+## Restrictions on user-defined simulation script
+
+In order to be able to use a custom SLiM or msprime script with _demografr_, the script must conform to a couple of rules:
+
+### 1. It must be runnable on the command-line as any other command-line script
+
+- **For an msprime script**, this means something like `python <your script>.py <command-line arguments>`.
+
+- **For a SLiM script**, this means something like `slim <command-line arguments> <your script>.slim`.
+
+### 2. It must accept three mandatory arguments with these exact names
+
+- `sequence_length`: the amount of sequence to simulated
+- `recombination_rate`: the recombination rate along the simulated sequence (in units of crossovers per basepair pergeneration)
+- `output_path`: the path where the simulated tree-sequence object will be saved
+
+**For an msprime script**, these parameters can be specified via the Python built-in module `argparse`, and provided on the command-line as `--sequence_length <value>`, `--recombination_rate <value>`, and `--output_path <path>`. In the script itself, if you use the `argparse` module and have thus the values of provided arguments (for instance) in an `args` object, you can then refer to these arguments as `args.sequence_length`, etc.
+
+**For a SLiM script**, these parameters can be specified via SLiM's standard way of supplying command-line arguments as `-d sequence_length=<value>`, `-d recombination_rate=<value>`, and `-d "output_path='<path>'"`. Importantly, note SLiM's format of specifying string arguments for the `output_path` argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to these arguments via constants `sequence_length`, `recombination_rate`, and `output_path`.
+
+### 3. All model parameters must be provided as additional command-line arguments
+
+You can refer to them in your script as you would to the mandatory arguments as described in the previous section.
+
+## ABC analysis using custom-defined simulation scripts
+
+### Toy problem
+
+Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized population given that we observed nucleotide diversity of:
+
+```{r, echo=FALSE}
+ts <- population("pop", N = 500, time = 10000) %>%
+  compile_model(generation_time = 1, direction = "backward") %>%
+  msprime(sequence_length = 50e6, recombination_rate = 1e-8, random_seed = 42) %>%
+  ts_mutate(mutation_rate = 1e-8, random_seed = 42)
+observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
+```
+
+```{r}
+observed_diversity
+```
+
+## Example pure SLiM and msprime script
+
+To demonstrate the use of requirements 1-3 above, let's perform ABC using each of those scripts as tree-sequence simulation engines.
+
+Imagine we have the following two scripts which we want to use as simulation engines instead of _slendr_'s own functions `slim()` and `msprime()`. The scripts have only **one _model parameter_, which is the $N_e$ of the simulated populations**. The *other parameters are mandatory, just discussed in the previous section.
+
+### SLiM script
+
+```{r, comment=""}
+slim_script <- system.file("examples/custom.slim", package = "demografr")
+
+cat(readLines(slim_script), sep = "\n")
+```
+
+### Python script
+
+```{R, comment=""}
+py_script <- system.file("examples/custom.py", package = "demografr")
+
+cat(readLines(py_script), sep = "\n")
+```
+
+### Individual ABC components
+
+Apart from the user-defined simulation SLiM and msprime scripts, the components of our toy inference remains the same&mdash;we need to define the observed statistics, tree-sequence summary functions, and priors. We don't need a model function&mdash;that's served by out custom scripts (which also serve as simulation engines).
+
+Here are the components (we won't be discussing them here because that's extensively taken care of elsewhere in _demografr_'s documentation vignettes):
+
+```{r}
+priors <- list(Ne ~ runif(10, 1000))
+
+observed <- list(diversity = observed_diversity)
+
+functions <- list(
+  # compute nucleotide diversity on 20 sampled chromosomes
+  diversity = function(ts) {
+    ts_diversity(ts, list(pop = seq(0, 19)))
+  }
+)
+```
+
+(Note that because our simulated tree sequences won't be coming with _slendr_ metadata, we have to refer to individuals' chromosomes using numerical indices rather than _slendr_ symbolic names like we do in all of our other vignettes. This is something we hope to solve on _slendr_'s side at some point soon.)
+
+### Simulating a testing tree sequence
+
+As we explained elsewhere, a useful function for developing inference pipelines using _demografr_ is a function `simulate_ts()`, which normally accepts a _slendr_ model generating function and some parameters (either given as priors or as a list of named values), and simulates a tree-sequence object. This function (as any other _demografr_ function operating with models) accepts our custom-defined simulation scripts in place of standard _slendr_ models.
+
+For instance, we can simulate a couple of Mb of sequence from our SLiM script like this:
+
+```{r, eval=FALSE}
+ts_slim <- simulate_ts(slim_script, parameters = list(Ne = 1234),
+                       sequence_length = 10e6, recombination_rate = 1e-8)
+```
+
+```
+> Setting 'engine' to "custom" is only allowed with a user-defined 'model' script.
+> Setting slendr function as a 'model' is only allowed with "msprime" or "slim" as 'engine'.
+```
+
+Oh no! We got an error! No reason to panic though&mdash;this is _demografr_ being cautious in an effort to prevent the user from making a silly mistake.
+
+Because _demografr_ assumes that most users will be using _slendr_-defined models as inputs, if you want to use a custom-built SLiM or msprime model, you need to explicitly tell every simulation function (`simulate_ts()`, `simulate_abc()`, and `simulate_grid()`) that you intend to do this by setting `engine = "custom"`.
+
+```{r}
+ts_s <- simulate_ts(slim_script, parameters = list(Ne = 123), mutation_rate = 1e-8, engine = "custom")
+ts_m <- simulate_ts(py_script, parameters = list(Ne = 123), mutation_rate = 1e-8, engine = "custom")
+```
+
+We can compare that we get a very similar tree sequence with both the SLiM and msprime engines:
+
+```{r}
+ts_s
+ts_m
+```
+
+Now we can finally test our little toy tree-sequence summary functions, verifying that we can indeed compute the summary statistic we want to:
+
+```{r}
+functions$diversity(ts_s)
+functions$diversity(ts_m)
+```
+
+### Running an ABC analysis
+
+Having all components of our pipeline set up we should, again, validate everything before we proceed to (potentially very costly) simulations. In the remainder of this vignette we'll only continue with the Python msprime custom script, in order to save some computational time. That said, it's important to realize that you could use this sort of workflow for any kind of SLiM script, including very elaborate spatial simulations, non-WF models, and all kinds of phenotypic simulations too!
+
+```{r}
+validate_abc(py_script, priors, functions, observed, engine = "custom")
+```
+
+```{r}
+library(future)
+plan(multicore, workers = 10)
+
+data <- simulate_abc(
+  py_script, priors, functions, observed,
+  engine = "custom", iterations = 10000,
+  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
+```

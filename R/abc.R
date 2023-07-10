@@ -78,34 +78,44 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
         else
           param_args <- params
 
-        # generate a compiled slendr model from a provided function
-        model_fun_args <- c(param_args, model_args)
+        # if a slendr model generating function is given as a model, generate a compiled model
+        # from given parameters and simulate a tree sequence with a specified engine
+        if (is.function(model)) {
+          model_fun_args <- c(param_args, model_args)
+          model_result <- do.call(model, model_fun_args)
 
-        model_result <- do.call(model, model_fun_args)
+          if (inherits(model_result, "slendr_model")) {
+            slendr_model <- model_result
+            sample_schedule <- NULL
+          } else if (length(model_result) == 2) {
+            slendr_model <- model_result[[1]]
+            sample_schedule <- model_result[[2]]
+          } else
+            stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
-        if (inherits(model_result, "slendr_model")) {
-          slendr_model <- model_result
-          sample_schedule <- NULL
-        } else if (length(model_result) == 2) {
-          slendr_model <- model_result[[1]]
-          sample_schedule <- model_result[[2]]
-        } else
-          stop("Incorrect format of the returned result of the model function", call. = FALSE)
+          if (engine == "msprime") slendr_model$path <- NULL
 
-        if (engine == "msprime") slendr_model$path <- NULL
+          # compose a list of required and optional arguments for msprime / SLiM engine
+          engine_fun_args <- list(
+            model = slendr_model,
+            sequence_length = sequence_length,
+            recombination_rate = recombination_rate,
+            samples = sample_schedule
+          ) %>% c(., engine_args)
 
-        # compose a list of required and optional arguments for msprime / SLiM engine
-        engine_fun_args <- list(
-          model = slendr_model,
-          sequence_length = sequence_length,
-          recombination_rate = recombination_rate,
-          samples = sample_schedule
-        ) %>% c(., engine_args)
+          engine_fun <- get(engine, envir = asNamespace("slendr"))
 
-        engine_fun <- get(engine, envir = asNamespace("slendr"))
-
-        # simulate a tree sequence
-        do.call(engine_fun, engine_fun_args)
+          # simulate a tree sequence
+          do.call(engine_fun, engine_fun_args)
+        } else { # if a user-defined script was provided as a model, run it in the background
+          model_engine_args <- c(
+            model, param_args,
+            sequence_length = sequence_length,
+            recombination_rate = recombination_rate
+          )
+          ts_path <- do.call(run_script, model_engine_args)
+          ts_load(ts_path)
+        }
       },
       error = function(cond) {
         msg <- conditionMessage(cond)
@@ -117,23 +127,27 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           return(NULL)
         } else { # if an unexpected error ocurred, report it in full
           cat(" \u274C\n\n")
-          # compose parameters for the complete model function call
-          # (i.e. priors and non-prior arguments to the model generating function)
-          model_fun_params <- paste(
-            vapply(names(model_fun_args),
-                  function(x) sprintf("%s = %s", x, ifelse(is.numeric(model_fun_args[[x]]),
-                                                          model_fun_args[[x]],
-                                                          sprintf("\"%s\"", model_fun_args[[x]]))),
-                  FUN.VALUE = character(1)),
-            collapse = ", "
-          )
-          stop("An unexpected error was raised when generating data from a slendr model\n",
-              "using the provided slendr function.\n\nThe error message received was:\n",
-              msg,
-              "\n\nPerhaps re-running the model function with the sampled parameters will\n",
-              "identify the problem. You can do so by calling:\n\n",
-              paste0(model_name, "(", model_fun_params, ")"),
-              call. = FALSE)
+          if (is.function(model)) {
+            # compose parameters for the complete model function call
+            # (i.e. priors and non-prior arguments to the model generating function)
+            model_fun_params <- paste(
+              vapply(names(model_fun_args),
+                    function(x) sprintf("%s = %s", x, ifelse(is.numeric(model_fun_args[[x]]),
+                                                            model_fun_args[[x]],
+                                                            sprintf("\"%s\"", model_fun_args[[x]]))),
+                    FUN.VALUE = character(1)),
+              collapse = ", "
+            )
+            stop("An unexpected error was raised when generating data from a slendr model\n",
+                "using the provided slendr function.\n\nThe error message received was:\n",
+                msg,
+                "\n\nPerhaps re-running the model function with the sampled parameters will\n",
+                "identify the problem. You can do so by calling:\n\n",
+                paste0(model_name, "(", model_fun_params, ")"),
+                call. = FALSE)
+          } else
+            stop("Simulation via the provided custom script ended with the following error:\n\n",
+                 msg, call. = FALSE)
         }
       }
     )

@@ -4,18 +4,22 @@
 #' replicates and computes summary statistic for the next step of an inference procedure,
 #' which is the ABC estimation itself.
 #'
-#' @param model A slendr model generating function
+#' @param model Either a slendr model generating function (in which case \code{engine} must
+#'   be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+#'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+#'   must be "custom").
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
+#'   script as provided in the \code{model} argument.
 #' @param iterations How many simulation replicates to run?
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
-#' @param engine Which simulation engine to use? Values "msprime" and "slendr::"
-#'   will use the built-in slendr simulation back ends.
 #' @param model_args Optional (non-prior) arguments for the scaffold model generating function
 #' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
@@ -28,10 +32,9 @@
 #'
 #' @export
 simulate_abc <- function(
-  model, priors, functions, observed,
+  model, priors, functions, observed, engine,
   iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  file = NULL, engine = c("msprime", "slim"),
-  model_args = NULL, engine_args = NULL, packages = NULL,
+  file = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
   debug = FALSE, attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
@@ -49,11 +52,9 @@ simulate_abc <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  engine <- match.arg(engine)
-
   # validate the ABC setup
   capture.output(validate_abc(
-    model, priors, functions, observed,
+    model, priors, functions, observed, engine = engine,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
     mutation_rate = mutation_rate, model_args = model_args
   ))

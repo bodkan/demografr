@@ -6,7 +6,11 @@ initialize() {
   initializeGenomicElement(g1, 0, sequence_length - 1);
   initializeRecombinationRate(recombination_rate);
 }
-1 early() { sim.addSubpop("p1", Ne); }
-1000 late() {
+
+1 early() {
+  sim.addSubpop("p0", asInteger(Ne));
+}
+
+10000 late() {
   sim.treeSeqOutput(output_path);
 }

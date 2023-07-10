@@ -76,11 +76,11 @@ simulate_grid <- function(
   results <- future.apply::future_lapply(
     X = seq_len(nrow(grid)),
     FUN = function(grid_i) {
-      params <- as.list(dplyr::select(grid[grid_i, ], -rep))
+      parameters <- as.list(dplyr::select(grid[grid_i, ], -rep))
       iter_result <- run_iteration(
         grid_i,
         model = model,
-        params = params,
+        params = parameters,
         functions = functions,
         sequence_length = sequence_length,
         recombination_rate = recombination_rate,

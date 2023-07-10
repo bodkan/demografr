@@ -5,11 +5,17 @@
 #' and that the user-defined summary functions produce output compatible with
 #' the provided empirical summary statistics.
 #'
-#' @param model A slendr model generating functions
+#' @param model Either a slendr model generating function (in which case \code{engine} must
+#'   be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+#'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+#'   must be "custom").
 #' @param priors A list of prior distributions to use for sampling of model parameters
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
+#'   script as provided in the \code{model} argument.
 #' @param model_args Optional non-prior arguments for the model generating function
 #'   (specified as a named list)
 #' @param engine_args Optional arguments to the simulation engine function (currently
@@ -23,11 +29,13 @@
 #' @return No return value. The function is ran for its terminal output.
 #'
 #' @export
-validate_abc <- function(model, priors, functions, observed, model_args = NULL, engine_args = NULL,
+validate_abc <- function(model, priors, functions, observed, engine,
+                         model_args = NULL, engine_args = NULL,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
-                         attempts = 1000, ...) {
-  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed))
-    stop("A model generating function, priors, summary functions, and observed\n",
+                         attempts = 1000) {
+  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||
+      !check_arg(engine))
+    stop("A model generating function, engine, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
          "really do contain what you think)", call. = FALSE)
 
@@ -35,40 +43,14 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
     stop("Elements of lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
 
-  cat("============================================================\n")
+  cat("======================================================================\n")
 
   prior_samples <- list()
   cat("A model generating function was provided as a scaffold\n")
 
-  cat("============================================================\n")
+  cat("======================================================================\n")
 
   prior_names <- get_prior_names(priors)
-
-  # check that a prior for each argument of a model generating function is provided
-  # (and that other function arguments are also provided)
-  cat("Checking the presence of required function arguments...")
-
-  missing_priors <- setdiff(prior_names, formalArgs(model))
-  if (length(missing_priors) > 0) {
-    cat(" \u274C\n\n")
-    stop("The following priors are not present in the model interface:\n    ",
-          paste(missing_priors, collapse = ", "), "\n\n",
-          "Each prior must correspond to a model function argument.\n",
-          call. = FALSE)
-  }
-
-  all_args <- names(formals(model))
-  nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
-  missing_args <- setdiff(nonimpl_args, c(prior_names, names(model_args)))
-  if (length(missing_args) > 0) {
-    cat(" \u274C\n\n")
-    stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
-          call. = FALSE)
-  }
-
-  cat(" \u2705\n")
-
-  cat("------------------------------------------------------------\n")
 
   cat("Testing sampling of each prior parameter:\n")
 
@@ -88,30 +70,78 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
     prior_samples <- append(prior_samples, list(prior_sample))
   }
 
-  cat("------------------------------------------------------------\n")
+  cat("---------------------------------------------------------------------\n")
 
-  cat("Checking the return statement of the model function...")
+  cat("Checking the consistency of the modelwith the chosen engine...")
 
-  return_expr <- extract_return(model)
-  if (length(return_expr) != 1) {
-    cat(" \u274C\n\n")
-    stop("A demografr model function must have exactly one return statement", call. = FALSE)
-  }
-
-  # extract the content of the return statement (i.e. for return(<expr>) gives <expr>)
-  inner_expr <- as.list(return_expr[[1]])[[2]]
-  if (!length(inner_expr) %in% c(1, 3) ||
-      (length(inner_expr) == 3 && inner_expr[[1]] != quote(list))) {
-    cat(" \u274C\n\n")
-    stop("A demografr model return statement must be:\n  - `return(<model object>)`, or\n",
-         "  - `return(list(<model object>, <sampling schedule>))`", call. = FALSE)
-  }
+  tryCatch(
+    check_model_engine(model, engine),
+    error = function(e) {
+      cat(" \u274C\n\n")
+      stop(e$message, call. = FALSE)
+    }
+  )
 
   cat(" \u2705\n")
 
-  cat("------------------------------------------------------------\n")
+  cat("---------------------------------------------------------------------\n")
 
-  cat("Generating model and simulating tree sequence...")
+  if (is.function(model)) {
+    cat("The model is a slendr function\n")
+
+    cat("Checking the return statement of the model function...")
+
+    return_expr <- extract_return(model)
+    if (length(return_expr) != 1) {
+      cat(" \u274C\n\n")
+      stop("A demografr model function must have exactly one return statement", call. = FALSE)
+    }
+
+    # extract the content of the return statement (i.e. for return(<expr>) gives <expr>)
+    inner_expr <- as.list(return_expr[[1]])[[2]]
+    if (!length(inner_expr) %in% c(1, 3) ||
+        (length(inner_expr) == 3 && inner_expr[[1]] != quote(list))) {
+      cat(" \u274C\n\n")
+      stop("A demografr model return statement must be:\n  - `return(<model object>)`, or\n",
+          "  - `return(list(<model object>, <sampling schedule>))`", call. = FALSE)
+    }
+
+    cat(" \u2705\n")
+
+    cat("---------------------------------------------------------------------\n")
+
+    # check that a prior for each argument of a model generating function is provided
+    # (and that other function arguments are also provided)
+    cat("Checking the presence of required function arguments...")
+
+    missing_priors <- setdiff(prior_names, formalArgs(model))
+    if (length(missing_priors) > 0) {
+      cat(" \u274C\n\n")
+      stop("The following priors are not present in the model interface:\n    ",
+            paste(missing_priors, collapse = ", "), "\n\n",
+            "Each prior must correspond to a model function argument.\n",
+            call. = FALSE)
+    }
+
+    all_args <- names(formals(model))
+    nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
+    missing_args <- setdiff(nonimpl_args, c(prior_names, names(model_args)))
+    if (length(missing_args) > 0) {
+      cat(" \u274C\n\n")
+      stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
+            call. = FALSE)
+    }
+
+    cat(" \u2705\n")
+  } else {
+    script_contents <- readLines(model)
+    script_engine <- if (any(grepl("treeSeqOutput\\(output_path", script_contents))) "SLiM" else "msprime"
+    cat("The model is a custom user-defined", script_engine, "script\n")
+  }
+
+  cat("---------------------------------------------------------------------\n")
+
+  cat("Simulating tree sequence from the given model...")
   ts <- run_simulation(model, priors, sequence_length, recombination_rate,
                        mutation_rate, engine = "msprime",
                        model_args = model_args,
@@ -119,7 +149,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
                        model_name = substitute(model))$ts
   cat(" \u2705\n")
 
-  cat("------------------------------------------------------------\n")
+  cat("---------------------------------------------------------------------\n")
 
   cat("Computing user-defined summary functions:\n")
 
@@ -134,7 +164,7 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
     cat(" \u2705\n")
   }
 
-  cat("------------------------------------------------------------\n")
+  cat("---------------------------------------------------------------------\n")
 
   cat("Checking the format of simulated summary statistics:\n")
 
@@ -212,14 +242,14 @@ validate_abc <- function(model, priors, functions, observed, model_args = NULL, 
 
   if (missing_names) {
     cat("\nSome summary statistics have been provided as plain numeric vectors\n")
-    cat("without names. It is much better to provide each statistic as two column\n")
-    cat("data frame, with the first column 'stat' giving a statistic's name,\n")
-    cat("and the second column 'value' containing its value, both for observed\n")
+    cat("without names. It is much better to provide each statistic in a full\n")
+    cat("data frame with columns containing information about its name etc.,\n")
+    cat("and with the last column containing its value, both for observed\n")
     cat("and simulated statistics.\n\n")
     cat("This bit of additional work makes inference much more robust to bugs and\n")
     cat("typos, as demografr can catch problems before running costly simulations.\n")
   }
 
-  cat("============================================================\n")
+  cat("======================================================================\n")
   cat("No issues have been found in the ABC setup!\n")
 }

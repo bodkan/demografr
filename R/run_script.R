@@ -10,6 +10,15 @@
 #' simulation engine. Otherwise, it is assumed the script is an msprime Python
 #' script.
 #'
+#' Please note that given that there are can be discrepancies between values of
+#' arguments of some SLiM or Python methods (such as \code{addSubPop} which expects an
+#' integer value for a population size, or the \code{samples} argument of
+#' \code{msprime.sim_ancestry}), and values of parameters sampled from
+#' priors by demografr (i.e., Ne often being a floating-point value after sampling
+#' from a continuous prior), you might have to perform explicit type conversion in
+#' your custom SLiM script such as \code{sim.addSubPop("p0", asInteger(Ne))} if
+#' Ne would be one of the model parameters.
+#'
 #' @param script Path to the SLiM or Python script
 #' @param ... Model arguments which will be provided to the script on the command line
 #'
@@ -53,7 +62,7 @@ run_script <- function(script, ...) {
     cli_command <- paste(engine, paste(cli_args, collapse = " "), script, collapse = " ")
 
     # execute the command on the shell command line
-    system(cli_command)
+    system(cli_command, intern = TRUE)
   } else { # run the msprime Python script in the reticulate'd Python interpreter
     # add the path to the output tree sequence and collapse the whole CLI command
     cli_args <- c(cli_args, paste0("--output_path=\"", output_path, "\""))
@@ -66,8 +75,7 @@ run_script <- function(script, ...) {
   }
 
   if (!file.exists(output_path))
-    stop("\n======================================================================\n",
-         "The provided script did not leave a tree-sequence output. Inspect the log\n",
+    stop("The provided script did not leave a tree-sequence output. Inspect the log\n",
          "output above for errors and make sure you can run your custom script \n",
          "on the command-line manually.\n\n",
          "The exact command that failed was:\n\n",

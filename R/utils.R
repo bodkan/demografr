@@ -66,3 +66,15 @@ check_model_functions <- function(model) {
 
   # unpack the expression
 }
+
+check_model_engine <- function(model, engine = c("msprime", "slim", "custom")) {
+  engine <- match.arg(engine)
+  if (is.function(model) && !engine %in% c("msprime", "slim"))
+    stop("For a slendr functions as a model, 'engine' must be either \"msprime\" or \"slim\"",
+         call. = FALSE)
+  if ((engine == "custom" && (!is.character(model) || !file.exists(model))) ||
+      (!is.function(model) && engine != "custom"))
+    stop("\nSetting 'engine' to \"custom\" is only allowed with a user-defined 'model' script.\n",
+         "Setting slendr function as a 'model' is only allowed with \"msprime\" or \"slim\" as 'engine'.",
+         call. = FALSE)
+}

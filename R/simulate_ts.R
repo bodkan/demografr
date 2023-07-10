@@ -1,39 +1,47 @@
-#' Simulate a single tree sequence from the given ABC setup
+#' Simulate a single tree sequence from the given inference setup
 #'
-#' Simulates a tree sequence object from a model with parameters sampled from priors
+#' Simulates a tree sequence object from a model with parameters as specified either
+#' by sampling from priors or by a given list of fixed parameter values
 #'
 #' This function is useful to generate a small tree sequence to be used when developing
-#' summary statistic functions for ABC inference using demografr.
+#' summary statistic functions inference using demografr.
 #'
-#' @param model A compiled slendr model object
-#' @param priors A list of prior distributions to use for sampling of model parameters
+#' @param model Either a slendr model generating function (in which case \code{engine} must
+#'   be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+#'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
+#'   must be "custom").
+#' @param parameters A list of prior distributions to use for sampling of model parameters
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param engine Which simulation engine to use? Values "msprime" and "slim"
-#'   will use the built-in slendr simulation back ends.
-#' @param model_args Optional (non-prior) arguments for the scaffold model generating function
+#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
+#'   script as provided in the \code{model} argument.
+#' @param model_args Optional (non-prior) arguments for the slendr model generating function.
+#'   Ignored when \code{engine = "custom"}.
 #' @param engine_args Optional arguments for the slendr simulation back ends
+#'   Ignored when \code{engine = "custom"}.
 #'
 #' @export
 simulate_ts <- function(
-  model, params,
+  model, parameters,
   sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  engine = NULL, model_args = NULL, engine_args = NULL
+  engine = c("msprime", "slim", "custom"), model_args = NULL, engine_args = NULL
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
-  if (!check_arg(model) || !check_arg(params) || !check_arg(sequence_length) || !check_arg(recombination_rate))
+  if (!check_arg(model) || !check_arg(parameters) || !check_arg(sequence_length) || !check_arg(recombination_rate))
     stop(paste0("A scaffold model, priors and sequence information must be provided."), call. = FALSE)
+
+  check_model_engine(model, engine)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   init_env(quiet = TRUE)
 
-  ts <- run_simulation(model, params, sequence_length, recombination_rate, mutation_rate,
-                       engine = "msprime",
-                       model_args = model_args, engine_args = engine_args, attempts = 1000,
-                       model_name = substitute(model))$ts
+  ts <- run_simulation(model, parameters, sequence_length, recombination_rate, mutation_rate,
+                       engine = engine, model_args = model_args, engine_args = engine_args, attempts = 1000, model_name = substitute(model))$ts
+
   ts
 }
