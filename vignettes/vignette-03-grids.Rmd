@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   fig.width = 8,
   fig.height = 5,
-  dpi = 100
+  dpi = 80
 )
 
 data_path <- here::here("inst/examples/grid_data.rds")
@@ -170,7 +170,7 @@ This looks quite neat and tidy, but how can we make sure that our tree-sequence 
 ```{r}
 # we don't care about the parameter values, as we only want to get *some* tree sequence
 # (also, note we did not specify sequence length, recombination rate, etc.)
-ts <- simulate_ts(model, params = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
+ts <- simulate_ts(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
 ```
 
 With the tiny tree sequence for testing, we can now check if our tree-sequence functions work as they're supposed to:

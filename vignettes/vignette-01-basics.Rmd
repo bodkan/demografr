@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   fig.width = 8,
   fig.height = 5,
-  dpi = 100
+  dpi = 80
 )
 
 data_path <- here::here("inst/examples/abc_data.rds")
@@ -94,9 +94,9 @@ For the purpose of the ABC analysis below, we will bind all statistics in an R l
 
 ```{r}
 observed <- list(
-  diversity = observed_diversity,
+  diversity  = observed_diversity,
   divergence = observed_divergence,
-  f4 = observed_f4
+  f4         = observed_f4
 )
 ```
 
