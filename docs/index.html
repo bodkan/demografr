@@ -100,9 +100,7 @@
 <div class="page-header"><h1 id="demografr-a-simple-and-efficient-abc-toolkit-for-r">
 <em>demografr</em>: A simple and efficient ABC toolkit for R<a class="anchor" aria-label="anchor" href="#demografr-a-simple-and-efficient-abc-toolkit-for-r"></a>
 </h1></div>
-<!-- badges: start -->
-<!-- badges: end -->
-<p><img src="reference/figures/logo.png" align="right"></p>
+<!-- badges: start --><!-- badges: end --><p><img src="reference/figures/logo.png" align="right"></p>
 <p>⚠️⚠️⚠️</p>
 <p><strong>This package is under active development and things often change (and break) on short notice! You probably shouldn’t be using <em>demografr</em> in your own modeling projects at this point.</strong></p>
 <p><strong>A more stable version and a preprint will be ready sometime in summer 2023. Feedback is most welcome!</strong></p>
@@ -157,9 +155,7 @@
 <p>Let’s also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about their <span class="math inline"><em>N</em><sub><em>e</em></sub></span> or split times):</p>
 <p><img src="reference/figures/README-ape_tree-1.png" alt="plot of chunk ape_tree" style="display: block; margin: auto;"></p>
 <p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:</p>
-<ol style="list-style-type: decimal">
-<li>Nucleotide diversity in each population:</li>
-</ol>
+<ol style="list-style-type: decimal"><li>Nucleotide diversity in each population:</li></ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_diversity.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -169,9 +165,7 @@
 <span><span class="co">#&gt; 2 popB 3.291639e-05</span></span>
 <span><span class="co">#&gt; 3 popC 1.015601e-04</span></span>
 <span><span class="co">#&gt; 4 popD 8.995622e-05</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal">
-<li>Pairwise divergence d_X_Y between populations X and Y:</li>
-</ol>
+<ol start="2" style="list-style-type: decimal"><li>Pairwise divergence d_X_Y between populations X and Y:</li></ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_divergence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_divergence.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -183,9 +177,7 @@
 <span><span class="co">#&gt; 4 popB popC 0.0001112956</span></span>
 <span><span class="co">#&gt; 5 popB popD 0.0001155166</span></span>
 <span><span class="co">#&gt; 6 popC popD 0.0001105615</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li>
-</ol>
+<ol start="3" style="list-style-type: decimal"><li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li></ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_f4</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_f4.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -346,13 +338,13 @@
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="reference/figures/README-posterior_Ne-1.png" alt=""><p class="caption">plot of chunk posterior_Ne</p>
+<img src="reference/figures/README-posterior_Ne-1.png" alt="plot of chunk posterior_Ne"><p class="caption">plot of chunk posterior_Ne</p>
 </div>
 <p>Similarly, we can take a look at the inferred posteriors of the split times:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="reference/figures/README-posterior_Tsplit-1.png" alt=""><p class="caption">plot of chunk posterior_Tsplit</p>
+<img src="reference/figures/README-posterior_Tsplit-1.png" alt="plot of chunk posterior_Tsplit"><p class="caption">plot of chunk posterior_Tsplit</p>
 </div>
 <p>And, finally, the rate of gene flow:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -362,7 +354,7 @@
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_C"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="reference/figures/README-diagnostic_Ne-1.png" alt=""><p class="caption">plot of chunk diagnostic_Ne</p>
+<img src="reference/figures/README-diagnostic_Ne-1.png" alt="plot of chunk diagnostic_Ne"><p class="caption">plot of chunk diagnostic_Ne</p>
 </div>
 </div>
 <div class="section level2">
@@ -373,12 +365,12 @@
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_prior.html">plot_prior</a></span><span class="op">(</span><span class="va">priors</span>, <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="reference/figures/README-prior_Ne-1.png" alt=""><p class="caption">plot of chunk prior_Ne</p>
+<img src="reference/figures/README-prior_Ne-1.png" alt="plot of chunk prior_Ne"><p class="caption">plot of chunk prior_Ne</p>
 </div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_prior.html">plot_prior</a></span><span class="op">(</span><span class="va">priors</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"^T"</span>, <span class="st">"^gf"</span><span class="op">)</span>, facet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="reference/figures/README-prior_T_gf-1.png" alt=""><p class="caption">plot of chunk prior_T_gf</p>
+<img src="reference/figures/README-prior_T_gf-1.png" alt="plot of chunk prior_T_gf"><p class="caption">plot of chunk prior_T_gf</p>
 </div>
 </div>
 </div>

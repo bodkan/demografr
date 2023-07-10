@@ -86,20 +86,23 @@ the provided empirical summary statistics.</p>
 <span>  <span class="va">priors</span>,</span>
 <span>  <span class="va">functions</span>,</span>
 <span>  <span class="va">observed</span>,</span>
-<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  recombination_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  attempts <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>model</dt>
-<dd><p>A slendr model generating functions</p></dd>
+<dd><p>Either a slendr model generating function (in which case <code>engine</code> must
+be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+or a path to a custom user-defined SLiM or msprime script (in which case <code>engine</code>
+must be "custom").</p></dd>
 
 
 <dt>priors</dt>
@@ -113,16 +116,6 @@ tree sequences</p></dd>
 
 <dt>observed</dt>
 <dd><p>A named list of observed summary statistics</p></dd>
-
-
-<dt>model_args</dt>
-<dd><p>Optional non-prior arguments for the model generating function
-(specified as a named list)</p></dd>
-
-
-<dt>engine_args</dt>
-<dd><p>Optional arguments to the simulation engine function (currently
-either <code>msprime</code> or <code>slim</code>)</p></dd>
 
 
 <dt>sequence_length</dt>
@@ -140,6 +133,26 @@ either <code>msprime</code> or <code>slim</code>)</p></dd>
 <dt>attempts</dt>
 <dd><p>Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)</p></dd>
+
+
+<dt>engine</dt>
+<dd><p>Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the <code>model</code>. If <code>engine = NULL</code>, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.</p></dd>
+
+
+<dt>model_args</dt>
+<dd><p>Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.</p></dd>
+
+
+<dt>engine_args</dt>
+<dd><p>Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.</p></dd>
 
 </dl></div>
     <div id="value">

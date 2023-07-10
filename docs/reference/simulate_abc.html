@@ -89,19 +89,21 @@ which is the ABC estimation itself.</p>
 <span>  <span class="va">recombination_rate</span>,</span>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"msprime"</span>, <span class="st">"slim"</span><span class="op">)</span>,</span>
-<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  attempts <span class="op">=</span> <span class="fl">1000</span></span>
+<span>  attempts <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>model</dt>
-<dd><p>A slendr model generating function</p></dd>
+<dd><p>Either a slendr model generating function (in which case <code>engine</code> must
+be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
+or a path to a custom user-defined SLiM or msprime script (in which case <code>engine</code>
+must be "custom").</p></dd>
 
 
 <dt>priors</dt>
@@ -137,19 +139,6 @@ tree sequences</p></dd>
 <dd><p>If not <code>NULL</code>, a path where to save the data frame with simulated grid results</p></dd>
 
 
-<dt>engine</dt>
-<dd><p>Which simulation engine to use? Values "msprime" and "slendr::"
-will use the built-in slendr simulation back ends.</p></dd>
-
-
-<dt>model_args</dt>
-<dd><p>Optional (non-prior) arguments for the scaffold model generating function</p></dd>
-
-
-<dt>engine_args</dt>
-<dd><p>Optional arguments for the slendr simulation back ends</p></dd>
-
-
 <dt>packages</dt>
 <dd><p>A character vector with package names used by user-defined summary statistic
 functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
@@ -157,13 +146,29 @@ sure that the parallelized tree-sequence summary statistic functions have all of
 packages available.</p></dd>
 
 
-<dt>debug</dt>
-<dd><p>Only perform a single ABC simulation run, skipping parallelization</p></dd>
-
-
 <dt>attempts</dt>
 <dd><p>Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)</p></dd>
+
+
+<dt>engine</dt>
+<dd><p>Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the <code>model</code>. If <code>engine = NULL</code>, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.</p></dd>
+
+
+<dt>model_args</dt>
+<dd><p>Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.</p></dd>
+
+
+<dt>engine_args</dt>
+<dd><p>Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.</p></dd>
 
 </dl></div>
 

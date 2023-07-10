@@ -85,12 +85,11 @@ values of given population genetic statistics</p>
 <span>  <span class="va">sequence_length</span>,</span>
 <span>  <span class="va">recombination_rate</span>,</span>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  split <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"msprime"</span>, <span class="st">"slim"</span><span class="op">)</span>,</span>
-<span>  file <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -126,14 +125,6 @@ tree sequences</p></dd>
 <dd><p>Mutation rate to use for the simulation</p></dd>
 
 
-<dt>model_args</dt>
-<dd><p>Optional (non-prior) arguments for the scaffold model generating function</p></dd>
-
-
-<dt>engine_args</dt>
-<dd><p>Optional arguments for the slendr simulation back ends</p></dd>
-
-
 <dt>packages</dt>
 <dd><p>A character vector with package names used by user-defined summary statistic
 functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
@@ -141,13 +132,28 @@ sure that the parallelized tree-sequence summary statistic functions have all of
 packages available.</p></dd>
 
 
-<dt>engine</dt>
-<dd><p>Which simulation engine to use? Values "msprime" and "slendr::"
-will use the built-in slendr simulation back ends.</p></dd>
-
-
 <dt>file</dt>
 <dd><p>If not <code>NULL</code>, a path where to save the data frame with simulated grid results</p></dd>
+
+
+<dt>engine</dt>
+<dd><p>Which simulation engine to use? Values "msprime" and "slim" will use one of
+the built-in slendr simulation back ends. Which engine will be used is determined
+by the nature of the <code>model</code>. If <code>engine = NULL</code>, then spatial slendr models will
+by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+custom user-defined model scripts will use the "custom" engine. Setting this argument
+explicitly will change the back ends (where appropriate). Setting this argument for custom
+simulation script has no effect.</p></dd>
+
+
+<dt>model_args</dt>
+<dd><p>Optional (non-prior) arguments for the slendr model generating function.
+Setting this argument for custom simulation script has no effect.</p></dd>
+
+
+<dt>engine_args</dt>
+<dd><p>Optional arguments for the slendr simulation back end. Setting this
+argument for custom simulation script has no effect.</p></dd>
 
 </dl></div>
     <div id="value">
