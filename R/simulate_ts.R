@@ -37,8 +37,6 @@ simulate_ts <- function(
   if (!check_arg(model) || !check_arg(parameters) || !check_arg(sequence_length) || !check_arg(recombination_rate))
     stop(paste0("A scaffold model, priors and sequence information must be provided."), call. = FALSE)
 
-  check_model_engine(model, engine)
-
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
