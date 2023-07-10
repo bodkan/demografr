@@ -14,8 +14,8 @@
 plot_prior <- function(x, param = NULL, facets = FALSE, file = NULL,
                        replicates = 10000, geom = ggplot2::geom_density, ...) {
   priors <- if (inherits(x, "demografr_abc.abc")) attr(x, "priors") else x
-  all_params <- get_prior_names(priors); names(priors) <- all_params
-  subset_params <- subset_parameters(subset = param, all = all_params)
+  all_params <- get_prior_names(priors); names(priors) <- all_parameters
+  subset_params <- subset_parameters(subset = param, all = all_parameters)
   priors <- priors[subset_params]; unname(priors)
 
   samples_df <- simulate_priors(priors, replicates)

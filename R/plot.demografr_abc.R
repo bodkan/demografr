@@ -10,13 +10,13 @@
 plot.demografr_abc.abc <- function(x, param = NULL, ...) {
   parameters <- attr(x, "parameters")
   if (!is.null(param)) {
-    params <- subset_parameters(subset = param, all = colnames(attr(x, "parameters")))
-    x$numparam <- length(params)
-    x$names$parameter.names <- params
-    x$adj.values <- x$adj.values[, params, drop = FALSE]
-    x$residuals <- x$residuals[, params, drop = FALSE]
-    x$unadj.values <- x$unadj.values[, params, drop = FALSE]
-    parameters <- parameters[, params, drop = FALSE]
+    parameters <- subset_parameters(subset = param, all = colnames(attr(x, "parameters")))
+    x$numparam <- length(parameters)
+    x$names$parameter.names <- parameters
+    x$adj.values <- x$adj.values[, parameters, drop = FALSE]
+    x$residuals <- x$residuals[, parameters, drop = FALSE]
+    x$unadj.values <- x$unadj.values[, parameters, drop = FALSE]
+    parameters <- parameters[, parameters, drop = FALSE]
   }
   # after the filtering is done, use normal abc plotting (temporarily stripping away
   # demografr class annotation, replacing it with the abc class)

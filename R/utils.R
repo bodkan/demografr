@@ -30,14 +30,14 @@ quiet <- function(x) {
 }
 
 subset_parameters <- function(subset, all) {
-  params <- all
+  parameters <- all
   if (!is.null(subset)) {
     param_re <- paste0(subset, collapse = "|")
-    params <- grep(param_re, params, value = TRUE)
-    if (length(params) == 0)
+    parameters <- grep(param_re, parameters, value = TRUE)
+    if (length(parameters) == 0)
       stop("No parameters fit the provided parameter subset or regular expression", call. = FALSE)
   }
-  params
+  parameters
 }
 
 # Extract the return expression from a given R function
