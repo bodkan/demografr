@@ -1,43 +1,8 @@
-#######################################################
-# internal functions used for batch simulations in
-# functions simulate_abc() and simulate_grid()
-#######################################################
-
-# Get parameters from the priors, simulate a tree sequence, compute summary statistics
-run_iteration <- function(it,
-                          model, params, functions,
-                          sequence_length, recombination_rate, mutation_rate,
-                          engine, samples, model_args, engine_args,
-                          model_name, attempts) {
-  init_env(quiet = TRUE)
-
-  sim_result <- run_simulation(
-    model = model, params = params, sequence_length = sequence_length,
-    recombination_rate = recombination_rate, mutation_rate = mutation_rate,
-    model_name = model_name, engine = engine, samples = samples,
-    model_args = model_args, engine_args = engine_args,
-    attempts = attempts
-  )
-  ts <- sim_result$ts
-  param_values <- sim_result$param_values
-
-  # collect data for a downstream ABC inference:
-  #   1. compute summary statistics using user-defined tree-sequence functions
-  simulated_stats <- lapply(functions, function(f) f(ts))
-  #   2. collect all parameter values (sampled from priors or given) into a single parameter matrix
-  if (contains_priors(params))
-    param_values <- collect_param_matrix(param_values)
-
-  list(
-    parameters = param_values,
-    simulated = simulated_stats
-  )
-}
-
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
-                           engine, samples, model_args, engine_args, model_name, attempts) {
+                           samples, slendr_engine, slendr_model_args, slendr_engine_args,
+                           model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
@@ -81,7 +46,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
         # if a slendr model generating function is given as a model, generate a compiled model
         # from given parameters and simulate a tree sequence with a specified engine
         if (is.function(model)) {
-          model_fun_args <- c(param_args, model_args)
+          model_fun_args <- c(param_args, slendr_model_args)
           model_result <- do.call(model, model_fun_args)
 
           if (inherits(model_result, "slendr_model")) {
@@ -93,6 +58,9 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           } else
             stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
+          engine <- get_engine(slendr_model, slendr_engine)
+
+          # force no serialization for msprime runs
           if (engine == "msprime") slendr_model$path <- NULL
 
           # compose a list of required and optional arguments for msprime / SLiM engine
@@ -101,7 +69,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
             samples = sample_schedule
-          ) %>% c(., engine_args)
+          ) %>% c(., slendr_engine_args)
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 

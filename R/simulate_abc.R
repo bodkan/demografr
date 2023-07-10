@@ -12,30 +12,33 @@
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param observed A named list of observed summary statistics
-#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
-#'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
-#'   script as provided in the \code{model} argument.
 #' @param iterations How many simulation replicates to run?
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
-#' @param model_args Optional (non-prior) arguments for the scaffold model generating function
-#' @param engine_args Optional arguments for the slendr simulation back ends
 #' @param packages A character vector with package names used by user-defined summary statistic
 #'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 #'   sure that the parallelized tree-sequence summary statistic functions have all of their
 #'   packages available.
-#' @param debug Only perform a single ABC simulation run, skipping parallelization
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
+#' @param slendr_engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#'   the built-in slendr simulation back ends. Which engine will be used is determined
+#'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+#'   by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+#'   custom user-defined model scripts will use the "custom" engine. Setting this argument
+#'   explicitly will change the back ends (where appropriate).
+#' @param slendr_model_args Optional (non-prior) arguments for the slendr model generating function
+#' @param slendr_engine_args Optional arguments for the slendr simulation back end
+#'   (see \code{slendr_engine})
 #'
 #' @export
 simulate_abc <- function(
-  model, priors, functions, observed, engine,
-  iterations, sequence_length, recombination_rate, mutation_rate = 0,
-  file = NULL, model_args = NULL, engine_args = NULL, packages = NULL,
-  debug = FALSE, attempts = 1000
+  model, priors, functions, observed, iterations,
+  sequence_length, recombination_rate, mutation_rate = 0,
+  file = NULL, packages = NULL, attempts = 1000,
+  slendr_engine = NULL, slendr_model_args = NULL, slendr_engine_args = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
   opts <- options(warn = 1)
@@ -54,49 +57,40 @@ simulate_abc <- function(
 
   # validate the ABC setup
   capture.output(validate_abc(
-    model, priors, functions, observed, engine = engine,
+    model, priors, functions, observed,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate, model_args = model_args
+    mutation_rate = mutation_rate,
+    slendr_engine = slendr_engine, slendr_model_args = slendr_model_args,
+    slendr_engine_args = slendr_engine_args
   ))
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   globals <- c(
     lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
-    names(model_args),
-    names(engine_args)
+    names(slendr_model_args),
+    names(slendr_engine_args)
   ) %>%
     unlist()
 
-  if (!debug) {
-    results <- future.apply::future_lapply(
-      X = seq_len(iterations),
-      FUN = run_iteration,
-      model = model,
-      params = priors,
-      functions = functions,
-      sequence_length = sequence_length,
-      recombination_rate = recombination_rate,
-      mutation_rate = mutation_rate,
-      engine = engine,
-      model_args = model_args,
-      engine_args = engine_args,
-      model_name = as.character(substitute(model)),
-      attempts = attempts,
-      future.seed = TRUE,
-      future.globals = globals,
-      future.packages = c("slendr", packages)
-    )
-  } else {
-    results <- list(
-      run_iteration(
-        it = 1, model = model, params = priors, functions = functions,
-        engine = engine, engine_args = engine_args, model_args = model_args,
-        sequence_length = sequence_length, recombination_rate = recombination_rate,
-        mutation_rate = mutation_rate, model_name = substitute(model), attempts = attempts
-      )
-    )
-  }
+  results <- future.apply::future_lapply(
+    X = seq_len(iterations),
+    FUN = run_iteration,
+    model = model,
+    params = priors,
+    functions = functions,
+    sequence_length = sequence_length,
+    recombination_rate = recombination_rate,
+    mutation_rate = mutation_rate,
+    slendr_engine = slendr_engine,
+    slendr_model_args = slendr_model_args,
+    slendr_engine_args = slendr_engine_args,
+    model_name = as.character(substitute(model)),
+    attempts = attempts,
+    future.seed = TRUE,
+    future.globals = globals,
+    future.packages = c("slendr", packages)
+  )
 
   # convert values of sampled priors (one element of a list for each replicate) into
   # a normal R matrix object

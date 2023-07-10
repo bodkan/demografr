@@ -67,9 +67,9 @@ check_model_functions <- function(model) {
   # unpack the expression
 }
 
-check_model_engine <- function(model, engine = c("msprime", "slim", "custom")) {
+check_model_engine <- function(model, engine) {
   engine <- match.arg(engine)
-  if (is.function(model) && !engine %in% c("msprime", "slim"))
+  if (inherits(model, "slendr_model") && !engine %in% c("msprime", "slim"))
     stop("For a slendr functions as a model, 'engine' must be either \"msprime\" or \"slim\"",
          call. = FALSE)
   if ((engine == "custom" && (!is.character(model) || !file.exists(model))) ||
@@ -77,4 +77,14 @@ check_model_engine <- function(model, engine = c("msprime", "slim", "custom")) {
     stop("\nSetting 'engine' to \"custom\" is only allowed with a user-defined 'model' script.\n",
          "Setting slendr function as a 'model' is only allowed with \"msprime\" or \"slim\" as 'engine'.",
          call. = FALSE)
+}
+
+get_engine <- function(slendr_model, slendr_engine) {
+  if (!is.null(slendr_engine)) # if an engine was specified by the user, use that
+    engine <- match.arg(slendr_engine, c("msprime", "slim"))
+  else if (is.null(slendr_model$world))
+    engine <- "msprime" # nonspatial models should use the coalescent slendr/msprime engine
+  else
+    engine <- "slim" # spatial models must use the slendr/SLiM engine
+  engine
 }

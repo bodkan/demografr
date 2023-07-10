@@ -14,19 +14,23 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
-#' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
+#' @param slendr_engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Value "custom" will use a user-defined simulation
-#'   script as provided in the \code{model} argument.
-#' @param model_args Optional (non-prior) arguments for the slendr model generating function.
+#'   script as provided in the \code{model} argument. Which engine will be used is determined
+#'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
+#'   by default use the "slim" back end, non-spatial models will use the "msprime" back end, and
+#'   custom user-defined model scripts will use the "custom" engine. Setting this argument
+#'   explicitly will change the back ends (where appropriate).
+#' @param slendr_model_args Optional (non-prior) arguments for the slendr model generating function.
 #'   Ignored when \code{engine = "custom"}.
-#' @param engine_args Optional arguments for the slendr simulation back ends
+#' @param slendr_engine_args Optional arguments for the slendr simulation back ends
 #'   Ignored when \code{engine = "custom"}.
 #'
 #' @export
 simulate_ts <- function(
   model, parameters,
   sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  engine = c("msprime", "slim", "custom"), model_args = NULL, engine_args = NULL
+  slendr_engine = NULL, slendr_model_args = NULL, slendr_engine_args = NULL
 ) {
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
@@ -41,7 +45,9 @@ simulate_ts <- function(
   init_env(quiet = TRUE)
 
   ts <- run_simulation(model, parameters, sequence_length, recombination_rate, mutation_rate,
-                       engine = engine, model_args = model_args, engine_args = engine_args, attempts = 1000, model_name = substitute(model))$ts
+                       slendr_engine = slendr_engine, slendr_model_args = slendr_model_args,
+                       slendr_engine_args = slendr_engine_args,
+                       attempts = 1000, model_name = substitute(model))$ts
 
   ts
 }
