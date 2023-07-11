@@ -4,25 +4,6 @@
 #' which one of the two it is based on the script's contents) and run it on the
 #' command line with model arguments formatted on the command line automatically.
 #'
-#' The simulation engine for the script is determined by simple heuristic: if the
-#' script contains the string 'treeSeqOutput(output_path' which is mandatory for
-#' any SLiM script usable by demografr, then the SLiM binary is chosen as a
-#' simulation engine. Otherwise, it is assumed the script is an msprime Python
-#' script.
-#'
-#' Please note that given that there are can be discrepancies between values of
-#' arguments of some SLiM or Python methods (such as \code{addSubPop} which expects an
-#' integer value for a population size, or the \code{samples} argument of
-#' \code{msprime.sim_ancestry}), and values of parameters sampled from
-#' priors by demografr (i.e., Ne often being a floating-point value after sampling
-#' from a continuous prior), you might have to perform explicit type conversion in
-#' your custom SLiM script such as \code{sim.addSubPop("p0", asInteger(Ne))} if
-#' Ne would be one of the model parameters.
-#'
-#' @param script Path to the SLiM or Python script
-#' @param ... Model arguments which will be provided to the script on the command line
-#'
-#' @export
 run_script <- function(script, ...) {
   if (!file.exists(script))
     stop("No '", engine, "' script found at '", script, "'", call. = FALSE)

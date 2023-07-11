@@ -10,7 +10,7 @@
 #'   or sampling time.
 #'
 #' @export
-sample_names <- function(ts, split = NULL) {
+extract_names <- function(ts, split = NULL) {
   df <- slendr::ts_samples(ts)
 
   if (is.null(split)) { # return all names if splitting not requested
