@@ -21,4 +21,4 @@ ts = msprime.sim_ancestry(
   recombination_rate=args.recombination_rate,
 )
 
-ts.dump(args.output_path)
+ts.dump(args.output_path) # this call must be present in every script
