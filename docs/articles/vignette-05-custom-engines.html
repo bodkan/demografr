@@ -238,6 +238,7 @@ ts = msprime.sim_ancestry(
 ts.dump(args.output_path) # this call must be present in every script</code></pre>
 <p><strong>Note that the Python script specifies all model parameters (here, <span class="math inline">\(N_e\)</span>) and mandatory arguments, via a command-line interface provided by the Python module <code>argparse</code></strong>.</p>
 <p><strong>The SLiM script, on the other hand, uses SLiM’s features for command-line specification of parameters and simply refers to each parameter by its symbolic name.</strong> No other setup is necessary.</p>
+<p>Please also note that given that there are can be discrepancies between values of arguments of some SLiM or Python methods (such as <code>addSubPop</code> of SLiM which expects an integer value for a population size, or the <code>samples</code> argument of <code>msprime.sim_ancestry</code>), and values of parameters sampled from priors by <em>demografr</em> (i.e., <span class="math inline">\(N_e\)</span> often being a floating-point value after sampling from a continuous prior), you might have to perform explicit type conversion in your custom scripts (such as <code>sim.addSubPop("p0", asInteger(Ne)</code> as above).</p>
 </div>
 <div class="section level3">
 <h3 id="individual-abc-components">Individual ABC components<a class="anchor" aria-label="anchor" href="#individual-abc-components"></a>
