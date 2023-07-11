@@ -25,7 +25,6 @@ docs:
 
 README.md: README.Rmd $(abc_data)
 	R -e 'devtools::install(upgrade = "never")'
-	R -e 'knitr::knit("README.Rmd", output = "README.md")'
 	R -e 'devtools::build_readme()'
 
 $(pkg): README.md
