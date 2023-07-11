@@ -26,6 +26,11 @@ docs:
 README.md: README.Rmd $(abc_data)
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
+	# restore back useless updates to the non-random figures made by pkgdown
+	git checkout \
+		man/figures/README-diagnostic_Ne-1.png \
+		man/figures/README-prior_Ne-1.png \
+		man/figures/README-prior_T_gf-1.png
 
 $(pkg): README.md
 	R -e 'devtools::document()'

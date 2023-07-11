@@ -252,9 +252,3 @@ extract_summary(abc)
 ```{r, custom_Ne_posterior}
 plot_posterior(abc)
 ```
-
-Again, in addition to _demografr_'s visualization functions (like `plot_posterior()` above) we have the full range of diagnostic plotting functions bundled with the _abc_ R package at our disposal:
-
-```{r, custom_Ne_diagnostic}
-plot(abc)
-```
