@@ -11,7 +11,10 @@ knitr::opts_chunk$set(
   dpi = 80
 )
 
-data_path <- here::here("inst/examples/abc_data.rds")
+data_path <- here::here("inst/examples/basics_abc.rds")
+
+if (!file.exists(data_path))
+  stop("Run vignette-01-basics first to generate data", call. = FALSE)
 
 devtools::load_all()
 ```
@@ -69,66 +72,13 @@ devtools::install_github("bodkan/slendr")
 
 _demografr_ is very much in an early experimental stage at this point. Although ABC fitting of "standard" demographic models (i.e. estimating $N_e$, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher. As such, please be aware that the interface might change significantly on a short notice to accomodate features for estimating parameters of more complex custom models such as spatial models etc.
 
-If you want to follow updates on _demografr_, you can do this also on my [Twitter](https://twitter.com/fleventy5). I am not very active there but I do use it to post notes about all my software projects.
+If you want to follow updates on _demografr_, you can do this also on my [Mastodon](https://fosstodon.org/@bodkan).
 
 ## Important pieces missing so far
 
-Currently in progress:
-
-1. Support for temporal sampling via _slendr_'s [schedule_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
-
-2. Implement flexible time units for model parameters as supported by _slendr_ (years ago, generations forwards in time, years into the future, etc.).
-
-3. Implement rejection of non-sensical parameter combinations (daughter populations existing before parent populations, etc.). Easy to solve internally in `simulate_abc()`, it just hasn't happened yet.
-
+Tying the results of _demografr_ ABC inference (internally facilitated by the _abc_ package) to various diagnostics features of _abc_ and other tools.
 
 ## An example ABC analysis
-
-```{r, echo=FALSE, message=FALSE}
-devtools::load_all(".")
-library(slendr)
-
-init_env()
-
-SEED <- 42
-set.seed(SEED)
-```
-
-```{r, eval=!file.exists(system.file("examples/observed_diversity.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_divergence.tsv", package = "demografr")) || !file.exists(system.file("examples/observed_f4.tsv", package = "demografr")), echo=FALSE, message=FALSE}
-# this simulates the entire example data set (also used in the ProbGen23 poster)
-popA <- population("popA", time = 1, N = 2000)
-popB <- population("popB", time = 2000, N = 800, parent = popA)
-popC <- population("popC", time = 6000, N = 9000, parent = popB)
-popD <- population("popD", time = 8000, N = 4000, parent = popC)
-
-gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.1)
-
-example_model <- compile_model(
-  populations = list(popA, popB, popC, popD), gene_flow = gf,
-  generation_time = 1,
-  simulation_length = 10000
-)
-
-ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
-  ts_mutate(1e-8, random_seed = SEED)
-
-samples <- sample_names(ts, split = "pop")
-
-observed_diversity <- ts_diversity(ts, sample_sets = samples)
-observed_divergence <- ts_divergence(ts, sample_sets = samples)
-observed_f4 <- ts_f4(ts,
-                     W = list(popA = samples$popA),
-                     X = list(popB = samples$popB),
-                     Y = list(popC = samples$popC),
-                     Z = list(popD = samples$popD))
-
-write.table(observed_diversity, file = here::here("inst/examples/observed_diversity.tsv"),
-            sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_divergence, file = here::here("inst/examples/observed_divergence.tsv"),
-            sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
-            sep = "\t", row.names = FALSE, quote = FALSE)
-```
 
 Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
@@ -171,7 +121,7 @@ observed_f4
 
 This is how we would use _demografr_ to estimate the $N_e$ and split times for all populations (and the rate of the indicated gene-flow event) with Approximate Bayesian Computation in a single R script:
 
-```{r, eval=!file.exists(data_path)}
+```{r, eval=FALSE}
 library(demografr)
 library(slendr)
 
@@ -285,13 +235,8 @@ data <- simulate_abc(
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
-saveRDS(data, data_path)
-```
-
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-data <- readRDS(data_path)
-abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- readRDS(data_path)
 ```
 
 ## Analysing posterior distributions of parameters

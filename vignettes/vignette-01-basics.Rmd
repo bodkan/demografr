@@ -17,9 +17,54 @@ knitr::opts_chunk$set(
   dpi = 80
 )
 
-data_path <- here::here("inst/examples/abc_data.rds")
+data_path <- here::here("inst/examples/basics_abc.rds")
 
 devtools::load_all()
+```
+
+```{r, echo=FALSE, message=FALSE}
+library(slendr)
+
+init_env()
+
+SEED <- 42
+set.seed(SEED)
+```
+
+```{r, eval=!file.exists(data_path), echo=FALSE, message=FALSE}
+# this simulates the entire example data set (also used in the ProbGen23 poster)
+popA <- population("popA", time = 1, N = 2000)
+popB <- population("popB", time = 2000, N = 800, parent = popA)
+popC <- population("popC", time = 6000, N = 9000, parent = popB)
+popD <- population("popD", time = 8000, N = 4000, parent = popC)
+
+gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.1)
+
+example_model <- compile_model(
+  populations = list(popA, popB, popC, popD), gene_flow = gf,
+  generation_time = 1,
+  simulation_length = 10000
+)
+
+ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
+  ts_mutate(1e-8, random_seed = SEED)
+
+samples <- sample_names(ts, split = "pop")
+
+observed_diversity <- ts_diversity(ts, sample_sets = samples)
+observed_divergence <- ts_divergence(ts, sample_sets = samples)
+observed_f4 <- ts_f4(ts,
+                     W = list(popA = samples$popA),
+                     X = list(popB = samples$popB),
+                     Y = list(popC = samples$popC),
+                     Z = list(popD = samples$popD))
+
+write.table(observed_diversity, file = here::here("inst/examples/observed_diversity.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(observed_divergence, file = here::here("inst/examples/observed_divergence.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
+            sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
 This vignette contains an expanded version of the basic ABC inference example from the homepage of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
@@ -39,29 +84,27 @@ arrows(2.5, 2, 2.5, 3, col="blue")
 
 After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a particular $f_4$ statistic, observing the following values of these summary statistics which we saved in standard R data frames:
 
-```{r, echo=FALSE}
-observed_diversity <- read.table(here::here("inst/examples/observed_diversity.tsv"), header = TRUE)
-
-observed_divergence <- read.table(here::here("inst/examples/observed_divergence.tsv"), header = TRUE)
-
-observed_f4  <- read.table(here::here("inst/examples/observed_f4.tsv"), header = TRUE)
-```
-
 1. Nucleotide diversity in each population:
 
 ```{r}
+observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
 observed_diversity
 ```
 
-2. Pairwise divergence between populations X and Y:
+2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
+observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
+
 observed_divergence
 ```
 
-3. The value of $f_4$(popA, popB; popC, popD):
+3. Value of the following $f_4$-statistic:
 
 ```{r}
+observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+
 observed_f4
 ```
 
@@ -84,10 +127,6 @@ library(future)
 plan(multicore, workers = availableCores())
 
 library(ggplot2)
-```
-
-```{r, echo=FALSE}
-data_file <- here::here("inst/examples/abc_data.rds")
 ```
 
 For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here "diversity" and "divergence") have meaning and are quite important for later steps:
@@ -212,14 +251,14 @@ data <- simulate_abc(
 tend <- Sys.time()
 
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
-saveRDS(tdelta, here::here("inst/examples/abc_tdelta.rds"))
+saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
 ncores <- future::availableCores()
-saveRDS(ncores, here::here("inst/examples/abc_ncores.rds"))
+saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-tdelta <- readRDS(here::here("inst/examples/abc_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/abc_ncores.rds"))
+tdelta <- readRDS(here::here("inst/examples/basics_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE}
@@ -230,25 +269,24 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
-
-```{r, eval=!file.exists(data_path), echo=FALSE}
-saveRDS(data, data_path)
-```
-
-```{r, eval=file.exists(data_path), echo=FALSE}
-data <- readRDS(data_path)
-```
-
 At this point we have generated summary statistics for simulations of models using parameters drawn from our priors. In the next step, we can finally do inference of our parameters.
 
 ### 5. ABC inference
 
-Having all the information about observed and simulated data bound in a single R object `abc_data`, we can finally perform the ABC inference. _demografr_ includes a convenient function `perform_abc()` which reformats the simulated and observed data in a format required by the R package [_abc_](https://cran.r-project.org/package=abc) and internally calls [the function `abc()`](https://cran.r-project.org/web/packages/abc/abc.pdf) of that package.
+Having all the information about observed and simulated data bound in a single R object `data`, we can finally perform the ABC inference. _demografr_ includes a convenient function `perform_abc()` which reformats the simulated and observed data in a format required by the R package [_abc_](https://cran.r-project.org/package=abc) and internally calls [the function `abc()`](https://cran.r-project.org/web/packages/abc/abc.pdf) of that package.
 
 Note that `perform_abc` is just convenience wrapper around the `abc()` function in the package _abc_`, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function `abc()` can be provided to `perform_abc()`, which will then pass them on appropriately.
 
-```{r}
+```{r, eval=file.exists(data_path), echo=FALSE}
+abc <- readRDS(data_path)
+```
+
+```{r, eval=!file.exists(data_path), echo=FALSE}
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet", seed = 42)
+```
+
+```{r, eval=!file.exists(data_path), echo=FALSE}
+saveRDS(abc, data_path)
 ```
 
 ### 6. Posterior analysis

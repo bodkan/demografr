@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   dpi = 80
 )
 
-data_path <- here::here("inst/examples/custom_data.rds")
+data_path <- here::here("inst/examples/custom_abc.rds")
 
 devtools::load_all()
 ```
@@ -171,29 +171,64 @@ validate_abc(py_script, priors, functions, observed)
 
 Looking good! Now let's first run ABC simulations. Note the use of the script where we would normally plug in a slendr model function in place of the `model` argument:
 
+
+
+
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+tstart <- Sys.time()
+```
+
 ```{r, eval=!file.exists(data_path)}
 library(future)
-plan(multicore, workers = 50) # parallelize across 50 CPUs
+plan(multicore, workers = availableCores()) # parallelize across all 96 CPUs
 
 data <- simulate_abc(
-  model = py_script, priors, functions, observed, iterations = 10000,
+  model = py_script, priors, functions, observed, iterations = 10,
   sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
+tend <- Sys.time()
+
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+saveRDS(tdelta, here::here("inst/examples/custom_tdelta.rds"))
+ncores <- future::availableCores()
+saveRDS(ncores, here::here("inst/examples/custom_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(data_path)}
+tdelta <- readRDS(here::here("inst/examples/custom_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/custom_ncores.rds"))
+```
+
+```{r, echo=FALSE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+
+```{r, eval=!file.exists(data_path), echo=FALSE}
 saveRDS(data, data_path)
 ```
+
+Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, $N_e$:
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
 data <- readRDS(data_path)
 ```
 
-Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, $N_e$:
-
-```{r}
+```{r, eval=!file.exists(data_path)}
 abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(abc, data_path)
+```
+
 
 Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results:
 
