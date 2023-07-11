@@ -299,7 +299,7 @@ samples <- tibble(
 
 ### Within-African gene flow vs inference of Neanderthal ancestry
 
-```{r, aa_indirect}
+```{r, aa_indirect, class.source = 'fold-hide'}
 results %>%
   unnest(indirect) %>%
   filter(rate_ea == 0) %>%          # ignore models with Eurasian -> African gene flow
@@ -315,7 +315,7 @@ results %>%
             "Red line indicates the true Neanderthal ancestry proportion")
 ```
 
-```{r, aa_direct}
+```{r, aa_direct, class.source = 'fold-hide'}
 results %>%
   unnest(direct) %>%
   filter(rate_ea == 0) %>%
@@ -335,7 +335,7 @@ results %>%
 
 ### Eurasia -> Africa gene flow vs inference of Neanderthal ancestry
 
-```{r, ea_indirect}
+```{r, ea_indirect, class.source = 'fold-hide'}
 results %>%
   unnest(indirect) %>%
   filter(rate_aa == 0.2) %>%
@@ -352,7 +352,7 @@ results %>%
 ```
 
 
-```{r, ea_direct}
+```{r, ea_direct, class.source = 'fold-hide'}
 results %>%
   unnest(direct) %>%
   filter(rate_aa == 0.2) %>%
