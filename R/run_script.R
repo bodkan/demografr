@@ -1,9 +1,8 @@
-#' Run a custom tailored SLiM or Python (msprime) simulation script
-#'
-#' This function will take as input a path to a SLiM or Python script (detecting
-#' which one of the two it is based on the script's contents) and run it on the
-#' command line with model arguments formatted on the command line automatically.
-#'
+# Run a custom tailored SLiM or Python (msprime) simulation script
+#
+# This function will take as input a path to a SLiM or Python script (detecting
+# which one of the two it is based on the script's contents) and run it on the
+# command line with model arguments formatted on the command line automatically.
 run_script <- function(script, ...) {
   if (!file.exists(script))
     stop("No '", engine, "' script found at '", script, "'", call. = FALSE)
