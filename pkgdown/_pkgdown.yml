@@ -37,14 +37,20 @@ reference:
     - validate_abc
     - simulate_abc
     - perform_abc
-    - combine_abc
 
   - title: Grid-based inference
     contents:
     - simulate_grid
-    - combine_grid
 
-  - title: Visualization of priors and posteriors
+  - title: Helper functions
+    contents:
+    - combine_data.demografr_sims_abc
+    - combine_data.demografr_sims_grid
+    - simulate_ts
+    - extract_names
+    - sample_prior
+
+  - title: Visualization of distributions
     contents:
     - plot_prior
     - plot_posterior
@@ -56,11 +62,6 @@ reference:
     - extract_summary
     - extract_posterior
 
-  - title: Helper functions
-    contents:
-    - simulate_ts
-    - extract_names
-    - sample_prior
 
 news:
   one_page: true

@@ -7,7 +7,7 @@
 #'
 #' @export
 #' @keywords internal
-print.demografr_sims <- function(x, ...) {
+print.demografr_sims.abc <- function(x, ...) {
 
   n_iterations <- nrow(x$parameters)
   cat("Number of simulation replicates:", n_iterations, "\n\n")

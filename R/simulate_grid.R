@@ -118,6 +118,8 @@ simulate_grid <- function(
   attr(results_df, "functions") <- functions
   attr(results_df, "model") <- model
 
+  class(results_df) <- c(class(results_df), "demografr_sims.grid")
+
   if (is.null(file))
     return(results_df)
   else
