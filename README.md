@@ -55,30 +55,19 @@ devtools::install_github("bodkan/slendr")
 
 _demografr_ is very much in an early experimental stage at this point. Although ABC fitting of "standard" demographic models (i.e. estimating $N_e$, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher. As such, please be aware that the interface might change significantly on a short notice to accomodate features for estimating parameters of more complex custom models such as spatial models etc.
 
-If you want to follow updates on _demografr_, you can do this also on my [Twitter](https://twitter.com/fleventy5). I am not very active there but I do use it to post notes about all my software projects.
+If you want to follow updates on _demografr_, you can do this also on my [Mastodon](https://fosstodon.org/@bodkan).
 
 ## Important pieces missing so far
 
-Currently in progress:
-
-1. Support for temporal sampling via _slendr_'s [schedule_sampling()](https://www.slendr.net/reference/schedule_sampling.html).
-
-2. Implement flexible time units for model parameters as supported by _slendr_ (years ago, generations forwards in time, years into the future, etc.).
-
-3. Implement rejection of non-sensical parameter combinations (daughter populations existing before parent populations, etc.). Easy to solve internally in `simulate_abc()`, it just hasn't happened yet.
-
+Tying the results of _demografr_ ABC inference (internally facilitated by the _abc_ package) to various diagnostics features of _abc_ and other tools.
 
 ## An example ABC analysis
-
-
-
-
 
 Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
 Let's also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
-<img src="man/figures/README-ape_tree-1.png" alt="plot of chunk ape_tree" style="display: block; margin: auto;" />
+<img src="man/figures/README-ape_tree-1.png" style="display: block; margin: auto;" />
 
 After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
 
@@ -90,10 +79,10 @@ observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", 
 
 observed_diversity
 #>    set    diversity
-#> 1 popA 8.017526e-05
-#> 2 popB 3.291639e-05
-#> 3 popC 1.015601e-04
-#> 4 popD 8.995622e-05
+#> 1 popA 8.138167e-05
+#> 2 popB 3.262781e-05
+#> 3 popC 1.010541e-04
+#> 4 popD 8.963820e-05
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
@@ -104,12 +93,12 @@ observed_divergence <- read.table(system.file("examples/observed_divergence.tsv"
 
 observed_divergence
 #>      x    y   divergence
-#> 1 popA popB 0.0002370556
-#> 2 popA popC 0.0002385690
-#> 3 popA popD 0.0002388364
-#> 4 popB popC 0.0001112956
-#> 5 popB popD 0.0001155166
-#> 6 popC popD 0.0001105615
+#> 1 popA popB 0.0002442102
+#> 2 popA popC 0.0002443844
+#> 3 popA popD 0.0002448539
+#> 4 popB popC 0.0001099973
+#> 5 popB popD 0.0001160577
+#> 6 popC popD 0.0001099985
 ```
 
 3. Value of the following $f_4$-statistic:
@@ -120,7 +109,7 @@ observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "de
 
 observed_f4
 #>      W    X    Y    Z            f4
-#> 1 popA popB popC popD -1.977049e-06
+#> 1 popA popB popC popD -2.796781e-06
 ```
 
 ### A complete ABC analysis in a single R script
@@ -151,7 +140,7 @@ observed <- list(
 # define a model generating function using the slendr interface
 # (each of the function parameters correspond to a parameter we want to infer)
 
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   # define populations
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
@@ -192,7 +181,9 @@ priors <- list(
 
   T_AB ~ runif(1, 10000),
   T_BC ~ runif(1, 10000),
-  T_CD ~ runif(1, 10000)
+  T_CD ~ runif(1, 10000),
+
+  gf_BC ~ runif(0, 1)
 )
 
 #--------------------------------------------------------------------------------
@@ -200,15 +191,15 @@ priors <- list(
 # same format as the summary statistics computed on empirical data)
 
 compute_diversity <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),
@@ -242,8 +233,6 @@ abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 
 
 
-
-
 ## Analysing posterior distributions of parameters
 
 After we run this R script, we end up with an object called `abc` here. This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest ($N_e$ of populations and their split times).
@@ -253,22 +242,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                             Ne_A      Ne_B       Ne_C      Ne_D      T_AB
-#> Min.:                   726.2542  163.8594 -1017.3406 -3433.837  927.4872
-#> Weighted 2.5 % Perc.:  1320.0719  378.2407   194.9113 -1564.857 1224.1380
-#> Weighted Median:       1656.3107  872.8798  3017.9671  1340.711 1886.0861
-#> Weighted Mean:         1647.9974  931.5978  3067.8114  1362.002 1927.7553
-#> Weighted Mode:         1458.4148  689.4098  2992.5771  1041.201 1803.2012
-#> Weighted 97.5 % Perc.: 1991.1578 1613.3712  6315.2782  4211.055 2688.1677
-#> Max.:                  2179.7458 2154.9233  9161.2290  8606.179 3218.2239
-#>                            T_BC      T_CD
-#> Min.:                  1291.719  7359.889
-#> Weighted 2.5 % Perc.:  3620.575  8300.836
-#> Weighted Median:       4621.168  9193.167
-#> Weighted Mean:         4588.311  9195.958
-#> Weighted Mode:         4706.233  8859.321
-#> Weighted 97.5 % Perc.: 5413.628 10050.445
-#> Max.:                  6025.282 10528.238
+#>                             Ne_A      Ne_B       Ne_C      Ne_D     T_AB
+#> Min.:                   180.7139  550.6153   122.8347 -1912.730 1003.899
+#> Weighted 2.5 % Perc.:   677.6925  659.8394  2160.5181  1459.736 1291.919
+#> Weighted Median:       1813.7545  920.5963  4976.6440  4785.787 1950.690
+#> Weighted Mean:         1872.0929  973.5713  5245.6373  4619.442 1927.526
+#> Weighted Mode:         1537.3341  780.4878  4239.7113  4966.632 2006.081
+#> Weighted 97.5 % Perc.: 3102.8138 1422.5237  9477.6885  8013.777 2678.851
+#> Max.:                  3755.4707 1847.5938 10638.4032 11360.235 3023.821
+#>                            T_BC      T_CD        gf_BC
+#> Min.:                  2379.081  5499.188 -0.173599521
+#> Weighted 2.5 % Perc.:  3927.054  6611.181  0.008873377
+#> Weighted Median:       5257.157  8501.592  0.276919543
+#> Weighted Mean:         5185.616  8437.859  0.307834005
+#> Weighted Mode:         5535.438  8597.783  0.233571446
+#> Weighted 97.5 % Perc.: 6151.175  9711.744  0.726300955
+#> Max.:                  6982.378 10565.561  1.248000026
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -277,13 +266,13 @@ We can also specify a subset of model parameters to select, or provide a regular
 ```r
 extract_summary(abc, param = "Ne")
 #>                             Ne_A      Ne_B       Ne_C      Ne_D
-#> Min.:                   726.2542  163.8594 -1017.3406 -3433.837
-#> Weighted 2.5 % Perc.:  1320.0719  378.2407   194.9113 -1564.857
-#> Weighted Median:       1656.3107  872.8798  3017.9671  1340.711
-#> Weighted Mean:         1647.9974  931.5978  3067.8114  1362.002
-#> Weighted Mode:         1458.4148  689.4098  2992.5771  1041.201
-#> Weighted 97.5 % Perc.: 1991.1578 1613.3712  6315.2782  4211.055
-#> Max.:                  2179.7458 2154.9233  9161.2290  8606.179
+#> Min.:                   180.7139  550.6153   122.8347 -1912.730
+#> Weighted 2.5 % Perc.:   677.6925  659.8394  2160.5181  1459.736
+#> Weighted Median:       1813.7545  920.5963  4976.6440  4785.787
+#> Weighted Mean:         1872.0929  973.5713  5245.6373  4619.442
+#> Weighted Mode:         1537.3341  780.4878  4239.7113  4966.632
+#> Weighted 97.5 % Perc.: 3102.8138 1422.5237  9477.6885  8013.777
+#> Max.:                  3755.4707 1847.5938 10638.4032 11360.235
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -293,7 +282,7 @@ We can also visualize the posterior distributions. Rather than plotting many dif
 plot_posterior(abc, param = "Ne")
 ```
 
-![plot of chunk posterior_Ne](man/figures/README-posterior_Ne-1.png)
+![](man/figures/README-posterior_Ne-1.png)
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
@@ -302,15 +291,16 @@ Similarly, we can take a look at the inferred posteriors of the split times:
 plot_posterior(abc, param = "T")
 ```
 
-![plot of chunk posterior_Tsplit](man/figures/README-posterior_Tsplit-1.png)
+![](man/figures/README-posterior_Tsplit-1.png)
 
 And, finally, the rate of gene flow:
 
 
 ```r
 plot_posterior(abc, param = "gf")
-#> Error: No parameters fit the provided parameter subset or regular expression
 ```
+
+![](man/figures/README-posterior_gf-1.png)
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
 
@@ -319,7 +309,7 @@ Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-proj
 plot(abc, param = "Ne_C")
 ```
 
-![plot of chunk diagnostic_Ne](man/figures/README-diagnostic_Ne-1.png)
+![](man/figures/README-diagnostic_Ne-1.png)
 
 ## Additional functionality
 
@@ -334,11 +324,11 @@ For instance, assuming we have `priors` set up as above, we can visualize the pr
 plot_prior(priors, "Ne")
 ```
 
-![plot of chunk prior_Ne](man/figures/README-prior_Ne-1.png)
+![](man/figures/README-prior_Ne-1.png)
 
 
 ```r
 plot_prior(priors, c("^T", "^gf"), facet = TRUE)
 ```
 
-![plot of chunk prior_T_gf](man/figures/README-prior_T_gf-1.png)
+![](man/figures/README-prior_T_gf-1.png)
