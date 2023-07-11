@@ -203,16 +203,16 @@ run5_file <- tempfile(fileext = ".rds")
 simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
 
 # on machine #2
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run2_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run2_file)
 
 # on machine #3
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run3_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run3_file)
 
 # on machine #4
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run4_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run4_file)
 
 # on machine #5
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-80, file = run5_file)
+simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run5_file)
 ```
 
 Then, once we collected the individual `.rds` files on a single computer from the remote machines (perhaps using something like the `scp` unix command), we can use another _demografr_ function `combine_grid()` to merge all individual runs into a single result:
