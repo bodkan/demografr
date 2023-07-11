@@ -74,7 +74,13 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
           # simulate a tree sequence
-          do.call(engine_fun, engine_fun_args)
+          ts <- do.call(engine_fun, engine_fun_args)
+
+          # clean up if needed
+          if (!is.null(slendr_model$path))
+            unlink(slendr_model$path, recursive = TRUE)
+
+          ts
         } else { # if a user-defined script was provided as a model, run it in the background
           model_engine_args <- c(
             model, param_args,
@@ -125,6 +131,9 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
 
   if (mutation_rate != 0)
     ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
+
+  # clean up if needed
+  if (!is.null(attr(ts, "path"))) unlink(attr(ts, "path"))
 
   list(ts = ts, param_values = unlist(param_args))
 }
