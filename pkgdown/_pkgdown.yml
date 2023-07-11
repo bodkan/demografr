@@ -59,7 +59,7 @@ reference:
   - title: Helper functions
     contents:
     - simulate_ts
-    - sample_names
+    - extract_names
     - sample_prior
 
 news:
