@@ -58,7 +58,7 @@ Here is our summary function:
 ```{r}
 functions <- list(
   diversity = function(ts) {
-    ts_diversity(ts, sample_sets = sample_names(ts, split = "pop"))
+    ts_diversity(ts, sample_sets = extract_names(ts, split = "pop"))
   }
 )
 ```
@@ -94,7 +94,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-data <- simulate_grid(model, grid, functions, replicates = 10, sequence_length = 10000, recombination_rate = 1e-8)
+data <- simulate_grid(model, grid, functions, replicates = 15, sequence_length = 10000, recombination_rate = 1e-8)
 
 data
 ```
@@ -119,7 +119,7 @@ First we setup _future_:
 
 ```{r}
 library(future)
-plan(multicore, workers = 10) # use all 10 available CPUs
+plan(multicore, workers = 15) # use all 10 available CPUs
 ```
 
 Then we can run the simulations **without having to do anything else!** This last point is important: _demografr_ can automatically leverage whatever parallelization scheme you set up via _future_'s function `plan()`.
@@ -129,7 +129,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-data <- simulate_grid(model, grid, functions, replicates = 10, sequence_length = 100000, recombination_rate = 1e-8)
+data <- simulate_grid(model, grid, functions, replicates = 15, sequence_length = 100000, recombination_rate = 1e-8)
 
 data
 ```
@@ -191,34 +191,26 @@ To demonstrate this, let's pretend we ran five simulation grid runs across five 
 
 ```{r}
 library(future)
-plan(multicore, workers = 10)
+plan(multicore, workers = 5)
 
 run1_file <- tempfile(fileext = ".rds")
 run2_file <- tempfile(fileext = ".rds")
 run3_file <- tempfile(fileext = ".rds")
-run4_file <- tempfile(fileext = ".rds")
-run5_file <- tempfile(fileext = ".rds")
 
 # on machine #1
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
+simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 1e-8, file = run1_file)
 
 # on machine #2
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run2_file)
+simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 1e-8, file = run2_file)
 
 # on machine #3
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run3_file)
-
-# on machine #4
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run4_file)
-
-# on machine #5
-simulate_grid(model, grid, functions, replicates = 2, sequence_length = 100000, recombination_rate = 1e-8, file = run5_file)
+simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 1e-8, file = run3_file)
 ```
 
 Then, once we collected the individual `.rds` files on a single computer from the remote machines (perhaps using something like the `scp` unix command), we can use another _demografr_ function `combine_grid()` to merge all individual runs into a single result:
 
 ```{r}
-data <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
+data <- combine_grid(run1_file, run2_file, run3_file)
 
 data
 ```
@@ -236,8 +228,8 @@ For completeness, `combine_grid()` and `combine_abc()` do not only accept file p
 **Merging data from serialized data files:**
 
 ```{r}
-combined1 <- combine_grid(run1_file, run2_file, run3_file, run4_file, run5_file)
-combined2 <- combine_grid(list(run1_file, run2_file, run3_file, run4_file, run5_file))
+combined1 <- combine_grid(run1_file, run2_file, run3_file)
+combined2 <- combine_grid(list(run1_file, run2_file, run3_file))
 ```
 
 
@@ -247,22 +239,18 @@ combined2 <- combine_grid(list(run1_file, run2_file, run3_file, run4_file, run5_
 run1 <- readRDS(run1_file)
 run2 <- readRDS(run2_file)
 run3 <- readRDS(run3_file)
-run4 <- readRDS(run4_file)
-run5 <- readRDS(run5_file)
 
-combined3 <- combine_grid(run1, run2, run3, run4, run5)
-combined4 <- combine_grid(list(run1, run2, run3, run4, run5))
+combined3 <- combine_grid(run1, run2, run3)
+combined4 <- combine_grid(list(run1, run2, run3))
 ```
 
 ```{r, eval=FALSE}
-run1 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-run2 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-run3 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-run4 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
-run5 <- simulate_grid(model, grid, functions, replicates = 4, sequence_length = 100000, recombination_rate = 0)
+run1 <- simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 0)
+run2 <- simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 0)
+run3 <- simulate_grid(model, grid, functions, replicates = 5, sequence_length = 100000, recombination_rate = 0)
 
-combined3 <- combine_grid(run1, run2, run3, run4, run5)
-combined4 <- combine_grid(list(run1, run2, run3, run4, run5))
+combined3 <- combine_grid(run1, run2, run3)
+combined4 <- combine_grid(list(run1, run2, run3))
 ```
 
 **All `combine_grid()` approaches give the same result:**

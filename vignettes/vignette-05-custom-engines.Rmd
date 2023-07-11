@@ -134,6 +134,8 @@ cat(readLines(python_script), sep = "\n")
 
 **The SLiM script, on the other hand, uses SLiM's features for command-line specification of parameters and simply refers to each parameter by its symbolic name.** No other setup is necessary.
 
+Please also note that given that there are can be discrepancies between values of arguments of some SLiM or Python methods (such as `addSubPop` of SLiM which expects an integer value for a population size, or the `samples` argument of `msprime.sim_ancestry`), and values of parameters sampled from priors by _demografr_ (i.e., $N_e$ often being a floating-point value after sampling from a continuous prior), you might have to perform explicit type conversion in your custom scripts (such as `sim.addSubPop("p0", asInteger(Ne)` as above).
+
 ### Individual ABC components
 
 Apart from the user-defined simulation SLiM and _msprime_ scripts, the components of our toy inference remains the same&mdash;we need to define the observed statistics, tree-sequence summary functions, and priors. We don't need a model function&mdash;that will be served by our custom script.

@@ -49,7 +49,7 @@ example_model <- compile_model(
 ts <- msprime(example_model, sequence_length = 100e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
-samples <- sample_names(ts, split = "pop")
+samples <- extract_names(ts, split = "pop")
 
 observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
@@ -201,15 +201,15 @@ In our example, because we computed nucleotide diversity and pairwise divergence
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- sample_names(ts, split = "pop")
+  samples <- extract_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),
