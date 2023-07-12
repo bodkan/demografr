@@ -67,13 +67,13 @@ write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
-This vignette contains an expanded version of the basic ABC inference example from the homepage of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
+This vignette contains an expanded version of the basic ABC inference example from the [homepage](https://bodkan.net/demografr) of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
 
 ## Introduction
 
 Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
 
-Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
+Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about the values of $N_e$, split times, or gene-flow rates):
 
 ```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
 par(mar = c(0, 0, 0, 0))
@@ -82,7 +82,7 @@ plot(tree)
 arrows(2.5, 2, 2.5, 3, col="blue")
 ```
 
-After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a particular $f_4$ statistic, observing the following values of these summary statistics which we saved in standard R data frames:
+After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a one $f_4$ statistic, observing the following values of these summary statistics (which we saved in standard R data frames&mdash;perhaps saved by software we used for computing these from empirical sequence data):
 
 1. Nucleotide diversity in each population:
 
