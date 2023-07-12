@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
   fig.height = 5,
   dpi = 100
 )
+
+set.seed(42)
 ```
 
 In order to perform probabilistic inference using a method such as Approximate Bayesian Computation, we need a way to specify prior distributions of parameters.
