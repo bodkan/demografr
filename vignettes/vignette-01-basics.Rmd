@@ -65,6 +65,12 @@ write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
+⚠️⚠️⚠️
+
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+
+⚠️⚠️⚠️
+
 This vignette contains an expanded version of the basic ABC inference example from the [homepage](https://bodkan.net/demografr/) of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
 
 ## Introduction

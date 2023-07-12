@@ -19,6 +19,12 @@ knitr::opts_chunk$set(
 set.seed(42)
 ```
 
+⚠️⚠️⚠️
+
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+
+⚠️⚠️⚠️
+
 In order to perform probabilistic inference using a method such as Approximate Bayesian Computation, we need a way to specify prior distributions of parameters.
 
 Different frameworks and languages approach this from different angles. This vignette describes a method used by _demografr_. **The description provided here is quite detailed and technical.** Unless you're very curious about metaprogramming tricks provided by the R language, you're very unlikely to need this.

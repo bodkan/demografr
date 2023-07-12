@@ -24,6 +24,12 @@ knitr::opts_chunk$set(
 data_path <- here::here("inst/examples/grid_data.rds")
 ```
 
+⚠️⚠️⚠️
+
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+
+⚠️⚠️⚠️
+
 Although Approximate Bayesian Computation is arguably the most popular method for simulation-based inference, it's certainly not the only one. Another useful method for exploring the behavior of statistics under given combination of model parameters, and perhaps even very simple model parameter fitting are grid simulations. Briefly, we define a set of parameters of a model, run simulation replicates for each combination of parameters, computing summary statistics of interest for each replicat, and then&mdash;for instance&mdash;inspect which parameter combinations lead to the values of summary statistics closes to those we observed in the data, or simply inspect how do different parameter values affect the statistics in general.
 
 ## Example analysis

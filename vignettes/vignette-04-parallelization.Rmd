@@ -18,6 +18,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+⚠️⚠️⚠️
+
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+
+⚠️⚠️⚠️
+
 One of the main selling points of _demografr_ is computational efficiency. Although R isn't exactly known for computational speed, by utilizing _msprime_ (and, optionally, SLiM) for simulation and the _tskit_ tree-sequence module for population genetic computation without having to rely on saving files to disk, _demografr_ is surprisingly fast and efficient for an R package.
 
 Still, optimized means of simulation and computation can only get us so far. Especially for computationally very heavy analyses such an ABC, parallelization is absolutely crucial. To this end, _demografr_ provides two ways of parallelizing analyses. One is more sophisticated and easier to do, but it does require a little bit of setup. Another is more straightforward but a little less convenient.
