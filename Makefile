@@ -4,8 +4,6 @@ version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/
 pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
 
-abc_data := inst/examples/abc_data.rds
-
 build: $(pkg)
 
 test:
@@ -23,7 +21,7 @@ docs:
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
 
-README.md: README.Rmd $(abc_data)
+README.md: README.Rmd
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
 	# restore back useless updates to the non-random figures made by pkgdown
@@ -38,9 +36,6 @@ $(pkg): README.md
 
 $(logo): logo.R
 	R -e 'source("logo.R")'
-
-$(abc_data):
-	R -e 'pkgdown::build_article("vignette-01-basics")'
 
 build: $(pkg)
 
