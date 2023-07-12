@@ -43,6 +43,9 @@ Setting this argument for custom simulation script has no effect.}
 \item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.}
 }
+\value{
+A tree-sequence object of the class \code{slendr_ts}
+}
 \description{
 Simulates a tree sequence object from a model with parameters as specified either
 by sampling from priors or by a given list of fixed parameter values

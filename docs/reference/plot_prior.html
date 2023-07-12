@@ -98,7 +98,8 @@ sampling statements</p></dd>
 
 <dt>param</dt>
 <dd><p>A character vector containing either parameter names to summarize,
-or a regex-like matches to be used for subsetting.</p></dd>
+or a regex-like matches to be used for subsetting. If <code>NULL</code> (the default),
+all parameters will be extracted.</p></dd>
 
 
 <dt>facets</dt>
@@ -119,6 +120,10 @@ or a regex-like matches to be used for subsetting.</p></dd>
 
 <dt>...</dt>
 <dd><p>Optional argument which will be passed to <code>ggsave</code></p></dd>
+
+
+<dt>A</dt>
+<dd><p>ggplot2 plot object</p></dd>
 
 </dl></div>
 

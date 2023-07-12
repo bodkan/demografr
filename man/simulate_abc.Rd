@@ -66,6 +66,10 @@ Setting this argument for custom simulation script has no effect.}
 \item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.}
 }
+\value{
+A list object of the class \code{demografr_abc_sims} containing the results
+  of ABC simulations, sampled parameters, priors, and tree-sequence summary statistics
+}
 \description{
 This is a core function for ABC inference using demografr. It generates simulation
 replicates and computes summary statistic for the next step of an inference procedure,

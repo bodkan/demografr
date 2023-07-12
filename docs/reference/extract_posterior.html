@@ -78,9 +78,32 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">extract_posterior</span><span class="op">(</span><span class="va">abc</span>, posterior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"adj"</span>, <span class="st">"unadj"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">extract_posterior</span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="cn">NULL</span>, posterior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"adj"</span>, <span class="st">"unadj"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
+    <div id="arguments">
+    <h2>Arguments</h2>
+    <dl><dt>abc</dt>
+<dd><p>An object produced by <code>perform_abc</code></p></dd>
+
+
+<dt>param</dt>
+<dd><p>A character vector containing either parameter names to summarize,
+or a regex-like matches to be used for subsetting. If <code>NULL</code> (the default),
+all parameters will be extracted.</p></dd>
+
+
+<dt>posterior</dt>
+<dd><p>Should an "adj"-usted or "unadj"-usted posterior be extracted?
+(Default is "adj").</p></dd>
+
+</dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>A data frame in the long format with posterior values of parameters</p>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

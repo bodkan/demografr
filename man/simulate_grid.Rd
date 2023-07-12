@@ -60,6 +60,8 @@ argument for custom simulation script has no effect.}
 \value{
 If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
   does not return anything, saving an object to an .rds file instead.
+
+A data frame object with the results of parameter grid simulations
 }
 \description{
 For a given data frame (each column a parameter of a slendr model function) simulates

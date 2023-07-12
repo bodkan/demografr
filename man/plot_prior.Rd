@@ -19,7 +19,8 @@ plot_prior(
 sampling statements}
 
 \item{param}{A character vector containing either parameter names to summarize,
-or a regex-like matches to be used for subsetting.}
+or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
+all parameters will be extracted.}
 
 \item{facets}{Should individual parameters be plotting on a facet each?}
 
@@ -30,6 +31,8 @@ or a regex-like matches to be used for subsetting.}
 \item{geom}{Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}}
 
 \item{...}{Optional argument which will be passed to \code{ggsave}}
+
+\item{A}{ggplot2 plot object}
 }
 \description{
 Plot prior distribution(s)

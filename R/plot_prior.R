@@ -3,12 +3,15 @@
 #' @param x Either an object of the class \code{demografr_abc}, or a list of prior
 #'   sampling statements
 #' @param param A character vector containing either parameter names to summarize,
-#'   or a regex-like matches to be used for subsetting.
+#'   or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
+#'   all parameters will be extracted.
 #' @param facets Should individual parameters be plotting on a facet each?
 #' @param file Output file for a figure saved via \code{ggsave}
 #' @param replicates How many samples to simulate from each prior for plotting?
 #' @param geom Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}
 #' @param ... Optional argument which will be passed to \code{ggsave}
+#'
+#' @param A ggplot2 plot object
 #'
 #' @export
 plot_prior <- function(x, param = NULL, facets = FALSE, file = NULL,

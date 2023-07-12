@@ -10,7 +10,7 @@ sample_prior(f)
 \item{f}{Formula-based prior sampling expression such as <variable> ~ <sampling statement>}
 }
 \value{
-A list of two elements, "variable" containing the name of the sampled variable,
+A list of two elements: "variable" containing the name of the sampled variable,
   and "value" containing the actual value of the sampled prior.
 }
 \description{

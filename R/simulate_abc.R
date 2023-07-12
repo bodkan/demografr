@@ -35,6 +35,9 @@
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
 #'
+#' @return A list object of the class \code{demografr_abc_sims} containing the results
+#'   of ABC simulations, sampled parameters, priors, and tree-sequence summary statistics
+#'
 #' @export
 simulate_abc <- function(
   model, priors, functions, observed, iterations,

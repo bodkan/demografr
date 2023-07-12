@@ -26,6 +26,8 @@
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
 #'
+#' @return A tree-sequence object of the class \code{slendr_ts}
+#'
 #' @export
 simulate_ts <- function(
   model, parameters,
