@@ -3,6 +3,4 @@
 .RData
 .Ruserdata
 .DS_Store
-inst/doc
-inst/extdata/
-scratch.R
+build/
