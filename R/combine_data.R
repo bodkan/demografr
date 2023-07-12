@@ -13,6 +13,7 @@ combine_data <- function(x, ...) {
 }
 
 #' @export
+#' @keywords internal
 combine_data.demografr_abc_sims <- function(...) {
   runs <- list(...)
 
@@ -50,6 +51,7 @@ combine_data.demografr_abc_sims <- function(...) {
 }
 
 #' @export
+#' @keywords internal
 combine_data.data.frame <- function(...) {
   runs <- list(...)
 
@@ -109,6 +111,7 @@ combine_data.data.frame <- function(...) {
 #' @return A combined object of the class \code{demografr_abc_sims}
 #'
 #' @export
+#' @keywords internal
 combine_data.character <- function(...) {
   runs <- list(...)
 
@@ -125,6 +128,7 @@ combine_data.character <- function(...) {
 }
 
 #' @export
+#' @keywords internal
 combine_data.list <- function(...) {
   runs <- list(...)[[1]]
 

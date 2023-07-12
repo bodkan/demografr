@@ -44,8 +44,7 @@ reference:
 
   - title: Helper functions
     contents:
-    - combine_data.demografr_abc_sims
-    - combine_data.data.frame
+    - combine_data
     - simulate_ts
     - extract_names
     - sample_prior
