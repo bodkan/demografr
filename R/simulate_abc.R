@@ -153,7 +153,7 @@ simulate_abc <- function(
     model = model
   )
 
-  class(result) <- "demografr_sims.abc"
+  class(result) <- "demografr_abc_sims"
 
   if (is.null(file))
     return(result)

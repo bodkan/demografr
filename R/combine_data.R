@@ -13,7 +13,7 @@ combine_data <- function(x, ...) {
 #' @return A combined object of the class \code{demografr_sims}
 #'
 #' @export
-combine_data.demografr_sims_abc <- function(...) {
+combine_data.demografr_abc_sims <- function(...) {
   runs <- list(...)
   if (length(runs) == 1) runs <- runs[[1]]
 
@@ -69,7 +69,7 @@ combine_data.demografr_sims_abc <- function(...) {
 #' @return A combined object of the class \code{demografr_sims}
 #'
 #' @export
-combine_data.demografr_sims_grid <- function(...) {
+combine_data.data.frame <- function(...) {
   runs <- list(...)
   if (length(runs) == 1) runs <- runs[[1]]
 
@@ -115,7 +115,6 @@ combine_data.demografr_sims_grid <- function(...) {
     stop("Simulation runs must originate from the same grid setup but summary functions differ", call. = FALSE)
 
   results <- do.call(rbind, runs)
-  class(results) <- setdiff(class(results), "demografr_sims_grid")
 
   # readjust replicate numbers for each parameter grid combination
   # 1. first extract only those columns that belong to grid parameters
@@ -125,8 +124,6 @@ combine_data.demografr_sims_grid <- function(...) {
 
   attr(results, "functions") <- attr(runs[[1]], "functions")
   attr(results, "model") <- attr(runs[[1]], "model")
-
-  class(results_df) <- c(class(results_df), "demografr_sims.grid")
 
   results
 }
