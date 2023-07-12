@@ -88,7 +88,7 @@ test_that("observed statistics must be consistent between runs", {
 
 test_that("both a list of runs and individual runs can be combined", {
   # individual runs as combine arguments
-  expect_s3_class(runs_ind <- combine_data(run1, run2, run3), "demografr_sims")
+  expect_s3_class(runs_ind <- combine_data(run1, run2, run3), "demografr_abc_sims")
 
   expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
@@ -108,7 +108,7 @@ test_that("both a list of runs and individual runs can be combined", {
   expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
 
   # list of runs
-  expect_s3_class(runs_list <- combine_data(list(run1, run2, run3)), "demografr_sims")
+  expect_s3_class(runs_list <- combine_data(list(run1, run2, run3)), "demografr_abc_sims")
 
   expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
@@ -187,4 +187,14 @@ test_that("missing serialized files are correctly handled", {
   unlink(f1)
   expect_error(combine_data(f1, f2, f3), "File .* does not exist")
   expect_error(combine_data(list(f1, f2, f3)), "File .* does not exist")
+})
+
+test_that("'combining' a single ABC run does not break", {
+  f1 <- tempfile()
+  saveRDS(run1, f1)
+
+  expect_s3_class(combine_data(f1), "demografr_abc_sims")
+  expect_s3_class(combine_data(list(f1)), "demografr_abc_sims")
+  expect_s3_class(combine_data(run1), "demografr_abc_sims")
+  expect_s3_class(combine_data(list(run1)), "demografr_abc_sims")
 })

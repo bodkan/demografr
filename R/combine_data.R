@@ -44,7 +44,7 @@ combine_data.demografr_abc_sims <- function(...) {
     priors = runs[[1]]$priors,
     model = runs[[1]]$model
   )
-  class(result) <- "demografr_sims"
+  class(result) <- "demografr_abc_sims"
 
   result
 }
@@ -111,7 +111,6 @@ combine_data.data.frame <- function(...) {
 #' @export
 combine_data.character <- function(...) {
   runs <- list(...)
-  if (length(runs) == 1) runs <- runs[[1]]
 
   if (all(vapply(runs, is.character, FUN.VALUE = logical(1)))) {
     for (i in seq_along(runs)) {
@@ -127,9 +126,16 @@ combine_data.character <- function(...) {
 
 #' @export
 combine_data.list <- function(...) {
-  runs <- list(...)
-  if (length(runs) == 1) runs <- runs[[1]]
-  do.call(combine_data, runs)
+  runs <- list(...)[[1]]
+
+  if (inherits(runs[[1]], "demografr_abc_sims"))
+    do.call(combine_data.demografr_abc_sims, runs)
+  else if (inherits(runs[[1]], "data.frame"))
+    do.call(combine_data.data.frame, runs)
+  else if (is.character(runs[[1]]))
+    do.call(combine_data.character, runs)
+  else
+    stop("Invalid data type of elements in the list of items to combine together", call. = FALSE)
 }
 
 # Formula objects we use for priors are stored alongside their environments, which

@@ -95,3 +95,13 @@ test_that("missing serialized files are correctly handled", {
   expect_error(combine_data(f1, f2, f3), "File .* does not exist")
   expect_error(combine_data(list(f1, f2, f3)), "File .* does not exist")
 })
+
+test_that("'combining' a single grid run does not break", {
+  f1 <- tempfile()
+  saveRDS(run1, f1)
+
+  expect_s3_class(combine_data(f1), "data.frame")
+  expect_s3_class(combine_data(list(f1)), "data.frame")
+  expect_s3_class(combine_data(run1), "data.frame")
+  expect_s3_class(combine_data(list(run1)), "data.frame")
+})
