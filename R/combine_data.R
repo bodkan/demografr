@@ -9,7 +9,7 @@
 #'
 #' @export
 combine_data <- function(...) {
-    UseMethod("combine_data", ...)
+    UseMethod("combine_data")
 }
 
 #' @export
