@@ -204,7 +204,7 @@ In this way, we defined `r nrow(grid)` parameter combinations and can finally pr
 
 In a final analogy to the ABC inference with _demografr_, we have a function `simulate_grid()` which performs the equivalent to `simulate_abc()`. In fact, the function has a nearly identical interface&mdash;we plug in the model function, our parameter grid, the list of summary tree-sequence functions, the number of simulation replicates to perform for each parameter combination (and a few other obvious parameters shown here).
 
-First, we will set up an automated parallelization scheme using the _future_ R package:
+First, we will set up an automated parallelization scheme using the [_future_](https://cran.r-project.org/package=future) R package:
 
 ```{r}
 library(future)
@@ -213,7 +213,7 @@ library(future)
 plan(multicore, workers = availableCores())
 ```
 
-(See much more detail on parallelization of _demografr_ inference pipelines in [this vignette]()).
+(See much more detail on parallelization of _demografr_ inference pipelines in [this vignette](vignette-04-parallelization.html)).
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
 tstart <- Sys.time()

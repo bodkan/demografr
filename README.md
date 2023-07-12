@@ -9,17 +9,6 @@
 
 <img src="man/figures/logo.png" align="right" />
 
-⚠️⚠️⚠️
-
-**This package is under active development and things often change (and break) on
-short notice! You probably shouldn't be using _demografr_ in your own modeling projects
-at this point.**
-
-**A more stable version and a preprint will be ready sometime in summer 2023.
-Feedback is most welcome!**
-
-⚠️⚠️⚠️
-
 The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics and make it more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
 Unlike traditional ABC approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, _demografr_ makes it possible to perform simulation, data analysis, and ABC inference itself entirely in R within a single reproducible analysis script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.
@@ -302,7 +291,7 @@ plot_posterior(abc, param = "gf")
 
 ![](man/figures/README-posterior_gf-1.png)
 
-Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
+Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/package=abc) R package at our disposal:
 
 
 ```r

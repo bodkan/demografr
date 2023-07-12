@@ -15,6 +15,10 @@ data_path <- here::here("inst/examples/basics_abc.rds")
 
 if (!file.exists(data_path))
   stop("Run vignette-01-basics first to generate data", call. = FALSE)
+
+library(demografr)
+library(slendr)
+init_env(quiet = TRUE)
 ```
 
 # _demografr_: A simple and efficient ABC toolkit for R

@@ -103,7 +103,7 @@ validate_abc <- function(model, priors, functions, observed,
     # (and that other function arguments are also provided)
     cat("Checking the presence of required function arguments...")
 
-    missing_priors <- setdiff(prior_names, methods::formalArgs(model))
+    missing_priors <- setdiff(prior_names, formalArgs(model))
     if (length(missing_priors) > 0) {
       cat(" \u274C\n\n")
       stop("The following priors are not present in the model interface:\n    ",

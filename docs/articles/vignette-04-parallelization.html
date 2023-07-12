@@ -159,17 +159,17 @@
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">003</span>48</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">037</span>2</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">004</span>18</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">057</span>0</span></span></code></pre>
 <p>Everything works!</p>
 <p><strong>Now, how can we parallelize the computation of diversity across all parameters of the grid?</strong></p>
 <div class="section level2">
 <h2 id="implicit-parallelization-via-future">1. Implicit parallelization via <em>future</em><a class="anchor" aria-label="anchor" href="#implicit-parallelization-via-future"></a>
 </h2>
-<p>The simplest way to parallelize <em>demografr</em> analyses is via the R package <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html" class="external-link"><em>future</em></a>.</p>
+<p>The simplest way to parallelize <em>demografr</em> analyses is via the R package <a href="https://cran.r-project.org/package=future" class="external-link"><em>future</em></a>.</p>
 <p>The magic of <em>future</em> lies in its ability to set up parallelized schemes of arbitrary topologies by automatic scheduling of jobs across a given number of CPUs distributed even across several remote compute servers.</p>
 <p>Going into detail in setting up <em>future</em>-based parallelization would be too far out of scope of this simple vignette (or <em>demografr</em>’s documentation in general). Luckily, once <em>future</em> parallelization is set up, it doesn’t matter whether the computation is done by <em>demografr</em> or anything else, as the <em>future</em> architecture is completely general.</p>
-<p>In order to use <em>future</em> effectively, you should study its documentation and tutorials (a good start would be <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html" class="external-link">here</a>), but here is a brief introduction focused on parallelizing a toy <em>demografr</em> analysis set up above:</p>
+<p>In order to use <em>future</em> effectively, you should study its documentation and tutorials (a good start would be the vignette <a href="https://cran.r-project.org/package=future" class="external-link">here</a>), but here is a brief introduction focused on parallelizing a toy <em>demografr</em> analysis set up above:</p>
 <div class="section level3">
 <h3 id="sequential-run">Sequential run<a class="anchor" aria-label="anchor" href="#sequential-run"></a>
 </h3>
@@ -192,7 +192,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 3 minutes 37 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 3 minutes 27 seconds parallelized across 96 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>
@@ -221,7 +221,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 0 minutes 29 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 0 minutes 27 seconds parallelized across 96 CPUs.</strong></p>
 <p>Notice the speed up even for this trivial toy analysis!</p>
 </div>
 <div class="section level3">

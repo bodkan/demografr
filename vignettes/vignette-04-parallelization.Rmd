@@ -81,7 +81,7 @@ The magic of _future_ lies in its ability to set up parallelized schemes of arbi
 
 Going into detail in setting up _future_-based parallelization would be too far out of scope of this simple vignette (or _demografr_'s documentation in general). Luckily, once _future_ parallelization is set up, it doesn't matter whether the computation is done by _demografr_ or anything else, as the _future_ architecture is completely general.
 
-In order to use _future_ effectively, you should study its documentation and tutorials (a good start would be [here](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)), but here is a brief introduction focused on parallelizing a toy _demografr_ analysis set up above:
+In order to use _future_ effectively, you should study its documentation and tutorials (a good start would be the vignette [here](https://cran.r-project.org/package=future)), but here is a brief introduction focused on parallelizing a toy _demografr_ analysis set up above:
 
 ### Sequential run
 
@@ -148,7 +148,7 @@ Notice the speed up even for this trivial toy analysis!
 
 ### Parallelization across CPUs of multiple machines
 
-If you read the documentation of the _future_ package (which you really [should](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html)), you will discover many more options for parallelization giving you near limitless options for scheduling parallel simulations.
+If you read the documentation of the _future_ package (which you really [should](https://cran.r-project.org/package=future)), you will discover many more options for parallelization giving you near limitless options for scheduling parallel simulations.
 
 For instance, imagine you have access to remote machines `server01`, `server02`, `server03`, all with available R as well as _demografr_ and _slendr_ R packages, with set up _slendr_ environments. In other words, you can start an R interpreter on each of these machines and eventually call:
 

@@ -1,6 +1,6 @@
 Package: demografr
 Type: Package
-Title: A Toolkit For Simulation-based Inference In Population Genetics
+Title: A Toolkit for Simulation-Based Inference in Population Genetics
 Version: 0.0.9000
 Authors@R:
     person(given = "Martin",
@@ -24,16 +24,17 @@ Imports:
     future.apply,
     ggplot2,
     magrittr,
+    reticulate,
     slendr,
     tidyr
 Suggests:
     ape,
-    knitr,
-    microbenchmark,
-    rmarkdown,
     cowplot,
     here,
+    knitr,
     lobstr,
+    microbenchmark,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3

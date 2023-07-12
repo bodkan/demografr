@@ -109,7 +109,7 @@
 
     
     
-<p>This vignette contains an expanded version of the basic ABC inference example from the <a href="https://bodkan.net/demografr">homepage</a> of <em>demografr</em>. It walks through the process of setting up a <em>demografr</em> ABC pipeline step by step.</p>
+<p>This vignette contains an expanded version of the basic ABC inference example from the <a href="https://bodkan.net/demografr/">homepage</a> of <em>demografr</em>. It walks through the process of setting up a <em>demografr</em> ABC pipeline step by step.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -308,7 +308,7 @@
 <div class="section level3">
 <h3 id="abc-inference">5. ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
 </h3>
-<p>Having all the information about observed and simulated data bound in a single R object <code>data</code>, we can finally perform the ABC inference. <em>demografr</em> includes a convenient function <code><a href="../reference/perform_abc.html">perform_abc()</a></code> which reformats the simulated and observed data in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and internally calls <a href="https://cran.r-project.org/web/packages/abc/abc.pdf" class="external-link">the function <code>abc()</code></a> of that package.</p>
+<p>Having all the information about observed and simulated data bound in a single R object <code>data</code>, we can finally perform the ABC inference. <em>demografr</em> includes a convenient function <code><a href="../reference/perform_abc.html">perform_abc()</a></code> which reformats the simulated and observed data in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and internally calls its function <code>abc()</code>.</p>
 <p>Note that <code>perform_abc</code> is just convenience wrapper around the <code>abc()</code> function in the package <em>abc</em><code>, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function</code>abc()<code>can be provided to</code>perform_abc()`, which will then pass them on appropriately.</p>
 </div>
 <div class="section level3">
