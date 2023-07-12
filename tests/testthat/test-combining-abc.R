@@ -62,33 +62,33 @@ test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"
   xrun1 <- run1
   xrun1$model <- ls
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("priors must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but priors differ"
   xrun1 <- run1
   xrun1$priors[[1]] <- NULL
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("summary functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but summary functions differ"
   xrun1 <- run1
   xrun1$functions[[1]] <- lm
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("observed statistics must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but observed statistics differ"
   xrun1 <- run1
   xrun1$observed[1] <- 42
-  expect_error(combine_abc(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("both a list of runs and individual runs can be combined", {
   # individual runs as combine arguments
-  expect_s3_class(runs_ind <- combine_abc(run1, run2, run3), "demografr_sims")
+  expect_s3_class(runs_ind <- combine_data(run1, run2, run3), "demografr_sims")
 
   expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
@@ -108,7 +108,7 @@ test_that("both a list of runs and individual runs can be combined", {
   expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
 
   # list of runs
-  expect_s3_class(runs_list <- combine_abc(list(run1, run2, run3)), "demografr_sims")
+  expect_s3_class(runs_list <- combine_data(list(run1, run2, run3)), "demografr_sims")
 
   expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
@@ -137,7 +137,7 @@ test_that("simulation runs can be loaded in their serialized form", {
   saveRDS(run3, f3)
 
   # individual runs as combine arguments
-  runs_ind <- combine_abc(f1, f2, f3)
+  runs_ind <- combine_data(f1, f2, f3)
   expect_true(nrow(runs_ind$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_ind$parameters) == ncol(run1$parameters))
   expect_true(ncol(runs_ind$parameters) == ncol(run2$parameters))
@@ -156,7 +156,7 @@ test_that("simulation runs can be loaded in their serialized form", {
   expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
 
   # list of runs
-  expect_s3_class(runs_list <- combine_abc(list(f1, f2, f3)), "demografr_sims")
+  expect_s3_class(runs_list <- combine_data(list(f1, f2, f3)), "demografr_sims")
 
   expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
@@ -185,6 +185,6 @@ test_that("missing serialized files are correctly handled", {
   saveRDS(run3, f3)
 
   unlink(f1)
-  expect_error(combine_abc(f1, f2, f3), "File .* does not exist")
-  expect_error(combine_abc(list(f1, f2, f3)), "File .* does not exist")
+  expect_error(combine_data(f1, f2, f3), "File .* does not exist")
+  expect_error(combine_data(list(f1, f2, f3)), "File .* does not exist")
 })

@@ -34,26 +34,26 @@ test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same grid setup but model functions differ"
   xrun1 <- run1
   attr(xrun1, "model") <- ls
-  expect_error(combine_grid(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("summary functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same grid setup but summary functions differ"
   xrun1 <- run1
   attr(xrun1, "functions")[[1]] <- lm
-  expect_error(combine_grid(xrun1, run2, run3), error_msg)
+  expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("both a list of runs and individual runs can be combined", {
   # individual runs as combine arguments
-  expect_s3_class(runs_ind <- combine_grid(run1, run2, run3), "data.frame")
+  expect_s3_class(runs_ind <- combine_data(run1, run2, run3), "data.frame")
 
   expect_true(nrow(runs_ind) == nrow(run1) + nrow(run2) + nrow(run3))
   expect_true(min(runs_ind$rep) == 1)
   expect_true(max(runs_ind$rep) == 3 * nreps)
 
   # list of runs
-  expect_s3_class(runs_list <- combine_grid(list(run1, run2, run3)), "data.frame")
+  expect_s3_class(runs_list <- combine_data(list(run1, run2, run3)), "data.frame")
 
   expect_true(nrow(runs_list) == nrow(run1) + nrow(run2) + nrow(run3))
   expect_true(min(runs_list$rep) == 1)
@@ -69,14 +69,14 @@ test_that("simulation runs can be loaded in their serialized form", {
   saveRDS(run3, f3)
 
   # individual runs as combine arguments
-  expect_s3_class(runs_ind <- combine_grid(f1, f2, f3), "data.frame")
+  expect_s3_class(runs_ind <- combine_data(f1, f2, f3), "data.frame")
 
   expect_true(nrow(runs_ind) == nrow(run1) + nrow(run2) + nrow(run3))
   expect_true(min(runs_ind$rep) == 1)
   expect_true(max(runs_ind$rep) == 3 * nreps)
 
   # list of runs
-  expect_s3_class(runs_list <- combine_grid(list(f1, f2, f3)), "data.frame")
+  expect_s3_class(runs_list <- combine_data(list(f1, f2, f3)), "data.frame")
 
   expect_true(nrow(runs_list) == nrow(run1) + nrow(run2) + nrow(run3))
   expect_true(min(runs_list$rep) == 1)
@@ -92,6 +92,6 @@ test_that("missing serialized files are correctly handled", {
   saveRDS(run3, f3)
 
   unlink(f1)
-  expect_error(combine_grid(f1, f2, f3), "File .* does not exist")
-  expect_error(combine_grid(list(f1, f2, f3)), "File .* does not exist")
+  expect_error(combine_data(f1, f2, f3), "File .* does not exist")
+  expect_error(combine_data(list(f1, f2, f3)), "File .* does not exist")
 })
