@@ -12,7 +12,7 @@
 #' @export
 plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), facets = FALSE,
                            file = NULL, ...) {
-  df <- extract_posterior(abc, posterior)
+  df <- extract_posterior(abc, param, posterior)
 
   param <- subset_parameters(subset = param, all = colnames(attr(abc, "parameters")))
   df <- df[df$param %in% param, ]
