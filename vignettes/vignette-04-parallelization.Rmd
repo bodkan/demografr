@@ -181,7 +181,7 @@ But this is just for completeness. It's not something that makes much sense to d
 
 ## 2. "Manual" parallelization
 
-In personal experience, it can be a bit of a hassle to distribute jobs across different machines, despite the conveniences of the _future_ R package. If you're having such problems, I first _highly_ encourage you to [read](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html) the basic overview and look up troubleshooting advice on Google.
+In personal experience, it can be a bit of a hassle to distribute jobs across different machines, despite the conveniences of the _future_ R package. If you're having such problems, I first _highly_ encourage you to [read](https://cran.r-project.org/package=future) the basic overview vignette and look up troubleshooting advice on Google.
 
 Still, _demografr_ provides rudimentary support for "manual" paralelization across multiple machines (each of those machines parallelizing on multiple CPUs), followed by merging simulation runs into a single data set.
 

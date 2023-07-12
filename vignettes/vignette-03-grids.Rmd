@@ -28,13 +28,13 @@ Although Approximate Bayesian Computation is arguably the most popular method fo
 
 ## Example analysis
 
-To demonstrate the features of _demografr_ for grid-based simulation inference, let's try to reproduce (at least qualitatively) the result from [Petr _et al._, 2018](https://www.pnas.org/doi/10.1073/pnas.1814338116). Briefly, this paper made an attempt to explain discrepancies between two different ways to estimate the proportion of Neanderthal ancestry in Europe over tens of thousands of years.
+To demonstrate the features of _demografr_ for grid-based simulation inference, let's try to reproduce (at least qualitatively) the result from Petr _et al._ (PNAS 2018). Briefly, this paper made an attempt to explain discrepancies between two different ways to estimate the proportion of Neanderthal ancestry in Europe over tens of thousands of years.
 
 1. The first statistic (dubbed the "indirect $f_4$-ratio" statistic) showed the following pattern of Neanderthal ancestry significantly declining over time (figure from [Fu _et al., Nature 2016](https://www.nature.com/articles/nature17993))
 
 ![](images/fu_2016.png){width="80%"}
 
-2. An alternative statistic (called "direct $f_4$-ratio" statistic, shown in the figure below in solid line in contrast to the "indirect $f_4$-statistic" as dashed line) did not find any significant decline at all (figure from [Petr _et al._, PNAS 2018](https://www.pnas.org/doi/10.1073/pnas.1814338116))
+2. An alternative statistic (called "direct $f_4$-ratio" statistic, shown in the figure below in solid line in contrast to the "indirect $f_4$-statistic" as dashed line) did not find any significant decline at all as shown in this figure from Petr _et al._ (PNAS 2018).
 
 ![](images/petr_2018a.png){width="80%"}
 
@@ -368,7 +368,7 @@ results %>%
 
 **Even more importantly, gene flow from Eurasia back into Africa creates an artificial decline of Neanderthal ancestry if measured via "indirect" $f_4$-ratio statistic!** However, the "direct" $f_4$-ratio remains stable.
 
-## Comparison with the result by Petr _et al._, PNAS 2018
+## Comparison with the result by Petr _et al._ (PNAS 2018)
 
 As we can see, the very simple analysis described in this code (worth a couple of dozen lines of easy-to-read R code) can qualitatively replicate the much more elaborate original result:
 
