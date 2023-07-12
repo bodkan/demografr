@@ -1,11 +1,11 @@
 #' Combine multiple individual ABC simulation runs into one
 #'
-#' @param ... Either a list of objects of the class \code{demografr_sims} as produced
+#' @param ... Either a list of objects of the class \code{demografr_abc_sims} as produced
 #'   by the function \code{simulate_abc}, or individual objects of this class given
 #'   as standard function arguments, or paths to 'rds' files containing serializations of
-#'   such \code{demografr_sims} objects.
+#'   such \code{demografr_abc_sims} objects.
 #'
-#' @return A combined object of the class \code{demografr_sims}
+#' @return A combined object of the class \code{demografr_abc_sims}
 #'
 #' @export
 combine_data <- function(x, ...) {
@@ -19,7 +19,7 @@ combine_data.demografr_abc_sims <- function(...) {
   if (!all(vapply(runs, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))))
     stop("All provided runs must be a product of the function `simulate_abc()`", call. = FALSE)
 
-  # check that all individual demografr_sims objects are from the same model
+  # check that all individual demografr_abc_sims objects are from the same model
   if (length(unique(lapply(runs, `[[`, "model"))) > 1)
     stop("Simulation runs must originate from the same ABC setup but model functions differ", call. = FALSE)
 
@@ -78,7 +78,7 @@ combine_data.data.frame <- function(...) {
     stop("Only the last columns of each simulate_grid() data frame can be list columns",
          call. = FALSE)
 
-  # check that all individual demografr_sims objects are from the same model
+  # check that all individual demografr_abc_sims objects are from the same model
   if (length(unique(lapply(runs, attr, "model"))) > 1)
     stop("Simulation runs must originate from the same grid setup but model functions differ", call. = FALSE)
 
@@ -101,12 +101,12 @@ combine_data.data.frame <- function(...) {
 
 #' Combine multiple individual grid simulation runs into one
 #'
-#' @param ... Either a list of objects of the class \code{demografr_sims} as produced
+#' @param ... Either a list of objects of the class \code{demografr_abc_sims} as produced
 #'   by the function \code{simulate_abc}, or individual objects of this class given
 #'   as standard function arguments, or paths to 'rds' files containing serializations of
-#'   such \code{demografr_sims} objects.
+#'   such \code{demografr_abc_sims} objects.
 #'
-#' @return A combined object of the class \code{demografr_sims}
+#' @return A combined object of the class \code{demografr_abc_sims}
 #'
 #' @export
 combine_data.character <- function(...) {

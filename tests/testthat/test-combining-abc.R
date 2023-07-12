@@ -156,7 +156,7 @@ test_that("simulation runs can be loaded in their serialized form", {
   expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
 
   # list of runs
-  expect_s3_class(runs_list <- combine_data(list(f1, f2, f3)), "demografr_sims")
+  expect_s3_class(runs_list <- combine_data(list(f1, f2, f3)), "demografr_abc_sims")
 
   expect_true(nrow(runs_list$parameters) == nrow(run1$parameters) + nrow(run2$parameters) + nrow(run3$parameters))
   expect_true(ncol(runs_list$parameters) == ncol(run1$parameters))
