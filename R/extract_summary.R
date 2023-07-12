@@ -7,6 +7,7 @@
 #'
 #' @return A data frame object with posterior summary statistics
 #'
+#' @import abc
 #' @export
 extract_summary <- function(abc, param = NULL) {
   posterior_df <- as.data.frame.matrix(quiet(summary(abc)))
