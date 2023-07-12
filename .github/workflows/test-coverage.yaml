@@ -51,7 +51,7 @@ jobs:
         run: |
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
-          R -e 'install.packages("slendr"); slendr::setup_env(pip = TRUE)'
+          R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/"); slendr::setup_env(pip = TRUE)'
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
