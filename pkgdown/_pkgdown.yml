@@ -44,8 +44,8 @@ reference:
 
   - title: Helper functions
     contents:
-    - combine_data
     - simulate_ts
+    - combine_data
     - extract_names
     - sample_prior
 

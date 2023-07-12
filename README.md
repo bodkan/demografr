@@ -242,22 +242,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                             Ne_A      Ne_B       Ne_C      Ne_D     T_AB
-#> Min.:                   180.7139  550.6153   122.8347 -1912.730 1003.899
-#> Weighted 2.5 % Perc.:   677.6925  659.8394  2160.5181  1459.736 1291.919
-#> Weighted Median:       1813.7545  920.5963  4976.6440  4785.787 1950.690
-#> Weighted Mean:         1872.0929  973.5713  5245.6373  4619.442 1927.526
-#> Weighted Mode:         1537.3341  780.4878  4239.7113  4966.632 2006.081
-#> Weighted 97.5 % Perc.: 3102.8138 1422.5237  9477.6885  8013.777 2678.851
-#> Max.:                  3755.4707 1847.5938 10638.4032 11360.235 3023.821
-#>                            T_BC      T_CD        gf_BC
-#> Min.:                  2379.081  5499.188 -0.173599521
-#> Weighted 2.5 % Perc.:  3927.054  6611.181  0.008873377
-#> Weighted Median:       5257.157  8501.592  0.276919543
-#> Weighted Mean:         5185.616  8437.859  0.307834005
-#> Weighted Mode:         5535.438  8597.783  0.233571446
-#> Weighted 97.5 % Perc.: 6151.175  9711.744  0.726300955
-#> Max.:                  6982.378 10565.561  1.248000026
+#>                               Ne_A      Ne_B      Ne_C      Ne_D      T_AB
+#> Min.:                    -3.010207  574.2056 -1453.896 -509.7813  556.2759
+#> Weighted 2.5 % Perc.:   474.550342  655.4132  1262.466 2227.0248 1195.4049
+#> Weighted Median:       1782.484402  908.4085  5476.699 4125.2670 1869.9525
+#> Weighted Mean:         1840.627399  946.8585  5594.961 4140.8364 1884.1942
+#> Weighted Mode:         1454.772471  789.5067  5053.863 4255.9646 1862.5793
+#> Weighted 97.5 % Perc.: 3424.879882 1313.6176 10166.234 5997.0714 2672.8709
+#> Max.:                  4030.283888 1516.9037 13445.633 7485.2941 3279.5452
+#>                            T_BC      T_CD       gf_BC
+#> Min.:                  2271.210  4921.490 -0.17303098
+#> Weighted 2.5 % Perc.:  3359.665  6131.964  0.04465324
+#> Weighted Median:       5369.389  8262.425  0.28803288
+#> Weighted Mean:         5271.758  8209.992  0.31888803
+#> Weighted Mode:         5420.005  8540.382  0.24631980
+#> Weighted 97.5 % Perc.: 6301.992  9946.337  0.69010571
+#> Max.:                  6754.829 10636.425  0.87366466
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -265,14 +265,14 @@ We can also specify a subset of model parameters to select, or provide a regular
 
 ```r
 extract_summary(abc, param = "Ne")
-#>                             Ne_A      Ne_B       Ne_C      Ne_D
-#> Min.:                   180.7139  550.6153   122.8347 -1912.730
-#> Weighted 2.5 % Perc.:   677.6925  659.8394  2160.5181  1459.736
-#> Weighted Median:       1813.7545  920.5963  4976.6440  4785.787
-#> Weighted Mean:         1872.0929  973.5713  5245.6373  4619.442
-#> Weighted Mode:         1537.3341  780.4878  4239.7113  4966.632
-#> Weighted 97.5 % Perc.: 3102.8138 1422.5237  9477.6885  8013.777
-#> Max.:                  3755.4707 1847.5938 10638.4032 11360.235
+#>                               Ne_A      Ne_B      Ne_C      Ne_D
+#> Min.:                    -3.010207  574.2056 -1453.896 -509.7813
+#> Weighted 2.5 % Perc.:   474.550342  655.4132  1262.466 2227.0248
+#> Weighted Median:       1782.484402  908.4085  5476.699 4125.2670
+#> Weighted Mean:         1840.627399  946.8585  5594.961 4140.8364
+#> Weighted Mode:         1454.772471  789.5067  5053.863 4255.9646
+#> Weighted 97.5 % Perc.: 3424.879882 1313.6176 10166.234 5997.0714
+#> Max.:                  4030.283888 1516.9037 13445.633 7485.2941
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:

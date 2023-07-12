@@ -37,6 +37,24 @@
     <loc>https://bodkan.net/demografr/reference/combine_abc.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.character.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.data.frame.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.demografr_abc_sims.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.demografr_sims_abc.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.demografr_sims_grid.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/combine_data.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/reference/combine_grid.html</loc>
   </url>
   <url>
@@ -68,6 +86,12 @@
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/plot_prior.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/print.demografr_abc_sims.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/print.demografr_sims.abc.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/print.demografr_sims.html</loc>

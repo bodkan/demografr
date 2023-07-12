@@ -312,7 +312,7 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 2 minutes 36 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 2 minutes 50 seconds parallelized across 96 CPUs.</strong></p>
 <p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <span class="math inline">\(N_e\)</span>:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
@@ -320,20 +320,16 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                              Ne</span></span>
-<span><span class="co">#&gt; Min.:                  278.5700</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  278.5700</span></span>
-<span><span class="co">#&gt; Weighted Median:       555.4339</span></span>
-<span><span class="co">#&gt; Weighted Mean:         551.8772</span></span>
-<span><span class="co">#&gt; Weighted Mode:         452.7342</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 934.6598</span></span>
-<span><span class="co">#&gt; Max.:                  934.6598</span></span></code></pre>
+<span><span class="co">#&gt; Min.:                  250.7345</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  370.6275</span></span>
+<span><span class="co">#&gt; Weighted Median:       503.0870</span></span>
+<span><span class="co">#&gt; Weighted Mean:         550.5659</span></span>
+<span><span class="co">#&gt; Weighted Mode:         488.6769</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 896.2471</span></span>
+<span><span class="co">#&gt; Max.:                  896.2471</span></span></code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-05-custom-engines_files/figure-html/custom_Ne_posterior-1.png" width="640" style="display: block; margin: auto;"></p>
-<p>Again, in addition to <em>demografr</em>’s visualization functions (like <code><a href="../reference/plot_posterior.html">plot_posterior()</a></code> above) we have the full range of diagnostic plotting functions bundled with the <em>abc</em> R package at our disposal:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-05-custom-engines_files/figure-html/custom_Ne_diagnostic-1.png" width="640" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </div>
