@@ -1,8 +1,3 @@
-#' @export
-combine_data <- function(x, ...) {
-    UseMethod("combine_data", x)
-}
-
 #' Combine multiple individual ABC simulation runs into one
 #'
 #' @param ... Either a list of objects of the class \code{demografr_sims} as produced
@@ -13,20 +8,15 @@ combine_data <- function(x, ...) {
 #' @return A combined object of the class \code{demografr_sims}
 #'
 #' @export
+combine_data <- function(x, ...) {
+    UseMethod("combine_data", x)
+}
+
+#' @export
 combine_data.demografr_abc_sims <- function(...) {
   runs <- list(...)
-  if (length(runs) == 1) runs <- runs[[1]]
 
-  if (all(vapply(runs, is.character, FUN.VALUE = logical(1)))) {
-    for (i in seq_along(runs)) {
-      if (file.exists(runs[[i]]))
-        runs[[i]] <- readRDS(runs[[i]])
-      else
-        stop("File ", runs[[i]], " does not exist", call. = FALSE)
-    }
-  }
-
-  if (!all(vapply(runs, inherits, "demografr_sims", FUN.VALUE = logical(1))))
+  if (!all(vapply(runs, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))))
     stop("All provided runs must be a product of the function `simulate_abc()`", call. = FALSE)
 
   # check that all individual demografr_sims objects are from the same model
@@ -59,28 +49,9 @@ combine_data.demografr_abc_sims <- function(...) {
   result
 }
 
-#' Combine multiple individual grid simulation runs into one
-#'
-#' @param ... Either a list of objects of the class \code{demografr_sims} as produced
-#'   by the function \code{simulate_abc}, or individual objects of this class given
-#'   as standard function arguments, or paths to 'rds' files containing serializations of
-#'   such \code{demografr_sims} objects.
-#'
-#' @return A combined object of the class \code{demografr_sims}
-#'
 #' @export
 combine_data.data.frame <- function(...) {
   runs <- list(...)
-  if (length(runs) == 1) runs <- runs[[1]]
-
-  if (all(vapply(runs, is.character, FUN.VALUE = logical(1)))) {
-    for (i in seq_along(runs)) {
-      if (file.exists(runs[[i]]))
-        runs[[i]] <- readRDS(runs[[i]])
-      else
-        stop("File ", runs[[i]], " does not exist", call. = FALSE)
-    }
-  }
 
   if (!all(vapply(runs, inherits, "data.frame", FUN.VALUE = logical(1))))
     stop("All provided runs must be data frames produced by the function `simulate_grid()`",
@@ -126,6 +97,39 @@ combine_data.data.frame <- function(...) {
   attr(results, "model") <- attr(runs[[1]], "model")
 
   results
+}
+
+#' Combine multiple individual grid simulation runs into one
+#'
+#' @param ... Either a list of objects of the class \code{demografr_sims} as produced
+#'   by the function \code{simulate_abc}, or individual objects of this class given
+#'   as standard function arguments, or paths to 'rds' files containing serializations of
+#'   such \code{demografr_sims} objects.
+#'
+#' @return A combined object of the class \code{demografr_sims}
+#'
+#' @export
+combine_data.character <- function(...) {
+  runs <- list(...)
+  if (length(runs) == 1) runs <- runs[[1]]
+
+  if (all(vapply(runs, is.character, FUN.VALUE = logical(1)))) {
+    for (i in seq_along(runs)) {
+      if (file.exists(runs[[i]]))
+        runs[[i]] <- readRDS(runs[[i]])
+      else
+        stop("File ", runs[[i]], " does not exist", call. = FALSE)
+    }
+  }
+
+  do.call(combine_data, runs)
+}
+
+#' @export
+combine_data.list <- function(...) {
+  runs <- list(...)
+  if (length(runs) == 1) runs <- runs[[1]]
+  do.call(combine_data, runs)
 }
 
 # Formula objects we use for priors are stored alongside their environments, which
