@@ -18,8 +18,6 @@ knitr::opts_chunk$set(
 )
 
 data_path <- here::here("inst/examples/basics_abc.rds")
-
-devtools::load_all()
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -67,7 +65,7 @@ write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
-This vignette contains an expanded version of the basic ABC inference example from the [homepage](https://bodkan.net/demografr) of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
+This vignette contains an expanded version of the basic ABC inference example from the [homepage](https://bodkan.net/demografr/) of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
 
 ## Introduction
 
@@ -275,7 +273,7 @@ At this point we have generated summary statistics for simulations of models usi
 
 ### 5. ABC inference
 
-Having all the information about observed and simulated data bound in a single R object `data`, we can finally perform the ABC inference. _demografr_ includes a convenient function `perform_abc()` which reformats the simulated and observed data in a format required by the R package [_abc_](https://cran.r-project.org/package=abc) and internally calls [the function `abc()`](https://cran.r-project.org/web/packages/abc/abc.pdf) of that package.
+Having all the information about observed and simulated data bound in a single R object `data`, we can finally perform the ABC inference. _demografr_ includes a convenient function `perform_abc()` which reformats the simulated and observed data in a format required by the R package [_abc_](https://cran.r-project.org/package=abc) and internally calls its function `abc()`.
 
 Note that `perform_abc` is just convenience wrapper around the `abc()` function in the package _abc_`, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function `abc()` can be provided to `perform_abc()`, which will then pass them on appropriately.
 

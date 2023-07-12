@@ -4,7 +4,7 @@
 \alias{combine_data}
 \title{Combine multiple individual ABC simulation runs into one}
 \usage{
-combine_data(x, ...)
+combine_data(...)
 }
 \arguments{
 \item{...}{Either a list of objects of the class \code{demografr_abc_sims} as produced

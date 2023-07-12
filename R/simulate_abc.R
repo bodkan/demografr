@@ -61,7 +61,7 @@ simulate_abc <- function(
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   # validate the ABC setup
-  capture.output(validate_abc(
+  utils::capture.output(validate_abc(
     model, priors, functions, observed,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
     mutation_rate = mutation_rate,

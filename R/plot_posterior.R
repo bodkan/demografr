@@ -4,6 +4,10 @@
 #' @param param A character vector containing either parameter names to summarize,
 #'   or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
 #'   all parameters will be extracted.
+#' @param posterior Should an "adj"-usted or "unadj"-usted posterior be extracted?
+#'   (Default is "adj").
+#' @param facets Should individual distributions be plotted in separate facets? Default
+#'   is \code{FALSE}.
 #' @param file Output file for a figure saved via \code{ggsave}
 #' @param ... Optional argument which will be passed to \code{ggsave}
 #'

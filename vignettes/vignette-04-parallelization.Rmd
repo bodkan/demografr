@@ -16,8 +16,6 @@ knitr::opts_chunk$set(
   fig.height = 5,
   dpi = 80
 )
-
-devtools::load_all()
 ```
 
 One of the main selling points of _demografr_ is computational efficiency. Although R isn't exactly known for computational speed, by utilizing _msprime_ (and, optionally, SLiM) for simulation and the _tskit_ tree-sequence module for population genetic computation without having to rely on saving files to disk, _demografr_ is surprisingly fast and efficient for an R package.
@@ -77,7 +75,7 @@ Everything works!
 
 ## 1. Implicit parallelization via _future_
 
-The simplest way to parallelize _demografr_ analyses is via the R package [_future_](https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html).
+The simplest way to parallelize _demografr_ analyses is via the R package [_future_](https://cran.r-project.org/package=future).
 
 The magic of _future_ lies in its ability to set up parallelized schemes of arbitrary topologies by automatic scheduling of jobs across a given number of CPUs distributed even across several remote compute servers.
 

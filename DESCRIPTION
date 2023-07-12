@@ -1,6 +1,6 @@
 Package: demografr
 Type: Package
-Title: Fitting population genetic demographic models using Approximate Bayesian Computation
+Title: A Toolkit For Simulation-based Inference In Population Genetics
 Version: 0.0.9000
 Authors@R:
     person(given = "Martin",
@@ -8,28 +8,32 @@ Authors@R:
            role = c("aut", "cre"),
            email = "contact@bodkan.net",
            comment = c(ORCID = "0000-0003-4879-8421"))
-Description: An Approximate Bayesian Computation (ABC) framework for fitting parameters
-    of demographic models in population genetics.
+Description: A toolkit for simulation-based inferences of demographic models in
+    population genetics, such as Approximate Bayesian Computation and simulations
+    across parameter grids. Models are specified using the functionality of the
+    slendr R package and summary statistics are computed using its interface to
+    the 'tskit' tree-sequence library. Other components provided allow building
+    of reproducible, fully automated inference pipelines entirely in R.
 Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    ape,
-    dplyr,
     abc,
-    future,
+    dplyr,
     future.apply,
     ggplot2,
-    slendr,
     magrittr,
-    phangorn
-Remotes: bodkan/slendr
+    slendr,
+    tidyr
 Suggests:
-    combinat,
+    ape,
     knitr,
     microbenchmark,
     rmarkdown,
+    cowplot,
+    here,
+    lobstr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3

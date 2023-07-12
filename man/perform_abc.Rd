@@ -11,6 +11,9 @@ perform_abc(data, engine, ...)
 
 \item{engine}{Which ABC engine to use? As of the current version of demografr, the
 valid choices are either "abc" or "ABC_mcmc".}
+
+\item{...}{Additional arguments passed on the the \code{abc} function from
+the abc package}
 }
 \description{
 Runs a selected ABC method on simulated data using R package abc as

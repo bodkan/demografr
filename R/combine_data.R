@@ -8,8 +8,8 @@
 #' @return A combined object of the class \code{demografr_abc_sims}
 #'
 #' @export
-combine_data <- function(x, ...) {
-    UseMethod("combine_data", x)
+combine_data <- function(...) {
+    UseMethod("combine_data", ...)
 }
 
 #' @export

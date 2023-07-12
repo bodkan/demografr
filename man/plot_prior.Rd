@@ -31,8 +31,9 @@ all parameters will be extracted.}
 \item{geom}{Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}}
 
 \item{...}{Optional argument which will be passed to \code{ggsave}}
-
-\item{A}{ggplot2 plot object}
+}
+\value{
+A ggplot2 plot object
 }
 \description{
 Plot prior distribution(s)

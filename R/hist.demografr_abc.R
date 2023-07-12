@@ -22,5 +22,5 @@ hist.demografr_abc.abc <- function(x, param = NULL, ...) {
   # after the filtering is done, use normal abc plotting (temporarily stripping away
   # demografr class annotation, replacing it with the abc class)
   class(x) <- "abc"
-  hist(x, ...)
+  graphics::hist(x, ...)
 }

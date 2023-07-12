@@ -88,7 +88,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
             recombination_rate = recombination_rate
           )
           ts_path <- do.call(run_script, model_engine_args)
-          ts_load(ts_path)
+          slendr::ts_load(ts_path)
         }
       },
       error = function(cond) {

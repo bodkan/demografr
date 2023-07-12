@@ -88,3 +88,5 @@ get_engine <- function(slendr_model, engine) {
     engine <- "slim" # spatial models must use the slendr/SLiM engine
   engine
 }
+
+utils::globalVariables(c("value", "."))

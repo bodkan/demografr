@@ -11,7 +11,7 @@
 #' @param geom Either \code{ggplot2::geom_histogram} or \code{ggplot2::geom_density}
 #' @param ... Optional argument which will be passed to \code{ggsave}
 #'
-#' @param A ggplot2 plot object
+#' @return A ggplot2 plot object
 #'
 #' @export
 plot_prior <- function(x, param = NULL, facets = FALSE, file = NULL,

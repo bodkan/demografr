@@ -20,6 +20,12 @@ plot_posterior(
 or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
 all parameters will be extracted.}
 
+\item{posterior}{Should an "adj"-usted or "unadj"-usted posterior be extracted?
+(Default is "adj").}
+
+\item{facets}{Should individual distributions be plotted in separate facets? Default
+is \code{FALSE}.}
+
 \item{file}{Output file for a figure saved via \code{ggsave}}
 
 \item{...}{Optional argument which will be passed to \code{ggsave}}

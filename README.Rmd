@@ -15,8 +15,6 @@ data_path <- here::here("inst/examples/basics_abc.rds")
 
 if (!file.exists(data_path))
   stop("Run vignette-01-basics first to generate data", call. = FALSE)
-
-devtools::load_all()
 ```
 
 # _demografr_: A simple and efficient ABC toolkit for R
@@ -25,17 +23,6 @@ devtools::load_all()
 <!-- badges: end -->
 
 <img src="man/figures/logo.png" align="right" />
-
-⚠️⚠️⚠️
-
-**This package is under active development and things often change (and break) on
-short notice! You probably shouldn't be using _demografr_ in your own modeling projects
-at this point.**
-
-**A more stable version and a preprint will be ready sometime in summer 2023.
-Feedback is most welcome!**
-
-⚠️⚠️⚠️
 
 The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics and make it more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
@@ -273,7 +260,7 @@ And, finally, the rate of gene flow:
 plot_posterior(abc, param = "gf")
 ```
 
-Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf) R package at our disposal:
+Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/package=abc) R package at our disposal:
 
 ```{r, diagnostic_Ne, fig.width=10, fig.height=8}
 plot(abc, param = "Ne_C")
