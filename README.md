@@ -2,12 +2,17 @@
 
 
 
-# _demografr_: A simple and efficient ABC toolkit for R
-
+# _demografr_: Simulation-based inference in population genetics
 <!-- badges: start -->
 <!-- badges: end -->
 
 <img src="man/figures/logo.png" align="right" />
+
+⚠️⚠️⚠️
+
+**Please note that _demografr_ is still under active development. Although it is used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the changelog for the list of the most recent updates.**
+
+⚠️⚠️⚠️
 
 The goal of _demografr_ is to simplify and streamline [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation) (ABC) in population genetics and make it more reproducible. Additionally, _demografr_ aims to make ABC orders of magnitude faster and more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as an internal data structure and computation engine.
 
