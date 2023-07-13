@@ -12,13 +12,16 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
   fig.align = "center",
   fig.width = 8,
   fig.height = 5,
-  dpi = 80
+  dpi = 80.
+  eval = slendr_present
 )
 
 data_path <- here::here("inst/examples/grid_data.rds")
