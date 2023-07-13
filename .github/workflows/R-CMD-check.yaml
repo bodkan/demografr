@@ -75,24 +75,20 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev
 
-      - name: Setup dedicated Python environment for slendr on Unix
-        if: runner.os != 'Windows'
+      - name: Install slendr
         run: |
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
           R -e 'install.packages("devtools", repos = "http://cran.rstudio.com/")'
           R -e 'devtools::install_github("bodkan/slendr")'
-          R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
-        shell: bash
+
+      - name: Setup dedicated Python environment for slendr on Unix
+        if: runner.os != 'Windows'
+        run: R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
 
       - name: Setup dedicated Python environment for slendr on Windows
         if: runner.os == 'Windows'
-        run: |
-          mkdir ~/R_LIBS
-          echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
-          R -e 'install.packages("devtools", repos = "http://cran.rstudio.com/")'
-          R -e 'library(devtools); install_github("bodkan/slendr")'
-          R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
+        run: R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
