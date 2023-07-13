@@ -200,7 +200,7 @@ validate_abc(python_script, priors, functions, observed)
 
 Looking good! Now let's first run ABC simulations. Again, note the use of the Python script where we would normally plug in a _slendr_ model function in place of the `model` argument:
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
@@ -214,21 +214,23 @@ data <- simulate_abc(
 )
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE, eval=TRUE}
 tend <- Sys.time()
-
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta.rds"))
 ncores <- future::availableCores()
-saveRDS(ncores, here::here("inst/examples/custom_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores.rds"))
+tdelta <- readRDS(here::here("inst/examples/basics_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/basics_ncores.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)

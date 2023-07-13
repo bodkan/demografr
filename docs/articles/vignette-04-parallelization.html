@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">demografr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
       </span>
     </div>
 
@@ -85,6 +85,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -109,9 +112,28 @@
 
     
     
-<p>One of the main selling points of <em>demografr</em> is computational efficiency. Although R isn’t exactly known for computational speed, by utilizing <em>msprime</em> (and, optionally, SLiM) for simulation and the <em>tskit</em> tree-sequence module for population genetic computation without having to rely on saving files to disk, <em>demografr</em> is surprisingly fast and efficient for an R package.</p>
-<p>Still, optimized means of simulation and computation can only get us so far. Especially for computationally very heavy analyses such an ABC, parallelization is absolutely crucial. To this end, <em>demografr</em> provides two ways of parallelizing analyses. One is more sophisticated and easier to do, but it does require a little bit of setup. Another is more straightforward but a little less convenient.</p>
-<p>In this vignette, we will briefly describe both methods, using the <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> function for simplicity and this trivial population genetic model:</p>
+<p>⚠️⚠️⚠️</p>
+<p><strong>Note:</strong> The <em>demografr</em> R package is still
+under active development. As a result, its documentation is in a draft
+stage at best. Apologies for typos, inconsistencies, and other
+issues.</p>
+<p>⚠️⚠️⚠️</p>
+<p>One of the main selling points of <em>demografr</em> is computational
+efficiency. Although R isn’t exactly known for computational speed, by
+utilizing <em>msprime</em> (and, optionally, SLiM) for simulation and
+the <em>tskit</em> tree-sequence module for population genetic
+computation without having to rely on saving files to disk,
+<em>demografr</em> is surprisingly fast and efficient for an R
+package.</p>
+<p>Still, optimized means of simulation and computation can only get us
+so far. Especially for computationally very heavy analyses such an ABC,
+parallelization is absolutely crucial. To this end, <em>demografr</em>
+provides two ways of parallelizing analyses. One is more sophisticated
+and easier to do, but it does require a little bit of setup. Another is
+more straightforward but a little less convenient.</p>
+<p>In this vignette, we will briefly describe both methods, using the
+<code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> function for simplicity and this trivial
+population genetic model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">demografr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -124,7 +146,10 @@
 <span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>Let’s say we want to explore the levels of genetic diversity in both populations across the following parameter grid (note that this grid is extremely small in order to make this example easy and quick to run):</p>
+<p>Let’s say we want to explore the levels of genetic diversity in both
+populations across the following parameter grid (note that this grid is
+extremely small in order to make this example easy and quick to
+run):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/expand.html" class="external-link">crossing</a></span><span class="op">(</span></span>
 <span>  Ne_p1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">1000</span><span class="op">)</span>,</span>
@@ -151,7 +176,9 @@
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_diversity.html" class="external-link">ts_diversity</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="fu"><a href="../reference/extract_names.html">extract_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Just to verify we have set up the components of our analysis correctly, let’s quickly simulate a tree sequence and try to compute genetic diversity in both populations using our summary function:</p>
+<p>Just to verify we have set up the components of our analysis
+correctly, let’s quickly simulate a tree sequence and try to compute
+genetic diversity in both populations using our summary function:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span><span class="va">model</span>, parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Ne_p1 <span class="op">=</span> <span class="fl">100</span>, Ne_p2 <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span></span>
@@ -159,21 +186,35 @@
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">004</span>18</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">057</span>0</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">003</span>95</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">032</span>9</span></span></code></pre>
 <p>Everything works!</p>
-<p><strong>Now, how can we parallelize the computation of diversity across all parameters of the grid?</strong></p>
+<p><strong>Now, how can we parallelize the computation of diversity
+across all parameters of the grid?</strong></p>
 <div class="section level2">
 <h2 id="implicit-parallelization-via-future">1. Implicit parallelization via <em>future</em><a class="anchor" aria-label="anchor" href="#implicit-parallelization-via-future"></a>
 </h2>
-<p>The simplest way to parallelize <em>demografr</em> analyses is via the R package <a href="https://cran.r-project.org/package=future" class="external-link"><em>future</em></a>.</p>
-<p>The magic of <em>future</em> lies in its ability to set up parallelized schemes of arbitrary topologies by automatic scheduling of jobs across a given number of CPUs distributed even across several remote compute servers.</p>
-<p>Going into detail in setting up <em>future</em>-based parallelization would be too far out of scope of this simple vignette (or <em>demografr</em>’s documentation in general). Luckily, once <em>future</em> parallelization is set up, it doesn’t matter whether the computation is done by <em>demografr</em> or anything else, as the <em>future</em> architecture is completely general.</p>
-<p>In order to use <em>future</em> effectively, you should study its documentation and tutorials (a good start would be the vignette <a href="https://cran.r-project.org/package=future" class="external-link">here</a>), but here is a brief introduction focused on parallelizing a toy <em>demografr</em> analysis set up above:</p>
+<p>The simplest way to parallelize <em>demografr</em> analyses is via
+the R package <a href="https://cran.r-project.org/package=future" class="external-link"><em>future</em></a>.</p>
+<p>The magic of <em>future</em> lies in its ability to set up
+parallelized schemes of arbitrary topologies by automatic scheduling of
+jobs across a given number of CPUs distributed even across several
+remote compute servers.</p>
+<p>Going into detail in setting up <em>future</em>-based parallelization
+would be too far out of scope of this simple vignette (or
+<em>demografr</em>’s documentation in general). Luckily, once
+<em>future</em> parallelization is set up, it doesn’t matter whether the
+computation is done by <em>demografr</em> or anything else, as the
+<em>future</em> architecture is completely general.</p>
+<p>In order to use <em>future</em> effectively, you should study its
+documentation and tutorials (a good start would be the vignette <a href="https://cran.r-project.org/package=future" class="external-link">here</a>), but here is
+a brief introduction focused on parallelizing a toy <em>demografr</em>
+analysis set up above:</p>
 <div class="section level3">
 <h3 id="sequential-run">Sequential run<a class="anchor" aria-label="anchor" href="#sequential-run"></a>
 </h3>
-<p>By default, if we would run <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code>, all simulations would be run <em>sequentially</em>:</p>
+<p>By default, if we would run <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code>, all
+simulations would be run <em>sequentially</em>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">10</span>, sequence_length <span class="op">=</span> <span class="fl">10000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span></span>
@@ -192,17 +233,25 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 3 minutes 27 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 1
+minutes 37 seconds parallelized across 10 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>
 </h3>
-<p>In order to distribute simulations across all (or some) available CPU cores of your machine, you only need to put the following bit of R code <em>before</em> your call to <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code>. For instance, on my personal laptop which has 10 CPUs, I can run the above analysis using all available CPUs like this:</p>
+<p>In order to distribute simulations across all (or some) available CPU
+cores of your machine, you only need to put the following bit of R code
+<em>before</em> your call to <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code>. For instance,
+on my personal laptop which has 10 CPUs, I can run the above analysis
+using all available CPUs like this:</p>
 <p>First we setup <em>future</em>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multicore</span>, workers <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="co"># use 10 CPUs</span></span></code></pre></div>
-<p>Then we can run the simulations <strong>without having to do anything else!</strong> This last point is important: <em>demografr</em> can automatically leverage whatever parallelization scheme you set up via <em>future</em>’s function <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code>.</p>
+<p>Then we can run the simulations <strong>without having to do anything
+else!</strong> This last point is important: <em>demografr</em> can
+automatically leverage whatever parallelization scheme you set up via
+<em>future</em>’s function <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">10</span>, sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span></span>
@@ -221,41 +270,70 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 0 minutes 27 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 0
+minutes 27 seconds parallelized across 10 CPUs.</strong></p>
 <p>Notice the speed up even for this trivial toy analysis!</p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-multiple-machines">Parallelization across CPUs of multiple machines<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-multiple-machines"></a>
 </h3>
-<p>If you read the documentation of the <em>future</em> package (which you really <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html" class="external-link">should</a>), you will discover many more options for parallelization giving you near limitless options for scheduling parallel simulations.</p>
-<p>For instance, imagine you have access to remote machines <code>server01</code>, <code>server02</code>, <code>server03</code>, all with available R as well as <em>demografr</em> and <em>slendr</em> R packages, with set up <em>slendr</em> environments. In other words, you can start an R interpreter on each of these machines and eventually call:</p>
+<p>If you read the documentation of the <em>future</em> package (which
+you really <a href="https://cran.r-project.org/package=future" class="external-link">should</a>), you will
+discover many more options for parallelization giving you near limitless
+options for scheduling parallel simulations.</p>
+<p>For instance, imagine you have access to remote machines
+<code>server01</code>, <code>server02</code>, <code>server03</code>, all
+with available R as well as <em>demografr</em> and <em>slendr</em> R
+packages, with set up <em>slendr</em> environments. In other words, you
+can start an R interpreter on each of these machines and eventually
+call:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">demografr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; The interface to all required Python modules has been activated.</span></span></code></pre>
-<p>Then, you can distribute the <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> run (but also <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>, of course!) simply by adjusting the <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code> setup like this:</p>
+<p>Then, you can distribute the <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> run (but
+also <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>, of course!) simply by adjusting the
+<code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code> setup like this:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hostnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"server01"</span>, <span class="st">"server02"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="va">hostnames</span><span class="op">)</span></span></code></pre></div>
-<p>We won’t be running this example here in practice because the “server01”, etc., don’t really exist, but you should get an idea.</p>
-<p>In short, the <em>future</em> R package (and it’s support provided by <em>demografr</em>) makes it very easy to set up arbitrary parallelization schemes without doing additional work beyond setting up the parallelization <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code>.</p>
+<p>We won’t be running this example here in practice because the
+“server01”, etc., don’t really exist, but you should get an idea.</p>
+<p>In short, the <em>future</em> R package (and it’s support provided by
+<em>demografr</em>) makes it very easy to set up arbitrary
+parallelization schemes without doing additional work beyond setting up
+the parallelization <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code>.</p>
 </div>
 <div class="section level3">
 <h3 id="for-completeness">For completeness<a class="anchor" aria-label="anchor" href="#for-completeness"></a>
 </h3>
-<p>By default, if you don’t set up any <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code> at all, the sequential simulation runs of <em>demografr</em> are implicitly organized by:</p>
+<p>By default, if you don’t set up any <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code> at all, the
+sequential simulation runs of <em>demografr</em> are implicitly
+organized by:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">sequential</span><span class="op">)</span></span></code></pre></div>
-<p>But this is just for completeness. It’s not something that makes much sense to do in practice, perhaps beyond debugging parallelization issues.</p>
+<p>But this is just for completeness. It’s not something that makes much
+sense to do in practice, perhaps beyond debugging parallelization
+issues.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="manual-parallelization">2. “Manual” parallelization<a class="anchor" aria-label="anchor" href="#manual-parallelization"></a>
 </h2>
-<p>In personal experience, it can be a bit of a hassle to distribute jobs across different machines, despite the conveniences of the <em>future</em> R package. If you’re having such problems, I first <em>highly</em> encourage you to <a href="https://cran.r-project.org/web/packages/future/vignettes/future-1-overview.html" class="external-link">read</a> the basic overview and look up troubleshooting advice on Google.</p>
-<p>Still, <em>demografr</em> provides rudimentary support for “manual” paralelization across multiple machines (each of those machines parallelizing on multiple CPUs), followed by merging simulation runs into a single data set.</p>
-<p>To demonstrate this, let’s pretend we ran five simulation grid runs across two different computers like this (we were originally interested in distributing 10 replicates, so we’ll run two times five replicates individually):</p>
+<p>In personal experience, it can be a bit of a hassle to distribute
+jobs across different machines, despite the conveniences of the
+<em>future</em> R package. If you’re having such problems, I first
+<em>highly</em> encourage you to <a href="https://cran.r-project.org/package=future" class="external-link">read</a> the basic
+overview vignette and look up troubleshooting advice on Google.</p>
+<p>Still, <em>demografr</em> provides rudimentary support for “manual”
+paralelization across multiple machines (each of those machines
+parallelizing on multiple CPUs), followed by merging simulation runs
+into a single data set.</p>
+<p>To demonstrate this, let’s pretend we ran five simulation grid runs
+across two different computers like this (we were originally interested
+in distributing 10 replicates, so we’ll run two times five replicates
+individually):</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multicore</span>, workers <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
@@ -268,7 +346,11 @@
 <span></span>
 <span><span class="co"># on machine #2</span></span>
 <span><span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">5</span>, sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, file <span class="op">=</span> <span class="va">run2_file</span><span class="op">)</span></span></code></pre></div>
-<p>Then, once we collected the individual <code>.rds</code> files on a single computer from the remote machines (perhaps using something like the <code>scp</code> unix command), we can use another <em>demografr</em> function <code><a href="../reference/combine_data.html">combine_data()</a></code> to merge all individual runs into a single result:</p>
+<p>Then, once we collected the individual <code>.rds</code> files on a
+single computer from the remote machines (perhaps using something like
+the <code>scp</code> unix command), we can use another
+<em>demografr</em> function <code><a href="../reference/combine_data.html">combine_data()</a></code> to merge all
+individual runs into a single result:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_data.html">combine_data</a></span><span class="op">(</span><span class="va">run1_file</span>, <span class="va">run2_file</span><span class="op">)</span></span>
 <span></span>
@@ -287,12 +369,26 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p>For each combination of parameters we ran five replicates across “two different machines”, totalling 9 x 5 x 2 = 90 simulations, so we should get the same number of rows in the merged data frame:</p>
+<p>For each combination of parameters we ran five replicates across “two
+different machines”, totalling 9 x 5 x 2 = 90 simulations, so we should
+get the same number of rows in the merged data frame:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] 90</span></span></code></pre>
-<p>One thing to note that <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> as well as <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code> really do save standard RDS files as one normally would using function <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> (in fact, they use this function internally). An additional behefit of using this approach combined with <code><a href="../reference/combine_data.html">combine_data()</a></code> is that these functions provide additional sanity checks making sure that the simulation data sets being merged are consistent (coming from the same model function, with the same priors or summary statistics, etc.).</p>
-<p>For completeness, <code><a href="../reference/combine_data.html">combine_data()</a></code> not only accepts file paths as individual function arguments but also file names as vectors, as well as individual data frame objects generated by <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> and <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>. In other words, the following approaches will all result in the same combined data set:</p>
+<p>One thing to note that <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> as well as
+<code><a href="../reference/simulate_abc.html">simulate_abc()</a></code> really do save standard RDS files as one
+normally would using function <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> (in fact, they use
+this function internally). An additional behefit of using this approach
+combined with <code><a href="../reference/combine_data.html">combine_data()</a></code> is that these functions
+provide additional sanity checks making sure that the simulation data
+sets being merged are consistent (coming from the same model function,
+with the same priors or summary statistics, etc.).</p>
+<p>For completeness, <code><a href="../reference/combine_data.html">combine_data()</a></code> not only accepts file
+paths as individual function arguments but also file names as vectors,
+as well as individual data frame objects generated by
+<code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> and <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>. In other
+words, the following approaches will all result in the same combined
+data set:</p>
 <p><strong>Merging data from serialized data files:</strong></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">combined1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_data.html">combine_data</a></span><span class="op">(</span><span class="va">run1_file</span>, <span class="va">run2_file</span><span class="op">)</span></span>
@@ -304,7 +400,8 @@
 <span></span>
 <span><span class="va">combined3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_data.html">combine_data</a></span><span class="op">(</span><span class="va">run1</span>, <span class="va">run2</span><span class="op">)</span></span>
 <span><span class="va">combined4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/combine_data.html">combine_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">run1</span>, <span class="va">run2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><strong>All <code><a href="../reference/combine_data.html">combine_data()</a></code> approaches give the same result:</strong></p>
+<p><strong>All <code><a href="../reference/combine_data.html">combine_data()</a></code> approaches give the same
+result:</strong></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">combined1</span>, <span class="va">combined2</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] TRUE</span></span></code></pre>

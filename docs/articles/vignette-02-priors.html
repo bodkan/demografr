@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">demografr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
       </span>
     </div>
 
@@ -85,6 +85,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
 </div>
@@ -109,19 +112,40 @@
 
     
     
-<p>In order to perform probabilistic inference using a method such as Approximate Bayesian Computation, we need a way to specify prior distributions of parameters.</p>
-<p>Different frameworks and languages approach this from different angles. This vignette describes a method used by <em>demografr</em>. <strong>The description provided here is quite detailed and technical.</strong> Unless you’re very curious about metaprogramming tricks provided by the R language, you’re very unlikely to need this.</p>
-<p>With that out of the way, imagine the following probabilistic statements. Which features does <em>demografr</em> provide to encode them in an R script?</p>
+<p>⚠️⚠️⚠️</p>
+<p><strong>Note:</strong> The <em>demografr</em> R package is still
+under active development. As a result, its documentation is in a draft
+stage at best. Apologies for typos, inconsistencies, and other
+issues.</p>
+<p>⚠️⚠️⚠️</p>
+<p>In order to perform probabilistic inference using a method such as
+Approximate Bayesian Computation, we need a way to specify prior
+distributions of parameters.</p>
+<p>Different frameworks and languages approach this from different
+angles. This vignette describes a method used by <em>demografr</em>.
+<strong>The description provided here is quite detailed and
+technical.</strong> Unless you’re very curious about metaprogramming
+tricks provided by the R language, you’re very unlikely to need
+this.</p>
+<p>With that out of the way, imagine the following probabilistic
+statements. Which features does <em>demografr</em> provide to encode
+them in an R script?</p>
 <ul>
-<li><p><span class="math display">\[N_e \sim Unif(1000, 10000)\]</span></p></li>
-<li><p><span class="math display">\[\textrm{geneflow} \sim Unif(0, 1)\]</span></p></li>
-<li><p><span class="math display">\[T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 5\}\]</span></p></li>
+<li><p><span class="math display">\[N_e \sim Unif(1000,
+10000)\]</span></p></li>
+<li><p><span class="math display">\[\textrm{geneflow} \sim Unif(0,
+1)\]</span></p></li>
+<li><p><span class="math display">\[T_{\textrm{split}}^i \sim Norm(10,
+10000), \textrm{for } i \in \{1, 2, ..., 5\}\]</span></p></li>
 </ul>
-<p><strong>If you don’t care about technical details of <em>demografr</em> internals, feel free to jump <a href="#final-result">here</a>.</strong></p>
+<p><strong>If you don’t care about technical details of
+<em>demografr</em> internals, feel free to jump <a href="#final-result">here</a>.</strong></p>
 <div class="section level2">
 <h2 id="one-trivial-option">One trivial option<a class="anchor" aria-label="anchor" href="#one-trivial-option"></a>
 </h2>
-<p>Possibly the most trivial solution to this problem in R would be to write something like this. Indeed, some probabilistic inference R packages do exactly the following:</p>
+<p>Possibly the most trivial solution to this problem in R would be to
+write something like this. Indeed, some probabilistic inference R
+packages do exactly the following:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Ne"</span>, <span class="st">"runif"</span>, <span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
@@ -129,28 +153,40 @@
 <span>  <span class="co"># (not sure how would one create a vector like T_i)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>In Python, you might create some objects like:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="im">import</span> tensorflow_probability <span class="im">as</span> tfp</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co"># define random variables</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4">Ne <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">1000.</span>, high<span class="op">=</span><span class="fl">10000.</span>)</a>
-<a class="sourceLine" id="cb2-5" data-line-number="5">geneflow <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">0.</span>, high<span class="op">=</span><span class="fl">1.</span>)</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">T_split <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">10.</span>, high<span class="op">=</span><span class="fl">10000.</span>)</a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co"># sample from the distributions</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9">Ne_sample <span class="op">=</span> Ne.sample()</a>
-<a class="sourceLine" id="cb2-10" data-line-number="10">geneflow_sample <span class="op">=</span> geneflow.sample()</a>
-<a class="sourceLine" id="cb2-11" data-line-number="11">T_split_sample <span class="op">=</span> T_split.sample(<span class="dv">5</span>)</a></code></pre></div>
-<p>The question I asked as I began drafting the design of <em>demografr</em> was whether it would be possible to do this more “elegantly”—with less code and closer to actual mathematical notation.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tensorflow_probability <span class="im">as</span> tfp</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># define random variables</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Ne <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">1000.</span>, high<span class="op">=</span><span class="fl">10000.</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>geneflow <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">0.</span>, high<span class="op">=</span><span class="fl">1.</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>T_split <span class="op">=</span> tfp.distributions.Uniform(low<span class="op">=</span><span class="fl">10.</span>, high<span class="op">=</span><span class="fl">10000.</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># sample from the distributions</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>Ne_sample <span class="op">=</span> Ne.sample()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>geneflow_sample <span class="op">=</span> geneflow.sample()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>T_split_sample <span class="op">=</span> T_split.sample(<span class="dv">5</span>)</span></code></pre></div>
+<p>The question I asked as I began drafting the design of
+<em>demografr</em> was whether it would be possible to do this more
+“elegantly”—with less code and closer to actual mathematical
+notation.</p>
 </div>
 <div class="section level2">
 <h2 id="fancier-metaprogramming-solution">Fancier metaprogramming solution<a class="anchor" aria-label="anchor" href="#fancier-metaprogramming-solution"></a>
 </h2>
-<p>Despite being <em>“a silly calculator language”</em> (quote by a former colleague of mine), R is a very powerful functional programming language with advanced <a href="https://en.wikipedia.org/wiki/Metaprogramming" class="external-link">metaprogramming</a> options. To paraphrase information from Wikipedia:</p>
+<p>Despite being <em>“a silly calculator language”</em> (quote by a
+former colleague of mine), R is a very powerful functional programming
+language with advanced <a href="https://en.wikipedia.org/wiki/Metaprogramming" class="external-link">metaprogramming</a>
+options. To paraphrase information from Wikipedia:</p>
 <blockquote>
-<p>Metaprogramming is a <strong>programming technique in which computer programs have the ability to treat other programs as their data</strong>. It means that a program can be designed to read, generate, analyze or transform other programs, and even modify itself while running.</p>
-<p>In other words, <strong>metaprogramming is when code is writing other code.</strong></p>
+<p>Metaprogramming is a <strong>programming technique in which computer
+programs have the ability to treat other programs as their
+data</strong>. It means that a program can be designed to read,
+generate, analyze or transform other programs, and even modify itself
+while running.</p>
+<p>In other words, <strong>metaprogramming is when code is writing other
+code.</strong></p>
 </blockquote>
-<p>What does this mean in practice in R? You might be familiar with the syntax for fitting linear models in R:</p>
+<p>What does this mean in practice in R? You might be familiar with the
+syntax for fitting linear models in R:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                    mpg cyl disp  hp drat    wt  qsec vs am gear carb</span></span>
@@ -169,39 +205,68 @@
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; (Intercept)          mpg  </span></span>
 <span><span class="co">#&gt;     11.2607      -0.2525</span></span></code></pre>
-<p>The <strong><code>~</code> operator creates a so-called “formula object”</strong>, which captures the expression provided by the user (relationship between columns of the data frame, <code>"cyl"</code> and <code>"mpg"</code>), and can then be manipulated or interpreted by the function that the formula is passed to.</p>
-<p>Importantly, if you type <code>cyl ~ mpg</code> into your R console, you get the same thing back. It doesn’t do anything by itself! In fact, if you were to type <code>cyl</code> or <code>mpg</code> into your R console on their own, you would get an error.</p>
-<p>However, when you execute the <code>lm</code> command above, the function uses R’s metaprogramming features to interpret the information in the formula to extract appropriate information (column vectors <code>"cyl"</code> and <code>"mpg"</code>) from the data frame, and perform the necessary computation for the linear regression fit. In this context, one could also say that the formula syntax provides a <a href="https://en.wikipedia.org/wiki/Domain-specific_language" class="external-link">domain-specific language</a> for encoding statistical modeling equations in R.</p>
-<p>Our goal in <em>demografr</em>, then, is to provide a similar functionality for encoding prior sampling statements.</p>
+<p>The <strong><code>~</code> operator creates a so-called “formula
+object”</strong>, which captures the expression provided by the user
+(relationship between columns of the data frame, <code>"cyl"</code> and
+<code>"mpg"</code>), and can then be manipulated or interpreted by the
+function that the formula is passed to.</p>
+<p>Importantly, if you type <code>cyl ~ mpg</code> into your R console,
+you get the same thing back. It doesn’t do anything by itself! In fact,
+if you were to type <code>cyl</code> or <code>mpg</code> into your R
+console on their own, you would get an error.</p>
+<p>However, when you execute the <code>lm</code> command above, the
+function uses R’s metaprogramming features to interpret the information
+in the formula to extract appropriate information (column vectors
+<code>"cyl"</code> and <code>"mpg"</code>) from the data frame, and
+perform the necessary computation for the linear regression fit. In this
+context, one could also say that the formula syntax provides a <a href="https://en.wikipedia.org/wiki/Domain-specific_language" class="external-link">domain-specific
+language</a> for encoding statistical modeling equations in R.</p>
+<p>Our goal in <em>demografr</em>, then, is to provide a similar
+functionality for encoding prior sampling statements.</p>
 </div>
 <div class="section level2">
 <h2 id="how-to-use-this-for-the-problem-above">How to use this for the problem above?<a class="anchor" aria-label="anchor" href="#how-to-use-this-for-the-problem-above"></a>
 </h2>
-<p>Imagine then that we want to write an R interface for doing something like this:</p>
+<p>Imagine then that we want to write an R interface for doing something
+like this:</p>
 <p><span class="math display">\[N_e \sim Unif(1000, 10000).\]</span></p>
-<p>Obviously, we have functions such as <code>runif</code>, <code>rnorm</code>, etc., which generate a number from a distribution:</p>
+<p>Obviously, we have functions such as <code>runif</code>,
+<code>rnorm</code>, etc., which generate a number from a
+distribution:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span>, min <span class="op">=</span> <span class="fl">1000</span>, max <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] 9233.254</span></span></code></pre>
-<p>We can also do this in R, “for free”, without doing anything else.</p>
+<p>We can also do this in R, “for free”, without doing anything
+else.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">prior</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Ne ~ runif(1000, 10000)</span></span></code></pre>
-<p><strong>Note that this expression is not evaluated! Formula is simply an object carrying a bit of syntax.</strong> Just as we demonstrated above in the discussion of formula used in an <code>lm</code> call, simply entering <code>Ne ~ runif(1000, 10000)</code> into the R console doesn’t do anything on its own.</p>
-<p>This is important, because the <code>runif(1000, 10000)</code> on the right is not a valid R code.</p>
-<p><strong>This is called <a href="https://en.wikipedia.org/wiki/Lazy_evaluation" class="external-link">lazy evaluation</a>.</strong> R does not evaluate something at the time unless it’s “needed” at that time. The opposite to this is “eager evaluation” done by something like Python or C.</p>
+<p><strong>Note that this expression is not evaluated! Formula is simply
+an object carrying a bit of syntax.</strong> Just as we demonstrated
+above in the discussion of formula used in an <code>lm</code> call,
+simply entering <code>Ne ~ runif(1000, 10000)</code> into the R console
+doesn’t do anything on its own.</p>
+<p>This is important, because the <code>runif(1000, 10000)</code> on the
+right is not a valid R code.</p>
+<p><strong>This is called <a href="https://en.wikipedia.org/wiki/Lazy_evaluation" class="external-link">lazy
+evaluation</a>.</strong> R does not evaluate something at the time
+unless it’s “needed” at that time. The opposite to this is “eager
+evaluation” done by something like Python or C.</p>
 </div>
 <div class="section level2">
 <h2 id="metaprogramming-in-r-in-practice">Metaprogramming in R in practice<a class="anchor" aria-label="anchor" href="#metaprogramming-in-r-in-practice"></a>
 </h2>
-<p>Metaprogramming is often magic requiring lots of complicated tools, but to do very basic metaprogramming in R is very simple.</p>
+<p>Metaprogramming is often magic requiring lots of complicated tools,
+but to do very basic metaprogramming in R is very simple.</p>
 <p>How can we “manipulate” code and give it our own meaning?</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prior</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Ne ~ runif(1000, 10000)</span></span></code></pre>
-<p>When given a formula, the R function <strong><code>as.list</code> parses the language expression into smallest possible “atomic pieces”</strong>:</p>
+<p>When given a formula, the R function <strong><code>as.list</code>
+parses the language expression into smallest possible “atomic
+pieces”</strong>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">prior</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [[1]]</span></span>
@@ -212,11 +277,15 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; runif(1000, 10000)</span></span></code></pre>
-<p>This is called an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree" class="external-link">abstract syntax tree</a> in programming language design.</p>
-<p>Note that this works generally for any language expression (even those that are much deeper):</p>
+<p>This is called an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree" class="external-link">abstract
+syntax tree</a> in programming language design.</p>
+<p>Note that this works generally for any language expression (even
+those that are much deeper):</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">a</span> <span class="op">+</span> <span class="va">b</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">c</span> <span class="op">-</span> <span class="va">d</span> <span class="op">/</span> <span class="va">e</span><span class="op">)</span></span></code></pre></div>
-<p>Although fut for expressions like the above it is easier to use a proper metaprogramming tool such as the function <code>ast</code> provided by the R package <a href="https://lobstr.r-lib.org" class="external-link"><em>lobstr</em></a>:</p>
+<p>Although fut for expressions like the above it is easier to use a
+proper metaprogramming tool such as the function <code>ast</code>
+provided by the R package <a href="https://lobstr.r-lib.org" class="external-link"><em>lobstr</em></a>:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">lobstr</span><span class="fu">::</span><span class="fu"><a href="https://lobstr.r-lib.org/reference/ast.html" class="external-link">ast</a></span><span class="op">(</span><span class="op">(</span><span class="va">a</span> <span class="op">+</span> <span class="va">b</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">c</span> <span class="op">-</span> <span class="va">d</span> <span class="op">/</span> <span class="va">e</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #FFAF00;">█</span>─<span style="color: #BB00BB; font-weight: bold;">`*`</span> </span></span>
@@ -230,12 +299,21 @@
 <span><span class="co">#&gt;     └─<span style="color: #FFAF00;">█</span>─<span style="color: #BB00BB; font-weight: bold;">`/`</span> </span></span>
 <span><span class="co">#&gt;       ├─<span style="color: #BB00BB; font-weight: bold;">d</span> </span></span>
 <span><span class="co">#&gt;       └─<span style="color: #BB00BB; font-weight: bold;">e</span></span></span></code></pre>
-<p>Even if you haven’t heard abotu AST before, if you look closely at the result just above, you will notice that it captures the same expression as <code>(a + b) * (c - d / e)</code> except that it dissassembled it into smalles possible atomic pieces and decomposed it via so-called <a href="https://en.wikipedia.org/wiki/Polish_notation" class="external-link">prefix notation</a>. This is a standard representation of AST data structure (in fact, the simpler version we obtained via <code>as.list</code> above does the same thing).</p>
+<p>Even if you haven’t heard abotu AST before, if you look closely at
+the result just above, you will notice that it captures the same
+expression as <code>(a + b) * (c - d / e)</code> except that it
+dissassembled it into smalles possible atomic pieces and decomposed it
+via so-called <a href="https://en.wikipedia.org/wiki/Polish_notation" class="external-link">prefix
+notation</a>. This is a standard representation of AST data structure
+(in fact, the simpler version we obtained via <code>as.list</code> above
+does the same thing).</p>
 </div>
 <div class="section level2">
 <h2 id="back-to-demografr">Back to <em>demografr</em><a class="anchor" aria-label="anchor" href="#back-to-demografr"></a>
 </h2>
-<p>Let’s now return to our original goal of encoding prior sampling statements such as <span class="math inline">\(\textrm{variable} \sim \textrm{distribution}\)</span>:</p>
+<p>Let’s now return to our original goal of encoding prior sampling
+statements such as <span class="math inline">\(\textrm{variable} \sim
+\textrm{distribution}\)</span>:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prior</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Ne ~ runif(1000, 10000)</span></span></code></pre>
@@ -250,8 +328,11 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; runif(1000, 10000)</span></span></code></pre>
-<p>And which we hope to interpret in a way that’s compatible with something like <span class="math inline">\(N_e \sim Unif(1000, 10000)\)</span>.</p>
-<p><em>demografr</em> implements a way to parse each such prior sampling statement, and automatically convert the “invalid” expression:</p>
+<p>And which we hope to interpret in a way that’s compatible with
+something like <span class="math inline">\(N_e \sim Unif(1000,
+10000)\)</span>.</p>
+<p><em>demografr</em> implements a way to parse each such prior sampling
+statement, and automatically convert the “invalid” expression:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <p>into a proper R statement</p>
@@ -262,7 +343,10 @@
 <h3 id="sample_prior-function">
 <code>sample_prior()</code> function<a class="anchor" aria-label="anchor" href="#sample_prior-function"></a>
 </h3>
-<p>The above feature of <em>demografr</em> is implemented by a function <code>sample_prior</code>. Although this function is exported to the user space in your R console, you shouldn’t need to use it for any of your work besides simple debugging of your priors:</p>
+<p>The above feature of <em>demografr</em> is implemented by a function
+<code>sample_prior</code>. Although this function is exported to the
+user space in your R console, you shouldn’t need to use it for any of
+your work besides simple debugging of your priors:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
@@ -284,14 +368,19 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
 <span><span class="co">#&gt; [1] 8474.029</span></span></code></pre>
-<p>This function takes in a formula statement (our DLS for encoding prior sampling events), parses it into individual components, and simulates a value of a random variable from a provided distribution function.</p>
+<p>This function takes in a formula statement (our DLS for encoding
+prior sampling events), parses it into individual components, and
+simulates a value of a random variable from a provided distribution
+function.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="sampling-random-vectors">Sampling random vectors<a class="anchor" aria-label="anchor" href="#sampling-random-vectors"></a>
 </h2>
-<p>To provide support for random vectors, <em>demografr</em> uses a similar metaprogramming trick as above.</p>
-<p>Imagine this syntax for vectorized statements (the <code>T_split[5]</code> is my made up syntax, not R syntax!):</p>
+<p>To provide support for random vectors, <em>demografr</em> uses a
+similar metaprogramming trick as above.</p>
+<p>Imagine this syntax for vectorized statements (the
+<code>T_split[5]</code> is my made up syntax, not R syntax!):</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="va">T_split</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
@@ -304,8 +393,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; runif(10, 10000)</span></span></code></pre>
-<p>Note that this expression is one layer “deeper” than would be with a plain <code>T_split ~ runif(10, 10000)</code>.</p>
-<p>This means that for “vector variables” of <em>demografr</em>, we need to take care of the nesting:</p>
+<p>Note that this expression is one layer “deeper” than would be with a
+plain <code>T_split ~ runif(10, 10000)</code>.</p>
+<p>This means that for “vector variables” of <em>demografr</em>, we need
+to take care of the nesting:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">prior</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">variable</span></span></code></pre></div>
@@ -330,13 +421,16 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
 <span><span class="co">#&gt; [1] 6421.038 5195.769 7368.517 1355.319 6573.353</span></span></code></pre>
-<p>Which internally turns the prior expression into <code>runif(n = 10, min = 10, max = 10000)</code>.</p>
+<p>Which internally turns the prior expression into
+<code>runif(n = 10, min = 10, max = 10000)</code>.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="final-result">Final list of all priors<a class="anchor" aria-label="anchor" href="#final-result"></a>
 </h2>
-<p>In conclusion, using <em>demografr</em>’s features it’s possible to define the example prior sampling statements from the top of this vignette in R code like this:</p>
+<p>In conclusion, using <em>demografr</em>’s features it’s possible to
+define the example prior sampling statements from the top of this
+vignette in R code like this:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">Ne</span>         <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
@@ -346,17 +440,23 @@
 <span><span class="op">)</span></span></code></pre></div>
 <p><strong>Take home messages:</strong></p>
 <ul>
-<li><p>All of this is <em>declarative</em>! The R code defines the priors, but doesn’t sample any numbers!</p></li>
-<li><p>The exact process of metaprogramming that accomplishes this is something you don’t ever have to worry or care about as a user.</p></li>
-<li><p>All of the processing and sampling from priors is done internally (and automatically) by <em>demografr</em> while running simulation replicates for ABC, etc., like this:</p></li>
+<li><p>All of this is <em>declarative</em>! The R code defines the
+priors, but doesn’t sample any numbers!</p></li>
+<li><p>The exact process of metaprogramming that accomplishes this is
+something you don’t ever have to worry or care about as a user.</p></li>
+<li><p>All of the processing and sampling from priors is done internally
+(and automatically) by <em>demografr</em> while running simulation
+replicates for ABC, etc., like this:</p></li>
 </ul>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">data &lt;-<span class="st"> </span><span class="kw">simulate_abc</span>(model, <span class="op">&lt;</span>priors<span class="op">&gt;</span>, functions, observed, ...)</a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">simulate_abc</span>(model, <span class="sc">&lt;</span>priors<span class="sc">&gt;</span>, functions, observed, ...)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="custom-functions">Custom functions<a class="anchor" aria-label="anchor" href="#custom-functions"></a>
 </h2>
-<p>The above also allows custom-defined prior distribution functions, not just built-in <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code>, etc.</p>
-<p>For instance, imagine this function simulating a sampling from a distribution of a loaded casino die, <code>rcasino()</code>:</p>
+<p>The above also allows custom-defined prior distribution functions,
+not just built-in <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code>, etc.</p>
+<p>For instance, imagine this function simulating a sampling from a
+distribution of a loaded casino die, <code>rcasino()</code>:</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rcasino</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">outcomes</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="co"># six sides of a die</span></span>
@@ -364,10 +464,16 @@
 <span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">outcomes</span>, size <span class="op">=</span> <span class="va">n</span>, prob <span class="op">=</span> <span class="va">probabilities</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>We can use our custom function in exactly the same way as standard R sampling functions. First, we define a prior for sampling a parameter value from the loaded die casino die (actually, do demonstrate that <code>rcasino</code> really works as it should, let’s sample a vector of 100 random die rolls):</p>
+<p>We can use our custom function in exactly the same way as standard R
+sampling functions. First, we define a prior for sampling a parameter
+value from the loaded die casino die (actually, do demonstrate that
+<code>rcasino</code> really works as it should, let’s sample a vector of
+100 random die rolls):</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">par</span> <span class="op">&lt;-</span> <span class="va">rolls</span><span class="op">[</span><span class="fl">100</span><span class="op">]</span> <span class="op">~</span> <span class="fu">rcasino</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>During a hypothetical ABC sampling process, <em>demografr</em> would then sample the parameter <code>par</code> (internally and automatically) via its function <code><a href="../reference/sample_prior.html">sample_prior()</a></code>:</p>
+<p>During a hypothetical ABC sampling process, <em>demografr</em> would
+then sample the parameter <code>par</code> (internally and
+automatically) via its function <code><a href="../reference/sample_prior.html">sample_prior()</a></code>:</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span></span>
 <span><span class="va">samples</span></span></code></pre></div>
@@ -378,7 +484,8 @@
 <span><span class="co">#&gt;   [1] 5 3 5 1 6 3 1 1 6 3 4 1 6 1 1 6 4 3 1 3 2 5 2 3 5 6 2 6 6 1 4 3 3 6 1 3 1</span></span>
 <span><span class="co">#&gt;  [38] 1 5 1 4 6 6 3 2 6 5 5 6 6 4 5 1 2 4 2 6 6 2 5 6 6 6 6 3 6 5 6 3 4 6 4 6 6</span></span>
 <span><span class="co">#&gt;  [75] 5 2 4 6 6 6 6 5 6 6 1 1 5 6 4 5 4 5 6 6 3 1 1 5 5 4</span></span></code></pre>
-<p>Finally, we can verify that the sampled values really correspond to a loaded die which throws a six much more often than others:</p>
+<p>Finally, we can verify that the sampled values really correspond to a
+loaded die which throws a six much more often than others:</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">samples</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; </span></span>

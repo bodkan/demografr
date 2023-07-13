@@ -96,7 +96,7 @@ In order to use _future_ effectively, you should study its documentation and tut
 
 By default, if we would run `simulate_grid()`, all simulations would be run _sequentially_:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
@@ -106,7 +106,7 @@ data <- simulate_grid(model, grid, functions, replicates = 10, sequence_length =
 data
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tend <- Sys.time()
 
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))

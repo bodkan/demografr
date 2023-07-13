@@ -245,7 +245,7 @@ validate_abc(model, priors, functions, observed)
 
 Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using _demografr_'s function `simulate_abc()`:
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
@@ -256,12 +256,14 @@ data <- simulate_abc(
 )
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE, eval=TRUE}
 tend <- Sys.time()
-
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
-saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
 ncores <- future::availableCores()
+```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
 saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
@@ -270,7 +272,7 @@ tdelta <- readRDS(here::here("inst/examples/basics_tdelta.rds"))
 ncores <- readRDS(here::here("inst/examples/basics_ncores.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
