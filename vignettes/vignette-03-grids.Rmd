@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   fig.align = "center",
   fig.width = 8,
   fig.height = 5,
-  dpi = 80.
+  dpi = 80,
   eval = slendr_present
 )
 
