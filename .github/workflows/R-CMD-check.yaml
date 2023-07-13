@@ -89,15 +89,15 @@ jobs:
 
       - name: Setup dedicated Python environment for slendr on Unix
         if: runner.os != 'Windows'
-        run: |
-          R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
-          R --no-echo -e 'reticulate::conda_binary()'
-          R --no-echo -e 'reticulate::conda_list()'
-          R --no-echo -e 'reticulate::py_config()'
+        run: R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
 
       - name: Setup dedicated Python environment for slendr on Windows
         if: runner.os == 'Windows'
-        run: R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
+        run: |
+          R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
+          R --no-echo -e 'reticulate::conda_binary()'
+          R --no-echo -e 'reticulate::conda_list()'
+          R --no-echo -e 'reticulate::py_config()'
         shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
