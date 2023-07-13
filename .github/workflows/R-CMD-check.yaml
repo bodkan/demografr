@@ -83,6 +83,10 @@ jobs:
       #     R -e 'library(devtools); install_github("bodkan/slendr")'
       #   shell: bash
 
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: rcmdcheck
+
       - name: Setup dedicated Python environment for slendr on Unix
         if: runner.os != 'Windows'
         run: R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
@@ -91,9 +95,5 @@ jobs:
         if: runner.os == 'Windows'
         run: R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
         shell: bash
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: rcmdcheck
 
       - uses: r-lib/actions/check-r-package@v2
