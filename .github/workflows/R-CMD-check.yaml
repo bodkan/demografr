@@ -71,12 +71,18 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Setup dedicated Python environment for slendr
+      - name: Setup dedicated Python environment for slendr on Unix
+        if: runner.os != 'Windows'
         run: |
-          mkdir ~/R_LIBS
-          echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
           R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
           R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
+        shell: bash
+
+      - name: Setup dedicated Python environment for slendr on Windows
+        if: runner.os == 'Windows'
+        run: |
+          R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
+          R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
