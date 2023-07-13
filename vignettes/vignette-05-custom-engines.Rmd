@@ -168,11 +168,11 @@ functions <- list(
 
 As we explained elsewhere, a useful function for developing inference pipelines using _demografr_ is a function `simulate_ts()`, which normally accepts a _slendr_ model generating function and the model parameters (either given as priors or as a list of named values), and simulates a tree-sequence object. This function (as any other _demografr_ function operating with models) accepts our custom-defined simulation scripts in place of standard _slendr_ models.
 
-For instance, we can simulate a couple of Mb of testing sequence from our SLiM script like this:
+For instance, we can simulate a couple of Mb of testing sequence from our _msprime_ script like this:
 
 ```{r}
-ts_slim <- simulate_ts(slim_script, parameters = list(Ne = 1234),
-                       sequence_length = 10e6, recombination_rate = 1e-8)
+ts_python <- simulate_ts(python_script, parameters = list(Ne = 1234),
+                         sequence_length = 10e6, recombination_rate = 1e-8)
 ```
 
 (Of course we could've plugged in the `python_script` instead.)
@@ -180,7 +180,7 @@ ts_slim <- simulate_ts(slim_script, parameters = list(Ne = 1234),
 Now we can finally test our little toy tree-sequence summary function, verifying that we can indeed compute the summary statistic we want to:
 
 ```{r}
-functions$diversity(ts_slim)
+functions$diversity(ts_python)
 ```
 
 The function works as expected&mdash;we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.
