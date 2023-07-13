@@ -47,10 +47,13 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install devtools-related dependencies on Linux
+      - if: runner.os == 'Linux'
+        run:
+          sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev
+
       - name: Setup dedicated Python environment for slendr
         run: |
-          # needed for devtools:
-          sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
           #R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
