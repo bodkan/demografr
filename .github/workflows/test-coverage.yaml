@@ -48,7 +48,7 @@ jobs:
           use-public-rspm: true
 
       - name: Install devtools-related dependencies on Linux
-      - if: runner.os == 'Linux'
+        if: runner.os == 'Linux'
         run: sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev
 
       - name: Setup dedicated Python environment for slendr

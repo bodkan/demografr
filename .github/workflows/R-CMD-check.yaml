@@ -76,7 +76,7 @@ jobs:
         run: sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev
 
       - name: Setup dedicated Python environment for slendr on Unix
-      - if: runner.os != 'Windows'
+        if: runner.os != 'Windows'
         run: |
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
@@ -87,7 +87,7 @@ jobs:
         shell: bash
 
       - name: Setup dedicated Python environment for slendr on Windows
-      - if: runner.os == 'Windows'
+        if: runner.os == 'Windows'
         run: |
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
