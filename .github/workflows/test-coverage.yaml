@@ -51,7 +51,8 @@ jobs:
         run: |
           mkdir ~/R_LIBS
           echo "R_LIBS_USER=~/R_LIBS" >> ~/.Renviron
-          R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
+          #R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
+          R -e 'devtools::install_github("bodkan/slendr")'
           R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
         shell: bash
 

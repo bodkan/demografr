@@ -81,7 +81,8 @@ jobs:
       - name: Setup dedicated Python environment for slendr on Windows
         if: runner.os == 'Windows'
         run: |
-          R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
+          #R -e 'install.packages("slendr", repos = "http://cran.rstudio.com/")'
+          R -e 'devtools::install_github("bodkan/slendr")'
           R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
         shell: bash
 
