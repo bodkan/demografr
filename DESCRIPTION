@@ -26,6 +26,7 @@ Imports:
     magrittr,
     methods,
     reticulate,
+    slendr,
     tidyr
 Remotes: bodkan/slendr
 Suggests:
