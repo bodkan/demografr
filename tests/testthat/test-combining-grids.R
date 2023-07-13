@@ -1,4 +1,4 @@
-skip_if(!slendr:::is_slendr_env_present())
+skip_if(!slendr:check_dependencies(python = TRUE, quit = TRUE))
 slendr::init_env(quiet = TRUE)
 
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
