@@ -117,6 +117,7 @@ test_that("errors in prior sampling are correctly caught", {
 })
 
 test_that("an error is raised with SLiM ABC on non-serialized models", {
+  skip_if(Sys.which("slim") == "")
   expect_error(
     utils::capture.output(simulate_abc(model, priors, functions, observed, iterations = 1,
                  sequence_length = 1e6, recombination_rate = 0, engine = "slim")),

@@ -29,6 +29,7 @@ test_that("simulate_ts generates a tree sequence from priors", {
   ts1 <- simulate_ts(model, priors, engine = "msprime")
   expect_s3_class(ts1, "slendr_ts")
 
+  skip_if(Sys.which("slim") == "")
   ts2 <- simulate_ts(model, priors, engine = "slim")
   expect_s3_class(ts2, "slendr_ts")
 })
@@ -39,6 +40,7 @@ test_that("simulate_ts generates a tree sequence from a parameter list", {
   ts1 <- simulate_ts(model, params, engine = "msprime")
   expect_s3_class(ts1, "slendr_ts")
 
+  skip_if(Sys.which("slim") == "")
   ts2 <- simulate_ts(model, params, engine = "slim")
   expect_s3_class(ts2, "slendr_ts")
 })
