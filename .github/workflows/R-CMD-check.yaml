@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get install  libgsl-dev
+        run: sudo apt-get install libgsl-dev libwebp-dev
 
       - name: Compile and install SLiM
         if: runner.os != 'Windows'
