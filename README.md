@@ -57,6 +57,17 @@ _demografr_ is very much in an experimental stage at this point. Although ABC fi
 
 If you want to follow updates on _demografr_, you can do this also on my [Mastodon](https://fosstodon.org/@bodkan) and by checking out the [changelog](https://bodkan.net/demografr/news) from time to time.
 
+
+### Testing the R package in an online RStudio session
+
+You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web browser by clicking this button (no installation is needed!):
+
+[![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio)
+
+**In case the RStudio instance appears to be starting very slowly, please be patient (Binder is a freely available service with limited computational resources provided by the community).** If Binder crashes, try reloading the web page, which will restart the cloud session.
+
+Once you get a browser-based RStudio session, you can navigate to the `vignettes/` directory and test the examples on your own!
+
 ## Important pieces missing so far
 
 Tying the results of _demografr_ ABC inference (internally facilitated by the _abc_ package) to various diagnostics features of _abc_ and other tools.
