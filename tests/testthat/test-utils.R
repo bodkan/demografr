@@ -1,4 +1,4 @@
-skip_if(!slendr:check_dependencies(python = TRUE, slim = TRUE, quit = TRUE))
+skip_if(!slendr::check_dependencies(python = TRUE, slim = TRUE, quit = TRUE))
 slendr::init_env(quiet = TRUE)
 
 p1 <- slendr::population("pop1", time = 1, N = 123)
