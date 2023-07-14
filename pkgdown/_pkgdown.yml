@@ -4,7 +4,7 @@ url: https://bodkan.net/demografr
 navbar:
   structure:
     left:  [home, reference, articles, news]
-    right: [github, twitter]
+    right: [github, mastodon]
   components:
     home:
       icon: fa-home

@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">demografr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -89,7 +89,20 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/bodkan/demografr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://fosstodon.org/bodkan" class="external-link">
+    <span class="fa fa-mastodon"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -105,7 +118,7 @@
       <h1 data-toc-skip>Parallelization options</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/bodkan/demografr/blob/HEAD/vignettes/vignette-04-parallelization.Rmd" class="external-link"><code>vignettes/vignette-04-parallelization.Rmd</code></a></small>
       <div class="hidden name"><code>vignette-04-parallelization.Rmd</code></div>
 
     </div>
@@ -135,7 +148,7 @@ more straightforward but a little less convenient.</p>
 <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> function for simplicity and this trivial
 population genetic model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">demografr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
 <span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
@@ -194,8 +207,8 @@ genetic diversity in both populations using our summary function:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">005</span>30</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">019</span>9</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">005</span>73</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">045</span>0</span></span></code></pre>
 <p>Everything works!</p>
 <p><strong>Now, how can we parallelize the computation of diversity
 across all parameters of the grid?</strong></p>
@@ -242,7 +255,7 @@ simulations would be run <em>sequentially</em>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
 <p><strong>The total runtime for the grid simulations was 0 hours 1
-minutes 43 seconds parallelized across 10 CPUs.</strong></p>
+minutes 53 seconds parallelized across 10 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>
@@ -279,7 +292,7 @@ automatically leverage whatever parallelization scheme you set up via
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
 <p><strong>The total runtime for the grid simulations was 0 hours 0
-minutes 29 seconds parallelized across 10 CPUs.</strong></p>
+minutes 35 seconds parallelized across 10 CPUs.</strong></p>
 <p>Notice the speed up even for this trivial toy analysis!</p>
 </div>
 <div class="section level3">
@@ -296,7 +309,7 @@ packages, with set up <em>slendr</em> environments. In other words, you
 can start an R interpreter on each of these machines and eventually
 call:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">demografr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; The interface to all required Python modules has been activated.</span></span></code></pre>

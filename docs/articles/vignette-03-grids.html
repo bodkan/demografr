@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">demografr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -89,7 +89,20 @@
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/bodkan/demografr/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://fosstodon.org/bodkan" class="external-link">
+    <span class="fa fa-mastodon"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -105,7 +118,7 @@
       <h1 data-toc-skip>Support for grid simulations</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/bodkan/demografr/blob/HEAD/vignettes/vignette-03-grids.Rmd" class="external-link"><code>vignettes/vignette-03-grids.Rmd</code></a></small>
       <div class="hidden name"><code>vignette-03-grids.Rmd</code></div>
 
     </div>
@@ -307,34 +320,34 @@ tree-sequence functions work as they’re supposed to:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">direct</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A     B     C      O           alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">34</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">781</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">56</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">56</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.001</span><span style="color: #BB0000; text-decoration: underline;">56</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">781</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1  0       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">12</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1  0       </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">12</span> </span></span>
+<span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.062</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.062</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1  0.072<span style="text-decoration: underline;">4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.062</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.062</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.060</span><span style="color: #BB0000; text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.059</span><span style="color: #BB0000; text-decoration: underline;">3</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">indirect</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A      B      C     O        alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 0.999 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.92  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 1.92  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 1.01  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 1.01  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 1.92  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 1.92  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 0.997 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 1.95  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 0.076<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt;    X      A      B      C     O       alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 1.29 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.54 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 0.989</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 0.503</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 1.35 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 0.989</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 1.17 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 0.994</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 1.35 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 1    </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>Excellent, we get the output tables from <code>ts_f4ratio</code>
 functions as we’re supposed to (and get one estimate for each of the

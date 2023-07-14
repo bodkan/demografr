@@ -2,7 +2,7 @@
 
 
 
-# _demografr_: Simulation-based inference in population genetics
+# _demografr_: Simulation-based inference for population genetics
 
 <!-- badges: start -->
 
@@ -16,7 +16,7 @@
 
 ⚠️⚠️⚠️
 
-**Please note that _demografr_ is still under active development. Although it's being successfully used in ongoing research projects in my group, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the [changelog](https://bodkan.net/demografr/news/index.html) for the list of the most recent updates.**
+**Please note that _demografr_ is still under active development. Although it's already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the [changelog](https://bodkan.net/demografr/news/) for the list of the most recent updates.**
 
 ⚠️⚠️⚠️
 
