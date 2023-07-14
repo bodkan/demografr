@@ -1,7 +1,7 @@
 Package: demografr
 Type: Package
 Title: A Toolkit for Simulation-Based Inference in Population Genetics
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R:
     person(given = "Martin",
            family = "Petr",
@@ -9,11 +9,13 @@ Authors@R:
            email = "contact@bodkan.net",
            comment = c(ORCID = "0000-0003-4879-8421"))
 Description: A toolkit for simulation-based inferences of demographic models in
-    population genetics, such as Approximate Bayesian Computation and simulations
-    across parameter grids. Models are specified using the functionality of the
-    slendr R package and summary statistics are computed using its interface to
-    the 'tskit' tree-sequence library. Other components provided allow building
-    of reproducible, fully automated inference pipelines entirely in R.
+    population genetics, such as Approximate Bayesian Computation and grid-based
+    simulation inference. Models are specified using the functionality of the
+    'slendr' R package, and summary statistics are computed using its 'tskit'
+    interface for tree-sequence analyses. Together with features for specifying
+    parameter prior distribution and implicit parallelism, the users can build
+    efficient, reproducible, and fully automated population genetic inference
+    pipelines entirely in R.
 Depends: R (>= 3.6.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -41,3 +43,4 @@ Suggests:
 Config/testthat/edition: 3
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
+URL: https://github.com/bodkan/demografr
