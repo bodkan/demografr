@@ -87,9 +87,6 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           R -e 'slendr::setup_env(pip = FALSE, agree = TRUE)'
-          R --no-echo -e 'reticulate::conda_binary()'
-          R --no-echo -e 'reticulate::conda_list()'
-          R --no-echo -e 'reticulate::py_config()'
         shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
