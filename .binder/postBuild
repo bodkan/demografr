@@ -1,0 +1,19 @@
+mkdir bin
+
+# installation instructions from the SLiM manual:
+wget http://benhaller.com/slim/SLiM.zip
+unzip SLiM.zip
+cd SLiM
+cmake .
+make slim
+
+# move the compiled SLiM binary
+cd ../
+mv SLiM/slim bin/
+rm SLiM.zip
+rm -rf SLiM
+
+export PATH=/home/jovyan/bin:$PATH
+echo "PATH=$PATH" > ~/.Renviron
+
+echo 'cat("-------------------------\nPlease be aware that Binder cloud has extremely limited resources.\nVery large simulations might get killed by the system.\n-------------------------\n")' > .Rprofile
