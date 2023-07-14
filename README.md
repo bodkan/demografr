@@ -3,7 +3,13 @@
 
 
 # _demografr_: Simulation-based inference in population genetics
+
 <!-- badges: start -->
+
+<!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
+
+[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://codecov.io/github/bodkan/demografr?branch=main)
+
 <!-- badges: end -->
 
 <img src="man/figures/logo.png" align="right" />
