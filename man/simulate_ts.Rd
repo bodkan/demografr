@@ -10,6 +10,7 @@ simulate_ts(
   sequence_length = 1e+06,
   recombination_rate = 0,
   mutation_rate = 0,
+  attempts = 1000,
   engine = NULL,
   model_args = NULL,
   engine_args = NULL
@@ -28,6 +29,9 @@ must be "custom").}
 \item{recombination_rate}{Recombination rate to use for the simulation}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
+
+\item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
+model (default is 1000)}
 
 \item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
 the built-in slendr simulation back ends. Which engine will be used is determined
