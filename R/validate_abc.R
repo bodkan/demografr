@@ -37,7 +37,7 @@ validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
                          attempts = 1000,
                          engine = NULL, model_args = NULL, engine_args = NULL) {
-  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed))
+  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||!length(priors))
     stop("A model generating function, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
          "really do contain what you think)", call. = FALSE)
@@ -49,9 +49,6 @@ validate_abc <- function(model, priors, functions, observed,
   cat("======================================================================\n")
 
   prior_samples <- list()
-  cat("A model generating function was provided as a scaffold\n")
-
-  cat("======================================================================\n")
 
   prior_names <- get_prior_names(priors)
 
@@ -78,6 +75,8 @@ validate_abc <- function(model, priors, functions, observed,
   if (is.function(model)) {
     cat("The model is a slendr function\n")
 
+    cat("---------------------------------------------------------------------\n")
+
     cat("Checking the return statement of the model function...")
 
     return_expr <- extract_return(model)
@@ -102,6 +101,16 @@ validate_abc <- function(model, priors, functions, observed,
     # check that a prior for each argument of a model generating function is provided
     # (and that other function arguments are also provided)
     cat("Checking the presence of required function arguments...")
+
+    # first expand any generic "..." prior sampling expressions (if needed)
+    priors <- tryCatch(
+      expand_priors(model, priors, model_args),
+      error = function(e) {
+        cat(" \u274C\n\n")
+        stop(e$message, call. = FALSE)
+    })
+    # prior names generated above have to be re-generated after templating
+    prior_names <- get_prior_names(priors)
 
     missing_priors <- setdiff(prior_names, methods::formalArgs(model))
     if (length(missing_priors) > 0) {
