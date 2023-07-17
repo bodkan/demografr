@@ -9,7 +9,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
   # are considered real errors on the part of the user and will be reported as such
   errors <- c(
     # invalid split order implied by sampled split times
-    "The model implies forward time direction but the specified split\ntime \\(\\d+\\) is lower than the parent's \\(\\d+\\)",
+    "The model implies (backward|forward) time direction but the specified split\ntime \\(\\d+\\) is (higher|lower) than the parent's \\(\\d+\\)",
     # daughter population splitting *at the same time* as its parent (i.e. 1 vs 1.3 after rounding)
     "Population can be only created after its parent is already present in the simulation",
     # invalid gene-flow window
@@ -20,7 +20,10 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
     "msprime._msprime.InputError: Input error in initialise: Attempt to sample a lineage from an inactive population",
     # sampling schedule itself provides times which are hard requirements for valid priors
     "A sampling event was scheduled outside of the simulation time window",
-    "Cannot schedule sampling for '.*' at time \\d+"
+    "Cannot schedule sampling for '.*' at time \\d+",
+    # population splits are specified in the right order, but the order is opposite to
+    # what is forced by the user in `compile_model()`
+    "The direction that was explicitly specified contradicts the direction implied by the model"
   )
 
   model_is_sampled <- contains_priors(params)
