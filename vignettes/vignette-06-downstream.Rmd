@@ -1,0 +1,178 @@
+---
+title: "Downstream analyses, model selection, troubleshooting"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Downstream analyses, model selection, troubleshooting"}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 80,
+  eval = slendr_present
+)
+
+bottleneck_path <- here::here("inst/examples/downstream_abc_bottle.rds")
+const_path <- here::here("inst/examples/downstream_abc_const.rds")
+exp_path <- here::here("inst/examples/downstream_abc_exp.rds")
+```
+
+```{r, echo=FALSE, message=FALSE}
+library(slendr)
+
+init_env()
+
+SEED <- 42
+set.seed(SEED)
+```
+
+Let's return to our [first](vignette-01-basics.html) example. However, this time, imagine that we don't really know whether which of the three following phylogenetic relationships is the one that captures the features of our data best, perhaps with different sources of evidence being consistent with one of them (as always, this is purely a toy example). In other words, we want to perform *model selection*.
+
+```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=3.5}
+par(mar = c(0, 0, 2, 0), mfrow = c(3, 1))
+tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
+plot(tree, main = "model X")
+arrows(2.5, 2, 2.5, 3, col="blue")
+
+tree <- ape::read.tree(text="((popA,popB),(popC,popD));")
+plot(tree, main = "model Y")
+arrows(2.5, 2, 2.5, 3, col="blue")
+
+tree <- ape::read.tree(text="(((popA,popB),popC),popD);")
+plot(tree, main = "model Z")
+arrows(2.5, 2, 2.5, 3, col="blue")
+```
+
+For completeness, here is again our computed observed data:
+
+1. Nucleotide diversity in each population:
+
+```{r}
+observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
+observed_diversity
+```
+
+2. Pairwise divergence d_X_Y between populations X and Y:
+
+```{r}
+observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
+
+observed_divergence
+```
+
+3. Value of the following $f_4$-statistic:
+
+```{r}
+observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+
+observed_f4
+```
+
+We will again bind them into a list:
+
+```{r}
+observed <- list(diversity  = observed_diversity, divergence = observed_divergence, f4 = observed_f4)
+```
+
+Similarly, we will simply copy over the definitions of priors and tree-sequence summary statistics from the [introductory vignette](vignette-01-basics.html). For details, please check out the link.
+
+
+```{r}
+priors <- list(
+  Ne_A  ~ runif(1, 10000),
+  Ne_B  ~ runif(1, 10000),
+  Ne_C  ~ runif(1, 10000),
+  Ne_D  ~ runif(1, 10000),
+
+  T...  ~ runif(1, 10000),
+
+  gf_BC ~ runif(0, 1)
+)
+
+compute_diversity <- function(ts) {
+  samples <- extract_names(ts, split = "pop")
+  ts_diversity(ts, sample_sets = samples)
+}
+compute_divergence <- function(ts) {
+  samples <- extract_names(ts, split = "pop")
+  ts_divergence(ts, sample_sets = samples)
+}
+compute_f4 <- function(ts) {
+  samples <- extract_names(ts, split = "pop")
+  ts_f4(ts,
+        W = list(popA = samples$popA),
+        X = list(popB = samples$popB),
+        Y = list(popC = samples$popC),
+        Z = list(popD = samples$popD))
+}
+
+functions <- list(diversity = compute_diversity, divergence = compute_divergence, f4 = compute_f4)
+```
+
+### Three competing models
+
+First, in order to perform model selection, we need the models themselves. In this example, we have to options to do this.
+
+**First**, we can define three separate functions, each of them encoding the three phylogenetic relationships:
+
+```{r}
+modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  popA <- population("popA", time = 1,    N = Ne_A)
+  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward", serialize = FALSE
+  )
+
+  return(model)
+}
+
+modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  popA <- population("popA", time = 1,    N = Ne_A)
+  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward", serialize = FALSE
+  )
+
+  return(model)
+}
+
+modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  popA <- population("popA", time = 1,    N = Ne_A)
+  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward", serialize = FALSE
+  )
+
+  return(model)
+}
+```
