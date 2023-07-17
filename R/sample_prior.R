@@ -28,6 +28,9 @@ sample_prior <- function(f) {
   if (length(variable_tokens) == 1) { # scalar demografr prior variable
     variable <- as.character(variable_tokens[[1]])
     n <- 1
+  } else if (any(grepl("\\.\\.\\.", as.character(variable_tokens))) &&
+             any(grepl("\\[", as.character(variable_tokens)))) {
+    stop("Templating of vector priors is not supported", call. = FALSE)
   } else if (variable_tokens[[1]] == "[" && variable_tokens[[3]] %% 1 == 0) {
     variable <- as.character(variable_tokens[[2]])
     n <- as.integer(variable_tokens[[3]])

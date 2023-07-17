@@ -32,22 +32,46 @@
 simulate_ts <- function(
   model, parameters,
   sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  engine = NULL, model_args = NULL, engine_args = NULL
+  attempts = 1000, engine = NULL, model_args = NULL, engine_args = NULL
 ) {
+  # make sure warnings are reported immediately before simulations are even started
+  warning_length <- (length(parameters) + length(model_args)) * 50
+  if (warning_length < 1000) warning_length <- 1000
+  opts <- options(warn = 1, warning.length = warning_length)
+  on.exit(options(opts))
+
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
-  if (!check_arg(model) || !check_arg(parameters) || !check_arg(sequence_length) || !check_arg(recombination_rate))
-    stop(paste0("A scaffold model, priors and sequence information must be provided."), call. = FALSE)
+  if (!check_arg(model) || !check_arg(parameters) || !check_arg(sequence_length) || !check_arg(recombination_rate) || !length(parameters))
+    stop(paste0("A model generating function, parameters and sequence information must be provided"), call. = FALSE)
+
+  if (inherits(parameters, "formula"))
+    parameters <- list(parameters)
+
+  if (!contains_priors(parameters) &&
+      !(is.numeric(unlist(parameters)) &&
+        !is.null(names(parameters)) &&
+        all(names(parameters) != "")))
+    stop("Parameters must be given as:\n  - a list of formula objects, or\n",
+         "  - a named list of numerical values", call. = FALSE)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   init_env(quiet = TRUE)
 
+  if (contains_priors(parameters)) {
+    parameters <- expand_priors(model, parameters, model_args) #%>% strip_prior_environments()
+
+    # it's not possible to perform full validation here but at least try that sampling
+    # from the prior definitions works as it should
+    invisible(lapply(parameters, sample_prior))
+  }
+
   ts <- run_simulation(model, parameters, sequence_length, recombination_rate, mutation_rate,
                        engine = engine, model_args = model_args,
                        engine_args = engine_args,
-                       attempts = 1000, model_name = substitute(model))$ts
+                       attempts = attempts, model_name = substitute(model))$ts
 
   ts
 }

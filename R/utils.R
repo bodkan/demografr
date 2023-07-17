@@ -13,6 +13,10 @@ get_prior_names <- function(priors) {
   sapply(seq_along(priors), function(i) {
     ast <- as.list(priors[[i]])
     variable_tokens <- as.character(as.list(ast[[2]]))
+    if (any(grepl("\\.\\.\\.", variable_tokens)) &&
+             any(grepl("\\[", variable_tokens)))
+      stop("Templating of vector priors is not supported", call. = FALSE)
+
     if (length(variable_tokens) == 1)
       variable_index <- 1
     else
