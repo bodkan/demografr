@@ -52,7 +52,7 @@ simulate_grid <- function(
   if (!check_arg(model) || !check_arg(grid) || !check_arg(functions))
     stop("A model generating function, parameter grid, and summary functions must be\n",
          "must be provided (check that the variables that you provided really do\n",
-         "contain what you think", call. = FALSE)
+         "contain what you think)", call. = FALSE)
 
   if (!inherits(grid, "data.frame") && !nrow(grid))
     stop("The parameter `grid` must be a non-empty R data frame object", call. = FALSE)
