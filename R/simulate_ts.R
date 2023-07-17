@@ -14,6 +14,8 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param attempts Maximum number of attempts to generate prior values for a valid demographic
+#'   model (default is 1000)
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
