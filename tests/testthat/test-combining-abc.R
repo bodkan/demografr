@@ -1,4 +1,4 @@
-skip_if(!slendr::check_dependencies(python = TRUE, quit = TRUE))
+skip_if(!slendr::check_dependencies(python = TRUE))
 slendr::init_env(quiet = TRUE)
 
 SEED <- 42
