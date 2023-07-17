@@ -198,3 +198,17 @@ test_that("'combining' a single ABC run does not break", {
   expect_s3_class(combine_data(run1), "demografr_abc_sims")
   expect_s3_class(combine_data(list(run1)), "demografr_abc_sims")
 })
+
+test_that("abc::abc via perform_abc() runs correctly", {
+  data <- combine_data(run1, run2, run3)
+  expect_error(
+    perform_abc(data, engine = "abc"),
+    "The `tol` argument must be provided"
+  )
+  expect_error(
+    perform_abc(data, engine = "abc", tol = 1),
+    "The `method` argument must be provided"
+  )
+  quiet(suppressWarnings(abc <- perform_abc(data, engine = "abc", tol = 1, method = "neuralnet")))
+  expect_s3_class(abc, "demografr_abc.abc")
+})
