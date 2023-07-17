@@ -46,7 +46,9 @@ simulate_abc <- function(
   engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
-  opts <- options(warn = 1)
+  warning_length <- (length(parameters) + length(model_args)) * 50
+  if (warning_length < 1000) warning_length <- 1000
+  opts <- options(warn = 1, warning.length = warning_length)
   on.exit(options(opts))
 
   # check the presence of all arguments to avoid cryptic errors when running
