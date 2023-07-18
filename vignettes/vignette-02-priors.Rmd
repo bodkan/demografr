@@ -269,7 +269,7 @@ data <- simulate_abc(model, <priors>, functions, observed, ...)
 
 ## Addendum
 
-## Prior parameter 'templates'
+## Prior parameter templates
 
 Imagine we have the following _slendr_ model function (hilariously overcomplicated, purely for demonstration purposes!):
 

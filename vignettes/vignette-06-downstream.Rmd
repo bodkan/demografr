@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present
+  eval = FALSE #slendr_present
 )
 
 bottleneck_path <- here::here("inst/examples/downstream_abc_bottle.rds")
@@ -83,19 +83,80 @@ We will again bind them into a list:
 observed <- list(diversity  = observed_diversity, divergence = observed_divergence, f4 = observed_f4)
 ```
 
-Similarly, we will simply copy over the definitions of priors and tree-sequence summary statistics from the [introductory vignette](vignette-01-basics.html). For details, please check out the link.
 
+### Three competing models
+
+First, in order to perform model selection, we need the models themselves. In this example, we have to options to do this.
+
+**First**, we can define three separate functions, each of them encoding the three phylogenetic relationships:
+
+```{r}
+modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+  popA <- population("popA", time = 1,   N = Ne_A)
+  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_C, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_D, N = Ne_D, parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward"
+  )
+
+  return(model)
+}
+
+modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+  popA <- population("popA", time = 1,   N = Ne_A)
+  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_C, N = Ne_C, parent = popA)
+  popD <- population("popD", time = T_D, N = Ne_D, parent = popC)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward"
+  )
+
+  return(model)
+}
+
+modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+  popA <- population("popA", time = 1,   N = Ne_A)
+  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_C, N = Ne_C, parent = popA)
+  popD <- population("popD", time = T_D, N = Ne_D, parent = popA)
+
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward"
+  )
+
+  return(model)
+}
+```
+
+
+```{r, eval=FALSE}
+modelX(1, 1, 1, 1, 2, 3, 4, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
+modelY(1, 1, 1, 1, 3, 2, 4, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
+modelZ(1, 1, 1, 1, 4, 3, 2, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
+```
+
+Now, let's [specify priors](vignette-02-priors.html) using _demografr_'s [templating syntax](vignette-02-priors.html#prior-parameter-templates) , as well as put together a list of tree-sequence summary functions and observed summary statistics:
 
 ```{r}
 priors <- list(
-  Ne_A  ~ runif(1, 10000),
-  Ne_B  ~ runif(1, 10000),
-  Ne_C  ~ runif(1, 10000),
-  Ne_D  ~ runif(1, 10000),
-
-  T...  ~ runif(1, 10000),
-
-  gf_BC ~ runif(0, 1)
+  Ne... ~ runif(100,  10000),
+  T...  ~ runif(1000, 10000),
+  gf    ~ runif(0, 1)
 )
 
 compute_diversity <- function(ts) {
@@ -116,63 +177,30 @@ compute_f4 <- function(ts) {
 }
 
 functions <- list(diversity = compute_diversity, divergence = compute_divergence, f4 = compute_f4)
+
+observed <- list(diversity = observed_diversity, divergence = observed_divergence, f4 = observed_f4)
 ```
 
-### Three competing models
+```{r, eval=FALSE}
+validate_abc(modelX, priors, functions, observed)
+validate_abc(modelY, priors, functions, observed)
+validate_abc(modelZ, priors, functions, observed)
+```
 
-First, in order to perform model selection, we need the models themselves. In this example, we have to options to do this.
-
-**First**, we can define three separate functions, each of them encoding the three phylogenetic relationships:
+With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 
 ```{r}
-modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
-  popA <- population("popA", time = 1,    N = Ne_A)
-  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
-
-  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
-
-  model <- compile_model(
-    populations = list(popA, popB, popC, popD), gene_flow = gf,
-    generation_time = 1, simulation_length = 10000,
-    direction = "forward", serialize = FALSE
-  )
-
-  return(model)
-}
-
-modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
-  popA <- population("popA", time = 1,    N = Ne_A)
-  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
-
-  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
-
-  model <- compile_model(
-    populations = list(popA, popB, popC, popD), gene_flow = gf,
-    generation_time = 1, simulation_length = 10000,
-    direction = "forward", serialize = FALSE
-  )
-
-  return(model)
-}
-
-modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
-  popA <- population("popA", time = 1,    N = Ne_A)
-  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
-
-  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
-
-  model <- compile_model(
-    populations = list(popA, popB, popC, popD), gene_flow = gf,
-    generation_time = 1, simulation_length = 10000,
-    direction = "forward", serialize = FALSE
-  )
-
-  return(model)
-}
+dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
+                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
+
+```{r}
+dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 1000,
+                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```
+
+```{r}
+dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 1000,
+                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```
+
