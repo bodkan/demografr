@@ -269,7 +269,7 @@ data <- simulate_abc(model, <priors>, functions, observed, ...)
 
 ## Addendum
 
-## Prior parameter matching
+## Prior parameter 'templates'
 
 Imagine we have the following _slendr_ model function (hilariously overcomplicated, purely for demonstration purposes!):
 
@@ -294,11 +294,9 @@ model <- function(T_a1, T_a2, T_a3, T_a4, T_a5, T_b1, T_b2, T_b3, T_b4, T_b5, N_
     list(a1, a2, a3, a4, a5, b1, b2, b3, b4, b5),
     generation_time = 30, direction = "backward")
 }
-
-model(10,9,8,7,6,5,4,3,2,1,42,123)
 ```
 
-This functions has a huge number of parameters, so if we were to specify them with the normal DSL described above, we would either have to write down the following monstrosity:
+This functions has a huge number of parameters, so if we were to specify them with the normal DSL described above for the purposes of ABC inference, we would either have to write down the following monstrosity:
 
 ```{r}
 individual_priors <- list(
@@ -322,27 +320,31 @@ individual_priors <- list(
 ts <- simulate_ts(model, individual_priors, sequence_length = 1)
 ```
 
-The second possibility would be to re-parametrize the function to accept, for instance, two pairs of two vectors of `T` and `N`, one for each population. However, we can also use _demografr_'s support for **'pattern matched' sampling statements** (for a lack of a better word). The easiest way to explain this is just to write it down:
+The second possibility would be to re-parametrize the function to accept, for instance, two pairs of two vectors of `T` and `N`, one for each population. However, we can also use _demografr_'s support for **'templated' prior sampling expressions** (for a lack of a better word). The easiest way to explain this is just to write it down:
 
 ```{r}
-priors <- list(
+templated_priors <- list(
   T_a... ~ runif(1,     100000),
   T_b... ~ runif(50000, 100000),
   N_a    ~ runif(10,    3000),
   N_b    ~ runif(1000,  10000)
 )
-
-expand_priors(model, priors)
 ```
 
-When priors like this are plugged in to either `simulate_abc()` or `simulate_ts()`, _demografr_ tries to **match model function arguments against the prior names, assigning each model function argument (i.e., model parameter) to an appropriate prior sampling expression by substituting the `...` on the left hand of each prior sampling statement**.
+When priors like this are plugged in to either `simulate_abc()` or `simulate_ts()`, _demografr_ tries to **match model function arguments against the prior names (here, `T_a...` and `T_b...`), assigning each model function argument (i.e., model parameter) to an appropriate prior sampling expression by substituting the `...` on the left hand of each prior sampling statement**.
+
+You can read `T_a... ~ <distribution>` as "sample any parameter starting with 'T_a' from `<distribution>`.
 
 This way, when defining prior sampling expressions, you're not hindered by the complexity of your model function (having to handle vector indexing as you'd have to with vectorized prior sampling statements).
+
+```{r, echo=FALSE}
+ts <- simulate_ts(model, templated_priors, sequence_length = 1)
+```
 
 
 ### Custom functions
 
-The above also allows custom-defined prior distribution functions, not just built-in `runif()`, `rnorm()`, etc.
+The DSL for specification of parameter priors also allows custom-defined prior distribution functions, not just built-in `runif()`, `rnorm()`, etc.
 
 For instance, imagine this function simulating a sampling from a distribution of a loaded casino die, `rcasino()`:
 
