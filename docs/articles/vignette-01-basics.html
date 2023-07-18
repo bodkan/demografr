@@ -341,8 +341,6 @@ using the function <code><a href="../reference/validate_abc.html">validate_abc()
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
-<span><span class="co">#&gt; A model generating function was provided as a scaffold</span></span>
-<span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; Testing sampling of each prior parameter:</span></span>
 <span><span class="co">#&gt;   * Ne_A ✅</span></span>
 <span><span class="co">#&gt;   * Ne_B ✅</span></span>
@@ -354,6 +352,7 @@ using the function <code><a href="../reference/validate_abc.html">validate_abc()
 <span><span class="co">#&gt;   * gf_BC ✅</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; The model is a slendr function</span></span>
+<span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; Checking the return statement of the model function... ✅</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; Checking the presence of required function arguments... ✅</span></span>
@@ -499,6 +498,9 @@ populations:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/diagnostic_Ne-1.png" width="800" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="vignette-01-basics_files/figure-html/diagnostic_hist_Ne-1.png" width="800" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>

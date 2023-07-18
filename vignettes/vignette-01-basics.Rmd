@@ -353,3 +353,7 @@ In contrast, we can see that there most definitely is sufficient information enc
 ```{r, diagnostic_Ne, fig.width=10, fig.height=7}
 plot(abc, param = "Ne_B")
 ```
+
+```{r, diagnostic_hist_Ne, fig.width=10, fig.height=7}
+hist(abc, param = "gf")
+```
