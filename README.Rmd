@@ -27,7 +27,7 @@ init_env(quiet = TRUE)
 
 <!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
 
-[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://codecov.io/github/bodkan/demografr?branch=main)
+[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
 
 <!-- badges: end -->
 
@@ -74,7 +74,7 @@ devtools::install_github("bodkan/slendr")
 
 _demografr_ is very much in an experimental stage at this point. Although ABC fitting of "standard" demographic models (i.e. estimating $N_e$, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher and extend, for instance, towards inferences of spatial models. As such, please be aware that the interface might change on a rather short notice to accomodate features for estimating parameters of much more complex custom models.
 
-If you want to follow updates on _demografr_, you can do this also on my [Mastodon](https://fosstodon.org/@bodkan) and by checking out the [changelog](https://bodkan.net/demografr/news) from time to time.
+If you want to follow updates on _demografr_, you can do this also on my [Mastodon](https://fosstodon.org/@bodkan) and by checking out the [changelog](https://bodkan.net/demografr/news/) from time to time.
 
 
 ### Testing the R package in an online RStudio session

@@ -8,3 +8,4 @@ Makefile
 pkgdown
 docs
 .github
+.binder

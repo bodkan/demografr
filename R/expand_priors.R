@@ -26,7 +26,7 @@ expand_priors <- function(model, priors, model_args = NULL) {
       stop("Multiple matching priors for the model parameter '", arg, "'", call. = FALSE)
     else if (length(matching_priors) == 1) {
       sampling_expr <- as.list(matching_priors[[1]])[[3]]
-      priors_expanded[[length(priors_expanded) + 1]] <- as.formula(paste(arg, "~", deparse(sampling_expr), collapse = " "))
+      priors_expanded[[length(priors_expanded) + 1]] <- stats::as.formula(paste(arg, "~", deparse(sampling_expr), collapse = " "))
     }
   }
 
