@@ -23,11 +23,13 @@ knitr::opts_chunk$set(
 bottleneck_path <- here::here("inst/examples/downstream_abc_bottle.rds")
 const_path <- here::here("inst/examples/downstream_abc_const.rds")
 exp_path <- here::here("inst/examples/downstream_abc_exp.rds")
+
+devtools::load_all()
 ```
 
-```{r, echo=FALSE, message=FALSE}
+```{r}
+library(demografr)
 library(slendr)
-
 init_env()
 
 SEED <- 42
@@ -187,7 +189,20 @@ validate_abc(modelY, priors, functions, observed)
 validate_abc(modelZ, priors, functions, observed)
 ```
 
+
+```{r, eval=FALSE}
+tsX <- simulate_ts(modelX, priors)
+tsY <- simulate_ts(modelY, priors)
+tsZ <- simulate_ts(modelZ, priors)
+```
+
+
 With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
+
+```{r}
+library(future)
+plan(multicore, workers = 10)
+```
 
 ```{r}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
@@ -202,5 +217,50 @@ dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 1000,
 ```{r}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 1000,
                       sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```
+
+```{r}
+saveRDS(dataX, "dataX.rds")
+saveRDS(dataY, "dataY.rds")
+saveRDS(dataZ, "dataZ.rds")
+```
+
+```{r}
+dataX <- readRDS("dataX.rds")
+dataY <- readRDS("dataY.rds")
+dataZ <- readRDS("dataZ.rds")
+```
+
+
+```{r}
+abcX <- perform_abc(dataX, engine = "abc", tol = 0.05, method = "neuralnet")
+abcY <- perform_abc(dataY, engine = "abc", tol = 0.05, method = "neuralnet")
+abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.05, method = "neuralnet")
+```
+
+```{r}
+models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+```
+
+```{r}
+asd <- c(rep("modelX", 1000), rep("modelY", 1000), rep("modelZ", 1000))
+stat <- rbind(
+  dataX$simulated,
+  dataY$simulated,
+  dataZ$simulated
+)
+
+cv.modsel <- cv4postpr(asd, stat, nval = 5, tol = 0.01, method = "rejection")
+summary(cv.modsel)
+
+plot(cv.modsel, names.arg=c("modelX", "modelY", "modelZ"))
+```
+
+```{r}
+models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+
+cv_result <- perform_cv(models, nval = 50, tol = 0.01, method = "rejection"); summary(cv_result)
+
+cv_result
 ```
 

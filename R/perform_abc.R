@@ -47,6 +47,7 @@ perform_abc <- function(data, engine, ...) {
   attr(result, "parameters") <- data$parameters
   attr(result, "priors") <- data$priors
   attr(result, "model") <- data$model
+  attr(result, "simulated") <- data$simulated
   # ... which is why the result is annotated with another class
   class(result) <- c(paste0("demografr_abc.", engine), engine)
 

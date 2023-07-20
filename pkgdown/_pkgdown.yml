@@ -56,8 +56,10 @@ reference:
     - plot.demografr_abc.abc
     - hist.demografr_abc.abc
 
-  - title: Extracting posteriors
+  - title: Analysis of ABC inference results
     contents:
+    - perform_cv
+    - summary.demografr_cv
     - extract_summary
     - extract_posterior
 
