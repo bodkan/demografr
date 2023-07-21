@@ -151,7 +151,7 @@ observed <- list(
 The first step in a _demografr_ ABC analysis is setting up a "scaffold" model&mdash;a _slendr_ function which will return a compiled _slendr_ model as its output, and which will accept the model parameters in form of normal R function arguments. In our simple examples, we will define the following function:
 
 ```{r}
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC = 0.5) {
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
