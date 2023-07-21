@@ -93,11 +93,11 @@ First, in order to perform model selection, we need the models themselves. In th
 **First**, we can define three separate functions, each of them encoding the three phylogenetic relationships:
 
 ```{r}
-modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   popA <- population("popA", time = 1,   N = Ne_A)
-  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_C, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_D, N = Ne_D, parent = popC)
+  popB <- population("popB", time = T_1, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_2, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_3, N = Ne_D, parent = popC)
 
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
 
@@ -110,11 +110,11 @@ modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
   return(model)
 }
 
-modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   popA <- population("popA", time = 1,   N = Ne_A)
-  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_C, N = Ne_C, parent = popA)
-  popD <- population("popD", time = T_D, N = Ne_D, parent = popC)
+  popB <- population("popB", time = T_1, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_2, N = Ne_C, parent = popA)
+  popD <- population("popD", time = T_3, N = Ne_D, parent = popC)
 
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
 
@@ -127,11 +127,11 @@ modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
   return(model)
 }
 
-modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
+modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   popA <- population("popA", time = 1,   N = Ne_A)
-  popB <- population("popB", time = T_B, N = Ne_B, parent = popA)
-  popC <- population("popC", time = T_C, N = Ne_C, parent = popA)
-  popD <- population("popD", time = T_D, N = Ne_D, parent = popA)
+  popB <- population("popB", time = T_1, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_2, N = Ne_C, parent = popA)
+  popD <- population("popD", time = T_3, N = Ne_D, parent = popA)
 
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
 
@@ -147,17 +147,21 @@ modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_B, T_C, T_D, gf) {
 
 
 ```{r, eval=FALSE}
-modelX(1, 1, 1, 1, 2, 3, 4, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
-modelY(1, 1, 1, 1, 3, 2, 4, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
-modelZ(1, 1, 1, 1, 4, 3, 2, 0.5) %>% plot_model(log = TRUE, order = c("popA", "popB", "popC", "popD"))
+modelX(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
+modelY(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
+modelZ(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
 ```
 
 Now, let's [specify priors](vignette-02-priors.html) using _demografr_'s [templating syntax](vignette-02-priors.html#prior-parameter-templates) , as well as put together a list of tree-sequence summary functions and observed summary statistics:
 
 ```{r}
 priors <- list(
-  Ne... ~ runif(100,  10000),
-  T...  ~ runif(1000, 10000),
+  Ne... ~ runif(100, 10000),
+
+  T_1   ~ runif(1,    4000),
+  T_2   ~ runif(3000, 9000),
+  T_3   ~ runif(5000, 10000),
+
   gf    ~ runif(0, 1)
 )
 
@@ -231,30 +235,17 @@ dataY <- readRDS("dataY.rds")
 dataZ <- readRDS("dataZ.rds")
 ```
 
-
 ```{r}
 abcX <- perform_abc(dataX, engine = "abc", tol = 0.05, method = "neuralnet")
 abcY <- perform_abc(dataY, engine = "abc", tol = 0.05, method = "neuralnet")
 abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.05, method = "neuralnet")
 ```
 
-```{r}
-models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
-```
+## Cross-validation
 
-```{r}
-asd <- c(rep("modelX", 1000), rep("modelY", 1000), rep("modelZ", 1000))
-stat <- rbind(
-  dataX$simulated,
-  dataY$simulated,
-  dataZ$simulated
-)
+Before doing model selection, it's important to perform cross-validation which you can do using _demografr_'s thin convenience interface wrapper `perform_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
-cv.modsel <- cv4postpr(asd, stat, nval = 5, tol = 0.01, method = "rejection")
-summary(cv.modsel)
-
-plot(cv.modsel, names.arg=c("modelX", "modelY", "modelZ"))
-```
+The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind
 
 ```{r}
 models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
@@ -263,4 +254,3 @@ cv_result <- perform_cv(models, nval = 50, tol = 0.01, method = "rejection"); su
 
 cv_result
 ```
-
