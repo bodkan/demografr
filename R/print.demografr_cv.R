@@ -6,6 +6,7 @@
 #'
 #' @export summary.demografr_cv
 #' @export
+#' @keywords internal
 print.demografr_cv <- function(x, ...) {
   class(x) <- "cv4postpr"
   invisible(summary(x))

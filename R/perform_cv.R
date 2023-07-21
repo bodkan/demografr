@@ -29,7 +29,6 @@ perform_cv <- function(models, nval, tols, method, ...) {
   result <- abc::cv4postpr(model_names, model_stats, nval = nval, tols = tols, method = method)
 
   class(result) <- c("demografr_cv", class(result))
-  attr(result, "model_names") <- names(models)
 
   result
 }

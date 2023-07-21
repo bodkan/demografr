@@ -4,14 +4,21 @@
 #' @param param A character vector containing either parameter names to summarize,
 #'   or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
 #'   all parameters will be extracted.
-#' @param ... Formal ellipsis argument of the \code{plot} method (unused)
+#' @param file Path to a PDF file for an output figure (if \code{NULL}, which is the default,
+#'   the figure will not be saved to a file)
+#' @param ... Formal ellipsis argument of the \code{plot} method
 #'
 #' @return Used exclusively for printing
 #'
 #' @export plot.demografr_cv
 #' @export
-plot.demografr_cv <- function(x, ...) {
-  model_names <- attr(x, "model_names")
+#' @keywords internal
+plot.demografr_cv <- function(x, file = NULL, ...) {
   class(x) <- "cv4postpr"
-  plot(x, names.arg = model_names, ...)
+
+  if (!is.null(file)) pdf(file = file)
+
+  plot(x, ...)
+
+  if (!is.null(file)) dev.off()
 }

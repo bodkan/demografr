@@ -15,3 +15,4 @@ Used exclusively for printing
 \description{
 Print a brief summary of the result of the \code{abc::cv4postpr} function
 }
+\keyword{internal}

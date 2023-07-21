@@ -101,6 +101,7 @@ by sampling from priors or by a given list of fixed parameter values</p>
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e+06</span>,</span>
 <span>  recombination_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  attempts <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -130,6 +131,11 @@ must be "custom").</p></dd>
 
 <dt>mutation_rate</dt>
 <dd><p>Mutation rate to use for the simulation</p></dd>
+
+
+<dt>attempts</dt>
+<dd><p>Maximum number of attempts to generate prior values for a valid demographic
+model (default is 1000)</p></dd>
 
 
 <dt>engine</dt>
