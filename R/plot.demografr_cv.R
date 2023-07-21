@@ -12,7 +12,6 @@
 #'
 #' @export plot.demografr_cv
 #' @export
-#' @keywords internal
 plot.demografr_cv <- function(x, file = NULL, ...) {
   class(x) <- "cv4postpr"
 
