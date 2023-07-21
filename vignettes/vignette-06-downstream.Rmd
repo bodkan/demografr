@@ -17,12 +17,13 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = FALSE #slendr_present
+  eval = slendr_present
 )
 
-bottleneck_path <- here::here("inst/examples/downstream_abc_bottle.rds")
-const_path <- here::here("inst/examples/downstream_abc_const.rds")
-exp_path <- here::here("inst/examples/downstream_abc_exp.rds")
+dataX_path <- here::here("inst/examples/downstream_dataX.rds")
+dataY_path <- here::here("inst/examples/downstream_dataY.rds")
+dataZ_path <- here::here("inst/examples/downstream_dataZ.rds")
+data_path <- here::here("inst/examples/downstream_cv.rds")
 
 devtools::load_all()
 ```
@@ -38,7 +39,7 @@ set.seed(SEED)
 
 Let's return to our [first](vignette-01-basics.html) example. However, this time, imagine that we don't really know whether which of the three following phylogenetic relationships is the one that captures the features of our data best, perhaps with different sources of evidence being consistent with one of them (as always, this is purely a toy example). In other words, we want to perform *model selection*.
 
-```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=3.5}
+```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=5}
 par(mar = c(0, 0, 2, 0), mfrow = c(3, 1))
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree, main = "model X")
@@ -147,9 +148,9 @@ modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
 
 
 ```{r, eval=FALSE}
-modelX(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
-modelY(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
-modelZ(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"))
+modelX(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelX.pdf")
+modelY(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelY.pdf")
+modelZ(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelZ.pdf")
 ```
 
 Now, let's [specify priors](vignette-02-priors.html) using _demografr_'s [templating syntax](vignette-02-priors.html#prior-parameter-templates) , as well as put together a list of tree-sequence summary functions and observed summary statistics:
@@ -205,37 +206,78 @@ With that out of the way, we can proceed with generating simulated data for infe
 
 ```{r}
 library(future)
-plan(multicore, workers = 10)
+plan(multicore, workers = availableCores())
 ```
 
-```{r}
-dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
-                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```{r, echo=FALSE, eval=TRUE}
+tstart <- Sys.time()
 ```
 
-```{r}
-dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 1000,
-                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```{r, eval=!file.exists(dataX_path)}
+dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
+                      sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r}
-dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 1000,
-                      sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```{r, eval=!file.exists(dataY_path)}
+dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
+                      sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r}
+```{r, eval=!file.exists(dataZ_path)}
+dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
+                      sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```
+
+```{r, echo=FALSE, eval=TRUE}
+tend <- Sys.time()
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+ncores <- future::availableCores()
+```
+
+```{r, echo=FALSE, eval=!file.exists(dataX_path)}
+saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(dataX_path)}
+tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=TRUE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+
+
+```{r, echo=FALSE, eval=!file.exists(dataX_path)}
 saveRDS(dataX, "dataX.rds")
+```
+
+```{r, echo=FALSE, eval=!file.exists(dataY_path)}
 saveRDS(dataY, "dataY.rds")
+```
+
+```{r, echo=FALSE, eval=!file.exists(dataZ_path)}
 saveRDS(dataZ, "dataZ.rds")
 ```
 
-```{r}
-dataX <- readRDS("dataX.rds")
-dataY <- readRDS("dataY.rds")
-dataZ <- readRDS("dataZ.rds")
+```{r, echo=FALSE, eval=file.exists(dataX_path)}
+dataX <- readRDS(dataX_path)
 ```
 
-```{r}
+```{r, echo=FALSE, eval=file.exists(dataY_path)}
+dataY <- readRDS(dataY_path)
+```
+
+```{r, echo=FALSE, eval=file.exists(dataZ_path)}
+dataZ <- readRDS(dataZ_path)
+```
+
+```{r, results="hide"}
 abcX <- perform_abc(dataX, engine = "abc", tol = 0.05, method = "neuralnet")
 abcY <- perform_abc(dataY, engine = "abc", tol = 0.05, method = "neuralnet")
 abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.05, method = "neuralnet")
@@ -243,14 +285,44 @@ abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.05, method = "neuralnet")
 
 ## Cross-validation
 
-Before doing model selection, it's important to perform cross-validation which you can do using _demografr_'s thin convenience interface wrapper `perform_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models.
 
-The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind
+This can be done using _demografr_'s convenience interface wrapper `perform_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+
+The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
+
+```{r, eval=!file.exists(data_path), results="hide", warning=FALSE}
+cv_result <- perform_cv(
+  models = list(modelX = abcX, modelY = abcY, modelZ = abcZ), # must be a *named* list!
+  nval = 50, tol = 0.05, method = "neuralnet"
+)
+```
+
+```{r, echo=FALSE, eval=!file.exists(data_path)}
+saveRDS(cv_result, data_path)
+```
+
+```{r, echo=FALSE, eval=file.exists(data_path)}
+cv_result <- readRDS(data_path)
+```
+
+If we print out the result, we get a quick summary with confusion matrices and other information:
 
 ```{r}
-models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
-
-cv_result <- perform_cv(models, nval = 50, tol = 0.01, method = "rejection"); summary(cv_result)
-
 cv_result
 ```
+
+Similarly, you can use the `plot()` function to visualize the result. This function, yet again, internally calls _abc_'s own plotting method internall, with a bonus option to save a figure to a PDF right from the `plot()` call (useful when working on a remote server):
+
+```{r plot_cv}
+plot(cv_result)
+```
+
+Because we have three models, each of the three barplots shows how often were summary statistics sampled from each model classified as likely coming from one of the three models. In other words, with absolutely perfect classification, each barplot would show just one of the three colors. If a barplot (results for one model) shows multiple colors, this means that some fraction of simulated statistics from that model was incorrectly classified as another model. Again, for more detail on interpretation, caveats, and best practices, please consult the _abc_ R package [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) and a relevant statistical textbook.
+
+The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in `r cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum` out of the total of 20 cross-validation simulations, with an overall misclassification rate for all models of only `r cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) }`.
+
+## Model selection
+
+Armed with confidence in the ability of ABC to correctly identify the right model based on simulated data, we can proceed to selection of _the best model for our empirical data set_.
+
