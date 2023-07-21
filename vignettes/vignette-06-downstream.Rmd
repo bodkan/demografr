@@ -37,6 +37,14 @@ SEED <- 42
 set.seed(SEED)
 ```
 
+⚠️⚠️⚠️
+
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+
+**This vignette in particular is currently being used as a testing ground for implementing the support of various validation features of the _abc_ R package. Please do not use any of this just yet.**
+
+⚠️⚠️⚠️
+
 Let's return to our [first](vignette-01-basics.html) example. However, this time, imagine that we don't really know whether which of the three following phylogenetic relationships is the one that captures the features of our data best, perhaps with different sources of evidence being consistent with one of them (as always, this is purely a toy example). In other words, we want to perform *model selection*.
 
 ```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=5}
