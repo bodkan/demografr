@@ -24,4 +24,3 @@ Used exclusively for printing
 \description{
 Plot results of the cv4postpr procedure from the abc R package
 }
-\keyword{internal}

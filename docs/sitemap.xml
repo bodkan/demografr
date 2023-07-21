@@ -28,6 +28,9 @@
     <loc>https://bodkan.net/demografr/articles/vignette-05-custom-engines.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/articles/vignette-06-downstream.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/authors.html</loc>
   </url>
   <url>
@@ -79,10 +82,16 @@
     <loc>https://bodkan.net/demografr/reference/perform_abc.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/reference/perform_cv.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/reference/pipe.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/plot.demografr_abc.abc.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/plot.demografr_cv.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/plot_posterior.html</loc>
@@ -92,6 +101,9 @@
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/print.demografr_abc_sims.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/print.demografr_cv.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/print.demografr_sims.abc.html</loc>
@@ -119,6 +131,9 @@
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/simulate_ts.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/summary.demografr_cv.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/validate_abc.html</loc>

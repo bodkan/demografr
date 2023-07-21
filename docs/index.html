@@ -90,6 +90,9 @@
     <li>
       <a href="articles/vignette-05-custom-engines.html">Custom SLiM or Python simulations</a>
     </li>
+    <li>
+      <a href="articles/vignette-06-downstream.html">Cross-validation and model selection</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -125,11 +128,8 @@
 <div class="page-header"><h1 id="demografr-simulation-based-inference-for-population-genetics">
 <em>demografr</em>: Simulation-based inference for population genetics<a class="anchor" aria-label="anchor" href="#demografr-simulation-based-inference-for-population-genetics"></a>
 </h1></div>
-<!-- badges: start -->
-<!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
-
-<!-- badges: end -->
-<p><img src="reference/figures/logo.png" align="right"></p>
+<!-- badges: start --><!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
+<!-- badges: end --><p><img src="reference/figures/logo.png" align="right"></p>
 <p>⚠️⚠️⚠️</p>
 <p><strong>Please note that <em>demografr</em> is still under active development. Although it’s already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the <a href="https://bodkan.net/demografr/news/">changelog</a> for the list of the most recent updates.</strong></p>
 <p>⚠️⚠️⚠️</p>
@@ -163,7 +163,7 @@
 <h3 id="note-on-stability">Note on stability<a class="anchor" aria-label="anchor" href="#note-on-stability"></a>
 </h3>
 <p><em>demografr</em> is very much in an experimental stage at this point. Although ABC fitting of “standard” demographic models (i.e. estimating <span class="math inline"><em>N</em><sub><em>e</em></sub></span>, split times and gene-flow parameters for non-spatial models) already works very nicely, our long-term ambitions for the project are much higher and extend, for instance, towards inferences of spatial models. As such, please be aware that the interface might change on a rather short notice to accomodate features for estimating parameters of much more complex custom models.</p>
-<p>If you want to follow updates on <em>demografr</em>, you can do this also on my <a href="https://fosstodon.org/@bodkan" class="external-link">Mastodon</a> and by checking out the <a href="https://bodkan.net/demografr/news">changelog</a> from time to time.</p>
+<p>If you want to follow updates on <em>demografr</em>, you can do this also on my <a href="https://fosstodon.org/@bodkan" class="external-link">Mastodon</a> and by checking out the <a href="https://bodkan.net/demografr/news/">changelog</a> from time to time.</p>
 </div>
 <div class="section level3">
 <h3 id="testing-the-r-package-in-an-online-rstudio-session">Testing the R package in an online RStudio session<a class="anchor" aria-label="anchor" href="#testing-the-r-package-in-an-online-rstudio-session"></a>
@@ -186,9 +186,7 @@
 <p>Let’s also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about their <span class="math inline"><em>N</em><sub><em>e</em></sub></span> or split times):</p>
 <p><img src="reference/figures/README-ape_tree-1.png" style="display: block; margin: auto;"></p>
 <p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:</p>
-<ol style="list-style-type: decimal">
-<li>Nucleotide diversity in each population:</li>
-</ol>
+<ol style="list-style-type: decimal"><li>Nucleotide diversity in each population:</li></ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_diversity.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -198,9 +196,7 @@
 <span><span class="co">#&gt; 2 popB 3.262781e-05</span></span>
 <span><span class="co">#&gt; 3 popC 1.010541e-04</span></span>
 <span><span class="co">#&gt; 4 popD 8.963820e-05</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal">
-<li>Pairwise divergence d_X_Y between populations X and Y:</li>
-</ol>
+<ol start="2" style="list-style-type: decimal"><li>Pairwise divergence d_X_Y between populations X and Y:</li></ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_divergence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_divergence.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -212,9 +208,7 @@
 <span><span class="co">#&gt; 4 popB popC 0.0001099973</span></span>
 <span><span class="co">#&gt; 5 popB popD 0.0001160577</span></span>
 <span><span class="co">#&gt; 6 popC popD 0.0001099985</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li>
-</ol>
+<ol start="3" style="list-style-type: decimal"><li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li></ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_f4</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_f4.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -441,7 +435,7 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/bodkan/demografr/actions" class="external-link"><img src="https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio" class="external-link"><img src="http://mybinder.org/badge.svg" alt="Binder"></a></li>
-<li><a href="https://codecov.io/github/bodkan/demografr?branch=main" class="external-link"><img src="https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg" alt="Coverage status"></a></li>
+<li><a href="https://app.codecov.io/github/bodkan/demografr?branch=main" class="external-link"><img src="https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg" alt="Coverage status"></a></li>
 </ul>
 </div>
 
