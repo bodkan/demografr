@@ -32,7 +32,8 @@
 #' @return If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
 #'   does not return anything, saving an object to an .rds file instead.
 #'
-#' @return A data frame object with the results of parameter grid simulations
+#' @return A data frame object with the results of parameter grid simulations, with values of
+#'  each summary statistic stored in a list-column
 #'
 #' @export
 simulate_grid <- function(
