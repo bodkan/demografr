@@ -1,4 +1,4 @@
----
+--
 title: "Downstream analyses, model selection, troubleshooting"
 output: rmarkdown::html_vignette
 vignette: >
@@ -24,14 +24,15 @@ dataX_path <- here::here("inst/examples/downstream_dataX.rds")
 dataY_path <- here::here("inst/examples/downstream_dataY.rds")
 dataZ_path <- here::here("inst/examples/downstream_dataZ.rds")
 data_path <- here::here("inst/examples/downstream_cv.rds")
-
-devtools::load_all()
 ```
 
-```{r}
+```{r, collapse=TRUE}
 library(demografr)
 library(slendr)
 init_env()
+
+library(future)
+plan(multicore, workers = availableCores())
 
 SEED <- 42
 set.seed(SEED)
@@ -212,17 +213,12 @@ tsZ <- simulate_ts(modelZ, priors)
 
 With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 
-```{r}
-library(future)
-plan(multicore, workers = availableCores())
-```
-
 ```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
 ```{r, eval=!file.exists(dataX_path)}
-dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
+dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
@@ -286,9 +282,9 @@ dataZ <- readRDS(dataZ_path)
 ```
 
 ```{r, results="hide"}
-abcX <- perform_abc(dataX, engine = "abc", tol = 0.05, method = "neuralnet")
-abcY <- perform_abc(dataY, engine = "abc", tol = 0.05, method = "neuralnet")
-abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.05, method = "neuralnet")
+abcX <- perform_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
+abcY <- perform_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
+abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ## Cross-validation
@@ -302,7 +298,7 @@ The one difference between the two functions is that `perform_cv()` removes the 
 ```{r, eval=!file.exists(data_path), results="hide", warning=FALSE}
 cv_result <- perform_cv(
   models = list(modelX = abcX, modelY = abcY, modelZ = abcZ), # must be a *named* list!
-  nval = 50, tol = 0.05, method = "neuralnet"
+  nval = 100, tol = 0.01, method = "neuralnet"
 )
 ```
 
@@ -328,9 +324,87 @@ plot(cv_result)
 
 Because we have three models, each of the three barplots shows how often were summary statistics sampled from each model classified as likely coming from one of the three models. In other words, with absolutely perfect classification, each barplot would show just one of the three colors. If a barplot (results for one model) shows multiple colors, this means that some fraction of simulated statistics from that model was incorrectly classified as another model. Again, for more detail on interpretation, caveats, and best practices, please consult the _abc_ R package [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) and a relevant statistical textbook.
 
-The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in `r cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum` out of the total of 20 cross-validation simulations, with an overall misclassification rate for all models of only `r cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) }`.
+The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in `r cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum` out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only `r cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100`%.
 
 ## Model selection
 
 Armed with confidence in the ability of ABC to correctly identify the right model based on simulated data, we can proceed to selection of _the best model for our empirical data set_.
 
+```{r}
+models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+
+  if (is.null(names(models)) || any(names(models) == ""))
+    stop("The 'models' argument must be a named list, with the names being\n",
+         "unique identifier names of each model", call. = FALSE)
+
+  if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
+      !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
+    stop("The list of models must be either all objects produced by the function\n",
+         "`simulate_abc()` or function `perform_abc()` as they store full information\n",
+         "about an ABC model being run, namely the simulated summary statistics", call. = FALSE)
+
+  model_nsims <- vapply(models, function(x) nrow(attr(x, "simulated")), FUN.VALUE = integer(1))
+  model_stats <- lapply(models, function(x) attr(x, "simulated")) %>% do.call(rbind, .) %>% as.matrix()
+  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+
+  observed_stats <- attr(abcX, "observed")
+
+modsel <- postpr(observed_stats, model_names, model_stats, tol = 0.05, method = "mnlogistic")
+
+summary(modsel)
+```
+
+
+```{r}
+observed_stats <- attr(abcX, "observed")
+sim_stats <- attr(abcX, "simulated")
+gfitX <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
+
+observed_stats <- attr(abcY, "observed")
+sim_stats <- attr(abcY, "simulated")
+gfitY <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
+
+observed_stats <- attr(abcZ, "observed")
+sim_stats <- attr(abcZ, "simulated")
+gfitZ <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
+
+summary(gfitX)
+summary(gfitY)
+summary(gfitZ)
+
+plot(gfitX, main="Histogram for modelX under H0")
+plot(gfitY, main="Histogram for modelY undeb H0")
+plot(gfitZ, main="Histogram for modelZ under H0")
+```
+
+
+```{r}
+  model_nsims <- vapply(models, function(x) nrow(attr(x, "simulated")), FUN.VALUE = integer(1))
+  model_stats <- lapply(models, function(x) attr(x, "simulated")) %>% do.call(rbind, .) %>% as.matrix()
+  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+
+library(locfit)
+gfitpca(target=observed_stats, sumstat=model_stats, index=model_names, cprob = 0.1)
+```
+
+
+```{r}
+predictions <- predict(abcX, 10, stat = "diversity")
+predictions
+```
+
+```{r}
+plot_prediction(predictions, "diversity")
+
+plot_prediction(predictions, "divergence")
+
+plot_prediction(predictions, "f4")
+```
+
+If more customization or a more detailed analyses is needed, you can also extract data from the posterior simulations themselves:
+
+```{r}
+extract_prediction(predictions, "diversity")
+```
+
+However, note that `extract_prediction` is a convenience function which only unnests, reformats, and renames the list-columns with summary statistics stored in the `predictions` data frame above. You can do all the processing based on the `predictions` object above.
