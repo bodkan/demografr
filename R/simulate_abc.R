@@ -129,28 +129,6 @@ simulate_abc <- function(
     }
   )) %>% do.call(cbind, .)
 
-  # and to the same for the observed statistics as well
-  observed <- lapply(names(functions), function(stat) {
-    # convert observed statistics to a matrix, either from a normal data frame
-    # result (with each statistic named), or from a simple vector
-    x <- observed[[stat]]
-
-    if (is.data.frame(x)) {
-      # find the column with the value of a statistic `stat`
-      # TODO: the last column will be numeric
-      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
-      value_col <- ncol(x)
-      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
-      names <- x[, !value_col, drop = FALSE] %>%
-        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
-    } else {
-      values <- matrix(x, nrow = 1)
-      names <- paste0(stat, "_", seq_along(x))
-    }
-    colnames(values) <- names
-    values
-  }) %>% do.call(cbind, .)
-
   result <- list(
     parameters = parameters,
     simulated = simulated,
@@ -159,6 +137,17 @@ simulate_abc <- function(
     priors = priors,
     model = model
   )
+
+  opts <- list(
+    sequence_length = sequence_length,
+    recombination_rate = recombination_rate,
+    mutation_rate = mutation_rate,
+    engine = engine,
+    model_args = model_args,
+    engine_args = engine_args,
+    packages = packages
+  )
+  attr(result, "options") <- opts
 
   class(result) <- "demografr_abc_sims"
 

@@ -24,6 +24,29 @@
 perform_abc <- function(data, engine, ...) {
   engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))
   args <- match.call()
+
+  # and to the same for the observed statistics as well
+  observed <- lapply(names(functions), function(stat) {
+    # convert observed statistics to a matrix, either from a normal data frame
+    # result (with each statistic named), or from a simple vector
+    x <- observed[[stat]]
+
+    if (is.data.frame(x)) {
+      # find the column with the value of a statistic `stat`
+      # TODO: the last column will be numeric
+      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+      value_col <- ncol(x)
+      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
+      names <- x[, !value_col, drop = FALSE] %>%
+        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
+    } else {
+      values <- matrix(x, nrow = 1)
+      names <- paste0(stat, "_", seq_along(x))
+    }
+    colnames(values) <- names
+    values
+  }) %>% do.call(cbind, .)
+
   if (engine == "abc") {
     if (!"tol" %in% names(args))
       stop("The `tol` argument must be provided to use the abc() inference engine.\n",
@@ -33,7 +56,7 @@ perform_abc <- function(data, engine, ...) {
            "See `?abc::abc` for more details.", call. = FALSE)
     result <- abc::abc(
       param = data$parameters,
-      target = data$observed,
+      target = observed,
       sumstat = data$simulated,
       ...
     )
@@ -44,10 +67,18 @@ perform_abc <- function(data, engine, ...) {
   # the result of the abc analysis is a standard object produced by the R package abc,
   # but additional annotation is added so that demografr's own functions can be used
   # for additional analyses and plotting...
-  attr(result, "parameters") <- data$parameters
-  attr(result, "priors") <- data$priors
-  attr(result, "model") <- data$model
-  attr(result, "simulated") <- data$simulated
+  components <- list(
+    model = data$model,
+    priors = data$priors,
+    parameters = data$parameters,
+    functions = data$functions,
+    simulated = data$simulated,
+    observed = data$observed
+  )
+
+  attr(result, "components") <- components
+  attr(result, "options") <- attr(data, "options")
+
   # ... which is why the result is annotated with another class
   class(result) <- c(paste0("demografr_abc.", engine), engine)
 
