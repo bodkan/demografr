@@ -14,6 +14,13 @@
 
 <img src="man/figures/logo.png" align="right" />
 
+
+## Hey SMBE 2023! 👋
+
+I'm only "attending" SMBE 2023 remotely so I won't be able to chat about this project as much and as freely as I'd like to. **If you want to know more about _demografr_**, are interested in using it in your work, or have suggestions or feedback, **please get in touch** at `contact@bodkan.net`. I'd be really happy to chat over Zoom too!
+
+---
+
 ⚠️⚠️⚠️
 
 **Please note that _demografr_ is still under active development. Although it's already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the [changelog](https://bodkan.net/demografr/news/) for the list of the most recent updates.**
@@ -90,10 +97,10 @@ observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", 
 
 observed_diversity
 #>    set    diversity
-#> 1 popA 8.138167e-05
-#> 2 popB 3.262781e-05
-#> 3 popC 1.010541e-04
-#> 4 popD 8.963820e-05
+#> 1 popA 8.037847e-05
+#> 2 popB 3.242467e-05
+#> 3 popC 1.021123e-04
+#> 4 popD 8.968777e-05
 ```
 
 2. Pairwise divergence d_X_Y between populations X and Y:
@@ -104,12 +111,12 @@ observed_divergence <- read.table(system.file("examples/observed_divergence.tsv"
 
 observed_divergence
 #>      x    y   divergence
-#> 1 popA popB 0.0002442102
-#> 2 popA popC 0.0002443844
-#> 3 popA popD 0.0002448539
-#> 4 popB popC 0.0001099973
-#> 5 popB popD 0.0001160577
-#> 6 popC popD 0.0001099985
+#> 1 popA popB 0.0002387594
+#> 2 popA popC 0.0002391843
+#> 3 popA popD 0.0002389617
+#> 4 popB popC 0.0001089125
+#> 5 popB popD 0.0001155571
+#> 6 popC popD 0.0001105323
 ```
 
 3. Value of the following $f_4$-statistic:
@@ -120,7 +127,7 @@ observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "de
 
 observed_f4
 #>      W    X    Y    Z            f4
-#> 1 popA popB popC popD -2.796781e-06
+#> 1 popA popB popC popD -3.433205e-06
 ```
 
 ### A complete ABC analysis in a single R script
@@ -156,7 +163,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
-  popD <- population("popD", time = T_CD, N = Ne_D[1], parent = popC)
+  popD <- population("popD", time = T_CD, N = Ne_D, parent = popC)
 
   # define gene-flow events
   gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
@@ -202,15 +209,15 @@ priors <- list(
 # same format as the summary statistics computed on empirical data)
 
 compute_diversity <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- slendr::ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- slendr::ts_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- slendr::ts_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),
@@ -253,22 +260,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                               Ne_A      Ne_B      Ne_C      Ne_D      T_AB
-#> Min.:                    -3.010207  574.2056 -1453.896 -509.7813  556.2759
-#> Weighted 2.5 % Perc.:   474.550342  655.4132  1262.466 2227.0248 1195.4049
-#> Weighted Median:       1782.484402  908.4085  5476.699 4125.2670 1869.9525
-#> Weighted Mean:         1840.627399  946.8585  5594.961 4140.8364 1884.1942
-#> Weighted Mode:         1454.772471  789.5067  5053.863 4255.9646 1862.5793
-#> Weighted 97.5 % Perc.: 3424.879882 1313.6176 10166.234 5997.0714 2672.8709
-#> Max.:                  4030.283888 1516.9037 13445.633 7485.2941 3279.5452
-#>                            T_BC      T_CD       gf_BC
-#> Min.:                  2271.210  4921.490 -0.17303098
-#> Weighted 2.5 % Perc.:  3359.665  6131.964  0.04465324
-#> Weighted Median:       5369.389  8262.425  0.28803288
-#> Weighted Mean:         5271.758  8209.992  0.31888803
-#> Weighted Mode:         5420.005  8540.382  0.24631980
-#> Weighted 97.5 % Perc.: 6301.992  9946.337  0.69010571
-#> Max.:                  6754.829 10636.425  0.87366466
+#>                   Ne_A      Ne_B     Ne_C      Ne_D       T_AB     T_BC
+#> Min.:         448.0318  157.8968 1075.309  421.7378   30.14955 3393.334
+#> 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504  105.44472 3582.828
+#> Median:      1753.0929 1365.3946 4698.593 4945.0077 1371.67593 6569.279
+#> Mean:        1745.2138 1305.5853 5221.514 4924.8508 1492.83466 6520.414
+#> Mode:        1740.0790 1471.9818 3850.674 2201.3303  649.57385 6586.714
+#> 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709 3380.50065 8806.911
+#> Max.:        3909.4340 2612.5218 9991.913 9922.1874 3923.85400 8940.088
+#>                  T_CD       gf_BC
+#> Min.:        6440.477 0.008707582
+#> 2.5% Perc.:  6808.872 0.012298823
+#> Median:      9184.433 0.272708825
+#> Mean:        8818.145 0.331597934
+#> Mode:        9527.178 0.146952932
+#> 97.5% Perc.: 9956.472 0.911635472
+#> Max.:        9997.854 0.967509437
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -276,14 +283,14 @@ We can also specify a subset of model parameters to select, or provide a regular
 
 ```r
 extract_summary(abc, param = "Ne")
-#>                               Ne_A      Ne_B      Ne_C      Ne_D
-#> Min.:                    -3.010207  574.2056 -1453.896 -509.7813
-#> Weighted 2.5 % Perc.:   474.550342  655.4132  1262.466 2227.0248
-#> Weighted Median:       1782.484402  908.4085  5476.699 4125.2670
-#> Weighted Mean:         1840.627399  946.8585  5594.961 4140.8364
-#> Weighted Mode:         1454.772471  789.5067  5053.863 4255.9646
-#> Weighted 97.5 % Perc.: 3424.879882 1313.6176 10166.234 5997.0714
-#> Max.:                  4030.283888 1516.9037 13445.633 7485.2941
+#>                   Ne_A      Ne_B     Ne_C      Ne_D
+#> Min.:         448.0318  157.8968 1075.309  421.7378
+#> 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504
+#> Median:      1753.0929 1365.3946 4698.593 4945.0077
+#> Mean:        1745.2138 1305.5853 5221.514 4924.8508
+#> Mode:        1740.0790 1471.9818 3850.674 2201.3303
+#> 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709
+#> Max.:        3909.4340 2612.5218 9991.913 9922.1874
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -291,36 +298,32 @@ We can also visualize the posterior distributions. Rather than plotting many dif
 
 ```r
 plot_posterior(abc, param = "Ne")
+#> Error: No parameters fit the provided parameter subset or regular expression
 ```
-
-![](man/figures/README-posterior_Ne-1.png)
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
 
 ```r
 plot_posterior(abc, param = "T")
+#> Error: No parameters fit the provided parameter subset or regular expression
 ```
-
-![](man/figures/README-posterior_Tsplit-1.png)
 
 And, finally, the rate of gene flow:
 
 
 ```r
 plot_posterior(abc, param = "gf")
+#> Error: No parameters fit the provided parameter subset or regular expression
 ```
-
-![](man/figures/README-posterior_gf-1.png)
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/package=abc) R package at our disposal:
 
 
 ```r
 plot(abc, param = "Ne_C")
+#> Error: No parameters fit the provided parameter subset or regular expression
 ```
-
-![](man/figures/README-diagnostic_Ne-1.png)
 
 ## Additional functionality
 
