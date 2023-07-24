@@ -51,20 +51,23 @@ reference:
     - extract_names
     - sample_prior
 
-  - title: Visualization of distributions
-    contents:
-    - plot_prior
-    - plot_posterior
-    - plot.demografr_abc.abc
-    - hist.demografr_abc.abc
-
-  - title: Analysis of ABC inference results
+  - title: Cross-validation and posterior checks
     contents:
     - perform_cv
     - summary.demografr_cv
     - plot.demografr_cv
+    - predict.demografr_abc.abc
+    - extract_prediction
+    - plot_prediction
+
+  - title: Analysis of ABC inference results
+    contents:
     - extract_summary
     - extract_posterior
+    - plot_prior
+    - plot_posterior
+    - plot.demografr_abc.abc
+    - hist.demografr_abc.abc
 
 news:
   one_page: true
