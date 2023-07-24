@@ -242,13 +242,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
-saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
-saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
+saveRDS(tdelta, here::here("inst/examples/grid_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-tdelta <- readRDS(here::here("inst/examples/basics_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/basics_ncores.rds"))
+tdelta <- readRDS(here::here("inst/examples/grid_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
