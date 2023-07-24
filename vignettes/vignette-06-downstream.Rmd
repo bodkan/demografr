@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present
+  eval = slendr_present && FALSE
 )
 
 dataX_path <- here::here("inst/examples/downstream_dataX.rds")
