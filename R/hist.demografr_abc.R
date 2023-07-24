@@ -11,9 +11,9 @@
 #' @export hist.demografr_abc.abc
 #' @export
 hist.demografr_abc.abc <- function(x, param = NULL, ...) {
-  parameters <- attr(x, "parameters")
+  parameters <- attr(x, "components")$parameters
   if (!is.null(param)) {
-    parameters <- subset_parameters(subset = param, all = colnames(attr(x, "parameters")))
+    parameters <- subset_parameters(subset = param, all = colnames(parameters))
     x$numparam <- length(parameters)
     x$names$parameter.names <- parameters
     x$adj.values <- x$adj.values[, parameters, drop = FALSE]

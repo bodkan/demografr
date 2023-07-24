@@ -14,11 +14,13 @@
 #' @return A ggplot2 plot object
 #'
 #' @export
-plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), facets = FALSE,
+plot_posterior <- function(abc, param = NULL, posterior = c("unadj", "adj"), facets = FALSE,
                            file = NULL, ...) {
+  posterior <- match.arg(posterior)
+
   df <- extract_posterior(abc, param, posterior)
 
-  param <- subset_parameters(subset = param, all = colnames(attr(abc, "parameters")))
+  param <- subset_parameters(subset = param, all = colnames(attr(abc, "components")$parameters))
   df <- df[df$param %in% param, ]
 
   # compute a given summary statistic of the posterior which will be added
