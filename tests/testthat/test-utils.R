@@ -31,27 +31,3 @@ ts_msprime <- slendr::ts_load(model, file = msprime_ts)
 # unique(slendr::ts_samples(ts_msprime)$time)
 # slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time %>% unique
 # slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time_tskit %>% unique
-
-test_that("extract_names(ts) returns a simple character vector", {
-  expect_type(extract_names(ts_msprime), "character")
-  expect_type(extract_names(ts_slim), "character")
-
-  expect_true(length(extract_names(ts_msprime)) == sum(samples$n))
-  expect_true(length(extract_names(ts_slim)) == sum(samples$n))
-})
-
-test_that("extract_names(ts, split = 'pop') returns a list of character vectors", {
-  expect_type(extract_names(ts_msprime, split = "pop"), "list")
-  expect_type(extract_names(ts_slim, split = "pop"), "list")
-
-  expect_true(length(extract_names(ts_msprime, split = "pop")) == 2)
-  expect_true(length(extract_names(ts_slim, split = "pop")) == 2)
-})
-
-test_that("extract_names(ts, split = 'time') returns a list of character vectors", {
-  expect_type(extract_names(ts_msprime, split = "time"), "list")
-  expect_type(extract_names(ts_slim, split = "time"), "list")
-
-  expect_true(length(extract_names(ts_msprime, split = "time")) == length(unique(samples$time)))
-  expect_true(length(extract_names(ts_slim, split = "time")) == length(unique(samples$time)))
-})

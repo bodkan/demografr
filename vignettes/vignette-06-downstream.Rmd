@@ -176,15 +176,15 @@ priors <- list(
 )
 
 compute_diversity <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- extract_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),

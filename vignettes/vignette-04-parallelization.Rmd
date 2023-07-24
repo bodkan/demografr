@@ -65,7 +65,7 @@ Here is our summary function:
 ```{r}
 functions <- list(
   diversity = function(ts) {
-    ts_diversity(ts, sample_sets = extract_names(ts, split = "pop"))
+    ts_diversity(ts, sample_sets = ts_names(ts, split = "pop"))
   }
 )
 ```
