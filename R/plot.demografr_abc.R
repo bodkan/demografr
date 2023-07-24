@@ -11,9 +11,9 @@
 #' @export plot.demografr_abc.abc
 #' @export
 plot.demografr_abc.abc <- function(x, param = NULL, ...) {
-  parameters <- attr(x, "parameters")
+  parameters <- attr(x, "components")$parameters
   if (!is.null(param)) {
-    params <- subset_parameters(subset = param, all = colnames(attr(x, "parameters")))
+    params <- subset_parameters(subset = param, all = colnames(parameters))
     x$numparam <- length(params)
     x$names$parameter.names <- params
     x$adj.values <- x$adj.values[, params, drop = FALSE]
