@@ -120,8 +120,10 @@ simulate_grid <- function(
 
   results_df <- dplyr::select(results_df, rep, dplyr::everything())
 
-  attr(results_df, "functions") <- functions
-  attr(results_df, "model") <- model
+  attr(results_df, "components") <- list(
+    functions = functions,
+    model = model
+  )
 
   if (is.null(file))
     return(results_df)
