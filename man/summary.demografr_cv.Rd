@@ -17,3 +17,4 @@
 \description{
 Summary results of the \code{cv4postpr} procedure from the abc R package
 }
+\keyword{internal}

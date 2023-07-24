@@ -48,13 +48,11 @@ reference:
     contents:
     - simulate_ts
     - combine_data
-    - extract_names
     - sample_prior
 
-  - title: Cross-validation and posterior checks
+  - title: ABC cross-validation and posterior checks
     contents:
     - perform_cv
-    - summary.demografr_cv
     - plot.demografr_cv
     - predict.demografr_abc.abc
     - extract_prediction

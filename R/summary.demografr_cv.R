@@ -6,7 +6,7 @@
 #' @return ...
 #'
 #' @export summary.demografr_cv
-#' @export
+#' @keywords internal
 summary.demografr_cv <- function(object, ...) {
   class(object) <- "cv4postpr"
   summary(object, ...)
