@@ -46,7 +46,7 @@ combine_data.demografr_abc_sims <- function(...) {
     model = runs[[1]]$model
   )
 
-  attr(result, "options") <- attr(run[[1]], "options")
+  attr(result, "options") <- attr(runs[[1]], "options")
 
   class(result) <- "demografr_abc_sims"
 
@@ -84,10 +84,10 @@ combine_data.data.frame <- function(...) {
          call. = FALSE)
 
   # check that all individual demografr_abc_sims objects are from the same model
-  if (length(unique(lapply(runs, attr, "model"))) > 1)
+  if (length(unique(lapply(runs, function(run) attr(run, "components")$model))) > 1)
     stop("Simulation runs must originate from the same grid setup but model functions differ", call. = FALSE)
 
-  if (length(unique(lapply(runs, attr, "functions"))) > 1)
+  if (length(unique(lapply(runs, function(run) attr(run, "components")$functions))) > 1)
     stop("Simulation runs must originate from the same grid setup but summary functions differ", call. = FALSE)
 
   results <- do.call(rbind, runs)
@@ -99,6 +99,7 @@ combine_data.data.frame <- function(...) {
   results <- results %>% dplyr::group_by(dplyr::across(dplyr::all_of(grid_cols))) %>% dplyr::mutate(rep = 1:dplyr::n()) %>% dplyr::ungroup()
 
   attr(results, "components") <- attr(runs[[1]], "components")
+  attr(results, "options") <- attr(runs[[1]], "options")
 
   results
 }

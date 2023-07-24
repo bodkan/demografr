@@ -31,3 +31,5 @@ ts_msprime <- slendr::ts_load(model, file = msprime_ts)
 # unique(slendr::ts_samples(ts_msprime)$time)
 # slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time %>% unique
 # slendr::ts_nodes(ts_msprime) %>% filter(sampled) %>% .$time_tskit %>% unique
+
+# TODO: extract_names() used to be tested here -- add tests of other internal utility functions

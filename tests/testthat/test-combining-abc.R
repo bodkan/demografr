@@ -54,9 +54,9 @@ test_that("validation passes", {
   expect_output(validate_abc(model, priors, functions, observed))
 })
 
-run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
-run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
-run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0)
+suppressPackageStartupMessages(run1 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0))
+suppressPackageStartupMessages(run2 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0))
+suppressPackageStartupMessages(run3 <- simulate_abc(model, priors, functions, observed, iterations = 2, sequence_length = 10000, recombination_rate = 0))
 
 test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same ABC setup but model functions differ"
@@ -100,12 +100,12 @@ test_that("both a list of runs and individual runs can be combined", {
   expect_true(ncol(runs_ind$simulated) == ncol(run2$simulated))
   expect_true(ncol(runs_ind$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_ind$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
+  expect_true(all(runs_ind$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run3$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run3$observed$diversity))
 
   # list of runs
   expect_s3_class(runs_list <- combine_data(list(run1, run2, run3)), "demografr_abc_sims")
@@ -120,12 +120,12 @@ test_that("both a list of runs and individual runs can be combined", {
   expect_true(ncol(runs_list$simulated) == ncol(run2$simulated))
   expect_true(ncol(runs_list$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_list$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run3$observed))
+  expect_true(all(runs_list$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run3$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run3$observed$diversity))
 })
 
 test_that("simulation runs can be loaded in their serialized form", {
@@ -148,12 +148,12 @@ test_that("simulation runs can be loaded in their serialized form", {
   expect_true(ncol(runs_ind$simulated) == ncol(run2$simulated))
   expect_true(ncol(runs_ind$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_ind$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_ind$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_ind$observed) == ncol(run3$observed))
+  expect_true(all(runs_ind$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run3$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_ind$observed$diversity == run3$observed$diversity))
 
   # list of runs
   expect_s3_class(runs_list <- combine_data(list(f1, f2, f3)), "demografr_abc_sims")
@@ -168,12 +168,12 @@ test_that("simulation runs can be loaded in their serialized form", {
   expect_true(ncol(runs_list$simulated) == ncol(run2$simulated))
   expect_true(ncol(runs_list$simulated) == ncol(run3$simulated))
 
-  expect_true(nrow(runs_list$observed) == nrow(run1$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run2$observed))
-  expect_true(nrow(runs_list$observed) == nrow(run3$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run1$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run2$observed))
-  expect_true(ncol(runs_list$observed) == ncol(run3$observed))
+  expect_true(all(runs_list$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run3$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run1$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run2$observed$diversity))
+  expect_true(all(runs_list$observed$diversity == run3$observed$diversity))
 })
 
 test_that("missing serialized files are correctly handled", {
@@ -201,14 +201,11 @@ test_that("'combining' a single ABC run does not break", {
 
 test_that("abc::abc via perform_abc() runs correctly", {
   data <- combine_data(run1, run2, run3)
-  expect_error(
-    perform_abc(data, engine = "abc"),
-    "The `tol` argument must be provided"
-  )
-  expect_error(
-    perform_abc(data, engine = "abc", tol = 1),
-    "The `method` argument must be provided"
-  )
+
+  expect_error(perform_abc(data, engine = "abc"), "The `tol` argument must be provided")
+  expect_error(perform_abc(data, engine = "abc", tol = 1), "The `method` argument must be provided")
+
   quiet(suppressWarnings(abc <- perform_abc(data, engine = "abc", tol = 1, method = "neuralnet")))
+
   expect_s3_class(abc, "demografr_abc.abc")
 })

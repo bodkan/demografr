@@ -26,10 +26,10 @@ perform_abc <- function(data, engine, ...) {
   args <- match.call()
 
   # and to the same for the observed statistics as well
-  observed <- lapply(names(functions), function(stat) {
+  observed <- lapply(names(data$functions), function(stat) {
     # convert observed statistics to a matrix, either from a normal data frame
     # result (with each statistic named), or from a simple vector
-    x <- observed[[stat]]
+    x <- data$observed[[stat]]
 
     if (is.data.frame(x)) {
       # find the column with the value of a statistic `stat`

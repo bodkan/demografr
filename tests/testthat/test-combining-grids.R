@@ -26,21 +26,21 @@ compute_diversity <- function(ts) {
 functions <- list(diversity = compute_diversity)
 
 nreps <- 2
-run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
-run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
-run3 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
+suppressPackageStartupMessages(run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0))
+suppressPackageStartupMessages(run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0))
+suppressPackageStartupMessages(run3 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0))
 
 test_that("model functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same grid setup but model functions differ"
   xrun1 <- run1
-  attr(xrun1, "model") <- ls
+  attr(xrun1, "components")$model <- ls
   expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 
 test_that("summary functions must be consistent between runs", {
   error_msg <- "Simulation runs must originate from the same grid setup but summary functions differ"
   xrun1 <- run1
-  attr(xrun1, "functions")[[1]] <- lm
+  attr(xrun1, "components")$functions[[1]] <- lm
   expect_error(combine_data(xrun1, run2, run3), error_msg)
 })
 

@@ -125,6 +125,17 @@ simulate_grid <- function(
     model = model
   )
 
+  opts <- list(
+    sequence_length = sequence_length,
+    recombination_rate = recombination_rate,
+    mutation_rate = mutation_rate,
+    engine = engine,
+    model_args = model_args,
+    engine_args = engine_args,
+    packages = packages
+  )
+  attr(results_df, "options") <- opts
+
   if (is.null(file))
     return(results_df)
   else
