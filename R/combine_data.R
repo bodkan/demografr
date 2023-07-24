@@ -45,6 +45,9 @@ combine_data.demografr_abc_sims <- function(...) {
     priors = runs[[1]]$priors,
     model = runs[[1]]$model
   )
+
+  attr(result, "options") <- attr(run[[1]], "options")
+
   class(result) <- "demografr_abc_sims"
 
   result
@@ -95,8 +98,7 @@ combine_data.data.frame <- function(...) {
   # 2. then replace replicate numbers of the original simulation runs
   results <- results %>% dplyr::group_by(dplyr::across(dplyr::all_of(grid_cols))) %>% dplyr::mutate(rep = 1:dplyr::n()) %>% dplyr::ungroup()
 
-  attr(results, "functions") <- attr(runs[[1]], "functions")
-  attr(results, "model") <- attr(runs[[1]], "model")
+  attr(results, "components") <- attr(runs[[1]], "components")
 
   results
 }
