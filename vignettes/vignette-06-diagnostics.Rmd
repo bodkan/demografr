@@ -217,17 +217,17 @@ With that out of the way, we can proceed with generating simulated data for infe
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(dataX_path)}
+```{r}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!file.exists(dataY_path)}
+```{r}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!file.exists(dataZ_path)}
+```{r}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
@@ -238,12 +238,12 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(dataX_path)}
+```{r, echo=FALSE}
 saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
 saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(dataX_path)}
+```{r, echo=FALSE}
 tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
 ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
 ```
@@ -257,27 +257,27 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
 
-```{r, echo=FALSE, eval=!file.exists(dataX_path)}
+```{r, echo=FALSE}
 saveRDS(dataX, "dataX.rds")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(dataY_path)}
+```{r, echo=FALSE}
 saveRDS(dataY, "dataY.rds")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(dataZ_path)}
+```{r, echo=FALSE}
 saveRDS(dataZ, "dataZ.rds")
 ```
 
-```{r, echo=FALSE, eval=file.exists(dataX_path)}
+```{r, echo=FALSE}
 dataX <- readRDS(dataX_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(dataY_path)}
+```{r, echo=FALSE}
 dataY <- readRDS(dataY_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(dataZ_path)}
+```{r, echo=FALSE}
 dataZ <- readRDS(dataZ_path)
 ```
 
@@ -295,18 +295,18 @@ This can be done using _demografr_'s convenience interface wrapper `perform_cv()
 
 The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
-```{r, eval=!file.exists(data_path), results="hide", warning=FALSE}
+```{r, results="hide", warning=FALSE}
 cv_result <- perform_cv(
   models = list(modelX = abcX, modelY = abcY, modelZ = abcZ), # must be a *named* list!
   nval = 100, tol = 0.01, method = "neuralnet"
 )
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE}
 saveRDS(cv_result, data_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(data_path)}
+```{r, echo=FALSE}
 cv_result <- readRDS(data_path)
 ```
 
