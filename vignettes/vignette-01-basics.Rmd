@@ -331,7 +331,7 @@ plot_prediction(predictions, "f4")
 
 (To make evaluation a little bit easier, there's an option `file =` which instructs `plot_prediction` to save a figure to disk instead of plotting it using a graphical device&mdash;useful for work on remote servers!).
 
-**For more details on possible downstream validation and troubleshooting analyses, please see [this vignette](vignette-06-downstream.html).**
+**For more details on possible downstream validation and troubleshooting analyses, please see [this vignette](vignette-06-diagnostics.html).**
 
 ### 7. Posterior analysis
 

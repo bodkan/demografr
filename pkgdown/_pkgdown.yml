@@ -27,8 +27,8 @@ navbar:
           href: articles/vignette-04-parallelization.html
         - text: Custom SLiM or Python simulations
           href: articles/vignette-05-custom-engines.html
-        - text: Cross-validation and model selection
-          href: articles/vignette-06-downstream.html
+        - text: ABC diagnostics
+          href: articles/vignette-06-diagnostics.html
     mastodon:
       icon: fa-mastodon
       href: https://fosstodon.org/bodkan
