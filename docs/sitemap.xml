@@ -28,6 +28,9 @@
     <loc>https://bodkan.net/demografr/articles/vignette-05-custom-engines.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/articles/vignette-06-diagnostics.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/articles/vignette-06-downstream.html</loc>
   </url>
   <url>
@@ -70,6 +73,9 @@
     <loc>https://bodkan.net/demografr/reference/extract_posterior.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/reference/extract_prediction.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/reference/extract_summary.html</loc>
   </url>
   <url>
@@ -97,7 +103,13 @@
     <loc>https://bodkan.net/demografr/reference/plot_posterior.html</loc>
   </url>
   <url>
+    <loc>https://bodkan.net/demografr/reference/plot_prediction.html</loc>
+  </url>
+  <url>
     <loc>https://bodkan.net/demografr/reference/plot_prior.html</loc>
+  </url>
+  <url>
+    <loc>https://bodkan.net/demografr/reference/predict.demografr_abc.abc.html</loc>
   </url>
   <url>
     <loc>https://bodkan.net/demografr/reference/print.demografr_abc_sims.html</loc>

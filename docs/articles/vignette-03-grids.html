@@ -17,7 +17,9 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Support for grid simulations">
+<script src="../pkgdown.js"></script><!-- docsearch --><script src="../docsearch.js"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous">
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="Support for grid simulations">
 <meta property="og:description" content="demografr">
 <meta property="og:image" content="https://bodkan.net/demografr/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -84,7 +86,7 @@
       <a href="../articles/vignette-05-custom-engines.html">Custom SLiM or Python simulations</a>
     </li>
     <li>
-      <a href="../articles/vignette-06-downstream.html">Cross-validation and model selection</a>
+      <a href="../articles/vignette-06-diagnostics.html">ABC diagnostics</a>
     </li>
   </ul>
 </li>
@@ -106,7 +108,13 @@
   </a>
 </li>
       </ul>
+<form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
+      </form>
+      
+    </div>
 <!--/.nav-collapse -->
   </div>
 <!--/.container -->
@@ -254,32 +262,32 @@
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">56</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.434  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.434  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.218  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">56</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">56</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">56</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">56</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.023</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.023</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1  0.379 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1  0.402 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1  0.673 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1  0.379 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1  0.402 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.023</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1  0.402 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">indirect</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A      B      C     O          alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1  1.89   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1  1.86   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">32</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 -<span style="color: #BB0000;">0.008</span><span style="color: #BB0000; text-decoration: underline;">32</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1  1.86   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1  0.859  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1  1.73   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1  1.89   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1  1.89   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1  1.73   </span></span>
+<span><span class="co">#&gt;    X      A      B      C     O        alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 -<span style="color: #BB0000;">0.367</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 -<span style="color: #BB0000;">0.367</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1  1.19 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1  2.53 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1  1.01 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1  1.29 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1  1.19 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1  2.57 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 -<span style="color: #BB0000;">0.367</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1  2.57 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>Excellent, we get the output tables from <code>ts_f4ratio</code> functions as we’re supposed to (and get one estimate for each of the 21):</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -327,7 +335,7 @@
 <span>  <span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">25e6</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the grid simulations was 0 hours 22 minutes 14 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 1 hours 3 minutes 47 seconds parallelized across 96 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="analyze-results">5. Analyze results<a class="anchor" aria-label="anchor" href="#analyze-results"></a>
@@ -354,52 +362,52 @@
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">$</span><span class="va">direct</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A     B     C      O        alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.056<span style="text-decoration: underline;">1</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.060<span style="text-decoration: underline;">3</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.081<span style="text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.102 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.066<span style="text-decoration: underline;">9</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.077<span style="text-decoration: underline;">3</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.074<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.067<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.051<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.044<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt;    X      A     B     C      O           alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.015</span><span style="color: #BB0000; text-decoration: underline;">3</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1  0.000<span style="text-decoration: underline;">916</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1  0.033<span style="text-decoration: underline;">5</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1  0.023<span style="text-decoration: underline;">5</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1  0.054<span style="text-decoration: underline;">7</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1  0.008<span style="text-decoration: underline;">00</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1  0.006<span style="text-decoration: underline;">47</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1  0.040<span style="text-decoration: underline;">8</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1  0.026<span style="text-decoration: underline;">1</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1  0.015<span style="text-decoration: underline;">8</span>  </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.010<span style="text-decoration: underline;">6</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">53</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.006<span style="text-decoration: underline;">17</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.025<span style="text-decoration: underline;">0</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.011<span style="text-decoration: underline;">1</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.007<span style="text-decoration: underline;">80</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.018<span style="text-decoration: underline;">9</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.014<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.012<span style="text-decoration: underline;">9</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.006<span style="text-decoration: underline;">78</span></span></span>
+<span><span class="co">#&gt;    X      A     B     C      O        alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.020<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.032<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.011<span style="text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.019<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.032<span style="text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.020<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.031<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.033<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.046<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.024<span style="text-decoration: underline;">8</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>List columns are very efficient and concise for storing complex data like this, but in order to be able to analyze data stored in them, we need a function <a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link"><code>unnest()</code></a> from <em>tidyverse</em>, which “explodes” a list-column with stored data frames into a wider data frame which can be immediately analyzed. In this example:</p>
 <p><strong>Direct f4-ratio:</strong></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">unnest</span><span class="op">(</span><span class="va">direct</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 127,050 × 10</span></span></span>
-<span><span class="co">#&gt;      rep rate_aa rate_ea X      A     B     C      O        alpha indirect</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 eur_1  nea_2 nea_1 afr1_1 chimp_1 0.056<span style="text-decoration: underline;">1</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 eur_2  nea_2 nea_1 afr1_1 chimp_1 0.060<span style="text-decoration: underline;">3</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 eur_3  nea_2 nea_1 afr1_1 chimp_1 0.081<span style="text-decoration: underline;">7</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 eur_4  nea_2 nea_1 afr1_1 chimp_1 0.102  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 eur_5  nea_2 nea_1 afr1_1 chimp_1 0.066<span style="text-decoration: underline;">9</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 eur_6  nea_2 nea_1 afr1_1 chimp_1 0.077<span style="text-decoration: underline;">3</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 eur_7  nea_2 nea_1 afr1_1 chimp_1 0.074<span style="text-decoration: underline;">6</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 eur_8  nea_2 nea_1 afr1_1 chimp_1 0.067<span style="text-decoration: underline;">4</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 eur_9  nea_2 nea_1 afr1_1 chimp_1 0.051<span style="text-decoration: underline;">4</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 eur_10 nea_2 nea_1 afr1_1 chimp_1 0.044<span style="text-decoration: underline;">1</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt;      rep rate_aa rate_ea X      A     B     C      O           alpha indirect</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.015</span><span style="color: #BB0000; text-decoration: underline;">3</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 eur_2  nea_2 nea_1 afr1_1 chimp_1  0.000<span style="text-decoration: underline;">916</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 eur_3  nea_2 nea_1 afr1_1 chimp_1  0.033<span style="text-decoration: underline;">5</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 eur_4  nea_2 nea_1 afr1_1 chimp_1  0.023<span style="text-decoration: underline;">5</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 eur_5  nea_2 nea_1 afr1_1 chimp_1  0.054<span style="text-decoration: underline;">7</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 eur_6  nea_2 nea_1 afr1_1 chimp_1  0.008<span style="text-decoration: underline;">00</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 eur_7  nea_2 nea_1 afr1_1 chimp_1  0.006<span style="text-decoration: underline;">47</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 eur_8  nea_2 nea_1 afr1_1 chimp_1  0.040<span style="text-decoration: underline;">8</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 eur_9  nea_2 nea_1 afr1_1 chimp_1  0.026<span style="text-decoration: underline;">1</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 eur_10 nea_2 nea_1 afr1_1 chimp_1  0.015<span style="text-decoration: underline;">8</span>   <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127,040 more rows</span></span></span></code></pre>
 <p><strong>Indirect f4-ratio:</strong></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
@@ -407,16 +415,16 @@
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 127,050 × 10</span></span></span>
 <span><span class="co">#&gt;      rep rate_aa rate_ea direct            X      A      B     C     O     alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_1  afr1_1 afr2… nea_2 chim… 0.951</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_2  afr1_1 afr2… nea_2 chim… 0.965</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_3  afr1_1 afr2… nea_2 chim… 0.928</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_4  afr1_1 afr2… nea_2 chim… 0.889</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_5  afr1_1 afr2… nea_2 chim… 0.960</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_6  afr1_1 afr2… nea_2 chim… 0.943</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_7  afr1_1 afr2… nea_2 chim… 0.971</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_8  afr1_1 afr2… nea_2 chim… 0.942</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_9  afr1_1 afr2… nea_2 chim… 0.984</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_10 afr1_1 afr2… nea_2 chim… 0.951</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_1  afr1_1 afr2… nea_2 chim… 1.02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_2  afr1_1 afr2… nea_2 chim… 0.989</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_3  afr1_1 afr2… nea_2 chim… 0.944</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_4  afr1_1 afr2… nea_2 chim… 0.964</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_5  afr1_1 afr2… nea_2 chim… 0.977</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_6  afr1_1 afr2… nea_2 chim… 1.02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_7  afr1_1 afr2… nea_2 chim… 0.983</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_8  afr1_1 afr2… nea_2 chim… 0.921</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_9  afr1_1 afr2… nea_2 chim… 0.953</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_10 afr1_1 afr2… nea_2 chim… 1.00 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127,040 more rows</span></span></span></code></pre>
 <p><strong>Note that unnesting each results column creates a plain old data frame which can be analyzed by whatever means you find convenient.</strong></p>
 <p>Because we were interested in the behavior of trajectories of indirect and direct estimates of Neanderthal ancestry over time, we will first create a small data frame indicating the times of sampling of each simulated European individual. We will use this small data frame for join operations for the purpose of plotting below:</p>
@@ -533,9 +541,20 @@
 </div>
 
   
-
-
-  
-
-  </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script><script>
+  docsearch({
+    
+    
+    apiKey: 'a232fffe35f6bc68735023bb34d1fee2',
+    indexName: 'bodkan',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+</body>
 </html>
