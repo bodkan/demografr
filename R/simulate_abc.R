@@ -80,7 +80,8 @@ simulate_abc <- function(
   ) %>%
     unlist()
 
-  priors <- expand_priors(model, priors, model_args) #%>% strip_prior_environments()
+  if (is.function(model))
+    priors <- expand_priors(model, priors, model_args) #%>% strip_prior_environments()
 
   results <- future.apply::future_lapply(
     X = seq_len(iterations),
