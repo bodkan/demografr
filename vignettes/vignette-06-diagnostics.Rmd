@@ -324,7 +324,19 @@ plot(cv_result)
 
 Because we have three models, each of the three barplots shows how often were summary statistics sampled from each model classified as likely coming from one of the three models. In other words, with absolutely perfect classification, each barplot would show just one of the three colors. If a barplot (results for one model) shows multiple colors, this means that some fraction of simulated statistics from that model was incorrectly classified as another model. Again, for more detail on interpretation, caveats, and best practices, please consult the _abc_ R package [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) and a relevant statistical textbook.
 
-The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in `r cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum` out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only `r cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100`%.
+The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in:
+
+```{r}
+cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum
+```
+
+simulations out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only:
+
+```{r}
+cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100
+```
+
+percent.
 
 ## Model selection
 
