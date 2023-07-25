@@ -141,8 +141,8 @@ validate_abc <- function(model, priors, functions, observed,
     template_priors <- grepl("\\.\\.\\.", prior_names)
     if (any(template_priors)) {
       cat(" \u274C\n\n")
-      stop("Template priors (those with '...' in their definition) are only allowed for\n",
-           "slendr models, not user-defined simulation scripts.", call. = FALSE)
+      stop("Template priors (those with '...' in their definition) are only\n",
+           "allowed for slendr models, not user-defined simulation scripts", call. = FALSE)
     }
 
   }
