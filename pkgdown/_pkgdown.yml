@@ -70,8 +70,8 @@ reference:
 news:
   one_page: true
 
-# template:
-#   params:
-#     docsearch:
-#       api_key: a895c93f0e9eda05eb10b29a9921d586
-#       index_name: slendr
+template:
+  params:
+    docsearch:
+      api_key: a232fffe35f6bc68735023bb34d1fee2
+      index_name: bodkan
