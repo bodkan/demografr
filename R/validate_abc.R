@@ -134,7 +134,17 @@ validate_abc <- function(model, priors, functions, observed,
   } else {
     script_contents <- readLines(model)
     script_engine <- if (any(grepl("treeSeqOutput\\(output_path", script_contents))) "SLiM" else "msprime"
+
     cat("The model is a custom user-defined", script_engine, "script\n")
+
+    prior_names <- get_prior_names(priors)
+    template_priors <- grepl("\\.\\.\\.", prior_names)
+    if (any(template_priors)) {
+      cat(" \u274C\n\n")
+      stop("Template priors (those with '...' in their definition) are only allowed for\n",
+           "slendr models, not user-defined simulation scripts.", call. = FALSE)
+    }
+
   }
 
   cat("---------------------------------------------------------------------\n")
