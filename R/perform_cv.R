@@ -1,12 +1,13 @@
 #' Perform cross-validation using the \code{anc::cv4postpr} function
 #'
-#' This function is a thin, convenience wrapper around the \code{cv4postpr} from the
+#' This function is a convenience wrapper around the \code{cv4postpr} from the
 #' R package abc
 #'
 #' @param models A list of objects of the class \code{demografr_sims_abc} or
 #'   \code{demografr_abc.abc} which store simulated summary statistics needed for
-#'   calling \code{cv4postpr}
-#' @param nval,tols,method Required arguments of \code{cv4postpr}
+#'   calling \code{abc::cv4postpr}
+#' @param nval,tols,method Required arguments of \code{abc::cv4postpr}
+#' @param ... Other optional arguments to be passed to \code{abc::cv4postpr}
 #'
 #' @return Object of the class \code{cv4postpr} and \code{demografr_cv}
 #'
