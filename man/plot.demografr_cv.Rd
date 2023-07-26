@@ -13,10 +13,6 @@
 the figure will not be saved to a file)}
 
 \item{...}{Formal ellipsis argument of the \code{plot} method}
-
-\item{param}{A character vector containing either parameter names to summarize,
-or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
-all parameters will be extracted.}
 }
 \value{
 Used exclusively for printing
