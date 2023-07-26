@@ -14,7 +14,7 @@
 #' @return A ggplot2 plot object
 #'
 #' @export
-plot_posterior <- function(abc, param = NULL, posterior = c("unadj", "adj"), facets = FALSE,
+plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), facets = FALSE,
                            file = NULL, ...) {
   posterior <- match.arg(posterior)
 
