@@ -22,8 +22,11 @@
 #'
 #' @export predict.demografr_abc.abc
 #' @export
-predict.demografr_abc.abc <- function(abc, samples, stat = NULL, posterior = c("unadj", "adj"),
+predict.demografr_abc.abc <- function(abc, samples, stat = NULL, posterior = c("adj", "unadj"),
                                       functions = NULL) {
+  opts <- options(warn = 1)
+  on.exit(options(opts))
+
   # extract the model function and other components and options used to run the
   # original ABC simulations
   components <- attr(abc, "components")

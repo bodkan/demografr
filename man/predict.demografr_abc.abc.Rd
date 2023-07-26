@@ -8,7 +8,7 @@
   abc,
   samples,
   stat = NULL,
-  posterior = c("unadj", "adj"),
+  posterior = c("adj", "unadj"),
   functions = NULL
 )
 }
