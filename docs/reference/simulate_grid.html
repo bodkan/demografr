@@ -115,7 +115,8 @@ values of given population genetic statistics</p>
 <span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  strict <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -180,6 +181,12 @@ Setting this argument for custom simulation script has no effect.</p></dd>
 <dt>engine_args</dt>
 <dd><p>Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.</p></dd>
+
+
+<dt>strict</dt>
+<dd><p>Should parameter combinations leading to invalid slendr models be treated as
+an error? Default is <code>TRUE</code>. If set to <code>FALSE</code>, invalid simulations will be simply
+dropped, with an informative message.</p></dd>
 
 </dl></div>
     <div id="value">
