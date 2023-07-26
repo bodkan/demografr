@@ -4,7 +4,7 @@
 #'
 #' @return Used exclusively for printing
 #'
-#' @export summary.demografr_cv
+#' @export print.demografr_cv
 #' @export
 #' @keywords internal
 print.demografr_cv <- function(x, ...) {
