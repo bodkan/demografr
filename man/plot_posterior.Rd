@@ -7,7 +7,7 @@
 plot_posterior(
   abc,
   param = NULL,
-  posterior = c("unadj", "adj"),
+  posterior = c("adj", "unadj"),
   facets = FALSE,
   file = NULL,
   ...
