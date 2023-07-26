@@ -28,6 +28,9 @@
 #'   Setting this argument for custom simulation script has no effect.
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
+#' @param strict Should parameter combinations leading to invalid slendr models be treated as
+#'   an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be simply
+#'   dropped, with an informative message.
 #'
 #' @return If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
 #'   does not return anything, saving an object to an .rds file instead.
@@ -40,7 +43,8 @@ simulate_grid <- function(
   model, grid, functions, replicates,
   sequence_length, recombination_rate, mutation_rate = 0,
   packages = NULL, file = NULL,
-  engine = NULL, model_args = NULL, engine_args = NULL
+  engine = NULL, model_args = NULL, engine_args = NULL,
+  strict = TRUE
 ) {
   # make sure warnings are reported immediately before simulations are even started
   warning_length <- (length(colnames(grid)) + length(model_args)) * 50
@@ -80,31 +84,58 @@ simulate_grid <- function(
   ) %>%
     do.call(rbind, .)
 
+  suppressPackageStartupMessages( # silence the super intrusive sp startup message
   results <- future.apply::future_lapply(
     X = seq_len(nrow(grid)),
     FUN = function(grid_i) {
       parameters <- as.list(dplyr::select(grid[grid_i, ], -rep))
-      iter_result <- run_iteration(
-        grid_i,
-        model = model,
-        params = parameters,
-        functions = functions,
-        sequence_length = sequence_length,
-        recombination_rate = recombination_rate,
-        mutation_rate = mutation_rate,
-        engine = engine,
-        model_args = model_args,
-        engine_args = engine_args,
-        model_name = as.character(substitute(model)),
-        attempts = 1
+      iter_result <- tryCatch(
+        {
+          quiet(res <- run_iteration(
+            grid_i,
+            model = model,
+            params = parameters,
+            functions = functions,
+            sequence_length = sequence_length,
+            recombination_rate = recombination_rate,
+            mutation_rate = mutation_rate,
+            engine = engine,
+            model_args = model_args,
+            engine_args = engine_args,
+            model_name = as.character(substitute(model)),
+            attempts = 1
+          ))
+          res$rep <- grid[grid_i, ]$rep
+          res
+        },
+        error = function(cond) {
+          if (strict)
+            stop(conditionMessage(cond), call. = FALSE)
+          else
+            NA
+        }
       )
-      iter_result$rep <- grid[grid_i, ]$rep
       iter_result
     },
     future.seed = TRUE,
     future.globals = globals,
     future.packages = c("slendr", packages)
   )
+  )
+
+  invalid_runs <- vapply(results, function(run) all(is.na(run)), FUN.VALUE = logical(1))
+  if (any(invalid_runs)) {
+    msg <- sprintf(paste0("Out of the total %i simulations %d runs resulted in an error.\n",
+      "The most likely explanation for this is that some parameter combinations\n",
+      "lead to an invalid model (such as inconsistent order of split times)."),
+      sum(invalid_runs), length(invalid_runs)
+    )
+    message(msg)
+    results <- results[!invalid_runs]
+  }
+
+  if (all(invalid_runs))
+    stop("All model simulation runs were invalid", call. = FALSE)
 
   # collect values of grid parameters from each simulation run back in a data frame format
   # (doing this instead of adding result columns to the original grid because simulations

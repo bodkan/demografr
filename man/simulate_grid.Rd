@@ -16,7 +16,8 @@ simulate_grid(
   file = NULL,
   engine = NULL,
   model_args = NULL,
-  engine_args = NULL
+  engine_args = NULL,
+  strict = TRUE
 )
 }
 \arguments{
@@ -56,6 +57,10 @@ Setting this argument for custom simulation script has no effect.}
 
 \item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.}
+
+\item{strict}{Should parameter combinations leading to invalid slendr models be treated as
+an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be simply
+dropped, with an informative message.}
 }
 \value{
 If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
