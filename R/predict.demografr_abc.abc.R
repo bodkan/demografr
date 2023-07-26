@@ -14,6 +14,7 @@
 #'   applied to each simulated tree sequence. If \code{NULL} (the default), the same
 #'   summary statistics will be computed as those that were used in the ABC inference
 #'   itself. Otherwise, custom tree-sequence summary statistics can be provided.
+#' @param ... A formal argument of the \code{predict} generic method (unused)
 #'
 #' @return A data frame object with the results of posterior simulations, with values of
 #'  each summary statistic stored in a list-column (i.e. the same format as used by
@@ -22,8 +23,8 @@
 #'
 #' @export predict.demografr_abc.abc
 #' @export
-predict.demografr_abc.abc <- function(abc, samples, stat = NULL, posterior = c("adj", "unadj"),
-                                      functions = NULL) {
+predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = c("adj", "unadj"),
+                                      functions = NULL, ...) {
   opts <- options(warn = 1)
   on.exit(options(opts))
 
