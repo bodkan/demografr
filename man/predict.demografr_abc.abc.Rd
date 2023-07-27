@@ -9,6 +9,7 @@
   samples,
   stat = NULL,
   posterior = c("adj", "unadj"),
+  strict = FALSE,
   functions = NULL,
   ...
 )
@@ -23,6 +24,12 @@ statistics will be computed.}
 
 \item{posterior}{Should 'unadj'usted or 'adj'usted parameters be sampled? Default
 (recommended) value is 'unadj'usted.}
+
+\item{strict}{Should parameter combinations leading to invalid slendr models be treated as
+an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be
+simply dropped, with an informative message. This parameter is internally passed to the
+function \code{simulate_grid()} which performs the simulations across a sampled parameter
+matrix.}
 
 \item{functions}{A named list of summary statistic tree-sequence functions to be
 applied to each simulated tree sequence. If \code{NULL} (the default), the same

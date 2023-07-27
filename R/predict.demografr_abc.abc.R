@@ -10,6 +10,11 @@
 #'   statistics will be computed.
 #' @param posterior Should 'unadj'usted or 'adj'usted parameters be sampled? Default
 #'   (recommended) value is 'unadj'usted.
+#' @param strict Should parameter combinations leading to invalid slendr models be treated as
+#'   an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be
+#'   simply dropped, with an informative message. This parameter is internally passed to the
+#'   function \code{simulate_grid()} which performs the simulations across a sampled parameter
+#'   matrix.
 #' @param functions A named list of summary statistic tree-sequence functions to be
 #'   applied to each simulated tree sequence. If \code{NULL} (the default), the same
 #'   summary statistics will be computed as those that were used in the ABC inference
@@ -24,7 +29,7 @@
 #' @export predict.demografr_abc.abc
 #' @export
 predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = c("adj", "unadj"),
-                                      functions = NULL, ...) {
+                                      strict = FALSE, functions = NULL, ...) {
   opts <- options(warn = 1)
   on.exit(options(opts))
 
@@ -45,8 +50,12 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
 
   posterior <- match.arg(posterior)
   if (posterior == "adj")
-    warning("Please note that sampling 'adjusted' parameters from the posterior\n",
-            "can lead to invalid models (i.e. inconsistent orders of split times)", call. = FALSE)
+    warning("Please note that sampling adjusted parameters from the posterior\n",
+            "can lead to invalid models (i.e. inconsistent orders of split times or\n",
+            "nonsensical values of parameters in general). If you get an error, you\n",
+            "can either sample unadjusted parameters  by setting `posterior = \"unadj\"`\n",
+            "or instruct the prediction function to skip invalid models by setting\n",
+            "`strict = FALSE`.", call. = FALSE)
 
   if (is.null(functions)) functions <- components$functions
 
@@ -73,7 +82,8 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     recombination_rate = opts$recombination_rate,
     mutation_rate = opts$mutation_rate,
     packages = opts$packages,
-    engine = opts$engine, model_args = opts$model_args, engine_args = opts$engine_args
+    engine = opts$engine, model_args = opts$model_args, engine_args = opts$engine_args,
+    strict = strict
   )
 
   attr(result, "components") <- components["observed"]
