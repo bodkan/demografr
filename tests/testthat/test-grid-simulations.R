@@ -1,5 +1,3 @@
-devtools::load_all()
-
 skip_if(!slendr::check_dependencies(python = TRUE))
 
 model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3) {
