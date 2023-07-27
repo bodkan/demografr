@@ -190,6 +190,10 @@ This is then used during the ABC simulation process.
 The above feature of _demografr_ is implemented by a function `sample_prior`. Although this function is exported to the user space in your R console, you shouldn't need to use it for any of your work besides simple debugging of your priors:
 
 ```{r}
+library(demografr)
+```
+
+```{r}
 sample_prior(Ne ~ runif(1000, 10000))
 ```
 
