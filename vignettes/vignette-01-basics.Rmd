@@ -145,8 +145,6 @@ init_env()
 # setup parallelization across all CPUs
 library(future)
 plan(multicore, workers = availableCores())
-
-library(ggplot2)
 ```
 
 For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here "diversity" and "divergence") have meaning and are quite important for later steps:
@@ -382,7 +380,7 @@ extract_summary(abc, param = "Ne_D")
 Because a chart is always more informative than a table, we can easily get a visualization of our posteriors using the function `plot_posterior()`:
 
 ```{r, posterior_Ne, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "Ne") + coord_cartesian(xlim = c(0, 10000))
+plot_posterior(abc, param = "Ne")
 ```
 
 Excellent! It looks like we got really nice and informative posterior distributions of $N_e$ values!
@@ -390,7 +388,7 @@ Excellent! It looks like we got really nice and informative posterior distributi
 In contrast, it looks like the posterior distributions for split times are not as informative compared to the priors that we specified:
 
 ```{r, posterior_Tsplit, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "T") + coord_cartesian(xlim = c(0, 10000))
+plot_posterior(abc, param = "T")
 ```
 
 Because the internals of _demografr_ ABC objects are represented by standard objects created by the _abc_ package, we have many of the standard diagnostics functions of the _abc_ R package at our disposal. For instance, we can use the standard function `plot()` to verify that the posterior (red line) for one of the split times matches the prior (dashed line), suggesting that the data we provided (nucleotide diversity and pairwise divergence) are not sufficient statistics to capture enough information about population divergences.
