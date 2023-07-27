@@ -50,14 +50,28 @@ ts <- msprime(example_model, sequence_length = 200e6, recombination_rate = 1e-8,
   ts_mutate(1e-8, random_seed = SEED)
 
 samples <- slendr::ts_names(ts, split = "pop")
+A <- samples["popA"]
+B <- samples["popB"]
+C <- samples["popC"]
+D <- samples["popD"]
 
 observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
-observed_f4 <- ts_f4(ts,
-                     W = list(popA = samples$popA),
-                     X = list(popB = samples$popB),
-                     Y = list(popC = samples$popC),
-                     Z = list(popD = samples$popD))
+
+# I keep forgetting the rules for the symmetry of f4 quadruplets so let's double check that
+# - generate all quadrupltes:
+# perms <- combinat::permn(c("A", "B", "C", "D"))
+# - compute theoretical values of all possible f4 statistics
+# all_f4s <- lapply(perms, function(p) {
+#  ts_f4(ts, get(p[1]), get(p[2]), get(p[3]), get(p[4]), mode = "branch")
+# }) %>% do.call(rbind, .) %>% dplyr::arrange(abs(f4)) %>% as.data.frame()
+
+# compute only unique f4 stats (up to a sign)
+observed_f4 <- rbind(
+  ts_f4(ts, A, B, C, D),
+  ts_f4(ts, A, C, B, D),
+  ts_f4(ts, A, D, B, C)
+)
 
 write.table(observed_diversity, file = here::here("inst/examples/observed_diversity.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
@@ -216,11 +230,13 @@ compute_divergence <- function(ts) {
 }
 compute_f4 <- function(ts) {
   samples <- ts_names(ts, split = "pop")
-  ts_f4(ts,
-        W = list(popA = samples$popA),
-        X = list(popB = samples$popB),
-        Y = list(popC = samples$popC),
-        Z = list(popD = samples$popD))
+  A <- samples["popA"]; B <- samples["popB"]
+  C <- samples["popC"]; D <- samples["popD"]
+  rbind(
+    ts_f4(ts, A, B, C, D),
+    ts_f4(ts, A, C, B, D),
+    ts_f4(ts, A, D, B, C)
+  )
 }
 
 functions <- list(
