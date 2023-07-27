@@ -185,11 +185,13 @@ compute_divergence <- function(ts) {
 }
 compute_f4 <- function(ts) {
   samples <- ts_names(ts, split = "pop")
-  ts_f4(ts,
-        W = list(popA = samples$popA),
-        X = list(popB = samples$popB),
-        Y = list(popC = samples$popC),
-        Z = list(popD = samples$popD))
+  A <- samples["popA"]; B <- samples["popB"]
+  C <- samples["popC"]; D <- samples["popD"]
+  rbind(
+    ts_f4(ts, A, B, C, D),
+    ts_f4(ts, A, C, B, D),
+    ts_f4(ts, A, D, B, C)
+  )
 }
 
 functions <- list(diversity = compute_diversity, divergence = compute_divergence, f4 = compute_f4)
@@ -218,7 +220,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 1000,
+dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
@@ -399,9 +401,13 @@ library(locfit)
 gfitpca(target=observed_stats, sumstat=model_stats, index=model_names, cprob = 0.1)
 ```
 
+```{r}
+abcX <- readRDS("inst/examples/basics_abc.rds")
+```
 
 ```{r}
-predictions <- predict(abcX, 10, stat = "diversity")
+future::plan("multicore", workers = future::availableCores())
+predictions <- predict(abcX, 1000, posterior = "adj")
 predictions
 ```
 
