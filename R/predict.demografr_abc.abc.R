@@ -35,8 +35,8 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
 
   # extract the model function and other components and options used to run the
   # original ABC simulations
-  components <- attr(abc, "components")
-  opts <- attr(abc, "options")
+  components <- attr(object, "components")
+  opts <- attr(object, "options")
 
   if (is.null(components) || is.null(opts))
     stop("The provided 'abc' object lacks demografr's metadata. Are you sure\n",
@@ -62,11 +62,11 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
   if (is.null(names(functions)) || any(names(functions) == ""))
     stop("All elements of the list of summary statistic functions must be named", call. = FALSE)
 
-  posterior_params <- abc[[paste0(posterior, ".values")]]
+  posterior_params <- object[[paste0(posterior, ".values")]]
 
   # sample given number of samples from the posterior distribution of all parameters,
   # with replacement, adjusting by weights
-  samples <- sample(seq_len(nrow(posterior_params)), size = samples, replace = TRUE, prob = abc$weights)
+  samples <- sample(seq_len(nrow(posterior_params)), size = samples, replace = TRUE, prob = object$weights)
 
   # parameters <- dplyr::as_tibble(abc$adj[samples, ])
   parameters <- dplyr::as_tibble(posterior_params[samples, ])
