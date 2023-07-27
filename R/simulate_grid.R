@@ -125,7 +125,7 @@ simulate_grid <- function(
 
   invalid_runs <- vapply(results, function(run) all(is.na(run)), FUN.VALUE = logical(1))
   if (any(invalid_runs)) {
-    msg <- sprintf(paste0("Out of the total %i simulations %d runs resulted in an error.\n",
+    msg <- sprintf(paste0("Out of the total %i simulations, %d runs resulted in an error.\n",
       "The most likely explanation for this is that some parameter combinations\n",
       "lead to an invalid model (such as inconsistent order of split times)."),
       sum(invalid_runs), length(invalid_runs)
