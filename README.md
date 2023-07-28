@@ -14,13 +14,6 @@
 
 <img src="man/figures/logo.png" align="right" />
 
-
-## Hey SMBE 2023! 👋
-
-I'm only "attending" SMBE 2023 remotely so I won't be able to chat about this project as much and as freely as I'd like to. **If you want to know more about _demografr_**, are interested in using it in your work, or have suggestions or feedback, **please get in touch** at `contact@bodkan.net`. I'd be really happy to chat over Zoom too!
-
----
-
 ⚠️⚠️⚠️
 
 **Please note that _demografr_ is still under active development. Although it's already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the [changelog](https://bodkan.net/demografr/news/) for the list of the most recent updates.**
