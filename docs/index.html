@@ -228,7 +228,9 @@
 <span></span>
 <span><span class="va">observed_f4</span></span>
 <span><span class="co">#&gt;      W    X    Y    Z            f4</span></span>
-<span><span class="co">#&gt; 1 popA popB popC popD -3.433205e-06</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 popA popB popC popD -3.433205e-06</span></span>
+<span><span class="co">#&gt; 2 popA popC popB popD -7.125812e-07</span></span>
+<span><span class="co">#&gt; 3 popA popD popB popC  2.720624e-06</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="a-complete-abc-analysis-in-a-single-r-script">A complete ABC analysis in a single R script<a class="anchor" aria-label="anchor" href="#a-complete-abc-analysis-in-a-single-r-script"></a>
 </h3>
@@ -344,7 +346,7 @@
 <span></span>
 <span><span class="co">#--------------------------------------------------------------------------------</span></span>
 <span><span class="co"># infer posterior distributions of parameters using the abc R package</span></span>
-<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -354,49 +356,49 @@
 <p>For instance, we can get a table of all posterior values with the function <code><a href="reference/extract_summary.html">extract_summary()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                   Ne_A      Ne_B     Ne_C      Ne_D       T_AB     T_BC</span></span>
-<span><span class="co">#&gt; Min.:         448.0318  157.8968 1075.309  421.7378   30.14955 3393.334</span></span>
-<span><span class="co">#&gt; 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504  105.44472 3582.828</span></span>
-<span><span class="co">#&gt; Median:      1753.0929 1365.3946 4698.593 4945.0077 1371.67593 6569.279</span></span>
-<span><span class="co">#&gt; Mean:        1745.2138 1305.5853 5221.514 4924.8508 1492.83466 6520.414</span></span>
-<span><span class="co">#&gt; Mode:        1740.0790 1471.9818 3850.674 2201.3303  649.57385 6586.714</span></span>
-<span><span class="co">#&gt; 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709 3380.50065 8806.911</span></span>
-<span><span class="co">#&gt; Max.:        3909.4340 2612.5218 9991.913 9922.1874 3923.85400 8940.088</span></span>
-<span><span class="co">#&gt;                  T_CD       gf_BC</span></span>
-<span><span class="co">#&gt; Min.:        6440.477 0.008707582</span></span>
-<span><span class="co">#&gt; 2.5% Perc.:  6808.872 0.012298823</span></span>
-<span><span class="co">#&gt; Median:      9184.433 0.272708825</span></span>
-<span><span class="co">#&gt; Mean:        8818.145 0.331597934</span></span>
-<span><span class="co">#&gt; Mode:        9527.178 0.146952932</span></span>
-<span><span class="co">#&gt; 97.5% Perc.: 9956.472 0.911635472</span></span>
-<span><span class="co">#&gt; Max.:        9997.854 0.967509437</span></span></code></pre></div>
+<span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D     T_AB     T_BC</span></span>
+<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060 1192.360 4988.493</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297 1561.180 5259.732</span></span>
+<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350 2003.515 5678.190</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215 2003.738 5655.562</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785 1939.879 5752.531</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347 2326.478 5941.146</span></span>
+<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341 2569.966 6036.115</span></span>
+<span><span class="co">#&gt;                            T_CD       gf_BC</span></span>
+<span><span class="co">#&gt; Min.:                  6863.233 -0.02455945</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  7294.305  0.02674433</span></span>
+<span><span class="co">#&gt; Weighted Median:       8127.699  0.16684306</span></span>
+<span><span class="co">#&gt; Weighted Mean:         8196.626  0.18184086</span></span>
+<span><span class="co">#&gt; Weighted Mode:         8052.760  0.12030457</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 9387.034  0.33763567</span></span>
+<span><span class="co">#&gt; Max.:                  9387.034  0.35898225</span></span></code></pre></div>
 <p>We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                   Ne_A      Ne_B     Ne_C      Ne_D</span></span>
-<span><span class="co">#&gt; Min.:         448.0318  157.8968 1075.309  421.7378</span></span>
-<span><span class="co">#&gt; 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504</span></span>
-<span><span class="co">#&gt; Median:      1753.0929 1365.3946 4698.593 4945.0077</span></span>
-<span><span class="co">#&gt; Mean:        1745.2138 1305.5853 5221.514 4924.8508</span></span>
-<span><span class="co">#&gt; Mode:        1740.0790 1471.9818 3850.674 2201.3303</span></span>
-<span><span class="co">#&gt; 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709</span></span>
-<span><span class="co">#&gt; Max.:        3909.4340 2612.5218 9991.913 9922.1874</span></span></code></pre></div>
+<span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297</span></span>
+<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347</span></span>
+<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341</span></span></code></pre></div>
 <p>We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let’s first check out the posterior distributions of inferred <span class="math inline"><em>N</em><sub><em>e</em></sub></span> values:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: No parameters fit the provided parameter subset or regular expression</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-posterior_Ne-1.png"></p>
 <p>Similarly, we can take a look at the inferred posteriors of the split times:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: No parameters fit the provided parameter subset or regular expression</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-posterior_Tsplit-1.png"></p>
 <p>And, finally, the rate of gene flow:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: No parameters fit the provided parameter subset or regular expression</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-posterior_gf-1.png"></p>
 <p>Finally, we have the diagnostic functionality of the <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> R package at our disposal:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_C"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: No parameters fit the provided parameter subset or regular expression</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_C"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-diagnostic_Ne-1.png"></p>
 </div>
 <div class="section level2">
 <h2 id="additional-functionality">Additional functionality<a class="anchor" aria-label="anchor" href="#additional-functionality"></a>

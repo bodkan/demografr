@@ -128,6 +128,8 @@ observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "de
 observed_f4
 #>      W    X    Y    Z            f4
 #> 1 popA popB popC popD -3.433205e-06
+#> 2 popA popC popB popD -7.125812e-07
+#> 3 popA popD popB popC  2.720624e-06
 ```
 
 ### A complete ABC analysis in a single R script
@@ -246,7 +248,7 @@ data <- simulate_abc(
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters using the abc R package
-abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- perform_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 
@@ -260,22 +262,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                   Ne_A      Ne_B     Ne_C      Ne_D       T_AB     T_BC
-#> Min.:         448.0318  157.8968 1075.309  421.7378   30.14955 3393.334
-#> 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504  105.44472 3582.828
-#> Median:      1753.0929 1365.3946 4698.593 4945.0077 1371.67593 6569.279
-#> Mean:        1745.2138 1305.5853 5221.514 4924.8508 1492.83466 6520.414
-#> Mode:        1740.0790 1471.9818 3850.674 2201.3303  649.57385 6586.714
-#> 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709 3380.50065 8806.911
-#> Max.:        3909.4340 2612.5218 9991.913 9922.1874 3923.85400 8940.088
-#>                  T_CD       gf_BC
-#> Min.:        6440.477 0.008707582
-#> 2.5% Perc.:  6808.872 0.012298823
-#> Median:      9184.433 0.272708825
-#> Mean:        8818.145 0.331597934
-#> Mode:        9527.178 0.146952932
-#> 97.5% Perc.: 9956.472 0.911635472
-#> Max.:        9997.854 0.967509437
+#>                             Ne_A     Ne_B      Ne_C     Ne_D     T_AB     T_BC
+#> Min.:                   929.0679 670.3812  2966.659 1790.060 1192.360 4988.493
+#> Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297 1561.180 5259.732
+#> Weighted Median:       1990.5578 799.0462  7366.514 3714.350 2003.515 5678.190
+#> Weighted Mean:         1967.7919 802.3221  7075.016 3578.215 2003.738 5655.562
+#> Weighted Mode:         1954.3619 757.0564  7620.487 3809.785 1939.879 5752.531
+#> Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347 2326.478 5941.146
+#> Max.:                  3144.9674 927.3249 11696.130 5228.341 2569.966 6036.115
+#>                            T_CD       gf_BC
+#> Min.:                  6863.233 -0.02455945
+#> Weighted 2.5 % Perc.:  7294.305  0.02674433
+#> Weighted Median:       8127.699  0.16684306
+#> Weighted Mean:         8196.626  0.18184086
+#> Weighted Mode:         8052.760  0.12030457
+#> Weighted 97.5 % Perc.: 9387.034  0.33763567
+#> Max.:                  9387.034  0.35898225
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -283,14 +285,14 @@ We can also specify a subset of model parameters to select, or provide a regular
 
 ```r
 extract_summary(abc, param = "Ne")
-#>                   Ne_A      Ne_B     Ne_C      Ne_D
-#> Min.:         448.0318  157.8968 1075.309  421.7378
-#> 2.5% Perc.:   527.9820  198.3514 1443.668  881.5504
-#> Median:      1753.0929 1365.3946 4698.593 4945.0077
-#> Mean:        1745.2138 1305.5853 5221.514 4924.8508
-#> Mode:        1740.0790 1471.9818 3850.674 2201.3303
-#> 97.5% Perc.: 3155.0247 2456.4742 9814.671 9353.5709
-#> Max.:        3909.4340 2612.5218 9991.913 9922.1874
+#>                             Ne_A     Ne_B      Ne_C     Ne_D
+#> Min.:                   929.0679 670.3812  2966.659 1790.060
+#> Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297
+#> Weighted Median:       1990.5578 799.0462  7366.514 3714.350
+#> Weighted Mean:         1967.7919 802.3221  7075.016 3578.215
+#> Weighted Mode:         1954.3619 757.0564  7620.487 3809.785
+#> Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347
+#> Max.:                  3144.9674 927.3249 11696.130 5228.341
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -298,32 +300,36 @@ We can also visualize the posterior distributions. Rather than plotting many dif
 
 ```r
 plot_posterior(abc, param = "Ne")
-#> Error: No parameters fit the provided parameter subset or regular expression
 ```
+
+![](man/figures/README-posterior_Ne-1.png)
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
 
 ```r
 plot_posterior(abc, param = "T")
-#> Error: No parameters fit the provided parameter subset or regular expression
 ```
+
+![](man/figures/README-posterior_Tsplit-1.png)
 
 And, finally, the rate of gene flow:
 
 
 ```r
 plot_posterior(abc, param = "gf")
-#> Error: No parameters fit the provided parameter subset or regular expression
 ```
+
+![](man/figures/README-posterior_gf-1.png)
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/package=abc) R package at our disposal:
 
 
 ```r
 plot(abc, param = "Ne_C")
-#> Error: No parameters fit the provided parameter subset or regular expression
 ```
+
+![](man/figures/README-diagnostic_Ne-1.png)
 
 ## Additional functionality
 
