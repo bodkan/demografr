@@ -10,6 +10,9 @@
 #' @import abc
 #' @export
 extract_summary <- function(abc, param = NULL) {
+  # TODO: there is a new warning in a density calculation performed in abc's summary method
+  # via built-in density function:
+  # https://bugs.r-project.org/show_bug.cgi?id=18490
   posterior_df <- as.data.frame.matrix(quiet(summary(abc)))
 
   params <- subset_parameters(subset = param, all = colnames(posterior_df))
