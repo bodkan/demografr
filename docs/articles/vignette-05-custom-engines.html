@@ -316,7 +316,7 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set   diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">050</span>9</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">049</span>6</span></span></code></pre>
 <p>The function works as expected—we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.</p>
 </div>
 <div class="section level3">
@@ -350,22 +350,26 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 3 minutes 3 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 2 minutes 39 seconds parallelized across 96 CPUs.</strong></p>
 <p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <span class="math inline">\(N_e\)</span>:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; 12345678910</span></span>
+<span><span class="co">#&gt; 12345678910</span></span></code></pre>
 <p>Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results (we’re skipping diagnostics such as posterior predictive checks but you can read more about those <a href="vignette-01-basics.html">here</a> and <a href="vignette-06-diagnostics.html">here</a>):</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;                               Ne</span></span>
-<span><span class="co">#&gt; Min.:                  -157.5576</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  -157.5576</span></span>
-<span><span class="co">#&gt; Weighted Median:        588.5049</span></span>
-<span><span class="co">#&gt; Weighted Mean:          598.2534</span></span>
-<span><span class="co">#&gt; Weighted Mode:          646.8252</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 1081.8948</span></span>
-<span><span class="co">#&gt; Max.:                  1081.8948</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
+<span><span class="co">#&gt; using 'weights'</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                              Ne</span></span>
+<span><span class="co">#&gt; Min.:                  281.9347</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  281.9347</span></span>
+<span><span class="co">#&gt; Weighted Median:       568.4176</span></span>
+<span><span class="co">#&gt; Weighted Mean:         555.8596</span></span>
+<span><span class="co">#&gt; Weighted Mode:         571.6191</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 800.3001</span></span>
+<span><span class="co">#&gt; Max.:                  800.3001</span></span></code></pre>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-05-custom-engines_files/figure-html/custom_Ne_posterior-1.png" width="640" style="display: block; margin: auto;"></p>
 </div>

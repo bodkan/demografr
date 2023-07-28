@@ -294,20 +294,22 @@
 </h3>
 <p>The above feature of <em>demografr</em> is implemented by a function <code>sample_prior</code>. Although this function is exported to the user space in your R console, you shouldn’t need to use it for any of your work besides simple debugging of your priors:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
 <span><span class="co">#&gt; [1] 9433.679</span></span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $value</span></span>
 <span><span class="co">#&gt; [1] 3575.256</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "Ne"</span></span>
@@ -322,9 +324,9 @@
 </h2>
 <p>To provide support for random vectors, <em>demografr</em> uses a similar metaprogramming trick as above.</p>
 <p>Imagine this syntax for vectorized statements (the <code>T_split[5]</code> is my made up syntax, not R syntax!):</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="va">T_split</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prior</span> <span class="op">&lt;-</span> <span class="va">T_split</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">prior</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; `~`</span></span>
@@ -336,11 +338,11 @@
 <span><span class="co">#&gt; runif(10, 10000)</span></span></code></pre>
 <p>Note that this expression is one layer “deeper” than would be with a plain <code>T_split ~ runif(10, 10000)</code>.</p>
 <p>This means that for “vector variables” of <em>demografr</em>, we need to take care of the nesting:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variable</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">prior</span><span class="op">)</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">variable</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; T_split[5]</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">variable</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; `[`</span></span>
@@ -353,7 +355,7 @@
 <div class="section level3">
 <h3 id="in-demografr-then">In <em>demografr</em> then…<a class="anchor" aria-label="anchor" href="#in-demografr-then"></a>
 </h3>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">T_split</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
 <span><span class="co">#&gt; [1] "T_split"</span></span>
@@ -367,7 +369,7 @@
 <h2 id="final-result">Final list of all priors<a class="anchor" aria-label="anchor" href="#final-result"></a>
 </h2>
 <p>In conclusion, using <em>demografr</em>’s features it’s possible to define the example prior sampling statements from the top of this vignette in R code like this:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">Ne</span>         <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
 <span>  <span class="va">geneflow</span>   <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
@@ -380,7 +382,7 @@
 <li><p>The exact process of metaprogramming that accomplishes this is something you don’t ever have to worry or care about as a user.</p></li>
 <li><p>All of the processing and sampling from priors is done internally (and automatically) by <em>demografr</em> while running simulation replicates for ABC, etc., like this:</p></li>
 </ul>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">data &lt;-<span class="st"> </span><span class="kw">simulate_abc</span>(model, <span class="op">&lt;</span>priors<span class="op">&gt;</span>, functions, observed, ...)</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">data &lt;-<span class="st"> </span><span class="kw">simulate_abc</span>(model, <span class="op">&lt;</span>priors<span class="op">&gt;</span>, functions, observed, ...)</a></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="addendum">Addendum<a class="anchor" aria-label="anchor" href="#addendum"></a>
@@ -390,18 +392,9 @@
 <h2 id="prior-parameter-templates">Prior parameter templates<a class="anchor" aria-label="anchor" href="#prior-parameter-templates"></a>
 </h2>
 <p>Imagine we have the following <em>slendr</em> model function (hilariously overcomplicated, purely for demonstration purposes!):</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
-<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
-<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
-<span><span class="co">#&gt; The sp package is now running under evolution status 2</span></span>
-<span><span class="co">#&gt;      (status 2 uses the sf package in place of rgdal)</span></span></code></pre>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">T_a1</span>, <span class="va">T_a2</span>, <span class="va">T_a3</span>, <span class="va">T_a4</span>, <span class="va">T_a5</span>, <span class="va">T_b1</span>, <span class="va">T_b2</span>, <span class="va">T_b3</span>, <span class="va">T_b4</span>, <span class="va">T_b5</span>, <span class="va">N_a</span>, <span class="va">N_b</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"a1"</span>, time <span class="op">=</span> <span class="va">T_a1</span>, N <span class="op">=</span> <span class="va">N_a</span><span class="op">)</span></span>
@@ -421,7 +414,7 @@
 <span>    generation_time <span class="op">=</span> <span class="fl">30</span>, direction <span class="op">=</span> <span class="st">"backward"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>This functions has a huge number of parameters, so if we were to specify them with the normal DSL described above for the purposes of ABC inference, we would either have to write down the following monstrosity:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">individual_priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">T_a1</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100000</span><span class="op">)</span>,</span>
 <span>  <span class="va">T_a2</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100000</span><span class="op">)</span>,</span>
@@ -438,7 +431,7 @@
 <span>  <span class="va">N_b</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">7000</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The second possibility would be to re-parametrize the function to accept, for instance, two pairs of two vectors of <code>T</code> and <code>N</code>, one for each population. However, we can also use <em>demografr</em>’s support for <strong>‘templated’ prior sampling expressions</strong> (for a lack of a better word). The easiest way to explain this is just to write it down:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">templated_priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">T_a...</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>,     <span class="fl">100000</span><span class="op">)</span>,</span>
 <span>  <span class="va">T_b...</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">50000</span>, <span class="fl">100000</span><span class="op">)</span>,</span>
@@ -453,7 +446,7 @@
 </h3>
 <p>The DSL for specification of parameter priors also allows custom-defined prior distribution functions, not just built-in <code><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif()</a></code>, <code><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm()</a></code>, etc.</p>
 <p>For instance, imagine this function simulating a sampling from a distribution of a loaded casino die, <code>rcasino()</code>:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rcasino</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n</span> <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">outcomes</span>      <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span> <span class="co"># six sides of a die</span></span>
 <span>  <span class="va">probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span> <span class="co"># rolling a 6 is 3x more likely!</span></span>
@@ -461,10 +454,10 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">outcomes</span>, size <span class="op">=</span> <span class="va">n</span>, prob <span class="op">=</span> <span class="va">probabilities</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We can use our custom function in exactly the same way as standard R sampling functions. First, we define a prior for sampling a parameter value from the loaded die casino die (actually, do demonstrate that <code>rcasino</code> really works as it should, let’s sample a vector of 100 random die rolls):</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">par</span> <span class="op">&lt;-</span> <span class="va">rolls</span><span class="op">[</span><span class="fl">100</span><span class="op">]</span> <span class="op">~</span> <span class="fu">rcasino</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>During a hypothetical ABC sampling process, <em>demografr</em> would then sample the parameter <code>par</code> (internally and automatically) via its function <code><a href="../reference/sample_prior.html">sample_prior()</a></code>:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sample_prior.html">sample_prior</a></span><span class="op">(</span><span class="va">par</span><span class="op">)</span></span>
 <span><span class="va">samples</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $variable</span></span>
@@ -475,7 +468,7 @@
 <span><span class="co">#&gt;  [38] 6 5 6 6 4 4 6 1 5 5 6 3 1 1 3 5 6 2 3 1 2 3 4 6 6 3 3 6 2 6 4 3 2 6 3 4 3</span></span>
 <span><span class="co">#&gt;  [75] 4 5 6 2 1 6 6 3 6 3 4 6 5 6 5 6 3 5 3 6 6 6 6 4 5 6</span></span></code></pre>
 <p>Finally, we can verify that the sampled values really correspond to a loaded die which throws a six much more often than others:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">samples</span><span class="op">$</span><span class="va">value</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  1  2  3  4  5  6 </span></span>
