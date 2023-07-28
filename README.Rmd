@@ -252,7 +252,7 @@ data <- simulate_abc(
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters using the abc R package
-abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- perform_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
@@ -265,31 +265,31 @@ After we run this R script, we end up with an object called `abc` here. This obj
 
 For instance, we can get a table of all posterior values with the function `extract_summary()`:
 
-```{r}
+```{r, warning=FALSE}
 extract_summary(abc)
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
 
-```{r}
+```{r, warning=FALSE}
 extract_summary(abc, param = "Ne")
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
 
-```{r, posterior_Ne, fig.width=8, fig.height=5}
+```{r, posterior_Ne, warning=FALSE, fig.width=8, fig.height=5}
 plot_posterior(abc, param = "Ne")
 ```
 
 Similarly, we can take a look at the inferred posteriors of the split times:
 
-```{r, posterior_Tsplit, fig.width=8, fig.height=5}
+```{r, posterior_Tsplit, warning=FALSE, fig.width=8, fig.height=5}
 plot_posterior(abc, param = "T")
 ```
 
 And, finally, the rate of gene flow:
 
-```{r, posterior_gf, fig.width=8, fig.height=5}
+```{r, posterior_gf, warning=FALSE, fig.width=8, fig.height=5}
 plot_posterior(abc, param = "gf")
 ```
 
