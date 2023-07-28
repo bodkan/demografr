@@ -63,7 +63,7 @@ observed_divergence <- ts_divergence(ts, sample_sets = samples)
 # perms <- combinat::permn(c(A, B, C, D))
 # - compute theoretical values of all possible f4 statistics
 # all_f4s <- lapply(perms, function(p) {
-#  ts_f4(ts, p[1], p[2], p[3], p[4], mode = "branch")
+#   ts_f4(ts, p[1], p[2], p[3], p[4], mode = "branch")
 # }) %>% do.call(rbind, .) %>% dplyr::arrange(abs(f4)) %>% as.data.frame()
 
 # compute only unique f4 stats (up to a sign)
