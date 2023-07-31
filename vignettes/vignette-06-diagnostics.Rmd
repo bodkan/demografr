@@ -56,7 +56,7 @@ arrows(2.5, 2, 2.5, 3, col="blue")
 
 tree <- ape::read.tree(text="((popA,popB),(popC,popD));")
 plot(tree, main = "model Y")
-arrows(2.5, 2, 2.5, 3, col="blue")
+arrows(1.5, 1.5, 1.5, 3.5, col="blue")
 
 tree <- ape::read.tree(text="(((popA,popB),popC),popD);")
 plot(tree, main = "model Z")
@@ -126,7 +126,7 @@ modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   popC <- population("popC", time = T_2, N = Ne_C, parent = popA)
   popD <- population("popD", time = T_3, N = Ne_D, parent = popC)
 
-  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = popA, to = popC, start = 7000, end = 7301, rate = gf)
 
   model <- compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
@@ -261,32 +261,20 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 
 ```{r, echo=FALSE}
 saveRDS(dataX, "dataX.rds")
-```
-
-```{r, echo=FALSE}
 saveRDS(dataY, "dataY.rds")
-```
-
-```{r, echo=FALSE}
 saveRDS(dataZ, "dataZ.rds")
 ```
 
 ```{r, echo=FALSE}
-dataX <- readRDS(dataX_path)
-```
-
-```{r, echo=FALSE}
-dataY <- readRDS(dataY_path)
-```
-
-```{r, echo=FALSE}
-dataZ <- readRDS(dataZ_path)
+dataX <- readRDS("dataX.rds")
+dataY <- readRDS("dataY.rds")
+dataZ <- readRDS("dataZ.rds")
 ```
 
 ```{r, results="hide"}
-abcX <- perform_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
-abcY <- perform_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
-abcZ <- perform_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
+abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
+abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
+abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ## Cross-validation
@@ -298,10 +286,10 @@ This can be done using _demografr_'s convenience interface wrapper `perform_cv()
 The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
 ```{r, results="hide", warning=FALSE}
-cv_result <- perform_cv(
-  models = list(modelX = abcX, modelY = abcY, modelZ = abcZ), # must be a *named* list!
-  nval = 100, tol = 0.01, method = "neuralnet"
-)
+# must be a *named* list!
+models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+
+cv_result <- run_cv(models = models, nval = 100, tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE}
@@ -328,21 +316,19 @@ Because we have three models, each of the three barplots shows how often were su
 
 The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in:
 
-```{r}
+```{r, echo=FALSE}
 cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum
 ```
 
 simulations out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only:
 
-```{r}
-cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100
+```{r, echo=FALSE}
+cat(sprintf("%.1f%%", cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100))
 ```
-
-percent.
 
 ## Model selection
 
-Armed with confidence in the ability of ABC to correctly identify the right model based on simulated data, we can proceed to selection of _the best model for our empirical data set_.
+Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_.
 
 ```{r}
 models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
@@ -354,41 +340,58 @@ models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
   if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
       !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
     stop("The list of models must be either all objects produced by the function\n",
-         "`simulate_abc()` or function `perform_abc()` as they store full information\n",
+         "`simulate_abc()` or function `run_abc()` as they store full information\n",
          "about an ABC model being run, namely the simulated summary statistics", call. = FALSE)
 
-  model_nsims <- vapply(models, function(x) nrow(attr(x, "simulated")), FUN.VALUE = integer(1))
-  model_stats <- lapply(models, function(x) attr(x, "simulated")) %>% do.call(rbind, .) %>% as.matrix()
+  model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
+  model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
   model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
 
-  observed_stats <- attr(abcX, "observed")
+  observed_stats <- attr(abcX, "components")$observed
+    # and to the same for the observed statistics as well
+  observed_stats <- lapply(names(observed_stats), function(stat) {
+    # convert observed statistics to a matrix, either from a normal data frame
+    # result (with each statistic named), or from a simple vector
+    x <- observed_stats[[stat]]
 
-modsel <- postpr(observed_stats, model_names, model_stats, tol = 0.05, method = "mnlogistic")
+    if (is.data.frame(x)) {
+      # find the column with the value of a statistic `stat`
+      # TODO: the last column will be numeric
+      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
+      value_col <- ncol(x)
+      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
+      names <- x[, !value_col, drop = FALSE] %>%
+        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
+    } else {
+      values <- matrix(x, nrow = 1)
+      names <- paste0(stat, "_", seq_along(x))
+    }
+    colnames(values) <- names
+    values
+  }) %>% do.call(cbind, .)
+
+modsel <- postpr(observed_stats, model_names, model_stats, tol = 0.05, method = "neuralnet")
 
 summary(modsel)
 ```
 
 
 ```{r}
-observed_stats <- attr(abcX, "observed")
-sim_stats <- attr(abcX, "simulated")
+#observed_stats <- attr(abcX, "observed")
+sim_stats <- attr(abcX, "components")$simulated
 gfitX <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
 
-observed_stats <- attr(abcY, "observed")
-sim_stats <- attr(abcY, "simulated")
-gfitY <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
-
-observed_stats <- attr(abcZ, "observed")
-sim_stats <- attr(abcZ, "simulated")
-gfitZ <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
-
 summary(gfitX)
-summary(gfitY)
-summary(gfitZ)
 
 plot(gfitX, main="Histogram for modelX under H0")
-plot(gfitY, main="Histogram for modelY undeb H0")
-plot(gfitZ, main="Histogram for modelZ under H0")
+
+#observed_stats <- attr(abcX, "observed")
+sim_stats <- attr(abcY, "components")$simulated
+gfitY <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
+
+summary(gfitY)
+
+plot(gfitY, main="Histogram for modelY under H0")
 ```
 
 

@@ -21,7 +21,7 @@
 #'   the abc package
 #'
 #' @export
-perform_abc <- function(data, engine, ...) {
+run_abc <- function(data, engine, ...) {
   engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))
   args <- match.call()
 

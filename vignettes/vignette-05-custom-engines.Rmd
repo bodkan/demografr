@@ -243,7 +243,7 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, $N_e$:
 
 ```{r, eval=!file.exists(data_path)}
-abc <- perform_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- run_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}

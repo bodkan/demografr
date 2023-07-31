@@ -245,7 +245,7 @@ data <- simulate_abc(
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters using the abc R package
-abc <- perform_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}

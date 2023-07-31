@@ -1,6 +1,6 @@
 #' Extract inferred posterior(s) as a standard data frame
 #'
-#' @param abc An object produced by \code{perform_abc}
+#' @param abc An object produced by \code{run_abc}
 #' @param param A character vector containing either parameter names to summarize,
 #'   or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
 #'   all parameters will be extracted.
