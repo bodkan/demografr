@@ -7,7 +7,7 @@
 extract_posterior(abc, param = NULL, posterior = c("adj", "unadj"))
 }
 \arguments{
-\item{abc}{An object produced by \code{perform_abc}}
+\item{abc}{An object produced by \code{run_abc}}
 
 \item{param}{A character vector containing either parameter names to summarize,
 or a regex-like matches to be used for subsetting. If \code{NULL} (the default),
