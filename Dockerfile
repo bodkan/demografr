@@ -76,27 +76,27 @@ RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.3.tar.gz -O $REN
 # run this when first setting up the container to create an renv.lock file:
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   - renv::init(bare = TRUE, bioconductor = "3.17")
-#   - install.packages("remotes"); remotes::install_deps()
+#   - options(timeout=600); install.packages("remotes"); remotes::install_deps()
 
 # for 'production' builds, restore all R dependencies at their locked-in versions
-#COPY DESCRIPTION .
-#COPY renv.lock .Rprofile ./
-#COPY renv/ renv/
-#ARG GITHUB_PAT="''"
-#RUN R -e 'renv::restore()'
-#
+COPY DESCRIPTION .
+COPY renv.lock .Rprofile ./
+COPY renv/ renv/
+ARG GITHUB_PAT="''"
+RUN R -e 'renv::restore()'
+
 # rather than installing a separate Python interpreter, use the Python environment
 # that's installed and used by slendr, in order to avoid version compatibility issues
-#RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-#ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.11_msprime-1.2.0_tskit-0.5.6_pyslim-1.0.4/bin:${PATH}"
+RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
+ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.11_msprime-1.2.0_tskit-0.5.6_pyslim-1.0.4/bin:${PATH}"
 
 # put personal dotfiles into the container
-#ENV IN_DOCKER=true
-#RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
-#    cd ~/.dotfiles; ./install.sh
+ENV IN_DOCKER=true
+RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
+    cd ~/.dotfiles; ./install.sh
 
 # set the default directory of RStudio Server to the project directory
-#RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
+RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 
 # clean up compilation sources and other redundant files
-#RUN rm -r /home/rstudio
+RUN rm -r /home/rstudio
