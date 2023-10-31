@@ -101,7 +101,7 @@ local-webapp:
 
 remote-webapp:
 ifndef SERVER
-    $(error SERVER variable must be set to start a web app)
+	$(error SERVER variable must be set to start a web app)
 endif
 	@if [[ "$(SERVER)" != "localhost" ]]; then \
 	    PID=$$(lsof -ti:$(PORT)); \
