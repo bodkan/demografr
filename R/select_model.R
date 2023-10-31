@@ -13,7 +13,7 @@
 #' @return Object of the class \code{postpr} and \code{demografr_postpr}
 #'
 #' @export
-model_selection <- function(models, ...) {
+select_model <- function(models, ...) {
   args <- match.call()
 
   if (!"tol" %in% names(args))
@@ -24,8 +24,7 @@ model_selection <- function(models, ...) {
            "See `?abc::abc` for more details.", call. = FALSE)
 
   if (is.null(names(models)) || any(names(models) == ""))
-    stop("The 'models' argument must be a named list, with the names being\n",
-         "unique identifier names of each model", call. = FALSE)
+    names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
 
   if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
       !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
@@ -37,26 +36,8 @@ model_selection <- function(models, ...) {
   model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
   model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
 
-  observed_stats <- lapply(names(attr(abcX, "components")$observed), function(stat) {
-    # convert observed statistics to a matrix, either from a normal data frame
-    # result (with each statistic named), or from a simple vector
-    x <- attr(abcX, "components")$observed[[stat]]
-
-    if (is.data.frame(x)) {
-      # find the column with the value of a statistic `stat`
-      # TODO: the last column will be numeric
-      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
-      value_col <- ncol(x)
-      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
-      names <- x[, !value_col, drop = FALSE] %>%
-        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
-    } else {
-      values <- matrix(x, nrow = 1)
-      names <- paste0(stat, "_", seq_along(x))
-    }
-    colnames(values) <- names
-    values
-  }) %>% do.call(cbind, .)
+  observed_list <- attr(models[[1]], "components")$observed
+  observed_stats <- bind_observed(observed_list)
 
   result <- abc::postpr(observed_stats, model_names, model_stats, ...)
 

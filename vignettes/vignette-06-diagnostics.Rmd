@@ -20,10 +20,11 @@ knitr::opts_chunk$set(
   eval = slendr_present && FALSE
 )
 
-dataX_path <- here::here("inst/examples/downstream_dataX.rds")
-dataY_path <- here::here("inst/examples/downstream_dataY.rds")
-dataZ_path <- here::here("inst/examples/downstream_dataZ.rds")
-data_path <- here::here("inst/examples/downstream_cv.rds")
+abcX_path <- here::here("inst/examples/downstream_abcX.rds")
+abcY_path <- here::here("inst/examples/downstream_abcY.rds")
+abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
+abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
+cv_path <- here::here("inst/examples/downstream_cv.rds")
 ```
 
 ```{r, collapse=TRUE}
@@ -212,24 +213,23 @@ tsY <- simulate_ts(modelY, priors)
 tsZ <- simulate_ts(modelZ, priors)
 ```
 
-
 With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 
 ```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
-```{r}
+```{r, eval=!abc_exists}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r}
+```{r, eval=!abc_exists}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r}
+```{r, eval=!abc_exists}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
@@ -258,46 +258,44 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
-
-```{r, echo=FALSE}
-saveRDS(dataX, "dataX.rds")
-saveRDS(dataY, "dataY.rds")
-saveRDS(dataZ, "dataZ.rds")
-```
-
-```{r, echo=FALSE}
-dataX <- readRDS("dataX.rds")
-dataY <- readRDS("dataY.rds")
-dataZ <- readRDS("dataZ.rds")
-```
-
-```{r, results="hide"}
+```{r, eval=!abc_exists, results="hide"}
 abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
 abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
 abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
+```
+
+```{r, eval=!abc_exists, echo=FALSE}
+saveRDS(abcX, abcX_path)
+saveRDS(abcY, abcY_path)
+saveRDS(abcZ, abcZ_path)
+```
+
+```{r, eval=!abc_exists, echo=FALSE}
+abcX <- readRDS(abcX_path)
+abcY <- readRDS(abcY_path)
+abcZ <- readRDS(abcZ_path)
 ```
 
 ## Cross-validation
 
 Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models.
 
-This can be done using _demografr_'s convenience interface wrapper `perform_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+This can be done using _demografr_'s convenience interface wrapper `run_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
-The one difference between the two functions is that `perform_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
+The one difference between the two functions is that `run_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
-```{r, results="hide", warning=FALSE}
-# must be a *named* list!
-models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+```{r, eval=!file.exists(cv_path), results="hide", warning=FALSE}
+models <- list(abcX, abcY, abcZ)
 
-cv_result <- run_cv(models = models, nval = 100, tol = 0.01, method = "neuralnet")
+cv_result <- cross_validate(models = models, nval = 100, tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE}
-saveRDS(cv_result, data_path)
+```{r, eval=!file.exists(cv_path), echo=FALSE}
+saveRDS(cv_result, cv_path)
 ```
 
-```{r, echo=FALSE}
-cv_result <- readRDS(data_path)
+```{r, eval=file.exists(cv_path), echo=FALSE}
+cv_result <- readRDS(cv_path)
 ```
 
 If we print out the result, we get a quick summary with confusion matrices and other information:
@@ -314,114 +312,111 @@ plot(cv_result)
 
 Because we have three models, each of the three barplots shows how often were summary statistics sampled from each model classified as likely coming from one of the three models. In other words, with absolutely perfect classification, each barplot would show just one of the three colors. If a barplot (results for one model) shows multiple colors, this means that some fraction of simulated statistics from that model was incorrectly classified as another model. Again, for more detail on interpretation, caveats, and best practices, please consult the _abc_ R package [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) and a relevant statistical textbook.
 
-The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in:
-
-```{r, echo=FALSE}
-cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum
-```
-
-simulations out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only:
-
-```{r, echo=FALSE}
-cat(sprintf("%.1f%%", cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100))
-```
+The confusion matrices and the visualization all suggest that ABC can distinguish between the three models very well. For instance, _modelX_ has been classified correctly in `r cv_result$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum` simulations out of the total of 100 cross-validation simulations, with an overall misclassification rate for all models of only `{r sprintf("%.1f", cv_result$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100)}`%.
 
 ## Model selection
 
-Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_.
+Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_. This can be done with the function `model_selection()` which is _demografr_'s convenience wrapper around _abc_'s own function `postpr`:
+
+```{r, results="hide"}
+models <- list(abcX, abcY, abcZ)
+
+modsel <- select_model(models, tol = 0.03, method = "neuralnet")
+```
+
+We can make a decision on the model selection by inspecting the `summary()` of the produced result:
 
 ```{r}
-models <- list(modelX = abcX, modelY = abcY, modelZ = abcZ)
+summary(modsel)
+```
 
-  if (is.null(names(models)) || any(names(models) == ""))
-    stop("The 'models' argument must be a named list, with the names being\n",
-         "unique identifier names of each model", call. = FALSE)
+As we can see, `modelX` shows the highest rate of acceptance among all simulations. Specifically, we see that the proportion of acceptance is `r sprintf("%.1f", max(quiet(summary(modsel))$rejection$Prob) * 100)`%.
 
-  if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
-      !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
-    stop("The list of models must be either all objects produced by the function\n",
-         "`simulate_abc()` or function `run_abc()` as they store full information\n",
-         "about an ABC model being run, namely the simulated summary statistics", call. = FALSE)
+Similarly, looking at the Bayes factors, we see that the "modelX" is `r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 2])` times more likely than "modelY", and `r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 3])` more likely than "modelZ".
 
+When the posterior probabilities are computed using a more elaborate neural network method (again, see more details in the _abc_ [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf)), we find that the probability of "modelX" is even more overwhelming. In fact, the analysis shows that it has a nearly 100% probabiliy of being the correct model to explain our data.
+
+**But how accurate are these conclusions?** Well, if we take a peek at the _slendr_ model which was [internally used](https://github.com/bodkan/demografr/blob/main/vignettes/vignette-01-basics.Rmd#L36-L47) to generate the "observed" summary statistics, we see that the data was indeed simulated by code nearly identical to the one shown above as `modelX`.
+
+## Goodness-of-fit
+
+So, it appears that we can be quite confident in which of the three models best represents the data. However, before we move on to inferring parameters of the model, we should check whether the best selected model can indeed capture the most important features of the data, which is in case of ABC represented by our summary statistics.
+
+The _abc_ R package provides two functions, `gfit()` and `gfitpca()`, for which _demografr_ yet again provides convenient wrappers which leverage various model metadata stored in each _demografr_ inference object.
+
+First, there is a function `goodness_of_fit()` which can be used in the following way:
+
+```{r}
+gfit <- goodness_of_fit(abcX, replicates = 100)
+
+summary(gfit)
+
+plot(gfit, main = "Histogram for modelX under H0")
+```
+
+```{r}
+gfit <- goodness_of_fit(abcY, replicates = 100)
+
+summary(gfit)
+
+plot(gfit, main = "Histogram for modelY under H0")
+```
+
+```{r}
+gfit <- goodness_of_fit(abcZ, replicates = 100)
+
+summary(gfit)
+
+plot(gfit, main = "Histogram for modelZ under H0")
+```
+
+
+
+```{r}
   model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
   model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
   model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
 
-  observed_stats <- attr(abcX, "components")$observed
-    # and to the same for the observed statistics as well
-  observed_stats <- lapply(names(observed_stats), function(stat) {
-    # convert observed statistics to a matrix, either from a normal data frame
-    # result (with each statistic named), or from a simple vector
-    x <- observed_stats[[stat]]
-
-    if (is.data.frame(x)) {
-      # find the column with the value of a statistic `stat`
-      # TODO: the last column will be numeric
-      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
-      value_col <- ncol(x)
-      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
-      names <- x[, !value_col, drop = FALSE] %>%
-        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
-    } else {
-      values <- matrix(x, nrow = 1)
-      names <- paste0(stat, "_", seq_along(x))
-    }
-    colnames(values) <- names
-    values
-  }) %>% do.call(cbind, .)
-
-modsel <- postpr(observed_stats, model_names, model_stats, tol = 0.05, method = "neuralnet")
-
-summary(modsel)
-```
-
-
-```{r}
-#observed_stats <- attr(abcX, "observed")
-sim_stats <- attr(abcX, "components")$simulated
-gfitX <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
-
-summary(gfitX)
-
-plot(gfitX, main="Histogram for modelX under H0")
-
-#observed_stats <- attr(abcX, "observed")
-sim_stats <- attr(abcY, "components")$simulated
-gfitY <- gfit(target = observed_stats, sumstat = sim_stats, statistic = mean, nb.replicate = 100)
-
-summary(gfitY)
-
-plot(gfitY, main="Histogram for modelY under H0")
-```
-
-
-```{r}
-  model_nsims <- vapply(models, function(x) nrow(attr(x, "simulated")), FUN.VALUE = integer(1))
-  model_stats <- lapply(models, function(x) attr(x, "simulated")) %>% do.call(rbind, .) %>% as.matrix()
-  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+colnames(observed_stats) <- colnames(model_stats)
 
 library(locfit)
-gfitpca(target=observed_stats, sumstat=model_stats, index=model_names, cprob = 0.1)
+gfitpca(target = observed_stats, sumstat = model_stats, index = model_names, cprob = 0.1)
 ```
 
 ```{r}
 abcX <- readRDS("inst/examples/basics_abc.rds")
 ```
 
+
+
+
+
+
+
+
 ```{r}
 future::plan("multicore", workers = future::availableCores())
-predictions <- predict(abcX, 1000, posterior = "adj")
-predictions
+predX <- predict(abcX, 1000, posterior = "unadj")
+predY <- predict(abcY, 1000, posterior = "unadj")
+predZ <- predict(abcZ, 1000, posterior = "unadj")
 ```
 
 ```{r}
-plot_prediction(predictions, "diversity")
+plot_prediction(predX, "diversity")
 
-plot_prediction(predictions, "divergence")
+plot_prediction(predX, "divergence")
 
-plot_prediction(predictions, "f4")
+plot_prediction(predX, "f4")
 ```
 
+```{r}
+cowplot::plot_grid(
+  plot_prediction(predX, "diversity"),
+  plot_prediction(predY, "diversity"),
+  plot_prediction(predZ, "diversity"),
+  nrow = 1
+)
+```
 If more customization or a more detailed analyses is needed, you can also extract data from the posterior simulations themselves:
 
 ```{r}

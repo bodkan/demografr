@@ -63,6 +63,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     stop("All elements of the list of summary statistic functions must be named", call. = FALSE)
 
   posterior_params <- object[[paste0(posterior, ".values")]]
+  if (!is.matrix(posterior_params)) posterior_params <- as.matrix(posterior_params)
 
   # sample given number of samples from the posterior distribution of all parameters,
   # with replacement, adjusting by weights
@@ -86,7 +87,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     strict = strict
   )
 
-  attr(result, "components") <- components["observed"]
+  attr(result, "components") <- components[c("observed", "model_name")]
 
   result
 }

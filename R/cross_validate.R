@@ -12,10 +12,9 @@
 #' @return Object of the class \code{cv4postpr} and \code{demografr_cv}
 #'
 #' @export
-run_cv <- function(models, nval, tols, method, ...) {
+cross_validate <- function(models, nval, tols, method, ...) {
   if (is.null(names(models)) || any(names(models) == ""))
-    stop("The 'models' argument must be a named list, with the names being\n",
-         "unique identifier names of each model", call. = FALSE)
+    names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
 
   if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
       !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))

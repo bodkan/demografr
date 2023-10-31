@@ -25,27 +25,7 @@ run_abc <- function(data, engine, ...) {
   engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))
   args <- match.call()
 
-  # and to the same for the observed statistics as well
-  observed <- lapply(names(data$functions), function(stat) {
-    # convert observed statistics to a matrix, either from a normal data frame
-    # result (with each statistic named), or from a simple vector
-    x <- data$observed[[stat]]
-
-    if (is.data.frame(x)) {
-      # find the column with the value of a statistic `stat`
-      # TODO: the last column will be numeric
-      # value_col <- sapply(names(x), function(i) is.numeric(x[[i]]))
-      value_col <- ncol(x)
-      values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
-      names <- x[, !value_col, drop = FALSE] %>%
-        apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))
-    } else {
-      values <- matrix(x, nrow = 1)
-      names <- paste0(stat, "_", seq_along(x))
-    }
-    colnames(values) <- names
-    values
-  }) %>% do.call(cbind, .)
+  observed <- bind_observed(data$observed)
 
   if (engine == "abc") {
     if (!"tol" %in% names(args))
@@ -73,7 +53,8 @@ run_abc <- function(data, engine, ...) {
     parameters = data$parameters,
     functions = data$functions,
     simulated = data$simulated,
-    observed = data$observed
+    observed = data$observed,
+    model_name = data$model_name
   )
 
   attr(result, "components") <- components

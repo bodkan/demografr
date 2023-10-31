@@ -46,6 +46,8 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
   color_by <- as.symbol(if (length(stat) > 1) "summary" else "stat")
   scales <- if (length(stat) > 1) "free_x" else NULL
 
+  model_name <- attr(data, "components")$model_name
+
   p <-
     ggplot2::ggplot(predicted_df, ggplot2::aes(value, color = !!color_by, fill = !!color_by)) +
       ggplot2::geom_density(alpha = 0.5) +
@@ -54,7 +56,8 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
       ggplot2::guides(color = ggplot2::guide_legend("simulated"),
                       fill = ggplot2::guide_legend("simulated"),
                       linetype = ggplot2::guide_legend("observed")) +
-      ggplot2::scale_linetype_manual(values = "dashed", labels = "")
+      ggplot2::scale_linetype_manual(values = "dashed", labels = "") +
+      ggplot2::ggtitle("Posterior predictive check for model '", model_name, "'")
 
   if (facets) p <- p + ggplot2::facet_wrap(~ stat, scales = scales)
 

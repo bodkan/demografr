@@ -83,6 +83,8 @@ simulate_abc <- function(
   if (is.function(model))
     priors <- expand_priors(model, priors, model_args) #%>% strip_prior_environments()
 
+  model_name <- as.character(substitute(model))
+
   results <- future.apply::future_lapply(
     X = seq_len(iterations),
     FUN = run_iteration,
@@ -95,7 +97,7 @@ simulate_abc <- function(
     engine = engine,
     model_args = model_args,
     engine_args = engine_args,
-    model_name = as.character(substitute(model)),
+    model_name = model_name,
     attempts = attempts,
     future.seed = TRUE,
     future.globals = globals,
@@ -136,7 +138,8 @@ simulate_abc <- function(
     observed = observed,
     functions = functions,
     priors = priors,
-    model = model
+    model = model,
+    model_name = model_name
   )
 
   opts <- list(

@@ -52,9 +52,10 @@ reference:
 
   - title: ABC cross-validation and posterior checks
     contents:
-    - perform_cv
-    - plot.demografr_cv
+    - cross_validate
+    - select_model
     - predict.demografr_abc.abc
+    - plot.demografr_cv
     - extract_prediction
     - plot_prediction
 
