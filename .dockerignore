@@ -1,0 +1,6 @@
+*
+!renv/
+!renv.lock
+!requirements.txt
+!DESCRIPTION
+!.Rprofile
