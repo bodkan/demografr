@@ -28,8 +28,8 @@ Imports:
     magrittr,
     methods,
     reticulate,
-    slendr,
-    tidyr
+    tidyr,
+    slendr
 Remotes: bodkan/slendr
 Suggests:
     ape,
