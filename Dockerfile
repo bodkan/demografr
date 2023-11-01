@@ -60,6 +60,13 @@ ENV HOME="/root"
 ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
+# compile SLiM
+RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.0.1.tar.gz -O slim.tar.gz; \
+    tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
+
+# install all compiled software into $PATH
+RUN cp SLiM-*/build/slim SLiM-*/build/eidos $BIN
+
 # location for the whole project (scripts, notebooks, and data) inside the container
 ENV PROJECT=/project
 
@@ -99,4 +106,4 @@ RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.pr
 RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 
 # clean up compilation sources and other redundant files
-RUN rm -r /home/rstudio
+RUN rm -r /tmp/*; rm -r /home/rstudio
