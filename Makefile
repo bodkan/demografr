@@ -56,9 +56,9 @@ clean:
 
 # check the OS type to assign appropriate Docker image tag
 ifeq ($(shell uname -s), Darwin)
-    PLATFORM ?= arm64
+PLATFORM ?= arm64
 else
-    PLATFORM ?= amd64
+PLATFORM ?= amd64
 endif
 
 IMAGE := bodkan/demografr:$(PLATFORM)
@@ -83,7 +83,7 @@ R r:
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
 
-docker-build-clean:
+docker-clean-build:
 	@echo $(IMAGE)
 	docker build --no-cache --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
 
