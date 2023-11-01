@@ -71,9 +71,6 @@ PORT ?= 9999
 
 .PHONY: help rstudio bash R r
 
-help:
-	@echo "Usage: make [rstudio|bash|r|R]"
-
 rstudio:
 	docker run --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)
 
@@ -90,10 +87,10 @@ docker-build-clean:
 	@echo $(IMAGE)
 	docker build --no-cache --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
 
-push:
+docker-push:
 	docker push $(IMAGE)
 
-pull:
+docker-pull:
 	docker pull $(IMAGE)
 
 local-webapp:
