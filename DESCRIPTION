@@ -34,6 +34,7 @@ Remotes: bodkan/slendr
 Suggests:
     ape,
     cowplot,
+    devtools,
     future,
     here,
     knitr,
