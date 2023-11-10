@@ -16,7 +16,7 @@ data_path <- here::here("inst/examples/basics_abc.rds")
 if (!file.exists(data_path))
   stop("Run vignette-01-basics first to generate data", call. = FALSE)
 
-library(demografr)
+devtools::load_all()
 library(slendr)
 init_env(quiet = TRUE)
 ```
@@ -208,20 +208,22 @@ priors <- list(
 # same format as the summary statistics computed on empirical data)
 
 compute_diversity <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
-  ts_f4(ts,
-        W = list(popA = samples$popA),
-        X = list(popB = samples$popB),
-        Y = list(popC = samples$popC),
-        Z = list(popD = samples$popD))
+  samples <- ts_names(ts, split = "pop")
+  A <- samples["popA"]; B <- samples["popB"]
+  C <- samples["popC"]; D <- samples["popD"]
+  rbind(
+    ts_f4(ts, A, B, C, D),
+    ts_f4(ts, A, C, B, D),
+    ts_f4(ts, A, D, B, C)
+  )
 }
 
 # the summary functions must be also bound to an R list named in the same
@@ -283,7 +285,7 @@ plot_posterior(abc, param = "T")
 And, finally, the rate of gene flow:
 
 ```{r, posterior_gf, warning=FALSE, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "gf")
+plot_posterior(abc, param = "gf") + ggplot2::coord_cartesian(xlim = c(0, 1))
 ```
 
 Finally, we have the diagnostic functionality of the [_abc_](https://cran.r-project.org/package=abc) R package at our disposal:
