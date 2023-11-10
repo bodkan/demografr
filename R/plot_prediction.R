@@ -57,7 +57,7 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
                       fill = ggplot2::guide_legend("simulated"),
                       linetype = ggplot2::guide_legend("observed")) +
       ggplot2::scale_linetype_manual(values = "dashed", labels = "") +
-      ggplot2::ggtitle("Posterior predictive check for model '", model_name, "'")
+      ggplot2::ggtitle(paste0("Posterior predictive check for model '", model_name, "'"))
 
   if (facets) p <- p + ggplot2::facet_wrap(~ stat, scales = scales)
 
