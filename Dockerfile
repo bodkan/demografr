@@ -83,7 +83,7 @@ RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.3.tar.gz -O $REN
 # run this when first setting up the container to create an renv.lock file:
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   - renv::init(bare = TRUE, bioconductor = "3.17")
-#   - options(timeout=600); install.packages("remotes"); remotes::install_deps()
+#   - options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 
 # for 'production' builds, restore all R dependencies at their locked-in versions
 COPY DESCRIPTION .
