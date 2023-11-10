@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
+devtools::load_all()
+
 data_path <- here::here("inst/examples/custom_abc.rds")
 ```
 
