@@ -21,9 +21,12 @@ knitr::opts_chunk$set(
 )
 
 data_path <- here::here("inst/examples/basics_abc.rds")
+
+devtools::load_all()
 ```
 
 ```{r, echo=FALSE, message=FALSE}
+library(demografr)
 library(slendr)
 
 init_env()
@@ -246,11 +249,25 @@ functions <- list(
 
 Crucially, the outputs of these summary functions _must_ match the format of the observed summary statistics (i.e., the data frames produced must have the same format). This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.
 
+Of course, having to run ABC simulations in order to check that the summary functions have been correctly defined would be slow and potentially costly in terms of wasted computation. To speed this process up, _demografr_ provides a helper function `simulate_ts()` which allows you to simulate a single tree sequence object from the specified model. You can then use that tree sequence object to develop (and test) your summary functions before proceeding further, like this:
+
+```{r}
+ts <- simulate_ts(model, priors)
+```
+
+With this `ts` object, we can, for instance, test that our `compute_f4` summary function is defined correctly (meaning that it returns $f_4$` statistics table formatted in exactly the same way as the observed table above):
+
+```{r}
+functions$f4(ts)
+```
+
+Looks good! (We have zero $f_4$ values because we didn't specify mutation rate in `simulate_ts`, as we were only interested in the compatibility of the formats and dimensions of both simulated and observed $f_4$ tables). Of course, in your analysis pipeline, you might (should!) check that all of your summary functions are set up correctly.
+
 ### 4. ABC simulations
 
 Having defined the scaffold model, a set of priors for our parameters of interest ($N_e$ and split times), as well as two summary statistic functions, we can plug all this information into the function `simulate_abc()`.
 
-Before we run a potentially computationally costly simulations, it is a good idea to validate the ABC components we have so far assembled using the function `validate_abc()`:
+Before we run a potentially computationally costly simulations, it is a good idea to validate the ABC components we have so far assembled using the function `validate_abc()`. This provides much deeper correctness checks beyond the simple testing of the summary functions as we did above.
 
 ```{r}
 validate_abc(model, priors, functions, observed)
