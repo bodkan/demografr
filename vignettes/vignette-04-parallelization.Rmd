@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
   dpi = 80,
   eval = slendr_present
 )
+
+devtools::load_all()
 ```
 
 ⚠️⚠️⚠️
@@ -35,7 +37,9 @@ In this vignette, we will briefly describe both methods, using the `simulate_gri
 
 ```{r}
 library(demografr)
-library(slendr); init_env(quiet = TRUE)
+
+library(slendr)
+init_env(quiet = TRUE)
 ```
 
 ```{r}
