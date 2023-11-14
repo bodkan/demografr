@@ -16,6 +16,8 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param quiet Should the log output of the validation be printed to the console?
+#'   (Default is \code{TRUE}.)
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
@@ -35,7 +37,7 @@
 #' @export
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
-                         attempts = 1000,
+                         quiet = FALSE, attempts = 1000,
                          engine = NULL, model_args = NULL, engine_args = NULL) {
   if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||!length(priors))
     stop("A model generating function, priors, summary functions, and observed\n",
@@ -45,6 +47,10 @@ validate_abc <- function(model, priors, functions, observed,
   if (length(setdiff(names(functions), names(observed))))
     stop("Elements of lists of summary functions and observed statistics must have the same names",
          call. = FALSE)
+
+  if (quiet) {
+    cat <- function(...) { invisible(NULL) }
+  }
 
   cat("======================================================================\n")
 

@@ -12,6 +12,7 @@ validate_abc(
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,
+  quiet = FALSE,
   attempts = 1000,
   engine = NULL,
   model_args = NULL,
@@ -36,6 +37,9 @@ tree sequences}
 \item{recombination_rate}{Recombination rate to use for the simulation}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
+
+\item{quiet}{Should the log output of the validation be printed to the console?
+(Default is \code{TRUE}.)}
 
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
