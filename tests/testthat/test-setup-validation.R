@@ -64,6 +64,10 @@ test_that("correct ABC setups are validated", {
   expect_output(validate_abc(model, priors, functions, observed))
 })
 
+test_that("validation output can be silenced", {
+  expect_silent(validate_abc(model, priors, functions, observed, quiet = TRUE))
+})
+
 test_that("consistent naming of summary functions and observed statistics is enforced", {
   error_msg <- "Elements of lists of summary functions and observed statistics must have the same names"
 
