@@ -29,6 +29,7 @@ Imports:
     methods,
     reticulate,
     tidyr,
+    GA,
     slendr
 Remotes: bodkan/slendr
 Suggests:
