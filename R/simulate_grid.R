@@ -88,7 +88,7 @@ simulate_grid <- function(
   results <- future.apply::future_lapply(
     X = seq_len(nrow(grid)),
     FUN = function(grid_i) {
-      parameters <- as.list(dplyr::select(grid[grid_i, ], -rep))
+      parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
           quiet(res <- run_iteration(
