@@ -17,14 +17,14 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present && FALSE
+  eval = slendr_present
 )
 
 devtools::load_all()
 
-abcX_path <- here::here("inst/examples/downstream_abcX.rds")
-abcY_path <- here::here("inst/examples/downstream_abcY.rds")
-abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
+abcX_path <- here::here("inst/examples/downstream_dataX.rds")
+abcY_path <- here::here("inst/examples/downstream_dataY.rds")
+abcZ_path <- here::here("inst/examples/downstream_dataZ.rds")
 abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
 cv_path <- here::here("inst/examples/downstream_cv.rds")
 ```
@@ -201,10 +201,12 @@ compute_f4 <- function(ts) {
 functions <- list(diversity = compute_diversity, divergence = compute_divergence, f4 = compute_f4)
 ```
 
-```{r, eval=FALSE}
-validate_abc(modelX, priors, functions, observed)
-validate_abc(modelY, priors, functions, observed)
-validate_abc(modelZ, priors, functions, observed)
+Let's validate the ABC setup of all three models -- this is an important check that the _slendr_ model functions are defined correctly:
+
+```{r}
+validate_abc(modelX, priors, functions, observed, quiet = TRUE)
+validate_abc(modelY, priors, functions, observed, quiet = TRUE)
+validate_abc(modelZ, priors, functions, observed, quiet = TRUE)
 ```
 
 ```{r, echo=FALSE, eval=FALSE}
@@ -243,6 +245,13 @@ ncores <- future::availableCores()
 ```{r, echo=FALSE}
 saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
 saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
+saveRDS(dataX, abcX_path)
+saveRDS(dataY, abcY_path)
+saveRDS(dataZ, abcZ_path)
+```
+
+```{r}
+stop("finished")
 ```
 
 ```{r, echo=FALSE}
