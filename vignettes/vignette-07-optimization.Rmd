@@ -1,0 +1,175 @@
+---
+title: "Genetic algorithm optimization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Genetic algorithm optimization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 80,
+  eval = slendr_present
+)
+
+data_path <- here::here("inst/examples/basics_abc.rds")
+
+devtools::load_all()
+```
+
+```{r, echo=FALSE, message=FALSE}
+library(demografr)
+library(slendr)
+init_env()
+
+library(GA)
+
+SEED <- 42
+set.seed(SEED)
+```
+
+1. Nucleotide diversity in each population:
+
+```{r}
+observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+
+observed_diversity
+```
+
+2. Pairwise divergence d_X_Y between populations X and Y:
+
+```{r}
+observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
+
+observed_divergence
+```
+
+3. Value of the following $f_4$-statistic:
+
+```{r}
+observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+
+observed_f4
+```
+
+```{r}
+observed <- list(
+  diversity  = observed_diversity,
+  divergence = observed_divergence,
+  f4         = observed_f4
+)
+
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf) {
+  # define populations
+  popA <- population("popA", time = 1,    N = Ne_A)
+  popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_CD, N = Ne_D, parent = popC)
+
+  # define gene-flow events
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+
+  # compile a slendr model
+  model <- compile_model(
+    populations = list(popA, popB, popC, popD), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward", serialize = FALSE
+  )
+
+  # set up sampling schedule (2 diploid individuals from each population at
+  # the end of the simulation) -- this step is optional
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(popA, 2), list(popB, 2), list(popC, 2), list(popD, 2),
+    strict = TRUE
+  )
+
+  # a return statement is mandatory!
+  # if a sampling schedule is not generated, use return(model)
+  return(list(model, samples))
+}
+
+compute_diversity <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  ts_diversity(ts, sample_sets = samples)
+}
+compute_divergence <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  ts_divergence(ts, sample_sets = samples)
+}
+compute_f4 <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  A <- samples["popA"]; B <- samples["popB"]
+  C <- samples["popC"]; D <- samples["popD"]
+  rbind(
+    ts_f4(ts, A, B, C, D),
+    ts_f4(ts, A, C, B, D),
+    ts_f4(ts, A, D, B, C)
+  )
+}
+
+functions <- list(
+  diversity  = compute_diversity,
+  divergence = compute_divergence,
+  f4         = compute_f4
+)
+
+```
+
+```{r}
+# par <- list(100, 100, 100, 100, 2, 3000, 5000, 0.5)
+# names(par) <- formals(model) %>% names()
+
+# optim_fn(par, model, observed)
+
+# res <- optim(par = par, fn = optim_fn, model = model, observed = observed,
+#              method = "SANN",
+#              lower = list(Ne_A = 1,
+#                           Ne_B = 1,
+#                           Ne_C = 1,
+#                           Ne_D = 1,
+#                           T_AB = 1,
+#                           T_BC = 1,
+#                           T_CD = 1,
+#                           gf_BC = 0),
+#              upper = list(Ne_A = 10000,
+#                           Ne_B = 10000,
+#                           Ne_C = 10000,
+#                           Ne_D = 10000,
+#                           T_AB = 10000,
+#                           T_BC = 10000,
+#                           T_CD = 10000,
+#                           gf_BC = 1))
+
+x=Sys.time()
+result <- ga(type = "real-valued",
+             fitness = optim_fn,
+             model = model, observed = observed,
+             lower = c(1, 1, 1, 1, 1, 1, 1, 0),
+             upper = c(10000, 10000, 10000, 10000, 10000, 10000, 10000, 1),
+             popSize = 50,
+             maxiter = 1000,
+             parallel = TRUE)
+y=Sys.time()
+saveRDS(y-x, "time.rds")
+```
+
+```{r}
+saveRDS(result, "result_ga.rds")
+```
+
+```{r}
+plot(result)
+```
+
+```{r}
+result@solution
+```
