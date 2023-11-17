@@ -1,4 +1,4 @@
-optim_fn <- function(par, model, observed) {
+optim_fn <- function(par, model, functions, observed) {
   # get all arguments of the model function...
   all_args <- names(formals(model))
   # ... from those, extract names of arguments which don't have an implicit value ...
@@ -9,29 +9,32 @@ optim_fn <- function(par, model, observed) {
   print(par)
 
   result <- tryCatch({
-    simulate_grid(model, par, functions, replicates = 1,
-                  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)},
-    error = function(e) NULL
+    # TODO: figure out a way to get the model_name just like simulate_grid does it
+    quiet(run_iteration(it = 1, model, params = par, functions = functions,
+                  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
+                  attempts = 1, NULL, engine = NULL, model_args = NULL, engine_args = NULL,
+                  model_name = "asdf"))
+    },
+    error = function(e) {
+      # cat(e$message, "\n")
+      NULL
+    }
   )
 
   if (is.null(result)) {
     # rmse <- Inf
     error <- Inf
   } else {
-    # name the list of data frames with simulated statistics
-    stat_names <- names(observed)
-    simulated <- lapply(stat_names, function(x) result[[x]][[1]])
-    names(simulated) <- stat_names
+    simulated <- result$simulated
 
-    simulated_col <- vapply(stat_names,
-                            function(x) which(vapply(simulated[[x]], is.numeric, FUN.VALUE = logical(1))),
-                            FUN.VALUE = integer(1))
-    observed_col <- vapply(stat_names,
-                           function(x) which(vapply(observed[[x]], is.numeric, FUN.VALUE = logical(1))),
-                           FUN.VALUE = integer(1))
+    value_cols <- vapply(
+      observed,
+      function(df) which(vapply(df, is.numeric, FUN.VALUE = logical(1))),
+      FUN.VALUE = integer(1)
+    )
 
-    merged <- lapply(stat_names, function(stat) {
-      shared_cols <- colnames(observed[[stat]][, -observed_col[stat], drop = FALSE])
+    merged <- lapply(names(observed), function(stat) {
+      shared_cols <- colnames(observed[[stat]][, -value_cols[stat], drop = FALSE])
       merged_stats <- dplyr::inner_join(
         simulated[[stat]], observed[[stat]],
         by = shared_cols
