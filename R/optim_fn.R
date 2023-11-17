@@ -15,7 +15,8 @@ optim_fn <- function(par, model, observed) {
   )
 
   if (is.null(result)) {
-    rmse <- Inf
+    # rmse <- Inf
+    error <- Inf
   } else {
     # name the list of data frames with simulated statistics
     stat_names <- names(observed)
@@ -36,21 +37,26 @@ optim_fn <- function(par, model, observed) {
         by = shared_cols
       )
       merged_stats[shared_cols] <- NULL
-      names(merged_stats) <- c("simulated", "observed")
-      merged_stats %>%
-        dplyr::mutate(
-          norm_sim = (simulated - mean(simulated)) / sd(simulated),
-          norm_obs = (observed - mean(observed)) / sd(observed)
-        )
+      merged_stats$stat <- stat
+      names(merged_stats) <- c("simulated", "observed", "stat")
+      merged_stats
+      # merged_stats %>%
+      #   dplyr::mutate(
+      #     norm_sim = (simulated - mean(simulated)) / sd(simulated),
+      #     norm_obs = (observed - mean(observed)) / sd(observed)
+      #   )
     }) %>%
       do.call(rbind, .)
 
-    rmse <- sqrt(mean((merged$norm_sim - merged$norm_obs)^2))
+      # browser()
+    # rmse <- sqrt(mean((merged$norm_sim - merged$norm_obs)^2))
+    errors <- 2 * abs(merged$simulated - merged$observed) / abs(merged$observed)
+    error <- mean(errors)
   }
 
-  # rmse = Inf (worse fit possible) => fitness = 0
-  # rmse = 0   (best fit possible)  => fitness = 100
-  fitness <- 100 / (1 + rmse)
+  # error = Inf (worse fit possible) => fitness = 0
+  # error = 0   (best fit possible)  => fitness = 100
+  fitness <- 1 / (1 + error)
 
   fitness
 }
