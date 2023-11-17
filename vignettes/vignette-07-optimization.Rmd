@@ -152,7 +152,9 @@ functions <- list(
 x=Sys.time()
 result <- ga(type = "real-valued",
              fitness = optim_fn,
-             model = model, observed = observed,
+             model = model,
+             functions = functions,
+             observed = observed,
              lower = c(1, 1, 1, 1, 1, 1, 1, 0),
              upper = c(10000, 10000, 10000, 10000, 10000, 10000, 10000, 1),
              popSize = 50,
@@ -160,6 +162,7 @@ result <- ga(type = "real-valued",
              parallel = TRUE)
 y=Sys.time()
 saveRDS(y-x, "time.rds")
+print(y-x)
 ```
 
 ```{r}
@@ -167,9 +170,15 @@ saveRDS(result, "result_ga.rds")
 ```
 
 ```{r}
+time <- readRDS("vignettes/time.rds")
+result <- readRDS("vignettes/result_ga.rds")
+```
+
+```{r}
 plot(result)
 ```
 
 ```{r}
+colnames(result@solution) <- names(formals(model))
 result@solution
 ```
