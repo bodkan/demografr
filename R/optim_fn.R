@@ -50,7 +50,7 @@ optim_fn <- function(par, model, observed) {
 
       # browser()
     # rmse <- sqrt(mean((merged$norm_sim - merged$norm_obs)^2))
-    errors <- 2 * abs(merged$simulated - merged$observed) / abs(merged$observed)
+    errors <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
     error <- mean(errors)
   }
 
