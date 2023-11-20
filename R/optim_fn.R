@@ -22,7 +22,6 @@ optim_fn <- function(par, model, functions, observed) {
   )
 
   if (is.null(result)) {
-    # rmse <- Inf
     error <- Inf
   } else {
     simulated <- result$simulated
@@ -43,19 +42,11 @@ optim_fn <- function(par, model, functions, observed) {
       merged_stats$stat <- stat
       names(merged_stats) <- c("simulated", "observed", "stat")
       merged_stats
-      # merged_stats %>%
-      #   dplyr::mutate(
-      #     norm_sim = (simulated - mean(simulated)) / sd(simulated),
-      #     norm_obs = (observed - mean(observed)) / sd(observed)
-      #   )
     }) %>%
       do.call(rbind, .)
 
-      # browser()
-    # rmse <- sqrt(mean((merged$norm_sim - merged$norm_obs)^2))
     merged$errors <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
     error <- mean(merged$errors)
-    # print(error)
   }
 
   # error = Inf (worse fit possible) => fitness = 0
