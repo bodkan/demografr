@@ -15,7 +15,7 @@ optim_fn <- function(par, model, functions, observed,
                   attempts = 1, samples = NULL, model_name = model_name))
     },
     error = function(e) {
-      cat(e$message, "\n")
+      # cat(e$message, "\n")
       NULL
     }
   )
