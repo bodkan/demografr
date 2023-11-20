@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-data_path <- here::here("inst/examples/basics_abc.rds")
+result_path <- here::here("inst/examples/ga_result.rds")
+time_path <- here::here("inst/examples/ga_time.rds")
 
 devtools::load_all()
 ```
@@ -36,67 +37,50 @@ SEED <- 42
 set.seed(SEED)
 ```
 
-1. Nucleotide diversity in each population:
+Load empirical summary statistics computed from the observed data:
 
 ```{r}
 observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
-
-observed_diversity
-```
-
-2. Pairwise divergence d_X_Y between populations X and Y:
-
-```{r}
 observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
-
-observed_divergence
-```
-
-3. Value of the following $f_4$-statistic:
-
-```{r}
 observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
 
-observed_f4
-```
-
-```{r}
 observed <- list(
   diversity  = observed_diversity,
   divergence = observed_divergence,
   f4         = observed_f4
 )
+```
 
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf) {
-  # define populations
+Specify the scaffold model function (each function argument corresponds to one parameter to be inferred):
+
+```{r}
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   popA <- population("popA", time = 1,    N = Ne_A)
   popB <- population("popB", time = T_AB, N = Ne_B, parent = popA)
   popC <- population("popC", time = T_BC, N = Ne_C, parent = popB)
   popD <- population("popD", time = T_CD, N = Ne_D, parent = popC)
 
-  # define gene-flow events
-  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = gf_BC)
 
-  # compile a slendr model
   model <- compile_model(
     populations = list(popA, popB, popC, popD), gene_flow = gf,
     generation_time = 1, simulation_length = 10000,
     direction = "forward", serialize = FALSE
   )
 
-  # set up sampling schedule (2 diploid individuals from each population at
-  # the end of the simulation) -- this step is optional
   samples <- schedule_sampling(
     model, times = 10000,
-    list(popA, 2), list(popB, 2), list(popC, 2), list(popD, 2),
+    list(popA, 25), list(popB, 25), list(popC, 25), list(popD, 25),
     strict = TRUE
   )
 
-  # a return statement is mandatory!
-  # if a sampling schedule is not generated, use return(model)
   return(list(model, samples))
 }
+```
 
+Specify tree-sequence summary statistics (one function per one observed statistic, as defined above):
+
+```{r}
 compute_diversity <- function(ts) {
   samples <- ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
@@ -121,7 +105,6 @@ functions <- list(
   divergence = compute_divergence,
   f4         = compute_f4
 )
-
 ```
 
 ```{r}
@@ -149,7 +132,7 @@ functions <- list(
 #                           T_CD = 10000,
 #                           gf_BC = 1))
 
-x=Sys.time()
+start <- Sys.time()
 result <- ga(type = "real-valued",
              fitness = optim_fn,
              model = model,
@@ -160,25 +143,44 @@ result <- ga(type = "real-valued",
              popSize = 50,
              maxiter = 1000,
              parallel = TRUE)
-y=Sys.time()
-saveRDS(y-x, "time.rds")
-print(y-x)
+end <- Sys.time()
+time <- y - x
 ```
 
 ```{r}
-saveRDS(result, "result_ga.rds")
+saveRDS(result, result_path)
+saveRDS(time, time_path)
 ```
 
 ```{r}
-time <- readRDS("vignettes/time.rds")
-result <- readRDS("vignettes/result_ga.rds")
+result <- readRDS(result_path)
+time <- readRDS(time_path)
 ```
 
 ```{r}
 plot(result)
 ```
 
+Checking the fitness of the best solution:
+
 ```{r}
 colnames(result@solution) <- names(formals(model))
 result@solution
+```
+
+```{r}
+result@fitnessValue
+
+fit_par <- as.list(result@solution)
+names(fit_par) <- colnames(result@solution)
+
+optim_fn(fit_par, model, functions, observed)
+```
+
+Fitness value for the true parameter vector:
+
+```{r}
+par <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
+
+optim_fn(par, model, functions, observed)
 ```
