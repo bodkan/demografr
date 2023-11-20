@@ -138,13 +138,19 @@ result <- ga(type = "real-valued",
              model = model,
              functions = functions,
              observed = observed,
+             sequence_length = 1e6,
+             recombination_rate = 1e-8,
+             mutation_rate = 1e-8,
+             engine = NULL, model_args = NULL, engine_args = NULL,
+             model_name = "model",
+             param_names = c("Ne_A", "Ne_B", "Ne_C", "Ne_D", "T_AB", "T_BC", "T_CD", "gf_BC"),
              lower = c(1, 1, 1, 1, 1, 1, 1, 0),
              upper = c(10000, 10000, 10000, 10000, 10000, 10000, 10000, 1),
              popSize = 50,
-             maxiter = 1000,
+             maxiter = 500,
              parallel = TRUE)
 end <- Sys.time()
-time <- y - x
+time <- end - start
 ```
 
 ```{r}
@@ -184,3 +190,16 @@ par <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC
 
 optim_fn(par, model, functions, observed)
 ```
+
+```{r}
+bounds <- list(
+  Ne...  ~ between(1, 10000),
+  T...   ~ between(1, 10000),
+  gf_BC  ~ between(0, 1)
+)
+
+result <- run_ga(model, functions, observed, bounds, iterations = 10,
+                 sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
+                 parallel = TRUE)
+```
+
