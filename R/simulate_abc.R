@@ -81,7 +81,7 @@ simulate_abc <- function(
     unlist()
 
   if (is.function(model))
-    priors <- expand_priors(model, priors, model_args) #%>% strip_prior_environments()
+    priors <- expand_formulas(priors, model, model_args) #%>% strip_prior_environments()
 
   model_name <- as.character(substitute(model))
 

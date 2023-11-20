@@ -15,7 +15,7 @@ sample_prior <- function(f) {
          "     N_afr <- 10000\n\n",
          "I.e. <parameter> ~ <random generation function>(parameters) for scalars, or\n",
          "     <parameter>[N] ~ <random generation function>(parameters) for vectors\n\n",
-         "Incorrect prior formula given: ", as.character(f), call. = FALSE)
+         "Incorrect prior formula given: ", deparse(f), call. = FALSE)
 
   # split the formula into an abstract syntax tree
   ast <- as.list(f)

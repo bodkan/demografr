@@ -8,10 +8,10 @@ check_arg <- function(x) {
   tryCatch({!is.null(x); TRUE}, error = function(e) FALSE)
 }
 
-# Extract prior variable names as a character vector
-get_prior_names <- function(priors) {
-  sapply(seq_along(priors), function(i) {
-    ast <- as.list(priors[[i]])
+# Extract variable names in formulas as a character vector
+get_param_names <- function(formulas) {
+  sapply(seq_along(formulas), function(i) {
+    ast <- as.list(formulas[[i]])
     variable_tokens <- as.character(as.list(ast[[2]]))
     if (any(grepl("\\.\\.\\.", variable_tokens)) &&
              any(grepl("\\[", variable_tokens)))

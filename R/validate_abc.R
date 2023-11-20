@@ -127,8 +127,7 @@ validate_abc <- function(model, priors, functions, observed,
             call. = FALSE)
     }
 
-    all_args <- names(formals(model))
-    nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
+    nonimpl_args <- get_nonimpl_params(model)
     missing_args <- setdiff(nonimpl_args, c(prior_names, names(model_args)))
     if (length(missing_args) > 0) {
       cat(" \u274C\n\n")

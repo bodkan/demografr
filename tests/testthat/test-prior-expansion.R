@@ -64,13 +64,13 @@ test_that("Templated prior sampling expressions validate correctly", {
   expect_output(validate_abc(model, templated_priors, functions, observed))
 })
 
-test_that("Expand_priors() produces parameters equal to formal arguments of a model", {
-  expanded_priors <- expand_priors(model, templated_priors)
+test_that("expand_fromulas() produces parameters equal to formal arguments of a model", {
+  expanded_priors <- expand_formulas(templated_priors, model)
   expect_true(all(get_prior_names(expanded_priors) == names(formals(model))))
 })
 
 test_that("With the same seed, both sets of priors give the same tree sequence", {
-  expanded_priors <- expand_priors(model, templated_priors)
+  expanded_priors <- expand_formulas(templated_priors, model)
 
   # first seed is for prior sampling, second for tree sequence generation
 
@@ -94,7 +94,7 @@ test_that("With the same seed, both sets of priors give the same tree sequence",
   expect_equal(slendr::ts_table(ts2, "mutations"),   slendr::ts_table(ts3, "mutations"))
 })
 
-test_that("Expand_priors() catches multiple template matches", {
+test_that("expand_formulas() catches multiple template matches", {
   templated_priors <- list(
     T_a1... ~ runif(1,     100000),
     T_a...  ~ runif(50000, 100000),
