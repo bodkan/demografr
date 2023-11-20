@@ -11,7 +11,7 @@ optim_fn <- function(par, model, functions, observed) {
   result <- tryCatch({
     # TODO: figure out a way to get the model_name just like simulate_grid does it
     quiet(run_iteration(it = 1, model, params = par, functions = functions,
-                  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
+                  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
                   attempts = 1, NULL, engine = NULL, model_args = NULL, engine_args = NULL,
                   model_name = "asdf"))
     },
