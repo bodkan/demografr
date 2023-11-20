@@ -1,12 +1,12 @@
 optim_fn <- function(par, model, functions, observed) {
-  # get all arguments of the model function...
+  # get all arguments of the model function, ...
   all_args <- names(formals(model))
-  # ... from those, extract names of arguments which don't have an implicit value ...
+  # ... extract names of arguments which don't have an implicit value, ...
   nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
+  # ... and name the list of parameters passed by the ga() routine (which is
+  # otherwise unnamed, causing issues with demografr's simulation functions)
   par <- as.list(par)
   names(par) <- nonimpl_args
-  par <- as.data.frame(par) # TODO: this is no longer necessary as run_iteration accepts a list
-  # print(par)
 
   result <- tryCatch({
     # TODO: figure out a way to get the model_name just like simulate_grid does it
