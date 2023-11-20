@@ -53,8 +53,9 @@ optim_fn <- function(par, model, functions, observed) {
 
       # browser()
     # rmse <- sqrt(mean((merged$norm_sim - merged$norm_obs)^2))
-    errors <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
-    error <- mean(errors)
+    merged$errors <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
+    error <- mean(merged$errors)
+    # print(error)
   }
 
   # error = Inf (worse fit possible) => fitness = 0
