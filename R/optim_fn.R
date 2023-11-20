@@ -1,37 +1,40 @@
-optim_fn <- function(par, model, functions, observed) {
-  # get all arguments of the model function, ...
-  all_args <- names(formals(model))
-  # ... extract names of arguments which don't have an implicit value, ...
-  nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
-  # ... and name the list of parameters passed by the ga() routine (which is
-  # otherwise unnamed, causing issues with demografr's simulation functions)
+# GA fitness function
+optim_fn <- function(par, model, functions, observed,
+                     sequence_length, recombination_rate, mutation_rate,
+                     engine, model_args, engine_args,
+                     model_name, param_names) {
   par <- as.list(par)
-  names(par) <- nonimpl_args
+  names(par) <- param_names
 
   result <- tryCatch({
-    # TODO: figure out a way to get the model_name just like simulate_grid does it
     quiet(run_iteration(it = 1, model, params = par, functions = functions,
-                  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
-                  attempts = 1, NULL, engine = NULL, model_args = NULL, engine_args = NULL,
-                  model_name = "asdf"))
+                  sequence_length = sequence_length,
+                  recombination_rate = recombination_rate,
+                  mutation_rate = mutation_rate,
+                  engine = NULL, model_args = NULL, engine_args = NULL,
+                  attempts = 1, samples = NULL, model_name = model_name))
     },
     error = function(e) {
-      # cat(e$message, "\n")
+      cat(e$message, "\n")
       NULL
     }
   )
 
-  if (is.null(result)) {
+  if (is.null(result)) { # consider simulation issues as Infinity errors
     error <- Inf
   } else {
     simulated <- result$simulated
 
+    # examine which column of each statistic's data frame is numerical
+    # (there can be only one)
     value_cols <- vapply(
       observed,
       function(df) which(vapply(df, is.numeric, FUN.VALUE = logical(1))),
       FUN.VALUE = integer(1)
     )
 
+    # loop across all observed and simulated statistics' data frames, and join
+    # them into a single table to compute observed-vs-simulated errors
     merged <- lapply(names(observed), function(stat) {
       shared_cols <- colnames(observed[[stat]][, -value_cols[stat], drop = FALSE])
       merged_stats <- dplyr::inner_join(
@@ -45,7 +48,9 @@ optim_fn <- function(par, model, functions, observed) {
     }) %>%
       do.call(rbind, .)
 
-    merged$errors <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
+    merged$errors <- 2 * abs(merged$simulated - merged$observed) /
+      (abs(merged$simulated) + abs(merged$observed))
+
     error <- mean(merged$errors)
   }
 
