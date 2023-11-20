@@ -5,8 +5,8 @@ optim_fn <- function(par, model, functions, observed) {
   nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
   par <- as.list(par)
   names(par) <- nonimpl_args
-  par <- as.data.frame(par)
-  print(par)
+  par <- as.data.frame(par) # TODO: this is no longer necessary as run_iteration accepts a list
+  # print(par)
 
   result <- tryCatch({
     # TODO: figure out a way to get the model_name just like simulate_grid does it
