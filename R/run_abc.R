@@ -17,7 +17,7 @@
 #' @param data Simulated data set produced by \code{simulate_abc}
 #' @param engine Which ABC engine to use? As of the current version of demografr, the
 #'   valid choices are either "abc" or "ABC_mcmc".
-#' @param ... Additional arguments passed on the the \code{abc} function from
+#' @param ... Additional arguments passed on the \code{abc} function from
 #'   the abc package
 #'
 #' @export
