@@ -64,12 +64,17 @@ run_ga <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
+  # if bounds are given as "templated" formulas, expand them first (and order
+  # them in the same way arguments of the model function are ordered)
   bounds <- expand_formulas(bounds, model, model_args)
   parsed_bounds <- parse_bounds(bounds, model, model_args)
+  # extract (now properly ordered) boundary limits required by the ga() routine
+  lower <- parsed_bounds$lower
+  upper <- parsed_bounds$upper
 
   result <- ga(
     type = "real-valued",
-    fitness = optim_fn,
+    fitness = compute_fitness,
     model = model,
     functions = functions,
     observed = observed,
@@ -79,11 +84,9 @@ run_ga <- function(
     engine = engine,
     model_args = model_args,
     engine_args = engine_args,
-    model_name = as.character(substitute(model)),
-    param_names = parsed_bounds$param,
-    lower = parsed_bounds$lower,
-    upper = parsed_bounds$upper,
     maxiter = iterations,
+    lower = lower,
+    upper = upper,
     ...
   )
 
