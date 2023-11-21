@@ -3,6 +3,7 @@
 compute_fitness <- function(
     params, model, functions, observed,
     sequence_length, recombination_rate, mutation_rate = 0,
+    error_fun = max,
     engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # if the parameter list is not named (such as is the case when this function
@@ -77,10 +78,10 @@ compute_fitness <- function(
     }) %>%
       do.call(rbind, .)
 
-    merged$errors <- 2 * abs(merged$simulated - merged$observed) /
+    merged$error <- 2 * abs(merged$simulated - merged$observed) /
       (abs(merged$simulated) + abs(merged$observed))
 
-    error <- mean(merged$errors)
+    error <- error_fun(merged$error)
   }
 
   # error = Inf (worse fit possible) => fitness = 0

@@ -44,6 +44,7 @@
 run_ga <- function(
   model, functions, observed, bounds, iterations,
   sequence_length, recombination_rate, mutation_rate = 0,
+  error_fun = max,
   engine = NULL, model_args = NULL, engine_args = NULL,
   ...
 ) {
@@ -81,6 +82,7 @@ run_ga <- function(
     sequence_length = sequence_length,
     recombination_rate = recombination_rate,
     mutation_rate = mutation_rate,
+    error_fun = error_fun,
     engine = engine,
     model_args = model_args,
     engine_args = engine_args,
