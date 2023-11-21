@@ -118,19 +118,6 @@ functions <- list(
 <!-- time <- readRDS(time_path) -->
 <!-- ``` -->
 
-Fitness value for the true parameter vector:
-
-```{r}
-params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
-
-params <- list(Ne_asd = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
-
-compute_fitness(
-  params, model, functions, observed,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
-)
-```
-
 ```{r}
 bounds <- list(
   Ne...  ~ between(1, 10000),
@@ -151,13 +138,12 @@ saveRDS(result, result_path)
 saveRDS(time, time_path)
 ```
 
-
 ```{r}
-plot(result)
+result <- readRDS(result_path)
 ```
 
 ```{r}
-result <- readRDS(result_path)
+plot(result)
 ```
 
 Checking the fitness of the best solution:
@@ -168,11 +154,25 @@ result@solution
 ```
 
 ```{r}
+result@fitnessValue
+```
+
+```{r}
 compute_fitness(
   result@solution, model, functions, observed,
   sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
 
+Fitness value for the true parameter vector:
+
+```{r}
+params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
+
+compute_fitness(
+  params, model, functions, observed,
+  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
+```
 
 
