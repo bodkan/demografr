@@ -2,7 +2,7 @@
 #'
 compute_fitness <- function(
     params, model, functions, observed,
-    sequence_length, recombination_rate, mutation_rate,
+    sequence_length, recombination_rate, mutation_rate = 0,
     engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # if the parameter list is not named (such as is the case when this function
