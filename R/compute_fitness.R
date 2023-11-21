@@ -85,7 +85,7 @@ compute_fitness <- function(
   }
 
   # error = Inf (worse fit possible) => fitness = 0
-  # error = 0   (best fit possible)  => fitness = 100
+  # error = 0   (best fit possible)  => fitness = 1
   fitness <- 1 / (1 + error)
 
   fitness
