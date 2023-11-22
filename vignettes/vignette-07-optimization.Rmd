@@ -33,6 +33,9 @@ init_env()
 
 library(GA)
 
+library(dplyr)
+library(ggplot2)
+
 SEED <- 42
 set.seed(SEED)
 ```
@@ -126,11 +129,12 @@ bounds <- list(
 )
 
 start <- Sys.time()
-result <- run_ga(model, functions, observed, bounds, iterations = 500,
-                 sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
+result <- run_ga(model, functions, observed, bounds, iterations = 500, error_fun = mean,
+                 sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
                  parallel = TRUE)
 end <- Sys.time()
 time <- end - start
+print(time)
 ```
 
 ```{r}
@@ -171,8 +175,49 @@ params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T
 
 compute_fitness(
   params, model, functions, observed,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8, statistics = TRUE
 )
+```
+
+```{r}
+params <- list(Ne_A = 20, Ne_B = 80, Ne_C = 90, Ne_D = 40, T_AB = 20, T_BC = 6000, T_CD = 8000, gf = 0.9)
+
+compute_fitness(
+  params, model, functions, observed,
+  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8, statistics = TRUE
+)
+```
+
+```{r}
+params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
+
+stats <- parallel::mclapply(1:1000, function(i)
+  compute_fitness(
+    params, model, functions, observed, statistics = TRUE,
+    sequence_length = 200e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  )[[1]] %>% dplyr::mutate(rep = i), mc.cores = 100) %>% do.call(rbind, .)
+```
+
+```{r}
+saveRDS(stats, "stats.rds")
+```
+
+```{r}
+p_diversity <- stats %>% filter(stat == "diversity") %>%
+  ggplot() +
+  geom_density(aes(error, color = id))
+
+p_divergence <- stats %>% filter(stat == "divergence") %>%
+  ggplot() +
+  geom_density(aes(error, color = id))
+
+p_f4 <- stats %>% filter(stat == "f4") %>%
+  ggplot() +
+  geom_density(aes(error, color = id))
+```
+
+```{r}
+cowplot::plot_grid(p_diversity, p_divergence, p_f4)
 ```
 
 
