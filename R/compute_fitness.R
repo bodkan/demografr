@@ -3,8 +3,8 @@
 compute_fitness <- function(
     params, model, functions, observed,
     sequence_length, recombination_rate, mutation_rate = 0,
-    error_fun = max,
-    engine = NULL, model_args = NULL, engine_args = NULL
+    engine = NULL, model_args = NULL, engine_args = NULL,
+    statistics = FALSE
 ) {
   # if the parameter list is not named (such as is the case when this function
   # is run by the ga() routine), fill in the parameter names based on the names
@@ -71,22 +71,29 @@ compute_fitness <- function(
         simulated[[stat]], observed[[stat]],
         by = shared_cols
       )
-      merged_stats[shared_cols] <- NULL
+      # concatenate identifier columns of the statistics into a single name
+      merged_stats$id <- apply(merged_stats[, shared_cols], 1, paste, collapse = "_")
+      merged_stats$id <- paste0(stat, "_", merged_stats$id)
       merged_stats$stat <- stat
-      names(merged_stats) <- c("simulated", "observed", "stat")
+      # then remove the individual identifier columns (pop names, etc.)
+      merged_stats[shared_cols] <- NULL
+      names(merged_stats) <- c("simulated", "observed", "id", "stat")
+      merged_stats <- merged_stats[c("stat", "id", "simulated", "observed")]
       merged_stats
     }) %>%
       do.call(rbind, .)
 
-    merged$error <- 2 * abs(merged$simulated - merged$observed) /
-      (abs(merged$simulated) + abs(merged$observed))
+    merged$error <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
 
-    error <- error_fun(merged$error)
+    error <- mean(merged$error)
   }
 
   # error = Inf (worse fit possible) => fitness = 0
-  # error = 0   (best fit possible)  => fitness = 1
+  # error = 0   (best fit possible)  => fitness = 100
   fitness <- 1 / (1 + error)
 
-  fitness
+  if (statistics)
+    return(list(merged, fitness))
+  else
+    return(fitness)
 }
