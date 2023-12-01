@@ -16,7 +16,7 @@
 
 ⚠️⚠️⚠️
 
-**Please note that _demografr_ is still under active development. Although it's already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the [changelog](https://bodkan.net/demografr/news/) for the list of the most recent updates.**
+**Please note that _demografr_ is still under active development. As a result, the interface (names of functions, names of function arguments, but even the functionality in general) does change on rather short notice and quite unpredictably. Before there is a first release of the R package on CRAN (and an associated preprint with it), you shouldn't be using _demografr_ for your work. If you'd like to be notified of updates and releases, click on on "Watch" on top of the main GitHub page. Thanks for understanding!**
 
 ⚠️⚠️⚠️
 
