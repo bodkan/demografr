@@ -147,7 +147,7 @@ init_env()
 
 # setup parallelization across all CPUs
 library(future)
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 ```
 
 For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here "diversity" and "divergence") have meaning and are quite important for later steps:
