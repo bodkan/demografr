@@ -63,7 +63,7 @@ simulate_ts <- function(
   init_env(quiet = TRUE)
 
   if (contains_priors(parameters)) {
-    parameters <- expand_priors(model, parameters, model_args) #%>% strip_prior_environments()
+    parameters <- expand_formulas(parameters, model, model_args) #%>% strip_prior_environments()
 
     # it's not possible to perform full validation here but at least try that sampling
     # from the prior definitions works as it should
