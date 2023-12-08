@@ -9,11 +9,12 @@ Authors@R:
            email = "contact@bodkan.net",
            comment = c(ORCID = "0000-0003-4879-8421"))
 Description: A toolkit for simulation-based inferences of demographic models in
-    population genetics, such as Approximate Bayesian Computation and grid-based
-    simulation inference. Models are specified using the functionality of the
+    population genetics, such as Approximate Bayesian Computation, grid-based
+    parameter sweeps, but also simulation-based parameter optimization.
+    Demographic models are specified using the standard functionality of the
     'slendr' R package, and summary statistics are computed using its 'tskit'
     interface for tree-sequence analyses. Together with features for specifying
-    parameter prior distribution and implicit parallelism, the users can build
+    parameter prior distributions and implicit parallelism, users can build
     efficient, reproducible, and fully automated population genetic inference
     pipelines entirely in R.
 Depends: R (>= 3.6.0)
