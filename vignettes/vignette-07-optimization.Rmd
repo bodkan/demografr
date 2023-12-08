@@ -128,19 +128,17 @@ bounds <- list(
   gf_BC  ~ between(0, 1)
 )
 
-start <- Sys.time()
-result <- run_ga(model, functions, observed, bounds, iterations = 500, error_fun = mean,
-                 sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
-                 parallel = TRUE)
-end <- Sys.time()
-time <- end - start
-print(time)
+result <- run_ga(
+  model, functions, observed, bounds,
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8,
+  iterations = 500, parallel = TRUE
+)
 ```
 
-```{r}
-saveRDS(result, result_path)
-saveRDS(time, time_path)
-```
+<!-- ```{r} -->
+<!-- saveRDS(result, result_path) -->
+<!-- saveRDS(time, time_path) -->
+<!-- ``` -->
 
 ```{r}
 result <- readRDS(result_path)
@@ -173,51 +171,79 @@ Fitness value for the true parameter vector:
 ```{r}
 params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
 
-compute_fitness(
-  params, model, functions, observed,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8, statistics = TRUE
-)
+do.call(model, params)[[1]] %>% plot_model()
+
+results <-
+  parallel::mclapply(
+    1:100,
+    function(i)
+      compute_fitness(
+        params, model, functions, observed, statistics = TRUE,
+        sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+      )[[1]] %>% dplyr::mutate(rep = i),
+    mc.cores = 100
+  ) %>%
+  do.call(rbind, .)
 ```
 
 ```{r}
-params <- list(Ne_A = 20, Ne_B = 80, Ne_C = 90, Ne_D = 40, T_AB = 20, T_BC = 6000, T_CD = 8000, gf = 0.9)
-
-compute_fitness(
-  params, model, functions, observed,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8, statistics = TRUE
-)
+p_stats <- lapply(names(functions), function(stat) {
+  results %>%
+    dplyr::filter(stat == !!stat) %>%
+    ggplot() +
+    geom_density(aes(error, color = id)) +
+    guides(color = guide_legend("statistic")) +
+    facet_wrap(~ stat, scales = "free")
+})
 ```
 
 ```{r}
-params <- list(Ne_A = 2000, Ne_B = 800, Ne_C = 9000, Ne_D = 4000, T_AB = 2000, T_BC = 6000, T_CD = 8000, gf = 0.1)
-
-stats <- parallel::mclapply(1:1000, function(i)
-  compute_fitness(
-    params, model, functions, observed, statistics = TRUE,
-    sequence_length = 200e6, recombination_rate = 1e-8, mutation_rate = 1e-8
-  )[[1]] %>% dplyr::mutate(rep = i), mc.cores = 100) %>% do.call(rbind, .)
+cowplot::plot_grid(plotlist = p_stats)
 ```
 
-```{r}
-saveRDS(stats, "stats.rds")
-```
+Results from the perturbed model:
 
 ```{r}
-p_diversity <- stats %>% filter(stat == "diversity") %>%
-  ggplot() +
-  geom_density(aes(error, color = id))
+params_ <- list(Ne_A = 1000, Ne_B = 1000, Ne_C = 1000, Ne_D = 1000, T_AB = 1000, T_BC = 5000, T_CD = 8000, gf = 0.1)
 
-p_divergence <- stats %>% filter(stat == "divergence") %>%
-  ggplot() +
-  geom_density(aes(error, color = id))
+observed_ <- simulate_grid(
+  model, as.data.frame(params_), functions, replicates = 1,
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+) %>%
+  {
+    list(
+      diversity = .$diversity[[1]],
+      divergence = .$divergence[[1]],
+      f4 = .$f4[[1]]
+    )
+  }
 
-p_f4 <- stats %>% filter(stat == "f4") %>%
-  ggplot() +
-  geom_density(aes(error, color = id))
-```
+results_ <-
+  parallel::mclapply(
+    1:100,
+    function(i)
+      compute_fitness(
+        params_, model, functions, observed_, statistics = TRUE,
+        sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+      )[[1]] %>% dplyr::mutate(rep = i),
+    mc.cores = 100
+  ) %>%
+  do.call(rbind, .)
 
-```{r}
-cowplot::plot_grid(p_diversity, p_divergence, p_f4)
+p_stats_ <- lapply(names(functions), function(stat) {
+  stat_result <- results_ %>% dplyr::filter(stat == !!stat)
+  ggplot(stat_result) +
+    geom_density(aes(simulated, color = id)) +
+    geom_vline(aes(xintercept = observed, color = id), linetype = 2, alpha = 0.5) +
+    geom_vline(xintercept = 0, linetype = 2, alpha = 0.5) +
+    guides(color = guide_legend("statistic")) +
+    facet_wrap(~ stat, scales = "free")
+})
+
+cowplot::plot_grid(plotlist = c(
+  p_stats_,
+  list(plot_model(do.call(model, params_)[[1]], proportions = TRUE))
+))
 ```
 
 
