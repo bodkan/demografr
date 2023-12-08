@@ -66,7 +66,7 @@ test_that("Templated prior sampling expressions validate correctly", {
 
 test_that("expand_fromulas() produces parameters equal to formal arguments of a model", {
   expanded_priors <- expand_formulas(templated_priors, model)
-  expect_true(all(get_prior_names(expanded_priors) == names(formals(model))))
+  expect_true(all(get_param_names(expanded_priors) == names(formals(model))))
 })
 
 test_that("With the same seed, both sets of priors give the same tree sequence", {

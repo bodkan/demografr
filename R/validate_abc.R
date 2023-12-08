@@ -56,7 +56,7 @@ validate_abc <- function(model, priors, functions, observed,
 
   prior_samples <- list()
 
-  prior_names <- get_prior_names(priors)
+  prior_names <- get_param_names(priors)
 
   cat("Testing sampling of each prior parameter:\n")
 
@@ -110,13 +110,13 @@ validate_abc <- function(model, priors, functions, observed,
 
     # first expand any generic "..." prior sampling expressions (if needed)
     priors <- tryCatch(
-      expand_priors(model, priors, model_args),
+      expand_formulas(priors, model, model_args),
       error = function(e) {
         cat(" \u274C\n\n")
         stop(e$message, call. = FALSE)
     })
     # prior names generated above have to be re-generated after templating
-    prior_names <- get_prior_names(priors)
+    prior_names <- get_param_names(priors)
 
     missing_priors <- setdiff(prior_names, methods::formalArgs(model))
     if (length(missing_priors) > 0) {
@@ -142,7 +142,7 @@ validate_abc <- function(model, priors, functions, observed,
 
     cat("The model is a custom user-defined", script_engine, "script\n")
 
-    prior_names <- get_prior_names(priors)
+    prior_names <- get_param_names(priors)
     template_priors <- grepl("\\.\\.\\.", prior_names)
     if (any(template_priors)) {
       cat(" \u274C\n\n")
