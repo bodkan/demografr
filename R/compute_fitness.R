@@ -83,13 +83,18 @@ compute_fitness <- function(
     }) %>%
       do.call(rbind, .)
 
-    merged$error <- 2 * abs(merged$simulated - merged$observed) / (abs(merged$simulated) + abs(merged$observed))
+    merged$error <-
+      2 * abs(merged$simulated - merged$observed) /
+      (abs(merged$simulated) + abs(merged$observed))
 
     error <- mean(merged$error)
+
+    # error <-
+    #   sqrt(mean((merged$observed - merged$simulated)^2))
   }
 
   # error = Inf (worse fit possible) => fitness = 0
-  # error = 0   (best fit possible)  => fitness = 100
+  # error = 0   (best fit possible)  => fitness = 1
   fitness <- 1 / (1 + error)
 
   if (statistics)
