@@ -31,7 +31,7 @@ data_path <- here::here("inst/examples/grid_data.rds")
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
 
 ⚠️⚠️⚠️
 
@@ -68,7 +68,7 @@ library(ggplot2)
 
 # setup parallelization across all CPUs
 library(future)
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 ```
 
 ### 1. Define a _slendr_ model function capturing the demographic history
@@ -221,7 +221,7 @@ First, we will set up an automated parallelization scheme using the [_future_](h
 library(future)
 
 # parallelize simulations across all CPUs of the machine
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 ```
 
 (See much more detail on parallelization of _demografr_ inference pipelines in [this vignette](vignette-04-parallelization.html)).

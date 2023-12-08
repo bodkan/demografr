@@ -43,9 +43,7 @@ set.seed(SEED)
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
-
-**This vignette in particular is currently being used as a testing ground for implementing the support of various validation features of the _abc_ R package. Please do not use any of this just yet.**
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
 
 ⚠️⚠️⚠️
 

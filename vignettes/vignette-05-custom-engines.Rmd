@@ -27,9 +27,9 @@ data_path <- here::here("inst/examples/custom_abc.rds")
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.
+**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
 
-⚠️⚠️⚠️
+⚠️⚠️⚠️️⚠️
 
 By default, _demografr_ uses the [_slendr_](https://github.com/bodkan/slendr) simulation framework for defining models and simulating data from them. But what if you need to do inference using your own scripts? Perhaps _slendr_'s opinionated interface doesn't allow you to do all that you need to do, such as using some of the powerful simulation features and options of "raw" [SLiM](https://messerlab.org/slim/) or [_msprime_](https://tskit.dev/msprime/docs/stable/intro.html)? This vignette explains how you can use any standard SLiM or _msprime_ script which produces a tree sequence file as its output as an engine in a standard _demografr_ inference pipeline.
 
