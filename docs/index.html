@@ -21,11 +21,12 @@
 <link href="docsearch.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script><meta property="og:title" content="A Toolkit for Simulation-Based Inference in Population Genetics">
 <meta property="og:description" content="A toolkit for simulation-based inferences of demographic models in
-    population genetics, such as Approximate Bayesian Computation and grid-based
-    simulation inference. Models are specified using the functionality of the
+    population genetics, such as Approximate Bayesian Computation, grid-based
+    parameter sweeps, but also simulation-based parameter optimization.
+    Demographic models are specified using the standard functionality of the
     slendr R package, and summary statistics are computed using its tskit
     interface for tree-sequence analyses. Together with features for specifying
-    parameter prior distribution and implicit parallelism, the users can build
+    parameter prior distributions and implicit parallelism, users can build
     efficient, reproducible, and fully automated population genetic inference
     pipelines entirely in R.">
 <meta property="og:image" content="https://bodkan.net/demografr/logo.png">
@@ -35,7 +36,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -58,22 +59,22 @@
 <li>
   <a href="index.html">
     <span class="fa fa-home"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="reference/index.html">
     <span class="fa fa-question-circle"></span>
-
+     
     Reference
   </a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="fa fa-book"></span>
-
+     
     Articles
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -105,13 +106,13 @@
 <li>
   <a href="https://github.com/bodkan/demografr/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="https://fosstodon.org/bodkan" class="external-link">
     <span class="fa fa-mastodon"></span>
-
+     
   </a>
 </li>
       </ul>
@@ -120,7 +121,7 @@
           <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
 </div>
       </form>
-
+      
     </div>
 <!--/.nav-collapse -->
   </div>
@@ -128,7 +129,7 @@
 </div>
 <!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -136,11 +137,13 @@
 <div class="page-header"><h1 id="demografr-simulation-based-inference-for-population-genetics">
 <em>demografr</em>: Simulation-based inference for population genetics<a class="anchor" aria-label="anchor" href="#demografr-simulation-based-inference-for-population-genetics"></a>
 </h1></div>
-<!-- badges: start --><!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
-<!-- badges: end --><p><img src="reference/figures/logo.png" align="right"></p>
-<div class="section level2">
+<!-- badges: start -->
+<!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
+
+<!-- badges: end -->
+<p><img src="reference/figures/logo.png" align="right"></p>
 <p>⚠️⚠️⚠️</p>
-<p><strong>Please note that <em>demografr</em> is still under active development. Although it’s already being used in ongoing research projects, the interface does occasionally change on rather short notice (function names, function arguments, etc.). I recommend that you keep an eye on the <a href="https://bodkan.net/demografr/news/">changelog</a> for the list of the most recent updates.</strong></p>
+<p><strong>Please note that <em>demografr</em> is still under active development. As a result, the interface (names of functions, names of function arguments, but even the functionality in general) does change on rather short notice and quite unpredictably. Before there is a first release of the R package on CRAN (and an associated preprint with it), you shouldn’t be using <em>demografr</em> for your work. If you’d like to be notified of updates and releases, click on on “Watch” on top of the main GitHub page. Thanks for understanding!</strong></p>
 <p>⚠️⚠️⚠️</p>
 <p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make the inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequences</a> as an internal data structure and computation engine.</p>
 <p>Unlike traditional ABC and other simulation-based approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, <em>demografr</em> makes it possible to perform simulation, data analysis, and the inference itself entirely in R within a single reproducible analysis script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier to entry for new users and facilitates reproducibility for all users regardless of their level of experience by eliminating many common sources of bugs.</p>
@@ -157,7 +160,6 @@
 <li>
 <em>demografr</em> facilitates tight integration with the powerful R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> by automatically feeding its simulation data to the <em>abc</em> package for inference and analysis.</li>
 </ol>
-</div>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -196,7 +198,9 @@
 <p>Let’s also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about their <span class="math inline"><em>N</em><sub><em>e</em></sub></span> or split times):</p>
 <p><img src="reference/figures/README-ape_tree-1.png" style="display: block; margin: auto;"></p>
 <p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:</p>
-<ol style="list-style-type: decimal"><li>Nucleotide diversity in each population:</li></ol>
+<ol style="list-style-type: decimal">
+<li>Nucleotide diversity in each population:</li>
+</ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_diversity.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -206,7 +210,9 @@
 <span><span class="co">#&gt; 2 popB 3.242467e-05</span></span>
 <span><span class="co">#&gt; 3 popC 1.021123e-04</span></span>
 <span><span class="co">#&gt; 4 popD 8.968777e-05</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal"><li>Pairwise divergence d_X_Y between populations X and Y:</li></ol>
+<ol start="2" style="list-style-type: decimal">
+<li>Pairwise divergence d_X_Y between populations X and Y:</li>
+</ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_divergence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_divergence.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -218,7 +224,9 @@
 <span><span class="co">#&gt; 4 popB popC 0.0001089125</span></span>
 <span><span class="co">#&gt; 5 popB popD 0.0001155571</span></span>
 <span><span class="co">#&gt; 6 popC popD 0.0001105323</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal"><li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li></ol>
+<ol start="3" style="list-style-type: decimal">
+<li>Value of the following <span class="math inline"><em>f</em><sub>4</sub></span>-statistic:</li>
+</ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_f4</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/observed_f4.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -342,7 +350,7 @@
 <span></span>
 <span><span class="co">#--------------------------------------------------------------------------------</span></span>
 <span><span class="co"># infer posterior distributions of parameters using the abc R package</span></span>
-<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">perform_abc</span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -468,11 +476,11 @@
       </footer>
 </div>
 
-
+  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script><script>
   docsearch({
-
-
+    
+    
     apiKey: 'a232fffe35f6bc68735023bb34d1fee2',
     indexName: 'bodkan',
     inputSelector: 'input#search-input.form-control',
