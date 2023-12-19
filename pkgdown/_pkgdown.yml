@@ -38,7 +38,7 @@ reference:
     contents:
     - validate_abc
     - simulate_abc
-    - perform_abc
+    - run_abc
 
   - title: Grid-based inference
     contents:
@@ -48,7 +48,7 @@ reference:
     contents:
     - simulate_ts
     - combine_data
-    - sample_prior
+    - combine_data
 
   - title: ABC cross-validation and posterior checks
     contents:
