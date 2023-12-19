@@ -143,7 +143,7 @@ init_env()
 
 # set up parallelization across all CPUs on the current machine
 library(future)
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
