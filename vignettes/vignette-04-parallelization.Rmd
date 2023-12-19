@@ -130,7 +130,7 @@ First we setup _future_:
 
 ```{r}
 library(future)
-plan(multicore, workers = 10) # use 10 CPUs
+plan(multisession, workers = 10) # use 10 CPUs
 ```
 
 Then we can run the simulations **without having to do anything else!** This last point is important: _demografr_ can automatically leverage whatever parallelization scheme you set up via _future_'s function `plan()`.
@@ -202,7 +202,7 @@ To demonstrate this, let's pretend we ran five simulation grid runs across two d
 
 ```{r}
 library(future)
-plan(multicore, workers = 5)
+plan(multisession, workers = 5)
 
 run1_file <- tempfile(fileext = ".rds")
 run2_file <- tempfile(fileext = ".rds")
