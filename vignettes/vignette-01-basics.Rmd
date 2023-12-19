@@ -282,7 +282,7 @@ tstart <- Sys.time()
 ```{r, eval=!file.exists(data_path)}
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,
-  sequence_length = 20e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
 
@@ -397,7 +397,7 @@ extract_summary(abc, param = "Ne_D")
 Because a chart is always more informative than a table, we can easily get a visualization of our posteriors using the function `plot_posterior()`:
 
 ```{r, posterior_Ne, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "Ne")
+plot_posterior(abc, param = "Ne") + ggplot2::coord_cartesian(xlim = c(0, 10000))
 ```
 
 Excellent! It looks like we got really nice and informative posterior distributions of $N_e$ values!
@@ -405,7 +405,7 @@ Excellent! It looks like we got really nice and informative posterior distributi
 Similarly, we get nice and informative posterior distributions of split times:
 
 ```{r, posterior_Tsplit, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "T")
+plot_posterior(abc, param = "T") + ggplot2::coord_cartesian(xlim = c(0, 10000))
 ```
 
 And the same is true for the gene-flow rate:

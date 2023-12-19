@@ -242,7 +242,7 @@ validate_abc(model, priors, functions, observed)
 # run ABC simulations
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,
-  sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 
 #--------------------------------------------------------------------------------
