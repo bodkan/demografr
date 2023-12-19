@@ -1916,14 +1916,14 @@
     },
     "slendr": {
       "Package": "slendr",
-      "Version": "0.7.2.9000",
+      "Version": "0.8.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "60e012293e885d42d240f0da083acc62de735dbd",
+      "RemoteSha": "23bc1dd170a6ab8bc0d3705f8a73efae2fef7cbb",
       "Requirements": [
         "R",
         "ape",
@@ -1940,7 +1940,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "72d4f53d9f29371903c6b810e86fdab0"
+      "Hash": "dd2ac6a03ebb0e81eba62ff0ba50ec53"
     },
     "sourcetools": {
       "Package": "sourcetools",
