@@ -61,7 +61,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.0.1.tar.gz -O slim.tar.gz; \
+RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.1.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
@@ -95,7 +95,7 @@ RUN R -e 'renv::restore()'
 # rather than installing a separate Python interpreter, use the Python environment
 # that's installed and used by slendr, in order to avoid version compatibility issues
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.11_msprime-1.2.0_tskit-0.5.6_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
+ENV PATH="${BIN}:${HOME}/.local/share/Python-3.12_msprime-1.3.0_tskit-0.5.6_pyslim-1.0.4_tspop-0.0.2:${PATH}"
 
 # put personal dotfiles into the container
 ENV IN_DOCKER=true
