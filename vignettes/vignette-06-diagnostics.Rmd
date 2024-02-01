@@ -35,7 +35,7 @@ library(slendr)
 init_env()
 
 library(future)
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 
 SEED <- 42
 set.seed(SEED)
@@ -51,6 +51,7 @@ Let's return to our [first](vignette-01-basics.html) example. However, this time
 
 ```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=5}
 par(mar = c(0, 0, 2, 0), mfrow = c(3, 1))
+
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree, main = "model X")
 arrows(2.5, 2, 2.5, 3, col="blue")
@@ -116,7 +117,13 @@ modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
     direction = "forward"
   )
 
-  return(model)
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(popA, 25), list(popB, 25), list(popC, 25), list(popD, 25),
+    strict = TRUE
+  )
+
+  return(list(model, samples))
 }
 
 modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
@@ -133,7 +140,13 @@ modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
     direction = "forward"
   )
 
-  return(model)
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(popA, 25), list(popB, 25), list(popC, 25), list(popD, 25),
+    strict = TRUE
+  )
+
+  return(list(model, samples))
 }
 
 modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
@@ -150,15 +163,21 @@ modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
     direction = "forward"
   )
 
-  return(model)
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(popA, 25), list(popB, 25), list(popC, 25), list(popD, 25),
+    strict = TRUE
+  )
+
+  return(list(model, samples))
 }
 ```
 
-```{r, echo=FALSE, eval=FALSE}
-modelX(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelX.pdf")
-modelY(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelY.pdf")
-modelZ(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelZ.pdf")
-```
+<!-- ```{r, echo=FALSE, eval=FALSE} -->
+<!-- modelX(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelX.pdf") -->
+<!-- modelY(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelY.pdf") -->
+<!-- modelZ(1, 1, 1, 1, 2000, 6000, 8000, 0.5) %>% plot_model(order = c("popA", "popB", "popC", "popD"), file = "modelZ.pdf") -->
+<!-- ``` -->
 
 Now, let's [specify priors](vignette-02-priors.html) using _demografr_'s [templating syntax](vignette-02-priors.html#prior-parameter-templates). This saves us a bit of typing, making the prior definition code a bit more consise and easier to read:
 
@@ -207,11 +226,11 @@ validate_abc(modelY, priors, functions, observed, quiet = TRUE)
 validate_abc(modelZ, priors, functions, observed, quiet = TRUE)
 ```
 
-```{r, echo=FALSE, eval=FALSE}
-tsX <- simulate_ts(modelX, priors)
-tsY <- simulate_ts(modelY, priors)
-tsZ <- simulate_ts(modelZ, priors)
-```
+<!-- ```{r, echo=FALSE, eval=FALSE} -->
+<!-- tsX <- simulate_ts(modelX, priors) -->
+<!-- tsY <- simulate_ts(modelY, priors) -->
+<!-- tsZ <- simulate_ts(modelZ, priors) -->
+<!-- ``` -->
 
 With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 
@@ -248,10 +267,6 @@ saveRDS(dataY, abcY_path)
 saveRDS(dataZ, abcZ_path)
 ```
 
-```{r}
-stop("finished")
-```
-
 ```{r, echo=FALSE}
 tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
 ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
@@ -263,7 +278,14 @@ minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
 ```
 
+
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+
+```{r, eval=!abc_exists, echo=FALSE}
+dataX <- readRDS(abcX_path)
+dataY <- readRDS(abcY_path)
+dataZ <- readRDS(abcZ_path)
+```
 
 ```{r, eval=!abc_exists, results="hide"}
 abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
@@ -287,9 +309,9 @@ abcZ <- readRDS(abcZ_path)
 
 Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models.
 
-This can be done using _demografr_'s convenience interface wrapper `run_cv()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+This can be done using _demografr_'s convenience interface wrapper `cross_validate()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
-The one difference between the two functions is that `run_cv()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
+The one difference between the two functions is that `cross_validate()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
 ```{r, eval=!file.exists(cv_path), results="hide", warning=FALSE}
 models <- list(abcX, abcY, abcZ)
@@ -323,7 +345,7 @@ The confusion matrices and the visualization all suggest that ABC can distinguis
 
 ## Model selection
 
-Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_. This can be done with the function `model_selection()` which is _demografr_'s convenience wrapper around _abc_'s own function `postpr`:
+Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_. This can be done with the function `select_model()` which is _demografr_'s convenience wrapper around _abc_'s own function `postpr`:
 
 ```{r, results="hide"}
 models <- list(abcX, abcY, abcZ)
