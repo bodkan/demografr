@@ -34,6 +34,7 @@ navbar:
       href: https://fosstodon.org/bodkan
 
 reference:
+
   - title: Approximate Bayesian Computation
     contents:
     - validate_abc
@@ -44,16 +45,16 @@ reference:
     contents:
     - simulate_grid
 
-  - title: Helper functions
+  - title: Genetic algorithms
     contents:
-    - simulate_ts
-    - combine_data
-    - combine_data
+    - compute_fitness
+    - run_ga
 
   - title: ABC cross-validation and posterior checks
     contents:
     - cross_validate
     - select_model
+    - goodness_of_fit
     - predict.demografr_abc.abc
     - plot.demografr_cv
     - extract_prediction
@@ -67,6 +68,13 @@ reference:
     - plot_posterior
     - plot.demografr_abc.abc
     - hist.demografr_abc.abc
+
+  - title: Helper functions
+    contents:
+    - simulate_ts
+    - combine_data
+    - combine_data
+    - sample_prior
 
 news:
   one_page: true

@@ -248,7 +248,7 @@
 <span></span>
 <span><span class="co"># set up parallelization across all CPUs on the current machine</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multicore</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#--------------------------------------------------------------------------------</span></span>
 <span><span class="co"># bind data frames with empirical summary statistics into a named list</span></span>
@@ -313,20 +313,22 @@
 <span><span class="co"># same format as the summary statistics computed on empirical data)</span></span>
 <span></span>
 <span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">slendr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_diversity.html" class="external-link">ts_diversity</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">compute_divergence</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">slendr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_divergence.html" class="external-link">ts_divergence</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">compute_f4</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">slendr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>,</span>
-<span>        W <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>popA <span class="op">=</span> <span class="va">samples</span><span class="op">$</span><span class="va">popA</span><span class="op">)</span>,</span>
-<span>        X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>popB <span class="op">=</span> <span class="va">samples</span><span class="op">$</span><span class="va">popB</span><span class="op">)</span>,</span>
-<span>        Y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>popC <span class="op">=</span> <span class="va">samples</span><span class="op">$</span><span class="va">popC</span><span class="op">)</span>,</span>
-<span>        Z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>popD <span class="op">=</span> <span class="va">samples</span><span class="op">$</span><span class="va">popD</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
+<span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popA"</span><span class="op">]</span>; <span class="va">B</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popB"</span><span class="op">]</span></span>
+<span>  <span class="va">C</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popC"</span><span class="op">]</span>; <span class="va">D</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popD"</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">B</span>, <span class="va">C</span>, <span class="va">D</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">C</span>, <span class="va">B</span>, <span class="va">D</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">D</span>, <span class="va">B</span>, <span class="va">C</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># the summary functions must be also bound to an R list named in the same</span></span>
@@ -345,12 +347,12 @@
 <span><span class="co"># run ABC simulations</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_abc.html">simulate_abc</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
-<span>  sequence_length <span class="op">=</span> <span class="fl">10e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
+<span>  sequence_length <span class="op">=</span> <span class="fl">50e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#--------------------------------------------------------------------------------</span></span>
 <span><span class="co"># infer posterior distributions of parameters using the abc R package</span></span>
-<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">perform_abc</span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -360,33 +362,33 @@
 <p>For instance, we can get a table of all posterior values with the function <code><a href="reference/extract_summary.html">extract_summary()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D     T_AB     T_BC</span></span>
-<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060 1192.360 4988.493</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297 1561.180 5259.732</span></span>
-<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350 2003.515 5678.190</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215 2003.738 5655.562</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785 1939.879 5752.531</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347 2326.478 5941.146</span></span>
-<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341 2569.966 6036.115</span></span>
-<span><span class="co">#&gt;                            T_CD       gf_BC</span></span>
-<span><span class="co">#&gt; Min.:                  6863.233 -0.02455945</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  7294.305  0.02674433</span></span>
-<span><span class="co">#&gt; Weighted Median:       8127.699  0.16684306</span></span>
-<span><span class="co">#&gt; Weighted Mean:         8196.626  0.18184086</span></span>
-<span><span class="co">#&gt; Weighted Mode:         8052.760  0.12030457</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 9387.034  0.33763567</span></span>
-<span><span class="co">#&gt; Max.:                  9387.034  0.35898225</span></span></code></pre></div>
+<span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C      Ne_D     T_AB</span></span>
+<span><span class="co">#&gt; Min.:                   804.0797  408.1848 -4305.207  502.5387 1607.479</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200 1665.661</span></span>
+<span><span class="co">#&gt; Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076 2010.293</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225 2016.526</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851 1995.493</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645 2262.405</span></span>
+<span><span class="co">#&gt; Max.:                  3646.4941 1919.2377 11815.139 6641.5602 2450.616</span></span>
+<span><span class="co">#&gt;                            T_BC     T_CD       gf_BC</span></span>
+<span><span class="co">#&gt; Min.:                  4843.964 7228.372 -0.21801869</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  4908.179 7286.378 -0.04095791</span></span>
+<span><span class="co">#&gt; Weighted Median:       5936.615 7874.670  0.11279850</span></span>
+<span><span class="co">#&gt; Weighted Mean:         5909.206 7907.132  0.11161160</span></span>
+<span><span class="co">#&gt; Weighted Mode:         5832.770 7724.623  0.07205975</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6651.473 8734.573  0.26094451</span></span>
+<span><span class="co">#&gt; Max.:                  6793.562 9936.191  1.41335586</span></span></code></pre></div>
 <p>We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297</span></span>
-<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347</span></span>
-<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341</span></span></code></pre></div>
+<span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C      Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                   804.0797  408.1848 -4305.207  502.5387</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200</span></span>
+<span><span class="co">#&gt; Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645</span></span>
+<span><span class="co">#&gt; Max.:                  3646.4941 1919.2377 11815.139 6641.5602</span></span></code></pre></div>
 <p>We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let’s first check out the posterior distributions of inferred <span class="math inline"><em>N</em><sub><em>e</em></sub></span> values:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
@@ -397,7 +399,7 @@
 <p><img src="reference/figures/README-posterior_Tsplit-1.png"></p>
 <p>And, finally, the rate of gene flow:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-posterior_gf-1.png"></p>
 <p>Finally, we have the diagnostic functionality of the <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> R package at our disposal:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
