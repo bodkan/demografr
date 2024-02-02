@@ -318,7 +318,7 @@ abcZ <- readRDS(abcZ_path)
 
 Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models.
 
-This can be done using _demografr_'s convenience interface wrapper `cross_validate()` built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+This can be done using _demografr_'s `cross_validate()` function which is built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments on behalf of a user to avoid unnecessary manual data munging. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
 The one difference between the two functions is that `cross_validate()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
@@ -354,7 +354,7 @@ The confusion matrices and the visualization all suggest that ABC can distinguis
 
 ## Model selection
 
-Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of _the best model for our empirical data set_. This can be done with the function `select_model()` which is _demografr_'s convenience wrapper around _abc_'s own function `postpr`:
+Armed with confidence in the ability of ABC to correctly identify the correct model based on simulated data, we can proceed to selection of the best model for our empirical data set. This can be done with the function `select_model()` which is _demografr_'s convenience wrapper around _abc_'s own function `postpr`:
 
 ```{r, results="hide"}
 models <- list(abcX, abcY, abcZ)
@@ -372,11 +372,31 @@ As we can see, `modelX` shows the highest rate of acceptance among all simulatio
 
 Similarly, looking at the Bayes factors, we see that the "modelX" is `r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 2])` times more likely than "modelY", and `r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 3])` more likely than "modelZ".
 
-When the posterior probabilities are computed using a more elaborate neural network method (again, see more details in the _abc_ [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf)), we find that the probability of "modelX" is even more overwhelming. In fact, the analysis shows that it has a nearly 100% probabiliy of being the correct model to explain our data.
+When the posterior probabilities are computed using a more elaborate neural network method (again, see more details in the _abc_ [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf)), we find that the probability of "modelX" is even more overwhelming. In fact, the analysis shows that it has a 100% probabiliy of being the correct model to explain our data.
 
-**But how accurate are these conclusions?** Well, if we take a peek at the _slendr_ model which was [internally used](https://github.com/bodkan/demografr/blob/main/vignettes/vignette-01-basics.Rmd#L36-L47) to generate the "observed" summary statistics, we see that the data was indeed simulated by code nearly identical to the one shown above as `modelX`.
+**But how accurate are these conclusions?** Well, if we take a peek at the _slendr_ model which was [internally used](https://github.com/bodkan/demografr/blob/main/vignettes/vignette-01-basics.Rmd#L36-L4) to generate the "observed" summary statistics, we see that the data was indeed simulated by code nearly identical to the one shown above as `modelX`. When plotted, the true model looks like this:
+
+```{r, true_model}
+popA <- population("popA", time = 1, N = 2000)
+popB <- population("popB", time = 2000, N = 800, parent = popA)
+popC <- population("popC", time = 6000, N = 9000, parent = popB)
+popD <- population("popD", time = 8000, N = 4000, parent = popC)
+
+gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.1)
+
+example_model <- compile_model(
+  populations = list(popA, popB, popC, popD), gene_flow = gf,
+  generation_time = 1,
+  simulation_length = 10000
+)
+
+plot_model(example_model, proportions = TRUE)
+```
+
 
 ## Goodness-of-fit
+
+http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf
 
 So, it appears that we can be quite confident in which of the three models best represents the data. However, before we move on to inferring parameters of the model, we should check whether the best selected model can indeed capture the most important features of the data, which is in case of ABC represented by our summary statistics.
 
@@ -385,40 +405,48 @@ The _abc_ R package provides two functions, `gfit()` and `gfitpca()`, for which 
 First, there is a function `goodness_of_fit()` which can be used in the following way:
 
 ```{r}
-gfit <- goodness_of_fit(abcX, replicates = 100)
+gfitX <- goodness_of_fit(abcX, replicates = 1000)
 
-summary(gfit)
+summary(gfitX)
 
-plot(gfit, main = "Histogram for modelX under H0")
+plot(gfitX, main = "Histogram for modelX under H0")
 ```
 
 ```{r}
-gfit <- goodness_of_fit(abcY, replicates = 100)
+gfitY <- goodness_of_fit(abcY, replicates = 1000)
 
-summary(gfit)
+summary(gfitY)
 
-plot(gfit, main = "Histogram for modelY under H0")
+plot(gfitY, main = "Histogram for modelY under H0")
 ```
 
 ```{r}
-gfit <- goodness_of_fit(abcZ, replicates = 100)
+gfitZ <- goodness_of_fit(abcZ, replicates = 1000)
 
-summary(gfit)
+summary(gfitZ)
 
-plot(gfit, main = "Histogram for modelZ under H0")
+plot(gfitZ, main = "Histogram for modelZ under H0")
 ```
 
 
 
 ```{r}
-  model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
-  model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
-  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+models <- list(abcX, abcY, abcZ)
 
-colnames(observed_stats) <- colnames(model_stats)
+names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
+model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
+model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
+model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+
+observed_stats <- bind_observed(attr(models[[1]], "components")$observed)
+
+if (length(colnames(observed_stats)) != length(colnames(observed_stats)) || 
+  any(colnames(observed_stats) != colnames(model_stats))) {
+  stop("Observed and simulated statistics matrices are not compatible", call. = FALSE)
+}
 
 library(locfit)
-gfitpca(target = observed_stats, sumstat = model_stats, index = model_names, cprob = 0.1)
+abc::gfitpca(target = observed_stats, sumstat = model_stats, index = model_names, cprob = 0.1)
 ```
 
 ```{r}
@@ -430,10 +458,8 @@ abcX <- readRDS("inst/examples/basics_abc.rds")
 
 
 
-
-
 ```{r}
-future::plan("multicore", workers = future::availableCores())
+plan(multisession, workers = availableCores())
 predX <- predict(abcX, 1000, posterior = "unadj")
 predY <- predict(abcY, 1000, posterior = "unadj")
 predZ <- predict(abcZ, 1000, posterior = "unadj")
@@ -458,7 +484,7 @@ cowplot::plot_grid(
 If more customization or a more detailed analyses is needed, you can also extract data from the posterior simulations themselves:
 
 ```{r}
-extract_prediction(predictions, "diversity")
+extract_prediction(predX, "diversity")
 ```
 
 However, note that `extract_prediction` is a convenience function which only unnests, reformats, and renames the list-columns with summary statistics stored in the `predictions` data frame above. You can do all the processing based on the `predictions` object above.
