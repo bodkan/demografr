@@ -137,16 +137,31 @@
     
     
 <p>⚠️⚠️⚠️</p>
-<p><strong>Note:</strong> The <em>demografr</em> R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.</p>
+<p><strong>Note:</strong> The <em>demografr</em> R package is still
+under active development. As a result, its documentation is in a draft
+stage at best. Typos, inconsistencies, and other issues are
+unfortunately expected.</p>
 <p>⚠️⚠️⚠️</p>
-<p>This vignette contains an expanded version of the basic ABC inference example from the <a href="https://bodkan.net/demografr/">homepage</a> of <em>demografr</em>. It walks through the process of setting up a <em>demografr</em> ABC pipeline step by step.</p>
+<p>This vignette contains an expanded version of the basic ABC inference
+example from the <a href="https://bodkan.net/demografr/">homepage</a> of
+<em>demografr</em>. It walks through the process of setting up a
+<em>demografr</em> ABC pipeline step by step.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Imagine that we sequenced genomes of individuals from populations “popA”, “popB”, “popC”, and “popD”.</p>
-<p>Let’s also assume that we know that the three populations are phylogenetically related in the following way but we don’t know anything else (i.e., we have no idea about the values of <span class="math inline">\(N_e\)</span>, split times, or gene-flow rates):</p>
+<p>Imagine that we sequenced genomes of individuals from populations
+“popA”, “popB”, “popC”, and “popD”.</p>
+<p>Let’s also assume that we know that the three populations are
+phylogenetically related in the following way but we don’t know anything
+else (i.e., we have no idea about the values of <span class="math inline">\(N_e\)</span>, split times, or gene-flow
+rates):</p>
 <p><img src="vignette-01-basics_files/figure-html/ape_tree-1.png" width="400" style="display: block; margin: auto;"></p>
-<p>After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a one <span class="math inline">\(f_4\)</span> statistic, observing the following values of these summary statistics (which we saved in standard R data frames—perhaps saved by software we used for computing these from empirical sequence data):</p>
+<p>After sequencing the genomes of individuals from these populations,
+we computed nucleotide diversity in these populations as well as their
+pairwise genetic divergence and a one <span class="math inline">\(f_4\)</span> statistic, observing the following
+values of these summary statistics (which we saved in standard R data
+frames—perhaps saved by software we used for computing these from
+empirical sequence data):</p>
 <ol style="list-style-type: decimal">
 <li>Nucleotide diversity in each population:</li>
 </ol>
@@ -184,12 +199,18 @@
 <span><span class="co">#&gt; 1 popA popB popC popD -3.433205e-06</span></span>
 <span><span class="co">#&gt; 2 popA popC popB popD -7.125812e-07</span></span>
 <span><span class="co">#&gt; 3 popA popD popB popC  2.720624e-06</span></span></code></pre>
-<p><strong>Now let’s develop a simple ABC pipeline which will infer the posterior distributions of two sets of parameters we are interested in: <span class="math inline">\(N_e\)</span> of each population lineage, as well as split times between our populations of interest.</strong></p>
+<p><strong>Now let’s develop a simple ABC pipeline which will infer the
+posterior distributions of two sets of parameters we are interested in:
+<span class="math inline">\(N_e\)</span> of each population lineage, as
+well as split times between our populations of interest.</strong></p>
 </div>
 <div class="section level2">
 <h2 id="developing-an-abc-pipeline">Developing an ABC pipeline<a class="anchor" aria-label="anchor" href="#developing-an-abc-pipeline"></a>
 </h2>
-<p>Let’s begin by loading <em>demografr</em> together with the R package <a href="https://www.slendr.net/" class="external-link"><em>slendr</em></a> on which <em>demografr</em> relies on for building and simulating demographic models.</p>
+<p>Let’s begin by loading <em>demografr</em> together with the R package
+<a href="https://www.slendr.net/" class="external-link"><em>slendr</em></a> on which
+<em>demografr</em> relies on for building and simulating demographic
+models.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
@@ -200,8 +221,11 @@
 <span></span>
 <span><span class="co"># setup parallelization across all CPUs</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multicore</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>For the purpose of the ABC analysis below, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here “diversity” and “divergence”) have meaning and are quite important for later steps:</p>
+<span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>For the purpose of the ABC analysis below, we will bind all
+statistics in an R list, naming them appropriately. The names of each
+statistic (here “diversity” and “divergence”) have meaning and are quite
+important for later steps:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  diversity  <span class="op">=</span> <span class="va">observed_diversity</span>,</span>
@@ -211,7 +235,11 @@
 <div class="section level3">
 <h3 id="setting-up-a-scaffold-model">1. Setting up a “scaffold” model<a class="anchor" aria-label="anchor" href="#setting-up-a-scaffold-model"></a>
 </h3>
-<p>The first step in a <em>demografr</em> ABC analysis is setting up a “scaffold” model—a <em>slendr</em> function which will return a compiled <em>slendr</em> model as its output, and which will accept the model parameters in form of normal R function arguments. In our simple examples, we will define the following function:</p>
+<p>The first step in a <em>demografr</em> ABC analysis is setting up a
+“scaffold” model—a <em>slendr</em> function which will return a compiled
+<em>slendr</em> model as its output, and which will accept the model
+parameters in form of normal R function arguments. In our simple
+examples, we will define the following function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Ne_A</span>, <span class="va">Ne_B</span>, <span class="va">Ne_C</span>, <span class="va">Ne_D</span>, <span class="va">T_AB</span>, <span class="va">T_BC</span>, <span class="va">T_CD</span>, <span class="va">gf_BC</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">popA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"popA"</span>, time <span class="op">=</span> <span class="fl">1</span>,    N <span class="op">=</span> <span class="va">Ne_A</span><span class="op">)</span></span>
@@ -241,7 +269,9 @@
 <div class="section level3">
 <h3 id="setting-up-priors">2. Setting up priors<a class="anchor" aria-label="anchor" href="#setting-up-priors"></a>
 </h3>
-<p>We are interested in estimating the <span class="math inline">\(N_e\)</span> of all populations and their split times. <em>demografr</em> makes this very easy using a familiar symbolic formula syntax in R:</p>
+<p>We are interested in estimating the <span class="math inline">\(N_e\)</span> of all populations and their split
+times. <em>demografr</em> makes this very easy using a familiar symbolic
+formula syntax in R:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">Ne_A</span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">10000</span><span class="op">)</span>,</span>
@@ -255,14 +285,31 @@
 <span></span>
 <span>  <span class="va">gf_BC</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>In an ABC simulation step below, the formulas are used to draw the values of each parameter from specified distributions (in this case, all uniform distributions across a wide range of parameter values).</p>
-<p>**For more detail into how <em>demografr</em>’s prior sampling formulas work (and why), take a look <a href="vignette-02-priors.html">here</a>.</p>
+<p>In an ABC simulation step below, the formulas are used to draw the
+values of each parameter from specified distributions (in this case, all
+uniform distributions across a wide range of parameter values).</p>
+<p>**For more detail into how <em>demografr</em>’s prior sampling
+formulas work (and why), take a look <a href="vignette-02-priors.html">here</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="defining-summary-statistics">3. Defining summary statistics<a class="anchor" aria-label="anchor" href="#defining-summary-statistics"></a>
 </h3>
-<p>Each run of a <em>demografr</em> ABC simulation internally produces a tree sequence as an output. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save each simulation output to disk for computation in different software. Thanks to <em>slendr</em>’s library of <a href="https://www.slendr.net/reference/index.html#tree-sequence-statistics" class="external-link">tree-sequence functions</a> serving as an R interface to the <a href="https://tskit.dev/tskit/docs/stable/stats.html" class="external-link"><em>tskit</em> module</a>, you can specify summary statistics to be computed for ABC using plain and simple R code.</p>
-<p>In our example, because we computed nucleotide diversity and pairwise divergence in the individuals sequenced from populations “p1”, “p2”, and “p3”, we will define the following functions. Crucially, when run on a tree-sequence object, they will produce an output data frame in the format analogous to the empirical statistics shown in data frames <code>diversity</code> and <code>divergence</code> above:</p>
+<p>Each run of a <em>demografr</em> ABC simulation internally produces a
+tree sequence as an output. Because tree sequence represents an
+efficient, succint representation of the complete genealogical history
+of a set of samples, it is possible to compute population genetic
+statistics directly on the tree sequence without having to first save
+each simulation output to disk for computation in different software.
+Thanks to <em>slendr</em>’s library of <a href="https://www.slendr.net/reference/index.html#tree-sequence-statistics" class="external-link">tree-sequence
+functions</a> serving as an R interface to the <a href="https://tskit.dev/tskit/docs/stable/stats.html" class="external-link"><em>tskit</em>
+module</a>, you can specify summary statistics to be computed for ABC
+using plain and simple R code.</p>
+<p>In our example, because we computed nucleotide diversity and pairwise
+divergence in the individuals sequenced from populations “p1”, “p2”, and
+“p3”, we will define the following functions. Crucially, when run on a
+tree-sequence object, they will produce an output data frame in the
+format analogous to the empirical statistics shown in data frames
+<code>diversity</code> and <code>divergence</code> above:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
@@ -288,14 +335,55 @@
 <span>  divergence <span class="op">=</span> <span class="va">compute_divergence</span>,</span>
 <span>  f4         <span class="op">=</span> <span class="va">compute_f4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Crucially, the outputs of these summary functions <em>must</em> match the format of the observed summary statistics (i.e., the data frames produced must have the same format). This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.</p>
+<p>Crucially, the outputs of these summary functions <em>must</em> match
+the format of the observed summary statistics (i.e., the data frames
+produced must have the same format). This minor inconvenience during ABC
+setup saves us the headache of having to match values of statistics
+between observed and simulated data during ABC inference itself.</p>
+<p>Of course, having to run ABC simulations in order to check that the
+summary functions have been correctly defined would be slow and
+potentially costly in terms of wasted computation. To speed this process
+up, <em>demografr</em> provides a helper function
+<code><a href="../reference/simulate_ts.html">simulate_ts()</a></code> which allows you to simulate a single tree
+sequence object from the specified model. You can then use that tree
+sequence object to develop (and test) your summary functions before
+proceeding further, like this:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span><span class="op">)</span></span></code></pre></div>
+<p>With this <code>ts</code> object, we can, for instance, test that our
+<code>compute_f4</code> summary function is defined correctly (meaning
+that it returns <span class="math inline">\(f_4\)</span>` statistics
+table formatted in exactly the same way as the observed table
+above):</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">f4</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<span><span class="co">#&gt;   W     X     Y     Z        f4</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> popA  popB  popC  popD      0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> popA  popC  popB  popD      0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> popA  popD  popB  popC      0</span></span></code></pre>
+<p>Looks good! (We have zero <span class="math inline">\(f_4\)</span>
+values because we didn’t specify mutation rate in
+<code>simulate_ts</code>, as we were only interested in the
+compatibility of the formats and dimensions of both simulated and
+observed <span class="math inline">\(f_4\)</span> tables). Of course, in
+your analysis pipeline, you might (should!) check that all of your
+summary functions are set up correctly.</p>
 </div>
 <div class="section level3">
 <h3 id="abc-simulations">4. ABC simulations<a class="anchor" aria-label="anchor" href="#abc-simulations"></a>
 </h3>
-<p>Having defined the scaffold model, a set of priors for our parameters of interest (<span class="math inline">\(N_e\)</span> and split times), as well as two summary statistic functions, we can plug all this information into the function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>.</p>
-<p>Before we run a potentially computationally costly simulations, it is a good idea to validate the ABC components we have so far assembled using the function <code><a href="../reference/validate_abc.html">validate_abc()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Having defined the scaffold model, a set of priors for our parameters
+of interest (<span class="math inline">\(N_e\)</span> and split times),
+as well as two summary statistic functions, we can plug all this
+information into the function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>.</p>
+<p>Before we run a potentially computationally costly simulations, it is
+a good idea to validate the ABC components we have so far assembled
+using the function <code><a href="../reference/validate_abc.html">validate_abc()</a></code>. This provides much
+deeper correctness checks beyond the simple testing of the summary
+functions as we did above.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; Testing sampling of each prior parameter:</span></span>
@@ -327,27 +415,49 @@
 <span><span class="co">#&gt;   * f4 ✅  </span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<p>Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using <em>demografr</em>’s function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>Having verified that all model components are set up correctly, we
+can proceed to the ABC simulations themselves, using
+<em>demografr</em>’s function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_abc.html">simulate_abc</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
-<span>  sequence_length <span class="op">=</span> <span class="fl">20e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
+<span>  sequence_length <span class="op">=</span> <span class="fl">50e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 24 minutes 49 seconds parallelized across 96 CPUs.</strong></p>
-<p>At this point we have generated summary statistics for simulations of models using parameters drawn from our priors. In the next step, we can finally do inference of our parameters.</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 53
+minutes 31 seconds parallelized across 96 CPUs.</strong></p>
+<p>At this point we have generated summary statistics for simulations of
+models using parameters drawn from our priors. In the next step, we can
+finally do inference of our parameters.</p>
 </div>
 <div class="section level3">
 <h3 id="abc-inference">5. ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
 </h3>
-<p>Having all the information about observed and simulated data bound in a single R object <code>data</code>, we can finally perform the ABC inference. <em>demografr</em> includes a convenient function <code><a href="../reference/perform_abc.html">perform_abc()</a></code> which reformats the simulated and observed data in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and internally calls its function <code>abc()</code>.</p>
-<p>Note that <code>perform_abc</code> is just convenience wrapper around the <code>abc()</code> function in the package <em>abc</em><code>, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function</code>abc()<code>can be provided to</code>perform_abc()`, which will then pass them on appropriately.</p>
+<p>Having all the information about observed and simulated data bound in
+a single R object <code>data</code>, we can finally perform the ABC
+inference. <em>demografr</em> includes a convenient function
+<code><a href="../reference/run_abc.html">run_abc()</a></code> which reformats the simulated and observed data
+in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and
+internally calls its function <code>abc()</code>.</p>
+<p>Note that <code>run_abc</code> is just convenience wrapper around the
+<code>abc()</code> function in the package
+<em>abc</em><code>, saving us a little work juggling the necessary matrices manually. As such, all parameters of the function</code>abc()<code>can be provided to</code>run_abc()`,
+which will then pass them on appropriately.</p>
 </div>
 <div class="section level3">
 <h3 id="posterior-predictive-check">6. Posterior predictive check<a class="anchor" aria-label="anchor" href="#posterior-predictive-check"></a>
 </h3>
-<p>Before we proceed with inferring values of the model parameters from their posterior distributions, we should check whether our model can actually produce summary statistics which match the statistics observed in the empirical data.</p>
-<p>In order to do this, we can use <em>demografr</em>’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method which accepts two mandatory function arguments: the first is the abc object generated by the <code><a href="../reference/perform_abc.html">perform_abc()</a></code> function (and contains, among other things, the information about the inferred posteriors), and the number of draws to take from the multidimensional posterior distribution of the parameters:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>Before we proceed with inferring values of the model parameters from
+their posterior distributions, we should check whether our model can
+actually produce summary statistics which match the statistics observed
+in the empirical data.</p>
+<p>In order to do this, we can use <em>demografr</em>’s
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method which accepts two mandatory function
+arguments: the first is the <code>abc</code> object generated by the
+<code><a href="../reference/run_abc.html">run_abc()</a></code> function (and contains, among other things, the
+information about the inferred posteriors), and the number of draws to
+take from the multidimensional posterior distribution of the
+parameters:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># because we set up a parallelization plan() above, the predictions are</span></span>
 <span><span class="co"># computed in parallel across all available CPUs</span></span>
 <span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">abc</span>, samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
@@ -357,23 +467,42 @@
 <span><span class="co">#&gt; can either sample unadjusted parameters  by setting `posterior = "unadj"`</span></span>
 <span><span class="co">#&gt; or instruct the prediction function to skip invalid models by setting</span></span>
 <span><span class="co">#&gt; `strict = FALSE`.</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Out of the total 7 simulations, 1000 runs resulted in an error.</span></span>
+<pre><code><span><span class="co">#&gt; Out of the total 67 simulations, 1000 runs resulted in an error.</span></span>
 <span><span class="co">#&gt; The most likely explanation for this is that some parameter combinations</span></span>
 <span><span class="co">#&gt; lead to an invalid model (such as inconsistent order of split times).</span></span></code></pre>
-<p>If we take a closer look at the produced result, we see that it’s a data frame object with several special columns (so-called <a href="https://dcl-prog.stanford.edu/list-columns.html" class="external-link">“list columns”</a>). Those columns contain nested data frames with the values of tree-sequence summary statistics computed for each combination of the parameter values. Because this data has the same format as the output of the function <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> (in fact, internally it <em>is</em> produced by this function), see the vignette on <a href="vignette-03-grids.html">grid simulations</a> for more detail how to analyse this.</p>
-<p>In order to perform a detailed analysis of the posterior predictive check results for individual (or all) summary statistics, you can use the function <code><a href="../reference/extract_prediction.html">extract_prediction()</a></code>. A convenient alternative to check the results visually is provided by the function <code><a href="../reference/plot_prediction.html">plot_prediction()</a></code>. For instance, we can take a look at the distributions of divergences produced from the parameter posterior like this:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p>If we take a closer look at the produced result, we see that it’s a
+data frame object with several special columns (so-called <a href="https://dcl-prog.stanford.edu/list-columns.html" class="external-link">“list
+columns”</a>). Those columns contain nested data frames with the values
+of tree-sequence summary statistics computed for each combination of the
+parameter values. Because this data has the same format as the output of
+the function <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> (in fact, internally it
+<em>is</em> produced by this function), see the vignette on <a href="vignette-03-grids.html">grid simulations</a> for more detail how
+to analyse this.</p>
+<p>In order to perform a detailed analysis of the posterior predictive
+check results for individual (or all) summary statistics, you can use
+the function <code><a href="../reference/extract_prediction.html">extract_prediction()</a></code>. A convenient alternative
+to check the results visually is provided by the function
+<code><a href="../reference/plot_prediction.html">plot_prediction()</a></code>. For instance, we can take a look at the
+distributions of divergences produced from the parameter posterior like
+this:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"diversity"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/postpred_diversity-1.png" width="640" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"divergence"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/postpred_divergence-1.png" width="640" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"f4"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/postpred_f4-1.png" width="640" style="display: block; margin: auto;"></p>
-<p><strong>Nice! It appears that the posterior from our simplistic model captures the observed summary statistics (dashed vertical lines) quite well.</strong></p>
-<p>(To make evaluation a little bit easier, there’s an option <code>file =</code> which instructs <code>plot_prediction</code> to save a figure to disk instead of plotting it using a graphical device—useful for work on remote servers!).</p>
-<p><strong>For more details on possible downstream validation and troubleshooting analyses, please see <a href="vignette-06-diagnostics.html">this vignette</a>.</strong></p>
+<p><strong>Nice! It appears that the posterior from our simplistic model
+captures the observed summary statistics (dashed vertical lines) quite
+well.</strong></p>
+<p>(To make evaluation a little bit easier, there’s an option
+<code>file =</code> which instructs <code>plot_prediction</code> to save
+a figure to disk instead of plotting it using a graphical device—useful
+for work on remote servers!).</p>
+<p><strong>For more details on possible downstream validation and
+troubleshooting analyses, please see <a href="vignette-06-diagnostics.html">this vignette</a>.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="posterior-analysis">7. Posterior analysis<a class="anchor" aria-label="anchor" href="#posterior-analysis"></a>
@@ -381,9 +510,15 @@
 <div class="section level4">
 <h4 id="extracting-posterior-summary-tables">Extracting posterior summary tables<a class="anchor" aria-label="anchor" href="#extracting-posterior-summary-tables"></a>
 </h4>
-<p>Now that we have the ABC output object ready and have more or less convinced ourselves that our model can capture the summary statistics we’ve chosen via posterior predictive checks, we can proceed with parameter inference.</p>
-<p>First, we can get a data frame with summary statistics of the posterior distributions of our parameters. For instance, we can easily read the maximum a posteriori probability (MAP) of the parameters in the row labelled “Mode:”:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<p>Now that we have the ABC output object ready and have more or less
+convinced ourselves that our model can capture the summary statistics
+we’ve chosen via posterior predictive checks, we can proceed with
+parameter inference.</p>
+<p>First, we can get a data frame with summary statistics of the
+posterior distributions of our parameters. For instance, we can easily
+read the maximum a posteriori probability (MAP) of the parameters in the
+row labelled “Mode:”:</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -408,24 +543,25 @@
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D     T_AB     T_BC</span></span>
-<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060 1192.360 4988.493</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297 1561.180 5259.732</span></span>
-<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350 2003.515 5678.190</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215 2003.738 5655.562</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785 1939.879 5752.531</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347 2326.478 5941.146</span></span>
-<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341 2569.966 6036.115</span></span>
-<span><span class="co">#&gt;                            T_CD       gf_BC</span></span>
-<span><span class="co">#&gt; Min.:                  6863.233 -0.02455945</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  7294.305  0.02674433</span></span>
-<span><span class="co">#&gt; Weighted Median:       8127.699  0.16684306</span></span>
-<span><span class="co">#&gt; Weighted Mean:         8196.626  0.18184086</span></span>
-<span><span class="co">#&gt; Weighted Mode:         8052.760  0.12030457</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 9387.034  0.33763567</span></span>
-<span><span class="co">#&gt; Max.:                  9387.034  0.35898225</span></span></code></pre>
-<p>Because large tables can get a little hard to read, it is possible to subset to only a specific <em>type</em> of parameter:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C      Ne_D     T_AB</span></span>
+<span><span class="co">#&gt; Min.:                   804.0797  408.1848 -4305.207  502.5387 1607.479</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200 1665.661</span></span>
+<span><span class="co">#&gt; Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076 2010.293</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225 2016.526</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851 1995.493</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645 2262.405</span></span>
+<span><span class="co">#&gt; Max.:                  3646.4941 1919.2377 11815.139 6641.5602 2450.616</span></span>
+<span><span class="co">#&gt;                            T_BC     T_CD       gf_BC</span></span>
+<span><span class="co">#&gt; Min.:                  4843.964 7228.372 -0.21801869</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  4908.179 7286.378 -0.04095791</span></span>
+<span><span class="co">#&gt; Weighted Median:       5936.615 7874.670  0.11279850</span></span>
+<span><span class="co">#&gt; Weighted Mean:         5909.206 7907.132  0.11161160</span></span>
+<span><span class="co">#&gt; Weighted Mode:         5832.770 7724.623  0.07205975</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6651.473 8734.573  0.26094451</span></span>
+<span><span class="co">#&gt; Max.:                  6793.562 9936.191  1.41335586</span></span></code></pre>
+<p>Because large tables can get a little hard to read, it is possible to
+subset to only a specific <em>type</em> of parameter:</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -450,15 +586,15 @@
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                             Ne_A     Ne_B      Ne_C     Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                   929.0679 670.3812  2966.659 1790.060</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297</span></span>
-<span><span class="co">#&gt; Weighted Median:       1990.5578 799.0462  7366.514 3714.350</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1967.7919 802.3221  7075.016 3578.215</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1954.3619 757.0564  7620.487 3809.785</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347</span></span>
-<span><span class="co">#&gt; Max.:                  3144.9674 927.3249 11696.130 5228.341</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C      Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                   804.0797  408.1848 -4305.207  502.5387</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200</span></span>
+<span><span class="co">#&gt; Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076</span></span>
+<span><span class="co">#&gt; Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645</span></span>
+<span><span class="co">#&gt; Max.:                  3646.4941 1919.2377 11815.139 6641.5602</span></span></code></pre>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -484,15 +620,16 @@
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
 <pre><code><span><span class="co">#&gt;                            T_AB     T_BC     T_CD</span></span>
-<span><span class="co">#&gt; Min.:                  1192.360 4988.493 6863.233</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1561.180 5259.732 7294.305</span></span>
-<span><span class="co">#&gt; Weighted Median:       2003.515 5678.190 8127.699</span></span>
-<span><span class="co">#&gt; Weighted Mean:         2003.738 5655.562 8196.626</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1939.879 5752.531 8052.760</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2326.478 5941.146 9387.034</span></span>
-<span><span class="co">#&gt; Max.:                  2569.966 6036.115 9387.034</span></span></code></pre>
-<p>Alternatively, we can also extract the posterior summary for a single parameter like this:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; Min.:                  1607.479 4843.964 7228.372</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1665.661 4908.179 7286.378</span></span>
+<span><span class="co">#&gt; Weighted Median:       2010.293 5936.615 7874.670</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2016.526 5909.206 7907.132</span></span>
+<span><span class="co">#&gt; Weighted Mode:         1995.493 5832.770 7724.623</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2262.405 6651.473 8734.573</span></span>
+<span><span class="co">#&gt; Max.:                  2450.616 6793.562 9936.191</span></span></code></pre>
+<p>Alternatively, we can also extract the posterior summary for a single
+parameter like this:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_D"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -517,36 +654,55 @@
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                            Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                  1790.060</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  2181.297</span></span>
-<span><span class="co">#&gt; Weighted Median:       3714.350</span></span>
-<span><span class="co">#&gt; Weighted Mean:         3578.215</span></span>
-<span><span class="co">#&gt; Weighted Mode:         3809.785</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 4842.347</span></span>
-<span><span class="co">#&gt; Max.:                  5228.341</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                             Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                   502.5387</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  2259.9200</span></span>
+<span><span class="co">#&gt; Weighted Median:       3714.8076</span></span>
+<span><span class="co">#&gt; Weighted Mean:         3852.1225</span></span>
+<span><span class="co">#&gt; Weighted Mode:         3564.2851</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6598.2645</span></span>
+<span><span class="co">#&gt; Max.:                  6641.5602</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="visualizing-posterior-distributions-of-parameters">Visualizing posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-parameters"></a>
 </h4>
-<p>Because a chart is always more informative than a table, we can easily get a visualization of our posteriors using the function <code><a href="../reference/plot_posterior.html">plot_posterior()</a></code>:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
+<p>Because a chart is always more informative than a table, we can
+easily get a visualization of our posteriors using the function
+<code><a href="../reference/plot_posterior.html">plot_posterior()</a></code>:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/posterior_Ne-1.png" width="640" style="display: block; margin: auto;"></p>
-<p>Excellent! It looks like we got really nice and informative posterior distributions of <span class="math inline">\(N_e\)</span> values!</p>
-<p>In contrast, it looks like the posterior distributions for split times are not as informative compared to the priors that we specified:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
+<p>Excellent! It looks like we got really nice and informative posterior
+distributions of <span class="math inline">\(N_e\)</span> values!</p>
+<p>Similarly, we get nice and informative posterior distributions of
+split times:</p>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/posterior_Tsplit-1.png" width="640" style="display: block; margin: auto;"></p>
-<p>Because the internals of <em>demografr</em> ABC objects are represented by standard objects created by the <em>abc</em> package, we have many of the standard diagnostics functions of the <em>abc</em> R package at our disposal. For instance, we can use the standard function <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> to verify that the posterior (red line) for one of the split times matches the prior (dashed line), suggesting that the data we provided (nucleotide diversity and pairwise divergence) are not sufficient statistics to capture enough information about population divergences.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<p>And the same is true for the gene-flow rate:</p>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="vignette-01-basics_files/figure-html/posterior_gf-1.png" width="640" style="display: block; margin: auto;"></p>
+<p>Because the internals of <em>demografr</em> ABC objects are
+represented by standard objects created by the <em>abc</em> package, we
+have many of the standard diagnostics functions of the <em>abc</em> R
+package at our disposal. For instance, we can use the standard function
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> to verify that the posterior (red line) for one of
+the split times matches the prior (dashed line), suggesting that the
+data we provided (nucleotide diversity and pairwise divergence) are not
+sufficient statistics to capture enough information about population
+divergences.</p>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T_BC"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/diagnostic_Tsplit-1.png" width="800" style="display: block; margin: auto;"></p>
-<p>In contrast, we can see that there most definitely is sufficient information encoded in the summary statistics to tell us quite a bit about the <span class="math inline">\(N_e\)</span> of our populations:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<p>In contrast, we can see that there most definitely is sufficient
+information encoded in the summary statistics to tell us quite a bit
+about the <span class="math inline">\(N_e\)</span> of our
+populations:</p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_B"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/diagnostic_Ne-1.png" width="800" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/diagnostic_hist_Ne-1.png" width="800" style="display: block; margin: auto;"></p>
 </div>

@@ -137,54 +137,92 @@
     
     
 <p>⚠️⚠️⚠️</p>
-<p><strong>Note:</strong> The <em>demografr</em> R package is still under active development. As a result, its documentation is in a draft stage at best. Apologies for typos, inconsistencies, and other issues.</p>
-<p>⚠️⚠️⚠️</p>
-<p>By default, <em>demografr</em> uses the <a href="https://github.com/bodkan/slendr" class="external-link"><em>slendr</em></a> simulation framework for defining models and simulating data from them. But what if you need to do inference using your own scripts? Perhaps <em>slendr</em>’s opinionated interface doesn’t allow you to do all that you need to do, such as using some of the powerful simulation features and options of “raw” <a href="https://messerlab.org/slim/" class="external-link">SLiM</a> or <a href="https://tskit.dev/msprime/docs/stable/intro.html" class="external-link"><em>msprime</em></a>? This vignette explains how you can use any standard SLiM or <em>msprime</em> script which produces a tree sequence file as its output as an engine in a standard <em>demografr</em> inference pipeline.</p>
-<p>First, let’s load <em>demografr</em> itself and also <em>slendr</em> (which, in this vignette, will serve only for analyzing simulated tree-sequence data, but not simulations themselves).</p>
+<p><strong>Note:</strong> The <em>demografr</em> R package is still
+under active development. As a result, its documentation is in a draft
+stage at best. Typos, inconsistencies, and other issues are
+unfortunately expected.</p>
+<p>⚠️⚠️⚠️️⚠️</p>
+<p>By default, <em>demografr</em> uses the <a href="https://github.com/bodkan/slendr" class="external-link"><em>slendr</em></a> simulation
+framework for defining models and simulating data from them. But what if
+you need to do inference using your own scripts? Perhaps
+<em>slendr</em>’s opinionated interface doesn’t allow you to do all that
+you need to do, such as using some of the powerful simulation features
+and options of “raw” <a href="https://messerlab.org/slim/" class="external-link">SLiM</a> or
+<a href="https://tskit.dev/msprime/docs/stable/intro.html" class="external-link"><em>msprime</em></a>?
+This vignette explains how you can use any standard SLiM or
+<em>msprime</em> script which produces a tree sequence file as its
+output as an engine in a standard <em>demografr</em> inference
+pipeline.</p>
+<p>First, let’s load <em>demografr</em> itself and also <em>slendr</em>
+(which, in this vignette, will serve only for analyzing simulated
+tree-sequence data, but not simulations themselves).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; The legacy packages maptools, rgdal, and rgeos, underpinning the sp package,</span></span>
-<span><span class="co">#&gt; which was just loaded, will retire in October 2023.</span></span>
-<span><span class="co">#&gt; Please refer to R-spatial evolution reports for details, especially</span></span>
-<span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html.</span></span>
-<span><span class="co">#&gt; It may be desirable to make the sf package available;</span></span>
-<span><span class="co">#&gt; package maintainers should consider adding sf to Suggests:.</span></span>
-<span><span class="co">#&gt; The sp package is now running under evolution status 2</span></span>
-<span><span class="co">#&gt;      (status 2 uses the sf package in place of rgdal)</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="restrictions-on-user-defined-simulation-scripts">Restrictions on user-defined simulation scripts<a class="anchor" aria-label="anchor" href="#restrictions-on-user-defined-simulation-scripts"></a>
 </h2>
-<p>In order to be able to use a custom SLiM or msprime script with <em>demografr</em>, the script must conform to a couple of rules:</p>
+<p>In order to be able to use a custom SLiM or msprime script with
+<em>demografr</em>, the script must conform to a couple of rules:</p>
 <div class="section level3">
-<h3 id="it-must-be-runnable-on-the-command-line-as-any-other-command-line-script">1. It must be runnable on the command-line as any other command-line script<a class="anchor" aria-label="anchor" href="#it-must-be-runnable-on-the-command-line-as-any-other-command-line-script"></a>
+<h3 id="it-must-be-runnable-on-the-command-line-as-any-other-command-line-script">1. It must be runnable on the command-line as any other command-line
+script<a class="anchor" aria-label="anchor" href="#it-must-be-runnable-on-the-command-line-as-any-other-command-line-script"></a>
 </h3>
 <ul>
-<li><p><strong>For an msprime script</strong>, this means something like <code>python &lt;your script&gt;.py &lt;command-line arguments&gt;</code>.</p></li>
-<li><p><strong>For a SLiM script</strong>, this means something like <code>slim &lt;command-line arguments&gt; &lt;your script&gt;.slim</code>.</p></li>
+<li><p><strong>For an msprime script</strong>, this means something like
+<code>python &lt;your script&gt;.py &lt;command-line arguments&gt;</code>.</p></li>
+<li><p><strong>For a SLiM script</strong>, this means something like
+<code>slim &lt;command-line arguments&gt; &lt;your script&gt;.slim</code>.</p></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="it-must-accept-three-mandatory-arguments-with-these-exact-names">2. It must accept three mandatory arguments with these exact names<a class="anchor" aria-label="anchor" href="#it-must-accept-three-mandatory-arguments-with-these-exact-names"></a>
+<h3 id="it-must-accept-three-mandatory-arguments-with-these-exact-names">2. It must accept three mandatory arguments with these exact
+names<a class="anchor" aria-label="anchor" href="#it-must-accept-three-mandatory-arguments-with-these-exact-names"></a>
 </h3>
 <ul>
 <li>
-<code>sequence_length</code>: the amount of sequence to simulated</li>
+<code>sequence_length</code>: the amount of sequence to
+simulated</li>
 <li>
-<code>recombination_rate</code>: the recombination rate along the simulated sequence (in units of crossovers per basepair pergeneration)</li>
+<code>recombination_rate</code>: the recombination rate along the
+simulated sequence (in units of crossovers per basepair
+pergeneration)</li>
 <li>
-<code>output_path</code>: the path where the simulated tree-sequence object will be saved</li>
+<code>output_path</code>: the path where the simulated tree-sequence
+object will be saved</li>
 </ul>
-<p><strong>For an msprime script</strong>, these parameters can be specified via the Python built-in module <code>argparse</code>, and provided on the command-line as <code>--sequence_length &lt;value&gt;</code>, <code>--recombination_rate &lt;value&gt;</code>, and <code>--output_path &lt;path&gt;</code>. In the script itself, if you use the <code>argparse</code> module and have thus the values of provided arguments (for instance) in an <code>args</code> object, you can then refer to these arguments as <code>args.sequence_length</code>, etc.</p>
-<p><strong>For a SLiM script</strong>, these parameters can be specified via SLiM’s standard way of supplying command-line arguments as <code>-d sequence_length=&lt;value&gt;</code>, <code>-d recombination_rate=&lt;value&gt;</code>, and <code>-d "output_path='&lt;path&gt;'"</code>. Importantly, note SLiM’s format of specifying string arguments for the <code>output_path</code> argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to these arguments via constants <code>sequence_length</code>, <code>recombination_rate</code>, and <code>output_path</code>.</p>
+<p><strong>For an msprime script</strong>, these parameters can be
+specified via the Python built-in module <code>argparse</code>, and
+provided on the command-line as
+<code>--sequence_length &lt;value&gt;</code>,
+<code>--recombination_rate &lt;value&gt;</code>, and
+<code>--output_path &lt;path&gt;</code>. In the script itself, if you
+use the <code>argparse</code> module and have thus the values of
+provided arguments (for instance) in an <code>args</code> object, you
+can then refer to these arguments as <code>args.sequence_length</code>,
+etc.</p>
+<p><strong>For a SLiM script</strong>, these parameters can be specified
+via SLiM’s standard way of supplying command-line arguments as
+<code>-d sequence_length=&lt;value&gt;</code>,
+<code>-d recombination_rate=&lt;value&gt;</code>, and
+<code>-d "output_path='&lt;path&gt;'"</code>. Importantly, note SLiM’s
+format of specifying string arguments for the <code>output_path</code>
+argument. If you need further detail, see Section 20.2 of the SLiM
+manual. In the script itself, you can then refer to these arguments via
+constants <code>sequence_length</code>, <code>recombination_rate</code>,
+and <code>output_path</code>.</p>
 </div>
 <div class="section level3">
-<h3 id="all-model-parameters-must-be-provided-as-additional-command-line-arguments">3. All model parameters must be provided as additional command-line arguments<a class="anchor" aria-label="anchor" href="#all-model-parameters-must-be-provided-as-additional-command-line-arguments"></a>
+<h3 id="all-model-parameters-must-be-provided-as-additional-command-line-arguments">3. All model parameters must be provided as additional command-line
+arguments<a class="anchor" aria-label="anchor" href="#all-model-parameters-must-be-provided-as-additional-command-line-arguments"></a>
 </h3>
-<p>You can refer to them in your script as you would to the mandatory arguments as described in the previous section.</p>
-<p><strong>A useful check to see whether you script would make a valid engine for a <em>demografr</em> analysis is to run it manually on the command line like this:</strong></p>
+<p>You can refer to them in your script as you would to the mandatory
+arguments as described in the previous section.</p>
+<p><strong>A useful check to see whether you script would make a valid
+engine for a <em>demografr</em> analysis is to run it manually on the
+command line like this:</strong></p>
 <pre><code>python \
   &lt;path to your Python script&gt;                   \
   --sequence_length &lt;number&gt;                     \
@@ -198,7 +236,11 @@
   -d "output_path='&lt;path to the output .trees file&gt;'" \
   &lt;... your model parameters ...&gt;</code></pre>
 <p>Then, if you get a <code>.trees</code> file, you’re good to go!</p>
-<p><strong>Note</strong> that mutation rate is not among the list of mandatory parameters for your script. Neutral mutations are taken care of via tree-sequence mutation process after the simulation is finished. If this sounds weird to you, take a look at some tree-sequence-related materials like <a href="https://tskit.dev/tutorials/no_mutations.html" class="external-link">this</a>.</p>
+<p><strong>Note</strong> that mutation rate is not among the list of
+mandatory parameters for your script. Neutral mutations are taken care
+of via tree-sequence mutation process after the simulation is finished.
+If this sounds weird to you, take a look at some tree-sequence-related
+materials like <a href="https://tskit.dev/tutorials/no_mutations.html" class="external-link">this</a>.</p>
 </div>
 </div>
 <div class="section level2">
@@ -207,26 +249,39 @@
 <div class="section level3">
 <h3 id="toy-problem">Toy problem<a class="anchor" aria-label="anchor" href="#toy-problem"></a>
 </h3>
-<p>Suppose that we intent to use ABC to infer the <span class="math inline">\(N_e\)</span> of a constant-sized population given that we observed the following value of nucleotide diversity:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>Suppose that we intent to use ABC to infer the <span class="math inline">\(N_e\)</span> of a constant-sized population given
+that we observed the following value of nucleotide diversity:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set   diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">019</span>8</span></span></code></pre>
-<p>We want to infer the posterior distribution of <span class="math inline">\(N_e\)</span> but not via the normal <em>slendr</em> interface (as shown <a href="vignette-01-basics.html">here</a>) but using a simple SLiM or Python script.</p>
-<p><strong>We acknowledge that this is a completely trivial example, not really worth spending so much effort on doing an ABC for.</strong> The example was chosen because it runs fast and demonstrates all the features of <em>demografr</em> that you would use regardless of the complexity of your model.</p>
+<p>We want to infer the posterior distribution of <span class="math inline">\(N_e\)</span> but not via the normal
+<em>slendr</em> interface (as shown <a href="vignette-01-basics.html">here</a>) but using a simple SLiM or
+Python script.</p>
+<p><strong>We acknowledge that this is a completely trivial example, not
+really worth spending so much effort on doing an ABC for.</strong> The
+example was chosen because it runs fast and demonstrates all the
+features of <em>demografr</em> that you would use regardless of the
+complexity of your model.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="example-pure-slim-and-msprime-script">Example pure SLiM and msprime script<a class="anchor" aria-label="anchor" href="#example-pure-slim-and-msprime-script"></a>
 </h2>
-<p>To demonstrate the requirements 1-3 above in practice, let’s perform ABC using each of those scripts as tree-sequence simulation engines.</p>
-<p>Imagine we have the following two scripts which we want to use as simulation engines instead of <em>slendr</em>’s own functions <code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and <code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>. The scripts have only <strong>one <em>model parameter</em>, <span class="math inline">\(N_e\)</span> of the single modelled population</strong>. The <strong>other parameters are mandatory</strong>, just discussed in the previous section.</p>
+<p>To demonstrate the requirements 1-3 above in practice, let’s perform
+ABC using each of those scripts as tree-sequence simulation engines.</p>
+<p>Imagine we have the following two scripts which we want to use as
+simulation engines instead of <em>slendr</em>’s own functions
+<code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and <code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>. The scripts have only
+<strong>one <em>model parameter</em>, <span class="math inline">\(N_e\)</span> of the single modelled
+population</strong>. The <strong>other parameters are
+mandatory</strong>, just discussed in the previous section.</p>
 <div class="section level3">
 <h3 id="slim-script">SLiM script<a class="anchor" aria-label="anchor" href="#slim-script"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">slim_script</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/custom.slim"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>initialize() {
   initializeTreeSeq();
@@ -248,7 +303,7 @@
 <div class="section level3">
 <h3 id="python-script">Python script<a class="anchor" aria-label="anchor" href="#python-script"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">python_script</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/custom.py"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>import argparse
 
@@ -274,16 +329,36 @@ ts = msprime.sim_ancestry(
 )
 
 ts.dump(args.output_path) # this call must be present in every script</code></pre>
-<p><strong>Note that the Python script specifies all model parameters (here, <span class="math inline">\(N_e\)</span>) and mandatory arguments, via a command-line interface provided by the Python module <code>argparse</code></strong>.</p>
-<p><strong>The SLiM script, on the other hand, uses SLiM’s features for command-line specification of parameters and simply refers to each parameter by its symbolic name.</strong> No other setup is necessary.</p>
-<p>Please also note that given that there are can be discrepancies between values of arguments of some SLiM or Python methods (such as <code>addSubPop</code> of SLiM which expects an integer value for a population size, or the <code>samples</code> argument of <code>msprime.sim_ancestry</code>), and values of parameters sampled from priors by <em>demografr</em> (i.e., <span class="math inline">\(N_e\)</span> often being a floating-point value after sampling from a continuous prior), you might have to perform explicit type conversion in your custom scripts (such as <code>sim.addSubPop("p0", asInteger(Ne)</code> as above).</p>
+<p><strong>Note that the Python script specifies all model parameters
+(here, <span class="math inline">\(N_e\)</span>) and mandatory
+arguments, via a command-line interface provided by the Python module
+<code>argparse</code></strong>.</p>
+<p><strong>The SLiM script, on the other hand, uses SLiM’s features for
+command-line specification of parameters and simply refers to each
+parameter by its symbolic name.</strong> No other setup is
+necessary.</p>
+<p>Please also note that given that there are can be discrepancies
+between values of arguments of some SLiM or Python methods (such as
+<code>addSubPop</code> of SLiM which expects an integer value for a
+population size, or the <code>samples</code> argument of
+<code>msprime.sim_ancestry</code>), and values of parameters sampled
+from priors by <em>demografr</em> (i.e., <span class="math inline">\(N_e\)</span> often being a floating-point value
+after sampling from a continuous prior), you might have to perform
+explicit type conversion in your custom scripts (such as
+<code>sim.addSubPop("p0", asInteger(Ne)</code> as above).</p>
 </div>
 <div class="section level3">
 <h3 id="individual-abc-components">Individual ABC components<a class="anchor" aria-label="anchor" href="#individual-abc-components"></a>
 </h3>
-<p>Apart from the user-defined simulation SLiM and <em>msprime</em> scripts, the components of our toy inference remains the same—we need to define the observed statistics, tree-sequence summary functions, and priors. We don’t need a model function—that will be served by our custom script.</p>
-<p>Here are the <em>demografr</em> pipeline components (we won’t be discussing them here because that’s extensively taken care of <a href="vignette-01-basics.html">elsewhere</a> in <em>demografr</em>’s documentation vignettes):</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Apart from the user-defined simulation SLiM and <em>msprime</em>
+scripts, the components of our toy inference remains the same—we need to
+define the observed statistics, tree-sequence summary functions, and
+priors. We don’t need a model function—that will be served by our custom
+script.</p>
+<p>Here are the <em>demografr</em> pipeline components (we won’t be
+discussing them here because that’s extensively taken care of <a href="vignette-01-basics.html">elsewhere</a> in <em>demografr</em>’s
+documentation vignettes):</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># a single prior parameter</span></span>
 <span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -297,34 +372,59 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_diversity.html" class="external-link">ts_diversity</a></span><span class="op">(</span><span class="va">ts</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>pop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">19</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="co"># compute using 20 chromosomes</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>(Note that because our simulated tree sequences won’t be coming with <em>slendr</em> metadata, we have to refer to individuals’ chromosomes using numerical indices rather than <em>slendr</em> symbolic names like we do in all of our other vignettes.)</p>
+<p>(Note that because our simulated tree sequences won’t be coming with
+<em>slendr</em> metadata, we have to refer to individuals’ chromosomes
+using numerical indices rather than <em>slendr</em> symbolic names like
+we do in all of our other vignettes.)</p>
 </div>
 <div class="section level3">
 <h3 id="simulating-a-testing-tree-sequence">Simulating a testing tree sequence<a class="anchor" aria-label="anchor" href="#simulating-a-testing-tree-sequence"></a>
 </h3>
-<p>As we explained elsewhere, a useful function for developing inference pipelines using <em>demografr</em> is a function <code><a href="../reference/simulate_ts.html">simulate_ts()</a></code>, which normally accepts a <em>slendr</em> model generating function and the model parameters (either given as priors or as a list of named values), and simulates a tree-sequence object. This function (as any other <em>demografr</em> function operating with models) accepts our custom-defined simulation scripts in place of standard <em>slendr</em> models.</p>
-<p>For instance, we can simulate a couple of Mb of testing sequence from our <em>msprime</em> script like this:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>As we explained elsewhere, a useful function for developing inference
+pipelines using <em>demografr</em> is a function
+<code><a href="../reference/simulate_ts.html">simulate_ts()</a></code>, which normally accepts a <em>slendr</em>
+model generating function and the model parameters (either given as
+priors or as a list of named values), and simulates a tree-sequence
+object. This function (as any other <em>demografr</em> function
+operating with models) accepts our custom-defined simulation scripts in
+place of standard <em>slendr</em> models.</p>
+<p>For instance, we can simulate a couple of Mb of testing sequence from
+our <em>msprime</em> script like this:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ts_python</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Ne <span class="op">=</span> <span class="fl">1234</span><span class="op">)</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">10e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>(Of course we could’ve plugged in the <code>python_script</code> instead.)</p>
-<p>Now we can finally test our little toy tree-sequence summary function, verifying that we can indeed compute the summary statistic we want to:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>(Of course we could’ve plugged in the <code>python_script</code>
+instead.)</p>
+<p>Now we can finally test our little toy tree-sequence summary
+function, verifying that we can indeed compute the summary statistic we
+want to:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">ts_python</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set   diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">042</span>2</span></span></code></pre>
-<p>The function works as expected—we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.</p>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">053</span>6</span></span></code></pre>
+<p>The function works as expected—we have a single population and want
+to compute nucleotide diversity in the whole population, and this is
+exactly what we get.</p>
 </div>
 <div class="section level3">
 <h3 id="running-an-abc-analysis">Running an ABC analysis<a class="anchor" aria-label="anchor" href="#running-an-abc-analysis"></a>
 </h3>
-<p>Having all components of our pipeline set up we should, again, validate everything before we proceed to (potentially very costly) simulations. In the remainder of this vignette we’ll only continue with the Python msprime custom script in order to save some computational time. That said, it’s important to realize that you could use this sort of workflow for any kind of SLiM script, including very elaborate spatial simulations, non-WF models, and all kinds of phenotypic simulations too! <strong>Although primarily designed to work with <em>slendr</em>, the <em>demografr</em> package intends to fully support any kind of SLiM or <em>msprime</em> simulation.</strong></p>
+<p>Having all components of our pipeline set up we should, again,
+validate everything before we proceed to (potentially very costly)
+simulations. In the remainder of this vignette we’ll only continue with
+the Python msprime custom script in order to save some computational
+time. That said, it’s important to realize that you could use this sort
+of workflow for any kind of SLiM script, including very elaborate
+spatial simulations, non-WF models, and all kinds of phenotypic
+simulations too! <strong>Although primarily designed to work with
+<em>slendr</em>, the <em>demografr</em> package intends to fully support
+any kind of SLiM or <em>msprime</em> simulation.</strong></p>
 <p>Let’s first validate all components of our pipeline:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; Testing sampling of each prior parameter:</span></span>
@@ -341,8 +441,11 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span><span class="co">#&gt;   * diversity ✅  </span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<p>Looking good! Now let’s first run ABC simulations. Again, note the use of the Python script where we would normally plug in a <em>slendr</em> model function in place of the <code>model</code> argument:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p>Looking good! Now let’s first run ABC simulations. Again, note the
+use of the Python script where we would normally plug in a
+<em>slendr</em> model function in place of the <code>model</code>
+argument:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multicore</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># parallelize across all 96 CPUs</span></span>
 <span></span>
@@ -350,12 +453,17 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 2 minutes 39 seconds parallelized across 96 CPUs.</strong></p>
-<p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <span class="math inline">\(N_e\)</span>:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/perform_abc.html">perform_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
-<p>Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results (we’re skipping diagnostics such as posterior predictive checks but you can read more about those <a href="vignette-01-basics.html">here</a> and <a href="vignette-06-diagnostics.html">here</a>):</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<p><strong>The total runtime for the ABC simulations was 0 hours 2
+minutes 39 seconds parallelized across 96 CPUs.</strong></p>
+<p>Once the simulations are finished, we can perform inference of the
+posterior distribution of the single parameter of our model, <span class="math inline">\(N_e\)</span>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<p>Having done so, we can again look at the summary statistics of the
+posterior distribution and also plot the results (we’re skipping
+diagnostics such as posterior predictive checks but you can read more
+about those <a href="vignette-01-basics.html">here</a> and <a href="vignette-06-diagnostics.html">here</a>):</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
@@ -367,7 +475,7 @@ ts.dump(args.output_path) # this call must be present in every script</code></pr
 <span><span class="co">#&gt; Weighted Mode:         571.6191</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 800.3001</span></span>
 <span><span class="co">#&gt; Max.:                  800.3001</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-05-custom-engines_files/figure-html/custom_Ne_posterior-1.png" width="640" style="display: block; margin: auto;"></p>
 </div>

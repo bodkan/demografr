@@ -449,9 +449,9 @@ library(locfit)
 abc::gfitpca(target = observed_stats, sumstat = model_stats, index = model_names, cprob = 0.1)
 ```
 
-```{r}
-abcX <- readRDS("inst/examples/basics_abc.rds")
-```
+<!-- ```{r} -->
+<!-- abcX <- readRDS("inst/examples/basics_abc.rds") -->
+<!-- ``` -->
 
 
 
