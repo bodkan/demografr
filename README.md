@@ -139,7 +139,7 @@ init_env()
 
 # set up parallelization across all CPUs on the current machine
 library(future)
-plan(multicore, workers = availableCores())
+plan(multisession, workers = availableCores())
 
 #--------------------------------------------------------------------------------
 # bind data frames with empirical summary statistics into a named list
@@ -204,20 +204,22 @@ priors <- list(
 # same format as the summary statistics computed on empirical data)
 
 compute_diversity <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- slendr::ts_names(ts, split = "pop")
-  ts_f4(ts,
-        W = list(popA = samples$popA),
-        X = list(popB = samples$popB),
-        Y = list(popC = samples$popC),
-        Z = list(popD = samples$popD))
+  samples <- ts_names(ts, split = "pop")
+  A <- samples["popA"]; B <- samples["popB"]
+  C <- samples["popC"]; D <- samples["popD"]
+  rbind(
+    ts_f4(ts, A, B, C, D),
+    ts_f4(ts, A, C, B, D),
+    ts_f4(ts, A, D, B, C)
+  )
 }
 
 # the summary functions must be also bound to an R list named in the same
@@ -236,12 +238,12 @@ validate_abc(model, priors, functions, observed)
 # run ABC simulations
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,
-  sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 
 #--------------------------------------------------------------------------------
 # infer posterior distributions of parameters using the abc R package
-abc <- perform_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 
@@ -255,22 +257,22 @@ For instance, we can get a table of all posterior values with the function `extr
 
 ```r
 extract_summary(abc)
-#>                             Ne_A     Ne_B      Ne_C     Ne_D     T_AB     T_BC
-#> Min.:                   929.0679 670.3812  2966.659 1790.060 1192.360 4988.493
-#> Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297 1561.180 5259.732
-#> Weighted Median:       1990.5578 799.0462  7366.514 3714.350 2003.515 5678.190
-#> Weighted Mean:         1967.7919 802.3221  7075.016 3578.215 2003.738 5655.562
-#> Weighted Mode:         1954.3619 757.0564  7620.487 3809.785 1939.879 5752.531
-#> Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347 2326.478 5941.146
-#> Max.:                  3144.9674 927.3249 11696.130 5228.341 2569.966 6036.115
-#>                            T_CD       gf_BC
-#> Min.:                  6863.233 -0.02455945
-#> Weighted 2.5 % Perc.:  7294.305  0.02674433
-#> Weighted Median:       8127.699  0.16684306
-#> Weighted Mean:         8196.626  0.18184086
-#> Weighted Mode:         8052.760  0.12030457
-#> Weighted 97.5 % Perc.: 9387.034  0.33763567
-#> Max.:                  9387.034  0.35898225
+#>                             Ne_A      Ne_B      Ne_C      Ne_D     T_AB
+#> Min.:                   804.0797  408.1848 -4305.207  502.5387 1607.479
+#> Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200 1665.661
+#> Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076 2010.293
+#> Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225 2016.526
+#> Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851 1995.493
+#> Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645 2262.405
+#> Max.:                  3646.4941 1919.2377 11815.139 6641.5602 2450.616
+#>                            T_BC     T_CD       gf_BC
+#> Min.:                  4843.964 7228.372 -0.21801869
+#> Weighted 2.5 % Perc.:  4908.179 7286.378 -0.04095791
+#> Weighted Median:       5936.615 7874.670  0.11279850
+#> Weighted Mean:         5909.206 7907.132  0.11161160
+#> Weighted Mode:         5832.770 7724.623  0.07205975
+#> Weighted 97.5 % Perc.: 6651.473 8734.573  0.26094451
+#> Max.:                  6793.562 9936.191  1.41335586
 ```
 
 We can also specify a subset of model parameters to select, or provide a regular expression for this subsetting:
@@ -278,14 +280,14 @@ We can also specify a subset of model parameters to select, or provide a regular
 
 ```r
 extract_summary(abc, param = "Ne")
-#>                             Ne_A     Ne_B      Ne_C     Ne_D
-#> Min.:                   929.0679 670.3812  2966.659 1790.060
-#> Weighted 2.5 % Perc.:  1201.0043 711.6460  4075.275 2181.297
-#> Weighted Median:       1990.5578 799.0462  7366.514 3714.350
-#> Weighted Mean:         1967.7919 802.3221  7075.016 3578.215
-#> Weighted Mode:         1954.3619 757.0564  7620.487 3809.785
-#> Weighted 97.5 % Perc.: 2837.7028 924.5835 10858.144 4842.347
-#> Max.:                  3144.9674 927.3249 11696.130 5228.341
+#>                             Ne_A      Ne_B      Ne_C      Ne_D
+#> Min.:                   804.0797  408.1848 -4305.207  502.5387
+#> Weighted 2.5 % Perc.:   902.1518  457.8242  6383.142 2259.9200
+#> Weighted Median:       2015.7613 1000.0325  8405.996 3714.8076
+#> Weighted Mean:         1997.8872  958.8280  8516.165 3852.1225
+#> Weighted Mode:         2195.5323 1067.1600  8619.141 3564.2851
+#> Weighted 97.5 % Perc.: 3434.1764 1563.1426 11309.784 6598.2645
+#> Max.:                  3646.4941 1919.2377 11815.139 6641.5602
 ```
 
 We can also visualize the posterior distributions. Rather than plotting many different distributions at once, let's first check out the posterior distributions of inferred $N_e$ values:
@@ -310,7 +312,7 @@ And, finally, the rate of gene flow:
 
 
 ```r
-plot_posterior(abc, param = "gf")
+plot_posterior(abc, param = "gf") + ggplot2::coord_cartesian(xlim = c(0, 1))
 ```
 
 ![](man/figures/README-posterior_gf-1.png)
