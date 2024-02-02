@@ -62,7 +62,7 @@ observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
 
 # I keep forgetting the rules for the symmetry of f4 quadruplets so let's double check that
-# - generate all quadrupltes:
+# - generate all quadruples:
 # perms <- combinat::permn(c(A, B, C, D))
 # - compute theoretical values of all possible f4 statistics
 # all_f4s <- lapply(perms, function(p) {
