@@ -2,6 +2,8 @@ source("renv/activate.R")
 
 options(browserNLdisabled = TRUE)
 
+Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
+
 # avoid annoyance of having to manually open .Rproj file
 # https://rstudio.github.io/rstudioapi/reference/projects.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
