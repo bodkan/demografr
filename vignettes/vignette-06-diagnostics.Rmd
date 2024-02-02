@@ -22,10 +22,16 @@ knitr::opts_chunk$set(
 
 devtools::load_all()
 
-abcX_path <- here::here("inst/examples/downstream_dataX.rds")
-abcY_path <- here::here("inst/examples/downstream_dataY.rds")
-abcZ_path <- here::here("inst/examples/downstream_dataZ.rds")
+dataX_path <- here::here("inst/examples/downstream_dataX.rds")
+dataY_path <- here::here("inst/examples/downstream_dataY.rds")
+dataZ_path <- here::here("inst/examples/downstream_dataZ.rds")
+data_exists <- all(c(file.exists(dataX_path), file.exists(dataY_path), file.exists(dataZ_path)))
+
+abcX_path <- here::here("inst/examples/downstream_abcX.rds")
+abcY_path <- here::here("inst/examples/downstream_abcY.rds")
+abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
 abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
+
 cv_path <- here::here("inst/examples/downstream_cv.rds")
 ```
 
@@ -238,28 +244,28 @@ With that out of the way, we can proceed with generating simulated data for infe
 tstart <- Sys.time()
 ```
 
-```{r, eval=!abc_exists}
+```{r, eval=!data_exists}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!abc_exists}
+```{r, eval=!data_exists}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!abc_exists}
+```{r, eval=!data_exists}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r, eval=!data_exists, echo=FALSE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE}
+```{r, eval=!data_exists, echo=FALSE}
 saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
 saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
 saveRDS(dataX, abcX_path)
@@ -267,9 +273,12 @@ saveRDS(dataY, abcY_path)
 saveRDS(dataZ, abcZ_path)
 ```
 
-```{r, echo=FALSE}
+```{r, eval=data_exists, echo=FALSE}
 tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
 ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
+dataX <- readRDS(dataX_path)
+dataY <- readRDS(dataY_path)
+dataZ <- readRDS(dataZ_path)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -282,9 +291,9 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
 ```{r, eval=!abc_exists, echo=FALSE}
-dataX <- readRDS(abcX_path)
-dataY <- readRDS(abcY_path)
-dataZ <- readRDS(abcZ_path)
+abcX <- readRDS(abcX_path)
+abcY <- readRDS(abcY_path)
+abcZ <- readRDS(abcZ_path)
 ```
 
 ```{r, eval=!abc_exists, results="hide"}
@@ -299,7 +308,7 @@ saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
 ```
 
-```{r, eval=!abc_exists, echo=FALSE}
+```{r, eval=abc_exists, echo=FALSE}
 abcX <- readRDS(abcX_path)
 abcY <- readRDS(abcY_path)
 abcZ <- readRDS(abcZ_path)
