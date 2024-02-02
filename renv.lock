@@ -1209,6 +1209,19 @@
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
     },
+    "markdown": {
+      "Package": "markdown",
+      "Version": "1.12",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "commonmark",
+        "utils",
+        "xfun"
+      ],
+      "Hash": "765cf53992401b3b6c297b69e1edb8bd"
+    },
     "memoise": {
       "Package": "memoise",
       "Version": "2.0.1",
@@ -1916,14 +1929,14 @@
     },
     "slendr": {
       "Package": "slendr",
-      "Version": "0.8.0.9000",
+      "Version": "0.8.1.9000",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "23bc1dd170a6ab8bc0d3705f8a73efae2fef7cbb",
+      "RemoteSha": "0bc83abb199c12594991bef17ee027807cad3c70",
       "Requirements": [
         "R",
         "ape",
@@ -1940,7 +1953,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "dd2ac6a03ebb0e81eba62ff0ba50ec53"
+      "Hash": "620ebdec02c110d0ff47e7ec08916979"
     },
     "sourcetools": {
       "Package": "sourcetools",
