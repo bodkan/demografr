@@ -1936,10 +1936,11 @@
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "0bc83abb199c12594991bef17ee027807cad3c70",
+      "RemoteSha": "2969215ec77444fc75bed2aee4e4ee6770ca7c0e",
       "Requirements": [
         "R",
         "ape",
+        "digest",
         "dplyr",
         "ggplot2",
         "ijtiff",
@@ -1953,7 +1954,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "620ebdec02c110d0ff47e7ec08916979"
+      "Hash": "4fac42d83e64cdc4ce5582a65c1d72ed"
     },
     "sourcetools": {
       "Package": "sourcetools",
