@@ -196,9 +196,7 @@ empirical sequence data):</p>
 <span></span>
 <span><span class="va">observed_f4</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;      W    X    Y    Z            f4</span></span>
-<span><span class="co">#&gt; 1 popA popB popC popD -3.262146e-06</span></span>
-<span><span class="co">#&gt; 2 popA popC popB popD -5.804119e-07</span></span>
-<span><span class="co">#&gt; 3 popA popD popB popC  2.681734e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 popA popB popC popD -3.262146e-06</span></span></code></pre>
 <p><strong>Now let’s develop a simple ABC pipeline which will infer the
 posterior distributions of two sets of parameters we are interested in:
 <span class="math inline">\(N_e\)</span> of each population lineage, as
@@ -323,11 +321,7 @@ format analogous to the empirical statistics shown in data frames
 <span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
 <span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popA"</span><span class="op">]</span>; <span class="va">B</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popB"</span><span class="op">]</span></span>
 <span>  <span class="va">C</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popC"</span><span class="op">]</span>; <span class="va">D</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="st">"popD"</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">B</span>, <span class="va">C</span>, <span class="va">D</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">C</span>, <span class="va">B</span>, <span class="va">D</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">D</span>, <span class="va">B</span>, <span class="va">C</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">A</span>, <span class="va">B</span>, <span class="va">C</span>, <span class="va">D</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -357,12 +351,10 @@ table formatted in exactly the same way as the observed table
 above):</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">f4</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 5</span></span></span>
+<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
 <span><span class="co">#&gt;   W     X     Y     Z        f4</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> popA  popB  popC  popD      0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> popA  popC  popB  popD      0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> popA  popD  popB  popC      0</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> popA  popB  popC  popD      0</span></span></code></pre>
 <p>Looks good! (We have zero <span class="math inline">\(f_4\)</span>
 values because we didn’t specify mutation rate in
 <code>simulate_ts</code>, as we were only interested in the
@@ -423,8 +415,8 @@ can proceed to the ABC simulations themselves, using
 <span>  <span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">50e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 50
-minutes 21 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 49
+minutes 45 seconds parallelized across 96 CPUs.</strong></p>
 <p>At this point we have generated summary statistics for simulations of
 models using parameters drawn from our priors. In the next step, we can
 finally do inference of our parameters.</p>
@@ -470,7 +462,7 @@ parameters:</p>
 <span><span class="co">#&gt; can either sample unadjusted parameters  by setting `posterior = "unadj"`</span></span>
 <span><span class="co">#&gt; or instruct the prediction function to skip invalid models by setting</span></span>
 <span><span class="co">#&gt; `strict = FALSE`.</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Out of the total 181 simulations, 1000 runs resulted in an error.</span></span>
+<pre><code><span><span class="co">#&gt; Out of the total 152 simulations, 1000 runs resulted in an error.</span></span>
 <span><span class="co">#&gt; The most likely explanation for this is that some parameter combinations</span></span>
 <span><span class="co">#&gt; lead to an invalid model (such as inconsistent order of split times).</span></span></code></pre>
 <p>If we take a closer look at the produced result, we see that it’s a
@@ -546,22 +538,22 @@ row labelled “Mode:”:</p>
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C     Ne_D      T_AB</span></span>
-<span><span class="co">#&gt; Min.:                   468.4438  611.6019  3233.911 1067.563  966.6914</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1020.6012  847.1105  6995.923 2255.475 1569.5379</span></span>
-<span><span class="co">#&gt; Weighted Median:       1772.8212 1130.4355  8900.365 4477.538 1998.6460</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1855.6624 1117.3963  8730.251 4397.339 2017.0605</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1678.9815 1181.5422  9084.676 4714.697 1966.3837</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2909.9078 1492.5456 10496.476 6605.479 2319.0880</span></span>
-<span><span class="co">#&gt; Max.:                  3193.6005 1829.4929 11256.181 7260.443 2574.1378</span></span>
+<pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B      Ne_C      Ne_D      T_AB</span></span>
+<span><span class="co">#&gt; Min.:                  1001.957  404.2273  3415.523 -747.0074  684.3254</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1345.018  640.9547  4711.907 1921.8398 1481.5127</span></span>
+<span><span class="co">#&gt; Weighted Median:       2060.767  990.4728  7554.335 3360.1585 2061.0519</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2032.334  952.0859  7488.144 3290.6565 2091.2844</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2312.410 1026.7882  7995.273 3624.6699 2030.0274</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2619.253 1286.9201 10091.549 4988.4912 2597.0219</span></span>
+<span><span class="co">#&gt; Max.:                  2834.625 1412.1827 11947.526 8229.7269 3738.1946</span></span>
 <span><span class="co">#&gt;                            T_BC     T_CD       gf_BC</span></span>
-<span><span class="co">#&gt; Min.:                  3707.336 6271.129 -0.36774557</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  5583.804 6535.508 -0.12909606</span></span>
-<span><span class="co">#&gt; Weighted Median:       6230.431 7533.721  0.07899156</span></span>
-<span><span class="co">#&gt; Weighted Mean:         6209.827 7535.472  0.10772873</span></span>
-<span><span class="co">#&gt; Weighted Mode:         6225.214 7697.084  0.05274744</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6716.775 8824.549  0.37466922</span></span>
-<span><span class="co">#&gt; Max.:                  8577.913 9616.156  0.48954753</span></span></code></pre>
+<span><span class="co">#&gt; Min.:                  4564.913 6102.605 -0.28016218</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  4942.478 6672.703 -0.10510515</span></span>
+<span><span class="co">#&gt; Weighted Median:       5949.328 7917.680  0.11389950</span></span>
+<span><span class="co">#&gt; Weighted Mean:         5867.263 7892.535  0.13304694</span></span>
+<span><span class="co">#&gt; Weighted Mode:         6026.866 7968.639  0.09747498</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6616.664 8906.090  0.39821362</span></span>
+<span><span class="co">#&gt; Max.:                  6938.472 9380.199  0.54002085</span></span></code></pre>
 <p>Because large tables can get a little hard to read, it is possible to
 subset to only a specific <em>type</em> of parameter:</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
@@ -589,14 +581,14 @@ subset to only a specific <em>type</em> of parameter:</p>
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                             Ne_A      Ne_B      Ne_C     Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                   468.4438  611.6019  3233.911 1067.563</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1020.6012  847.1105  6995.923 2255.475</span></span>
-<span><span class="co">#&gt; Weighted Median:       1772.8212 1130.4355  8900.365 4477.538</span></span>
-<span><span class="co">#&gt; Weighted Mean:         1855.6624 1117.3963  8730.251 4397.339</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1678.9815 1181.5422  9084.676 4714.697</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2909.9078 1492.5456 10496.476 6605.479</span></span>
-<span><span class="co">#&gt; Max.:                  3193.6005 1829.4929 11256.181 7260.443</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B      Ne_C      Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                  1001.957  404.2273  3415.523 -747.0074</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1345.018  640.9547  4711.907 1921.8398</span></span>
+<span><span class="co">#&gt; Weighted Median:       2060.767  990.4728  7554.335 3360.1585</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2032.334  952.0859  7488.144 3290.6565</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2312.410 1026.7882  7995.273 3624.6699</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2619.253 1286.9201 10091.549 4988.4912</span></span>
+<span><span class="co">#&gt; Max.:                  2834.625 1412.1827 11947.526 8229.7269</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
@@ -623,13 +615,13 @@ subset to only a specific <em>type</em> of parameter:</p>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
 <pre><code><span><span class="co">#&gt;                             T_AB     T_BC     T_CD</span></span>
-<span><span class="co">#&gt; Min.:                   966.6914 3707.336 6271.129</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1569.5379 5583.804 6535.508</span></span>
-<span><span class="co">#&gt; Weighted Median:       1998.6460 6230.431 7533.721</span></span>
-<span><span class="co">#&gt; Weighted Mean:         2017.0605 6209.827 7535.472</span></span>
-<span><span class="co">#&gt; Weighted Mode:         1966.3837 6225.214 7697.084</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2319.0880 6716.775 8824.549</span></span>
-<span><span class="co">#&gt; Max.:                  2574.1378 8577.913 9616.156</span></span></code></pre>
+<span><span class="co">#&gt; Min.:                   684.3254 4564.913 6102.605</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1481.5127 4942.478 6672.703</span></span>
+<span><span class="co">#&gt; Weighted Median:       2061.0519 5949.328 7917.680</span></span>
+<span><span class="co">#&gt; Weighted Mean:         2091.2844 5867.263 7892.535</span></span>
+<span><span class="co">#&gt; Weighted Mode:         2030.0274 6026.866 7968.639</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 2597.0219 6616.664 8906.090</span></span>
+<span><span class="co">#&gt; Max.:                  3738.1946 6938.472 9380.199</span></span></code></pre>
 <p>Alternatively, we can also extract the posterior summary for a single
 parameter like this:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
@@ -657,14 +649,14 @@ parameter like this:</p>
 <span></span>
 <span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;                            Ne_D</span></span>
-<span><span class="co">#&gt; Min.:                  1067.563</span></span>
-<span><span class="co">#&gt; Weighted 2.5 % Perc.:  2255.475</span></span>
-<span><span class="co">#&gt; Weighted Median:       4477.538</span></span>
-<span><span class="co">#&gt; Weighted Mean:         4397.339</span></span>
-<span><span class="co">#&gt; Weighted Mode:         4714.697</span></span>
-<span><span class="co">#&gt; Weighted 97.5 % Perc.: 6605.479</span></span>
-<span><span class="co">#&gt; Max.:                  7260.443</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;                             Ne_D</span></span>
+<span><span class="co">#&gt; Min.:                  -747.0074</span></span>
+<span><span class="co">#&gt; Weighted 2.5 % Perc.:  1921.8398</span></span>
+<span><span class="co">#&gt; Weighted Median:       3360.1585</span></span>
+<span><span class="co">#&gt; Weighted Mean:         3290.6565</span></span>
+<span><span class="co">#&gt; Weighted Mode:         3624.6699</span></span>
+<span><span class="co">#&gt; Weighted 97.5 % Perc.: 4988.4912</span></span>
+<span><span class="co">#&gt; Max.:                  8229.7269</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="visualizing-posterior-distributions-of-parameters">Visualizing posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-parameters"></a>
