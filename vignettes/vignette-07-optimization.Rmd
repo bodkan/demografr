@@ -193,7 +193,7 @@ results <-
 ```
 
 ```{r}
-p_stats <- lapply(names(functions), function(stat) {
+p_errors <- lapply(names(functions), function(stat) {
   results %>%
     dplyr::filter(stat == !!stat) %>%
     ggplot() +
@@ -204,8 +204,28 @@ p_stats <- lapply(names(functions), function(stat) {
 ```
 
 ```{r}
+cowplot::plot_grid(plotlist = p_errors)
+```
+
+```{r}
+p_stats <- lapply(names(functions), function(stat) {
+  results %>%
+    dplyr::filter(stat == !!stat) %>%
+    ggplot() +
+    geom_density(aes(simulated, color = id)) +
+    guides(color = guide_legend("statistic")) +
+    facet_wrap(~ stat, scales = "free")
+})
+```
+
+```{r}
 cowplot::plot_grid(plotlist = p_stats)
 ```
+
+```{r}
+p_stats[[3]] + geom_vline(xintercept = observed$f4$f4)
+```
+
 
 Results from the perturbed model:
 
