@@ -44,7 +44,7 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
   predicted_df <- extract_prediction(data, stat)
 
   color_by <- as.symbol(if (length(stat) > 1) "summary" else "stat")
-  scales <- if (length(stat) > 1) "free_x" else NULL
+  scales <- if (length(stat) > 1) "free" else NULL
 
   model_name <- attr(data, "components")$model_name
 
