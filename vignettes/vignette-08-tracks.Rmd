@@ -1,0 +1,255 @@
+---
+title: "Estimating the rate and time of gene flow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Estimating the rate and time of gene flow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 80,
+  eval = slendr_present
+)
+
+true_tracts_path <- here::here("inst/examples/tracts_truth.rds")
+data_path <- here::here("inst/examples/tracts_data.rds")
+
+devtools::load_all()
+```
+
+```{r, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+
+library(demografr)
+library(slendr)
+
+init_env()
+
+SEED <- 42
+set.seed(SEED)
+```
+
+Suppress annoying pandas warning triggered by the tspop package:
+
+```{r}
+warnings <- reticulate::import("warnings")
+warnings$simplefilter("ignore")
+```
+
+```{r, eval=!file.exists(true_tracts_path)}
+anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
+afr <- population("Africans", parent = anc, N = 10000, time = 650000)
+nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
+eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
+
+gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 35000, end = 35000 - 30)
+
+true_model <- compile_model(
+  populations = list(anc, afr, nea, eur), gene_flow = gf,
+  generation_time = 30
+)
+
+samples <- schedule_sampling(true_model, times = 0, list(eur, 100))
+
+# plot_model(true_model, proportions = TRUE,
+#            order = c("Africans", "Europeans", "ancestors", "Neanderthals"))
+
+true_ts <- msprime(true_model, sequence_length = 50e6, recombination_rate = 1e-8, samples = samples)
+
+true_tracts <- ts_tracts(true_ts, census = 35000, quiet = TRUE)
+
+saveRDS(true_tracts, true_tracts_path)
+```
+
+```{r, eval=file.exists(true_tracts_path), echo=FALSE}
+true_tracts <- readRDS(true_tracts_path)
+```
+
+```{r}
+# count tracts in twenty length bins
+n <- 30
+bins <- cut(true_tracts$length, breaks = n)
+counts <- as.vector(table(bins))
+
+# return proportions of tracts in each bin
+true_bins <- data.frame(bin = as.character(1:n), prop = counts / sum(counts))
+true_bins <- true_bins[1:(which(true_bins$prop == 0)[1] - 1), ]
+
+ggplot(true_bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
+
+tract_bins <- true_bins
+```
+
+```{r}
+tract_bins
+```
+
+```{r}
+observed <- list(tract_bins = tract_bins)
+```
+
+```{r}
+r <- 1e-8
+t <- round(true_model$geneflow$tstart_orig / 30)
+m <- 0.03
+
+L <- mean(true_tracts$length)
+L
+
+L <- 1/(r*t)
+L
+
+L <- 1/((1-m)*r*(t-1))
+L
+```
+
+```{r}
+lm_mod <- lm(log(prop) ~ as.integer(bin), data = true_bins)
+summary(lm_mod)
+
+slope <- summary(lm_mod)$coefficients["as.integer(bin)", "Estimate"]
+slope
+```
+
+```{r}
+ggplot(true_bins, aes(x = as.integer(bin), y = log(prop))) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+By how much does average tract length per bin decrease with each bin?
+
+```{r}
+mean_bin <- true_tracts %>% mutate(bin = cut(true_tracts$length, breaks = n, labels = FALSE)) %>% filter(bin <= max(as.integer(tract_bins$bin))) %>% group_by(bin) %>% summarise(x = mean(length)) %>% .$x %>% diff %>% mean
+mean_bin
+```
+
+```{r}
+lambda <- -slope
+
+ggplot(true_bins, aes(x = as.integer(bin), y = prop)) +
+  geom_point() +
+  stat_function(fun = dexp, args = list(rate = lambda), color = "red")
+```
+
+```{r}
+# lambda = - slope = r * t => t = - slope / (r * mean_bin)
+-slope / (r * mean_bin) * 30
+
+1 / (r * mean(true_tracts$length)) * 30
+```
+
+
+
+## Define ABC pipeline components
+
+## Model function
+
+```{r}
+model <- function(admixture_time, admixture_rate) {
+  generation_time <- 30
+
+anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
+afr <- population("Africans", parent = anc, N = 10000, time = 650000)
+nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
+eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
+
+  gf <- gene_flow(
+    from = nea, to = eur,
+    rate = admixture_rate,    # first model parameter
+    start = admixture_time,   # second model parameter
+    end = admixture_time - generation_time
+  )
+
+  model <- compile_model(
+    populations = list(anc, afr, nea, eur), gene_flow = gf,
+    generation_time = generation_time
+  )
+  
+  samples <- schedule_sampling(model, times = 0, list(eur, 100))
+
+  return(list(model, samples))
+}
+```
+
+## Parameter priors
+
+```{r}
+priors <- list(
+  admixture_time ~ runif(20000, 100000),
+  admixture_rate ~ runif(0, 0.3)
+)
+```
+
+As a sanity check, can we simulate a tree sequence from the model and priors?
+
+```{r}
+ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8)
+```
+
+## Summary function
+
+```{r}
+tract_bins <- function(ts) {
+  # get the admixture time of the simulated model
+  gf_time <- attr(ts, "model")$geneflow$tstart_orig
+
+  # extract tracts of Neanderthal ancestry in Europeans (no need to specify
+  # sources and targets because we have only one gene flow in the model)
+  tracts <- ts_tracts(ts, census = gf_time, quiet = TRUE)
+
+  # count tracts in twenty length bins
+  n <- 20
+  bins <- cut(tracts$length, breaks = n)
+  counts <- as.vector(table(bins))
+  
+  # return proportions of tracts in each bin
+  data.frame(bin = as.character(1:n), prop = counts / sum(counts))
+}
+
+functions <- list(tract_bins = tract_bins)
+```
+
+Using the simulated tree sequence `ts` above, let's again make sure that our summary function is defined correctly and that it produces a reasonable result:
+
+```{r}
+bins <- functions$tract_bins(ts)
+bins
+```
+
+```{r}
+ggplot(bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
+```
+
+
+## Validating all components
+
+Our simple sanity checks suggest that our ABC model components are defined correctly. However, to be absolutely sure that everything works, let's validate the model using _demografr_'s automated validation function:
+
+```{r}
+validate_abc(model, priors, functions, observed)
+```
+
+
+## Run ABC simulations
+
+```{r}
+library(future)
+plan(multisession, workers = availableCores())
+```
+
+```{r}
+data <- simulate_abc(model, priors, functions, observed, iterations = 100,
+                     sequence_length = 10e6, recombination_rate = 1e-8)
+```
+
