@@ -149,6 +149,12 @@ ggplot(true_bins, aes(x = as.integer(bin), y = prop)) +
 1 / (r * mean(true_tracts$length)) * 30
 ```
 
+```{r}
+ecdf_length <- ecdf(true_tracts$length)
+plot(ecdf_length)
+
+```
+
 
 
 ## Define ABC pipeline components
