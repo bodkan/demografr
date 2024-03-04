@@ -27,6 +27,8 @@
 #'   Setting this argument for custom simulation script has no effect.
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
+#' @param random_seed Random seed to be used for simulation and (potentially) adding of mutations
+#'   to a simulated tree sequence
 #'
 #' @return A tree-sequence object of the class \code{slendr_ts}
 #'
@@ -34,7 +36,8 @@
 simulate_ts <- function(
   model, parameters,
   sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  attempts = 1000, engine = NULL, model_args = NULL, engine_args = NULL
+  attempts = 1000, engine = NULL, model_args = NULL, engine_args = NULL,
+  random_seed = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
   warning_length <- (length(parameters) + length(model_args)) * 50
@@ -73,7 +76,8 @@ simulate_ts <- function(
   ts <- run_simulation(model, parameters, sequence_length, recombination_rate, mutation_rate,
                        engine = engine, model_args = model_args,
                        engine_args = engine_args,
-                       attempts = attempts, model_name = substitute(model))$ts
+                       attempts = attempts, model_name = substitute(model),
+                       random_seed = random_seed)$ts
 
   ts
 }

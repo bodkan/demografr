@@ -2,7 +2,7 @@
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
                            samples, engine, model_args, engine_args,
-                           model_name, attempts) {
+                           model_name, attempts, random_seed = NULL) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
@@ -71,7 +71,8 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
             model = slendr_model,
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
-            samples = sample_schedule
+            samples = sample_schedule,
+            random_seed = random_seed
           ) %>% c(., engine_args)
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))

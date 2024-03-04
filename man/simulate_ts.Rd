@@ -13,7 +13,8 @@ simulate_ts(
   attempts = 1000,
   engine = NULL,
   model_args = NULL,
-  engine_args = NULL
+  engine_args = NULL,
+  random_seed = NULL
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ Setting this argument for custom simulation script has no effect.}
 
 \item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.}
+
+\item{random_seed}{Random seed to be used for simulation and (potentially) adding of mutations
+to a simulated tree sequence}
 }
 \value{
 A tree-sequence object of the class \code{slendr_ts}
