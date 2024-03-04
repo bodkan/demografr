@@ -8,6 +8,8 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+devtools::install(upgrade=FALSE)
+
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
 
 knitr::opts_chunk$set(
@@ -52,7 +54,7 @@ afr <- population("Africans", parent = anc, N = 10000, time = 650000)
 nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
 eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 35000, end = 35000 - 30)
+gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 55000 - 30)
 
 true_model <- compile_model(
   populations = list(anc, afr, nea, eur), gene_flow = gf,
@@ -61,12 +63,12 @@ true_model <- compile_model(
 
 samples <- schedule_sampling(true_model, times = 0, list(eur, 100))
 
-# plot_model(true_model, proportions = TRUE,
-#            order = c("Africans", "Europeans", "ancestors", "Neanderthals"))
+plot_model(true_model, proportions = TRUE,
+           order = c("Africans", "Europeans", "ancestors", "Neanderthals"))
 
 true_ts <- msprime(true_model, sequence_length = 50e6, recombination_rate = 1e-8, samples = samples)
 
-true_tracts <- ts_tracts(true_ts, census = 35000, quiet = TRUE)
+true_tracts <- ts_tracts(true_ts, census = 55000, quiet = TRUE)
 
 saveRDS(true_tracts, true_tracts_path)
 ```
@@ -77,13 +79,12 @@ true_tracts <- readRDS(true_tracts_path)
 
 ```{r}
 # count tracts in twenty length bins
-n <- 30
+n <- 20
 bins <- cut(true_tracts$length, breaks = n)
 counts <- as.vector(table(bins))
 
 # return proportions of tracts in each bin
 true_bins <- data.frame(bin = as.character(1:n), prop = counts / sum(counts))
-true_bins <- true_bins[1:(which(true_bins$prop == 0)[1] - 1), ]
 
 ggplot(true_bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
 
@@ -97,65 +98,6 @@ tract_bins
 ```{r}
 observed <- list(tract_bins = tract_bins)
 ```
-
-```{r}
-r <- 1e-8
-t <- round(true_model$geneflow$tstart_orig / 30)
-m <- 0.03
-
-L <- mean(true_tracts$length)
-L
-
-L <- 1/(r*t)
-L
-
-L <- 1/((1-m)*r*(t-1))
-L
-```
-
-```{r}
-lm_mod <- lm(log(prop) ~ as.integer(bin), data = true_bins)
-summary(lm_mod)
-
-slope <- summary(lm_mod)$coefficients["as.integer(bin)", "Estimate"]
-slope
-```
-
-```{r}
-ggplot(true_bins, aes(x = as.integer(bin), y = log(prop))) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
-
-By how much does average tract length per bin decrease with each bin?
-
-```{r}
-mean_bin <- true_tracts %>% mutate(bin = cut(true_tracts$length, breaks = n, labels = FALSE)) %>% filter(bin <= max(as.integer(tract_bins$bin))) %>% group_by(bin) %>% summarise(x = mean(length)) %>% .$x %>% diff %>% mean
-mean_bin
-```
-
-```{r}
-lambda <- -slope
-
-ggplot(true_bins, aes(x = as.integer(bin), y = prop)) +
-  geom_point() +
-  stat_function(fun = dexp, args = list(rate = lambda), color = "red")
-```
-
-```{r}
-# lambda = - slope = r * t => t = - slope / (r * mean_bin)
--slope / (r * mean_bin) * 30
-
-1 / (r * mean(true_tracts$length)) * 30
-```
-
-```{r}
-ecdf_length <- ecdf(true_tracts$length)
-plot(ecdf_length)
-
-```
-
-
 
 ## Define ABC pipeline components
 
@@ -255,7 +197,18 @@ plan(multisession, workers = availableCores())
 ```
 
 ```{r}
-data <- simulate_abc(model, priors, functions, observed, iterations = 100,
+data <- simulate_abc(model, priors, functions, observed, iterations = 1000,
                      sequence_length = 10e6, recombination_rate = 1e-8)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
