@@ -18,6 +18,26 @@ run_iteration <- function(it,
   )
   ts <- sim_result$ts
   param_values <- sim_result$param_values
+  # i <- sample(x = 10000, size = 1)
+  # write(ts$metadata$slendr$arguments$SEED, file = paste0(i, ".seed"))
+  # write(param_values, file = paste0(i, ".params"))
+  # then use this to investigate reasons for crashing statistics:
+  # runs <- list.files(pattern = ".seed") %>% sapply(function(i) gsub(".seed", "", i))
+  # res <- list()
+  # for (i in runs) {
+  #   random_seed <- scan(paste0(i, ".seed"), what = integer())
+  #   param_values <- scan(paste0(i, ".params"), what = numeric()) %>% as.list() %>% setNames(c("admixture_time", "admixture_rate"))
+  #
+  #   ts <- simulate_ts(model, params, random_seed = random_seed)
+  #
+  #   simulated_stats <- lapply(functions, function(f) f(ts))
+  #
+  #   x <- list(
+  #     parameters = param_values,
+  #     simulated = simulated_stats
+  #   )
+  #   res[[length(res) + 1]] <- x
+  # }
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
