@@ -88,15 +88,15 @@ true_bins <- data.frame(bin = as.character(1:n), prop = counts / sum(counts))
 
 ggplot(true_bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
 
-tract_bins <- true_bins
+observed_bins <- true_bins
 ```
 
 ```{r}
-tract_bins
+observed_bins
 ```
 
 ```{r}
-observed <- list(tract_bins = tract_bins)
+observed <- list(tract_bins = observed_bins)
 ```
 
 ## Define ABC pipeline components
@@ -107,10 +107,10 @@ observed <- list(tract_bins = tract_bins)
 model <- function(admixture_time, admixture_rate) {
   generation_time <- 30
 
-anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
-afr <- population("Africans", parent = anc, N = 10000, time = 650000)
-nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
-eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
+  anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
+  afr <- population("Africans", parent = anc, N = 10000, time = 650000)
+  nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
+  eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
   gf <- gene_flow(
     from = nea, to = eur,
@@ -156,7 +156,7 @@ tract_bins <- function(ts) {
   # sources and targets because we have only one gene flow in the model)
   tracts <- ts_tracts(ts, census = gf_time, quiet = TRUE)
 
-  # count tracts in twenty length bins
+  # count tracts in 20 length bins
   n <- 20
 
   # take care of the edge case in which we get no tracts at all -- in such
@@ -203,8 +203,8 @@ plan(multisession, workers = availableCores())
 ```
 
 ```{r}
-data <- simulate_abc(model, priors, functions, observed, iterations = 1000,
-                     sequence_length = 200e6, recombination_rate = 1e-8)
+data <- simulate_abc(model, priors, functions, observed, iterations = 10000,
+                     sequence_length = 100e6, recombination_rate = 1e-8)
 saveRDS(data, data_path)
 ```
 
@@ -217,35 +217,21 @@ abc <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
 ```
 
 ```{r}
-plot_posterior(abc, param = "admixture_time")
+plot_posterior(abc, facets = TRUE)
 ```
 
 ```{r}
-plot_posterior(abc, param = "admixture_rate")
+extract_summary(abc)
 ```
+
 
 
 
 ```{r}
-predictions <- predict(abc, samples = 1000)
+predictions <- predict(abc, samples = 100)
 ```
 
 
-```{r, postpred_diversity}
-plot_prediction(predictions, "diversity")
+```{r, postpred_bins}
+plot_prediction(predictions, "tract_bins")
 ```
-
-```{r, postpred_divergence}
-plot_prediction(predictions, "divergence")
-```
-
-
-
-
-
-
-
-
-
-
-
