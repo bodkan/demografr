@@ -77,8 +77,8 @@ WORKDIR $PROJECT
 ENV R_INSTALL_STAGED=FALSE
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV RENV_CONFIG_INSTALL_TRANSACTIONAL=FALSE
-ENV RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.3.tar.gz"
-RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.3.tar.gz -O $RENV_BOOTSTRAP_TARBALL
+ENV RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.5.tar.gz"
+RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.5.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 
 # run this when first setting up the container to create an renv.lock file:
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
