@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-devtools::install(upgrade=FALSE)
+#devtools::install(upgrade=FALSE)
 
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
 
@@ -66,7 +66,7 @@ samples <- schedule_sampling(true_model, times = 0, list(eur, 100))
 plot_model(true_model, proportions = TRUE,
            order = c("Africans", "Europeans", "ancestors", "Neanderthals"))
 
-true_ts <- msprime(true_model, sequence_length = 50e6, recombination_rate = 1e-8, samples = samples)
+true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples)
 
 true_tracts <- ts_tracts(true_ts, census = 55000, quiet = TRUE)
 
@@ -158,11 +158,17 @@ tract_bins <- function(ts) {
 
   # count tracts in twenty length bins
   n <- 20
-  bins <- cut(tracts$length, breaks = n)
-  counts <- as.vector(table(bins))
-  
+
+  # take care of the edge case in which we get no tracts at all -- in such
+  if (nrow(tracts) > 0) {
+    bins <- cut(tracts$length, breaks = n)
+    counts <- as.vector(table(bins))
+    prop <- counts / sum(counts)
+  } else
+    prop <- rep(0, n)
+
   # return proportions of tracts in each bin
-  data.frame(bin = as.character(1:n), prop = counts / sum(counts))
+  data.frame(bin = as.character(1:n), prop = prop)
 }
 
 functions <- list(tract_bins = tract_bins)
@@ -198,9 +204,40 @@ plan(multisession, workers = availableCores())
 
 ```{r}
 data <- simulate_abc(model, priors, functions, observed, iterations = 1000,
-                     sequence_length = 10e6, recombination_rate = 1e-8)
+                     sequence_length = 200e6, recombination_rate = 1e-8)
+saveRDS(data, data_path)
 ```
 
+```{r}
+data = readRDS(data_path)
+```
+
+```{r}
+abc <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
+```
+
+```{r}
+plot_posterior(abc, param = "admixture_time")
+```
+
+```{r}
+plot_posterior(abc, param = "admixture_rate")
+```
+
+
+
+```{r}
+predictions <- predict(abc, samples = 1000)
+```
+
+
+```{r, postpred_diversity}
+plot_prediction(predictions, "diversity")
+```
+
+```{r, postpred_divergence}
+plot_prediction(predictions, "divergence")
+```
 
 
 
