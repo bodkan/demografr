@@ -160,7 +160,7 @@
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "0.12.6.6.1",
+      "Version": "0.12.8.1.0",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -170,7 +170,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "d2b60e0a15d73182a3a766ff0a7d0d7f"
+      "Hash": "e78bbbb81a5dcd71a4bd3268d6ede0b1"
     },
     "RcppTOML": {
       "Package": "RcppTOML",
@@ -822,7 +822,7 @@
     },
     "ggplot2": {
       "Package": "ggplot2",
-      "Version": "3.4.4",
+      "Version": "3.5.0",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -843,7 +843,7 @@
         "vctrs",
         "withr"
       ],
-      "Hash": "313d31eff2274ecf4c1d3581db7241f9"
+      "Hash": "52ef83f93f74833007f193b2d4c159a2"
     },
     "gh": {
       "Package": "gh",
@@ -1191,14 +1191,14 @@
     },
     "locfit": {
       "Package": "locfit",
-      "Version": "1.5-9.8",
+      "Version": "1.5-9.9",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R",
         "lattice"
       ],
-      "Hash": "3434988413fbabfdb0fcd6067d7e1aa4"
+      "Hash": "3885127e04b35dafded049075057ad83"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -1322,7 +1322,7 @@
     },
     "parallelly": {
       "Package": "parallelly",
-      "Version": "1.36.0",
+      "Version": "1.37.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1330,7 +1330,7 @@
         "tools",
         "utils"
       ],
-      "Hash": "bca377e1c87ec89ebed77bba00635b2e"
+      "Hash": "5410df8d22bd36e616f2a2343dbb328c"
     },
     "pillar": {
       "Package": "pillar",
@@ -1915,7 +1915,7 @@
     },
     "shinyWidgets": {
       "Package": "shinyWidgets",
-      "Version": "0.8.1",
+      "Version": "0.8.2",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1929,18 +1929,18 @@
         "sass",
         "shiny"
       ],
-      "Hash": "96bb249d21b7473dbeb0311702ef5288"
+      "Hash": "88289640c8206dc810ea9cb87bd58ffc"
     },
     "slendr": {
       "Package": "slendr",
-      "Version": "0.9.0.9000",
+      "Version": "0.9.1",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "83f30e8b21dc1544eb5e7a78a875769d8a4acb4e",
+      "RemoteSha": "6c94f102dd91a538e5ea4a9e0ac12e0c29f14a3a",
       "Requirements": [
         "R",
         "ape",
@@ -1958,7 +1958,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "597eb00393aea778bfa7d6f2b572eac5"
+      "Hash": "068d082cfd48becafed03f8560707ba2"
     },
     "sourcetools": {
       "Package": "sourcetools",
