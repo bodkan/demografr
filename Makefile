@@ -1,3 +1,7 @@
+##################################################################
+# R package infrastructure
+#
+
 .PHONY: docs
 
 version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/\1/')
@@ -54,6 +58,10 @@ winold: README.md
 clean:
 	rm -rf build
 
+##################################################################
+# Docker shortcuts
+#
+
 # check the OS type to assign appropriate Docker image tag
 ifeq ($(shell uname -s), Darwin)
 PLATFORM ?= arm64
@@ -61,8 +69,8 @@ else
 PLATFORM ?= amd64
 endif
 
-IMAGE := bodkan/demografr:$(PLATFORM)
-CONTAINER := demografr_$(shell date '+%Y-%m-%d_%H-%M-%S')
+IMAGE := bodkan/$(shell basename $(shell pwd)):$(PLATFORM)
+CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
 
 # if present, extract GitHub access token
 TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
