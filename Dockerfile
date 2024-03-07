@@ -106,4 +106,4 @@ RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.pr
 RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 
 # clean up compilation sources and other redundant files
-RUN rm -r /tmp/*; rm -r /home/rstudio
+RUN rm -r /tmp/* /home/rstudio
