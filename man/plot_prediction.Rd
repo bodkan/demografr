@@ -4,16 +4,16 @@
 \alias{plot_prediction}
 \title{Plot the results of a posterior predictive check for a given summary statistic}
 \usage{
-plot_prediction(data, stat = NULL, file = NULL, facets = TRUE, ...)
+plot_prediction(data, stat, file = NULL, facets = TRUE, ...)
 }
 \arguments{
 \item{data}{Data frame with predictions generated from ABC posteriors, as generated
 by the \code{predict} function}
 
-\item{stat}{Which tree-sequence summary statistic to extract? If \code{NULL}, all summary
-statistics will be returned.}
+\item{stat}{Which tree-sequence summary statistic to extract? If \code{NULL}, all
+summary statistics will be visualized.}
 
-\item{file}{Output file for a figure saved via \code{ggsave}}
+\item{file}{Output path to a PDF figure to be saved}
 
 \item{facets}{Should each summary statistic be plotted on its own facet (default is
 \code{TRUE})?}
@@ -21,8 +21,9 @@ statistics will be returned.}
 \item{...}{Optional argument which will be passed to \code{ggsave}}
 }
 \value{
-If \code{file = NULL}, a ggplot2 object, otherwise nothing is returned and the
-  plot is instead saved to a file.
+If \code{file = NULL}, a ggplot2 object (or a list of such objects, if
+  multiple summary statistics are visualized), otherwise nothing is returned and the
+  plots are instead saved to a file.
 }
 \description{
 Plot the results of a posterior predictive check for a given summary statistic
