@@ -73,7 +73,9 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
   parameters <- dplyr::as_tibble(posterior_params[samples, ])
 
   # once we have sampled parameters from the posteriors, getting the summary statistics
-  # is simply a matter of running simulations across a grid
+  # is simply a matter of running simulations across a grid, in the same way a
+  # user would do it directly in cases where they already had parameter values
+  # to simulate from
   result <- simulate_grid(
     model = components$model,
     grid = parameters,
@@ -86,6 +88,9 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     engine = opts$engine, model_args = opts$model_args, engine_args = opts$engine_args,
     strict = strict
   )
+  # replace the replicate number from simulate_grid by actual numbers of each
+  # posterior draw for easier downstream analysis
+  result$rep <- 1:nrow(result)
 
   attr(result, "components") <- components[c("observed", "model_name")]
 
