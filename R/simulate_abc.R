@@ -85,20 +85,28 @@ simulate_abc <- function(
 
   model_name <- as.character(substitute(model))
 
+  its <- seq_len(iterations)
+  p <- progressr::progressor(along = its)
+
   results <- future.apply::future_lapply(
-    X = seq_len(iterations),
-    FUN = run_iteration,
-    model = model,
-    params = priors,
-    functions = functions,
-    sequence_length = sequence_length,
-    recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate,
-    engine = engine,
-    model_args = model_args,
-    engine_args = engine_args,
-    model_name = model_name,
-    attempts = attempts,
+    X = its,
+    FUN = function(i) {
+      p()
+      run_iteration(
+        i,
+        model = model,
+        params = priors,
+        functions = functions,
+        sequence_length = sequence_length,
+        recombination_rate = recombination_rate,
+        mutation_rate = mutation_rate,
+        engine = engine,
+        model_args = model_args,
+        engine_args = engine_args,
+        model_name = model_name,
+        attempts = attempts,
+      )
+    },
     future.seed = TRUE,
     future.globals = globals,
     future.packages = c("slendr", packages)

@@ -84,10 +84,15 @@ simulate_grid <- function(
   ) %>%
     do.call(rbind, .)
 
+
+  its <- seq_len(nrow(grid))
+  p <- progressr::progressor(along = its)
+
   suppressPackageStartupMessages( # silence the super intrusive sp startup message
   results <- future.apply::future_lapply(
-    X = seq_len(nrow(grid)),
+    X = its,
     FUN = function(grid_i) {
+      p()
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
