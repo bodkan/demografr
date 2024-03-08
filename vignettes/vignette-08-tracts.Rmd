@@ -8,9 +8,9 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-#devtools::install(upgrade=FALSE)
+devtools::install(upgrade=FALSE)
 
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -22,7 +22,9 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-true_tracts_path <- here::here("inst/examples/tracts_truth.rds")
+true_bins_path <- here::here("inst/examples/tracts_true_bins.rds")
+true_f4_path <- here::here("inst/examples/tracts_true_f4.rds")
+
 data_path <- here::here("inst/examples/tracts_data.rds")
 
 devtools::load_all()
@@ -41,54 +43,69 @@ SEED <- 42
 set.seed(SEED)
 ```
 
-Suppress annoying pandas warning triggered by the tspop package:
-
-```{r}
-warnings <- reticulate::import("warnings")
-warnings$simplefilter("ignore")
-```
-
-```{r, eval=!file.exists(true_tracts_path)}
-anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
+```{r, eval=!file.exists(true_bins_path)}
+anc <- population("ancestors", N = 10000, time = 7e6, remove = 649000)
+chimp <- population("Chimpanzees", parent = anc, N = 10000, time = 6e6)
 afr <- population("Africans", parent = anc, N = 10000, time = 650000)
 nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
 eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 55000 - 30)
+gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 57000, end = 53000)
 
 true_model <- compile_model(
-  populations = list(anc, afr, nea, eur), gene_flow = gf,
+  populations = list(anc, chimp, afr, nea, eur), gene_flow = gf,
   generation_time = 30
 )
 
-samples <- schedule_sampling(true_model, times = 0, list(eur, 100))
+samples <- schedule_sampling(
+  true_model, times = 0,
+  list(eur, 100), list(afr, 2), list(nea, 1), list(chimp, 1)
+)
 
-plot_model(true_model, proportions = TRUE,
-           order = c("Africans", "Europeans", "ancestors", "Neanderthals"))
+plot_model(true_model, proportions = TRUE, log = TRUE,
+           order = c("Africans", "Europeans", "ancestors", "Neanderthals", "Chimpanzees"))
 
-true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples)
+true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples) %>%
+  ts_mutate(mutation_rate = 1e-8, random_seed = SEED)
 
-true_tracts <- ts_tracts(true_ts, census = 55000, quiet = TRUE)
-
-saveRDS(true_tracts, true_tracts_path)
+true_tracts <- ts_tracts(true_ts, census = 57000, quiet = TRUE)
 ```
 
-```{r, eval=file.exists(true_tracts_path), echo=FALSE}
-true_tracts <- readRDS(true_tracts_path)
-```
-
-```{r}
+```{r, eval=file.exists(true_bins_path), echo=FALSE}
 # count tracts in twenty length bins
 n <- 20
 bins <- cut(true_tracts$length, breaks = n)
 counts <- as.vector(table(bins))
 
 # return proportions of tracts in each bin
-true_bins <- data.frame(bin = as.character(1:n), prop = counts / sum(counts))
+true_bins <- data.frame(length_bin = 1:n, prop = counts / sum(counts))
+```
 
-ggplot(true_bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
+```{r, eval=!file.exists(true_bins_path), echo=FALSE}
+saveRDS(true_bins, true_bins_path)
+```
 
-observed_bins <- true_bins
+```{r, eval=file.exists(true_f4_path), echo=FALSE}
+samples <- ts_names(true_ts, split = "pop")
+
+true_f4 <- rbind(
+  ts_f4(true_ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
+  ts_f4(true_ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
+)
+
+saveRDS(true_f4, true_f4_path)
+```
+
+```{r, eval=file.exists(true_f4_path), echo=FALSE}
+observed_f4 <- readRDS(true_f4_path)
+```
+
+```{r, eval=!file.exists(true_bins_path), echo=FALSE}
+observed_bins <- readRDS(true_bins_path)
+```
+
+```{r}
+ggplot(observed_bins, aes(x = length_bin, y = prop)) + geom_bar(stat = "identity")
 ```
 
 ```{r}
@@ -96,7 +113,13 @@ observed_bins
 ```
 
 ```{r}
-observed <- list(tract_bins = observed_bins)
+observed_f4
+```
+
+```{r}
+observed <- list(tract_bins = observed_bins, f4 = observed_f4)
+
+observed
 ```
 
 ## Define ABC pipeline components
@@ -107,24 +130,23 @@ observed <- list(tract_bins = observed_bins)
 model <- function(admixture_time, admixture_rate) {
   generation_time <- 30
 
-  anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
+  anc <- population("ancestors", N = 10000, time = 7e6, remove = 649000)
+  chimp <- population("Chimpanzees", parent = anc, N = 10000, time = 6e6)
   afr <- population("Africans", parent = anc, N = 10000, time = 650000)
   nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
   eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
-
-  gf <- gene_flow(
-    from = nea, to = eur,
-    rate = admixture_rate,    # first model parameter
-    start = admixture_time,   # second model parameter
-    end = admixture_time - generation_time
-  )
-
+  
+  gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 57000, end = 53000)
+  
   model <- compile_model(
-    populations = list(anc, afr, nea, eur), gene_flow = gf,
-    generation_time = generation_time
+    populations = list(anc, chimp, afr, nea, eur), gene_flow = gf,
+    generation_time = 30, serialize = FALSE
   )
   
-  samples <- schedule_sampling(model, times = 0, list(eur, 100))
+  samples <- schedule_sampling(
+    model, times = 0,
+    list(eur, 100), list(afr, 2), list(nea, 1), list(chimp, 1)
+  )
 
   return(list(model, samples))
 }
@@ -142,7 +164,7 @@ priors <- list(
 As a sanity check, can we simulate a tree sequence from the model and priors?
 
 ```{r}
-ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8)
+ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
 ## Summary function
@@ -168,21 +190,31 @@ tract_bins <- function(ts) {
     prop <- rep(0, n)
 
   # return proportions of tracts in each bin
-  data.frame(bin = as.character(1:n), prop = prop)
+  data.frame(length_bin = 1:n, prop = prop)
 }
 
-functions <- list(tract_bins = tract_bins)
+f4 <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+
+  rbind(
+    ts_f4(ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
+    ts_f4(ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
+  )
+}
+
+functions <- list(tract_bins = tract_bins, f4 = f4)
 ```
 
 Using the simulated tree sequence `ts` above, let's again make sure that our summary function is defined correctly and that it produces a reasonable result:
 
 ```{r}
 bins <- functions$tract_bins(ts)
-bins
+
+ggplot(bins, aes(x = length_bin, y = prop)) + geom_bar(stat = "identity")
 ```
 
 ```{r}
-ggplot(bins, aes(x = as.integer(bin), y = prop)) + geom_bar(stat = "identity")
+functions$f4(ts)
 ```
 
 
@@ -194,22 +226,31 @@ Our simple sanity checks suggest that our ABC model components are defined corre
 validate_abc(model, priors, functions, observed)
 ```
 
-
 ## Run ABC simulations
 
 ```{r}
+# schedule simulations across all CPU cores
 library(future)
 plan(multisession, workers = availableCores())
+
+# show a progress bar in the console
+library(progressr)
+handlers(global = TRUE)
 ```
 
 ```{r}
-data <- simulate_abc(model, priors, functions, observed, iterations = 10000,
-                     sequence_length = 100e6, recombination_rate = 1e-8)
+data <- simulate_abc(
+  model, priors, functions, observed, iterations = 5000,
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
+```
+
+```{r, eval=!file.exists(data_path)}
 saveRDS(data, data_path)
 ```
 
-```{r}
-data = readRDS(data_path)
+```{r, eval=file.exists(data_path)}
+data <- readRDS(data_path)
 ```
 
 ```{r}
@@ -235,3 +276,8 @@ predictions <- predict(abc, samples = 100)
 ```{r, postpred_bins}
 plot_prediction(predictions, "tract_bins")
 ```
+
+```{r}
+predictions
+```
+
