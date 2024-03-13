@@ -71,7 +71,7 @@ true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-
 true_tracts <- ts_tracts(true_ts, census = 57000, quiet = TRUE)
 ```
 
-```{r, eval=file.exists(true_bins_path), echo=FALSE}
+```{r, eval=!file.exists(true_bins_path), echo=FALSE}
 # count tracts in twenty length bins
 n <- 20
 bins <- cut(true_tracts$length, breaks = n)
