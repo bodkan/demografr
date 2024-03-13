@@ -69,6 +69,13 @@ true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-
   ts_mutate(mutation_rate = 1e-8, random_seed = SEED)
 
 true_tracts <- ts_tracts(true_ts, census = 57000, quiet = TRUE)
+
+samples <- ts_names(true_ts, split = "pop")
+
+true_f4 <- rbind(
+  ts_f4(true_ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
+  ts_f4(true_ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
+)
 ```
 
 ```{r, eval=!file.exists(true_bins_path), echo=FALSE}
@@ -84,13 +91,6 @@ saveRDS(true_bins, true_bins_path)
 ```
 
 ```{r, eval=!file.exists(true_f4_path), echo=FALSE}
-samples <- ts_names(true_ts, split = "pop")
-
-true_f4 <- rbind(
-  ts_f4(true_ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
-  ts_f4(true_ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
-)
-
 saveRDS(true_f4, true_f4_path)
 ```
 
