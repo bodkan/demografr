@@ -43,7 +43,7 @@ SEED <- 42
 set.seed(SEED)
 ```
 
-```{r, eval=!file.exists(true_bins_path)}
+```{r, eval=!file.exists(true_bins_path) || !file.exists(true_f4_path)}
 anc <- population("ancestors", N = 10000, time = 7e6, remove = 649000)
 chimp <- population("Chimpanzees", parent = anc, N = 10000, time = 6e6)
 afr <- population("Africans", parent = anc, N = 10000, time = 650000)
@@ -238,8 +238,8 @@ handlers(global = TRUE)
 
 ```{r}
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 2000,
-  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  model, priors, functions, observed, iterations = 10000,
+  sequence_length = 100e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
 
