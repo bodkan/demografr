@@ -62,7 +62,7 @@ samples <- schedule_sampling(
   list(eur, 100), list(afr, 2), list(nea, 1), list(chimp, 1)
 )
 
-plot_model(true_model, proportions = TRUE, log = TRUE,
+plot_model(true_model, proportions = TRUE, log = TRUE, samples = samples,
            order = c("Africans", "Europeans", "ancestors", "Neanderthals", "Chimpanzees"))
 
 true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples) %>%
@@ -240,7 +240,7 @@ handlers(global = TRUE)
 
 ```{r}
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 5000,
+  model, priors, functions, observed, iterations = 2000,
   sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
