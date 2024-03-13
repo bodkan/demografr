@@ -269,12 +269,17 @@ extract_summary(abc)
 
 
 ```{r}
-predictions <- predict(abc, samples = 100)
+predictions <- predict(abc, samples = 90)
 ```
 
 
 ```{r, postpred_bins}
 plot_prediction(predictions, "tract_bins")
+```
+
+```{r, postpred_f4}
+plot_prediction(predictions, "f4", facets = FALSE) +
+  ggplot2::geom_vline(xintercept = 0, linetype = 2)
 ```
 
 ```{r}
