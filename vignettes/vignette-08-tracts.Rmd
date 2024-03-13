@@ -100,7 +100,7 @@ saveRDS(true_f4, true_f4_path)
 observed_f4 <- readRDS(true_f4_path)
 ```
 
-```{r, eval=!file.exists(true_bins_path), echo=FALSE}
+```{r, eval=file.exists(true_bins_path), echo=FALSE}
 observed_bins <- readRDS(true_bins_path)
 ```
 
