@@ -79,13 +79,11 @@ counts <- as.vector(table(bins))
 
 # return proportions of tracts in each bin
 true_bins <- data.frame(length_bin = 1:n, prop = counts / sum(counts))
-```
 
-```{r, eval=!file.exists(true_bins_path), echo=FALSE}
 saveRDS(true_bins, true_bins_path)
 ```
 
-```{r, eval=file.exists(true_f4_path), echo=FALSE}
+```{r, eval=!file.exists(true_f4_path), echo=FALSE}
 samples <- ts_names(true_ts, split = "pop")
 
 true_f4 <- rbind(
