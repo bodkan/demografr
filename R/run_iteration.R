@@ -5,9 +5,6 @@ run_iteration <- function(it,
                           samples, engine, model_args, engine_args,
                           model_name, attempts) {
   init_env(quiet = TRUE)
-  # TODO: temporarily silence tspop pandas warnings
-  warnings <- reticulate::import("warnings")
-  warnings$simplefilter("ignore")
 
   sim_result <- run_simulation(
     model = model, params = params, sequence_length = sequence_length,
