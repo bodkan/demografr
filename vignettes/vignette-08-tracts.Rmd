@@ -159,12 +159,6 @@ priors <- list(
 )
 ```
 
-As a sanity check, can we simulate a tree sequence from the model and priors?
-
-```{r}
-ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
-```
-
 ## Summary function
 
 ```{r}
@@ -203,7 +197,13 @@ f4 <- function(ts) {
 functions <- list(tract_bins = tract_bins, f4 = f4)
 ```
 
-Using the simulated tree sequence `ts` above, let's again make sure that our summary function is defined correctly and that it produces a reasonable result:
+As a sanity check, can we simulate a tree sequence from the model and priors?
+
+```{r}
+ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+```
+
+Furthermore, let's also make sure that our summary function is defined correctly and that it produces a reasonable result:
 
 ```{r}
 bins <- functions$tract_bins(ts)
@@ -226,17 +226,21 @@ validate_abc(model, priors, functions, observed)
 
 ## Run ABC simulations
 
+Set up the parallelization backend to utilize all CPUs on the machine we're at:
+
 ```{r}
-# schedule simulations across all CPU cores
 library(future)
 plan(multisession, workers = availableCores())
+```
 
-# show a progress bar in the console
+Set up a progress bar for simulations to be able to track their progress:
+
+```{r, eval=FALSE}
 library(progressr)
 handlers(global = TRUE)
 ```
 
-```{r}
+```{r, eval=!file.exists(data_path)}
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,
   sequence_length = 100e6, recombination_rate = 1e-8, mutation_rate = 1e-8
@@ -252,7 +256,7 @@ data <- readRDS(data_path)
 ```
 
 ```{r}
-abc <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ```{r}
@@ -267,7 +271,7 @@ extract_summary(abc)
 
 
 ```{r}
-predictions <- predict(abc, samples = 90)
+predictions <- predict(abc, samples = 200)
 ```
 
 
