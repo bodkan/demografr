@@ -1683,9 +1683,14 @@
     },
     "reticulate": {
       "Package": "reticulate",
-      "Version": "1.35.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
+      "Version": "1.35.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "reticulate",
+      "RemoteUsername": "rstudio",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "129b6f54411fd6811f91b7afa24a28096b5ac321",
       "Requirements": [
         "Matrix",
         "R",
@@ -1701,7 +1706,7 @@
         "utils",
         "withr"
       ],
-      "Hash": "90be16b53b955990db4aa355c03d85eb"
+      "Hash": "bc876ca5eed077b2630131d8fde278bc"
     },
     "rlang": {
       "Package": "rlang",
@@ -1952,7 +1957,7 @@
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "398bb7af6a6585dcebad6a5b69c07d588659743c",
+      "RemoteSha": "ad7bda770d5c51801a00292b4f639a34f4252639",
       "Requirements": [
         "R",
         "ape",
@@ -1970,7 +1975,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "c73446241bfdf23c677ea55f51669d47"
+      "Hash": "4ae865a5cab062603b01db4a32457f16"
     },
     "sourcetools": {
       "Package": "sourcetools",
