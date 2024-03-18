@@ -18,8 +18,15 @@ extract_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj")) 
 
   # TODO check demographr_abc type
 
+  post_values <- paste0(posterior, ".values")
+  if (!post_values %in% names(abc)) {
+    post_values <- "unadj.values"
+    warning("Only unadjusted posterior values available for the ",
+            abc$method, " ABC method", call. = FALSE)
+  }
+
   # get the entire posterior sample, convert it to a long format, subset variables
-  df <- abc[[paste0(posterior, ".values")]] %>%
+  df <- abc[[post_values]] %>%
     as.data.frame() %>%
     stats::setNames(colnames(components$parameters)) %>%
     dplyr::as_tibble() %>%
