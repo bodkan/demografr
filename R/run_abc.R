@@ -66,7 +66,7 @@ run_abc <- function(data, engine, stat = NULL, ...) {
     parameters = data$parameters,
     functions = data$functions,
     simulated = simulated,
-    observed = observed,
+    observed = data$observed[stat],
     model_name = data$model_name
   )
 
