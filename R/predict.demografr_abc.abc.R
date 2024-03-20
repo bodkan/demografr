@@ -53,7 +53,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     warning("Please note that sampling adjusted parameters from the posterior\n",
             "can lead to invalid models (i.e. inconsistent orders of split times or\n",
             "nonsensical values of parameters in general). If you get an error, you\n",
-            "can either sample unadjusted parameters  by setting `posterior = \"unadj\"`\n",
+            "can either sample unadjusted parameters by setting `posterior = \"unadj\"`\n",
             "or instruct the prediction function to skip invalid models by setting\n",
             "`strict = FALSE`.", call. = FALSE)
 
