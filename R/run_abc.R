@@ -17,27 +17,27 @@
 #' @param data Simulated data set produced by \code{simulate_abc}
 #' @param engine Which ABC engine to use? As of the current version of demografr, the
 #'   only valid choice is "abc".
-#' @param stats Which of the simulated summary statistics to use for inference?
+#' @param stat Which of the simulated summary statistics to use for inference?
 #'   If \code{NULL} (the default), all simulated statistics will be used.
 #' @param ... Additional arguments passed on the \code{abc} function from
 #'   the abc package
 #'
 #' @export
-run_abc <- function(data, engine, stats = NULL, ...) {
+run_abc <- function(data, engine, stat = NULL, ...) {
   engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))
   args <- match.call()
 
   all_stats <- names(data$observed)
-  if (is.null(stats))
-    stats <- all_stats
+  if (is.null(stat))
+    stat <- all_stats
 
-  if (!all(stats %in% all_stats))
+  if (!all(stat %in% all_stats))
     stop("Unknown statistic(s) '", paste(stat, collapse = ", "), "' specified", call. = FALSE)
 
   # if the user provided names of statistics to use for inference, subset the
   # observed and simulated tables
-  observed <- bind_observed(data$observed[stats])
-  simulated <- data$simulated[, grep(paste0(paste0(stats, collapse = "|"), "_"),
+  observed <- bind_observed(data$observed[stat])
+  simulated <- data$simulated[, grep(paste0(paste0(stat, collapse = "|"), "_"),
                                      colnames(data$simulated)), drop = FALSE]
 
   if (engine == "abc") {
