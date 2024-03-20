@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-#devtools::install(upgrade=FALSE)
+# devtools::install(upgrade=FALSE)
 
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = TRUE)
 
@@ -44,14 +44,55 @@ SEED <- 42
 set.seed(SEED)
 ```
 
-```{r, eval=!file.exists(true_bins_path) || !file.exists(true_f4_path)}
+```{r, echo=FALSE}
+true_fun_tract_bins <- function(ts) {
+  # get the admixture time of the simulated model
+  gf_time <- extract_parameters(ts)$gene_flow$start
+
+  # extract tracts of Neanderthal ancestry in Europeans (no need to specify
+  # sources and targets because we have only one gene flow in the model)
+  tracts <- ts_tracts(ts, census = gf_time, quiet = TRUE)
+
+  # count tracts in 20 length bins
+  n <- 20
+
+  # take care of the edge case in which we get no tracts at all -- in such
+  if (nrow(tracts) > 0) {
+    bins <- cut(tracts$length, breaks = n)
+    counts <- as.vector(table(bins))
+    prop <- counts / sum(counts)
+  } else
+    prop <- rep(0, n)
+
+  # return proportions of tracts in each bin
+  data.frame(length_bin = 1:n, prop = prop)
+}
+
+true_fun_f4 <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+
+  rbind(
+    ts_f4(ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
+    ts_f4(ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
+  )
+}
+
+true_fun_f4ratio <- function(ts) {
+ ts_f4ratio(
+    ts, X = ts_names(ts, split = "pop")["Europeans"],
+    A = "Neanderthals_1", B = "Neanderthals_2", C = "Africans_1", O = "Chimpanzees_1"
+  )
+}
+```
+
+```{r, eval=!file.exists(true_bins_path) || !file.exists(true_f4_path) || !file.exists(true_f4ratio_path)}
 anc <- population("ancestors", N = 10000, time = 7e6, remove = 649000)
 chimp <- population("Chimpanzees", parent = anc, N = 10000, time = 6e6)
 afr <- population("Africans", parent = anc, N = 10000, time = 650000)
 nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
 eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 54500)
+gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 54000)
 
 true_model <- compile_model(
   populations = list(anc, chimp, afr, nea, eur), gene_flow = gf,
@@ -65,41 +106,19 @@ samples <- rbind(modern_samples, ancient_samples)
 plot_model(true_model, proportions = TRUE, log = TRUE, samples = samples,
            order = c("Africans", "Europeans", "ancestors", "Neanderthals", "Chimpanzees"))
 
-true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples) %>%
+true_ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, samples = samples, random_seed = SEED) %>%
   ts_mutate(mutation_rate = 1e-8, random_seed = SEED)
 
-true_tracts <- ts_tracts(true_ts, census = 55000, quiet = TRUE)
+true_bins <- true_fun_tract_bins(true_ts)
 
-samples <- ts_names(true_ts, split = "pop")
+true_f4 <- true_fun_f4(true_ts)
 
-true_f4 <- rbind(
-  ts_f4(true_ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
-  ts_f4(true_ts, W = "Africans_1", X = "Africans_2", Y = "Neanderthals_1", Z = "Chimpanzees_1")
-)
-
-true_f4ratio <- ts_f4ratio(
-  true_ts, X = samples["Europeans"],
-  A = "Neanderthals_1", B = "Neanderthals_2", C = "Africans_1", O = "Chimpanzees_1"
-)
-```
-
-```{r, eval=!file.exists(true_bins_path), echo=FALSE}
-# count tracts in twenty length bins
-n <- 20
-bins <- cut(true_tracts$length, breaks = n)
-counts <- as.vector(table(bins))
-
-# return proportions of tracts in each bin
-true_bins <- data.frame(length_bin = 1:n, prop = counts / sum(counts))
+true_f4ratio <- true_fun_f4ratio(true_ts)
 
 saveRDS(true_bins, true_bins_path)
-```
 
-```{r, eval=!file.exists(true_f4_path), echo=FALSE}
 saveRDS(true_f4, true_f4_path)
-```
 
-```{r, eval=!file.exists(true_f4ratio_path), echo=FALSE}
 saveRDS(true_f4ratio, true_f4ratio_path)
 ```
 
@@ -141,7 +160,7 @@ model <- function(admixture_time, admixture_rate) {
   eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
   
   gf <- gene_flow(from = nea, to = eur, rate = admixture_rate,
-                  start = admixture_time, end = admixture_time - generation_time)
+                  start = admixture_time, end = admixture_time - 1000)
   
   model <- compile_model(
     populations = list(anc, chimp, afr, nea, eur), gene_flow = gf,
@@ -210,6 +229,12 @@ f4ratio <- function(ts) {
 functions <- list(tract_bins = tract_bins, f4 = f4, f4ratio = f4ratio)
 ```
 
+```{r, echo=FALSE}
+all.equal(functions$tract_bins, true_fun_tract_bins)
+all.equal(functions$f4, true_fun_f4)
+all.equal(functions$f4ratio, true_fun_f4ratio)
+```
+
 As a sanity check, can we simulate a tree sequence from the model and priors?
 
 ```{r}
@@ -255,29 +280,19 @@ handlers(global = TRUE)
 ```
 
 ```{r, eval=!file.exists(data_path)}
+start <- Sys.time()
+
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 50000,
-  sequence_length = 25e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+  model, priors, functions, observed, iterations = 10000,
+  sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
+
+end <- Sys.time()
+end - start # 5.5 hours
 ```
 
 ```{r, eval=!file.exists(data_path)}
 saveRDS(data, data_path)
-```
-
-```{r}
-stop("hello there ;)")
-```
-
-
-```{r}
-data <- readRDS(data_path)
-data$simulated <- data$simulated[, 1:20]
-data$observed$f4 <- NULL
-data$functions$f4 <- NULL
-abc_nof4 <- run_abc(data, engine = "abc", tol = 0.025, method = "neuralnet")
-p_at_nof4 <- plot_posterior(abc_nof4, "admixture_time") + ggplot2::coord_cartesian(xlim = c(20000, 80000))
-p_ar_nof4 <- plot_posterior(abc_nof4, "admixture_rate") + ggplot2::coord_cartesian(xlim = c(0, 0.5))
 ```
 
 ```{r, eval=file.exists(data_path)}
@@ -285,42 +300,61 @@ data <- readRDS(data_path)
 ```
 
 ```{r}
-abc_f4 <- run_abc(data, engine = "abc", tol = 0.025, method = "neuralnet")
+abc_bins <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "tract_bins")
+abc_f4 <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "f4")
+abc_f4ratio <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "f4ratio")
+abc_binsf4 <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = c("tract_bins", "f4"))
+abc_binsf4ratio <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = c("tract_bins", "f4ratio"))
+abc_all <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
 ```
 
 ```{r}
-p_at_f4 <- plot_posterior(abc_f4, "admixture_time") + ggplot2::coord_cartesian(xlim = c(20000, 80000))
-p_ar_f4 <- plot_posterior(abc_f4, "admixture_rate") + ggplot2::coord_cartesian(xlim = c(0, 0.5))
+plot_posterior(abc, facets = TRUE)
 ```
 
 ```{r}
-cowplot::plot_grid(p_at_f4, p_at_nof4, nrow = 2)
-cowplot::plot_grid(p_ar_f4, p_ar_nof4, nrow = 2)
+truth_df <- data.frame(
+  param = c("admixture_rate", "admixture_time"),
+  value = c(0.03, 55000)
+)
+
+rbind(
+  extract_posterior(abc_bins)        %>% mutate(stats = "bins"),
+  extract_posterior(abc_f4)          %>% mutate(stats = "f4"),
+  extract_posterior(abc_f4ratio)     %>% mutate(stats = "f4ratio"),
+  extract_posterior(abc_binsf4)      %>% mutate(stats = "bins+f4"),
+  extract_posterior(abc_binsf4ratio) %>% mutate(stats = "bins+f4ratio"),
+  extract_posterior(abc_all)         %>% mutate(stats = "all")
+) %>%
+  ggplot(aes(value, color = stats)) +
+    geom_density() +
+    geom_vline(data = truth_df, aes(xintercept = value), linetype = "dashed") +
+    facet_wrap(~ param, scales = "free")
 ```
 
 ```{r}
-extract_summary(abc_f4)
+extract_summary(abc)
 ```
-
-
-
 
 ```{r}
-predictions_f4 <- predict(abc_f4, samples = 1000)
-predictions_nof4 <- predict(abc_nof4, functions = functions, samples = 1000)
+predictions <- predict(abc_bins, samples = 500)
+predictions <- predict(abc_f4, samples = 500)
+predictions <- predict(abc_f4ratio, samples = 500)
+predictions <- predict(abc_binsf4, samples = 500)
+predictions <- predict(abc_binsf4ratio, samples = 500)
+predictions <- predict(abc_all, samples = 500)
 ```
-
 
 ```{r, postpred_bins}
-p_tb_f4 <- plot_prediction(predictions_f4, "tract_bins")
-p_tb_nof4 <- plot_prediction(predictions_nof4, "tract_bins")
-cowplot::plot_grid(p_tb_f4, p_tb_nof4, nrow = 2)
+plot_prediction(predictions, "tract_bins")
 ```
 
 ```{r, postpred_f4}
-p_f_f4 <- plot_prediction(predictions_f4, "f4", facets = FALSE) + ggplot2::geom_vline(xintercept = 0) + ggplot2::coord_cartesian(xlim = c(-1e-4, 0))
-p_f_nof4 <- plot_prediction(predictions_nof4, "f4", facets = FALSE) + ggplot2::geom_vline(xintercept = 0) + ggplot2::coord_cartesian(xlim = c(-1e-4, 0))
-cowplot::plot_grid(p_f_f4, p_f_nof4, nrow = 2)
+plot_prediction(predictions, "f4") + geom_vline(xintercept = 0)
+```
+
+```{r, postpred_f4ratio}
+plot_prediction(predictions, "f4ratio") + geom_vline(xintercept = 0)
 ```
 
 ```{r}
