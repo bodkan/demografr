@@ -27,6 +27,7 @@ true_f4_path <- here::here("inst/examples/tracts_true_f4.rds")
 true_f4ratio_path <- here::here("inst/examples/tracts_true_f4ratio.rds")
 
 data_path <- here::here("inst/examples/tracts_data.rds")
+predictions_path <- here::here("inst/examples/tracts_predictions.rds")
 
 devtools::load_all()
 ```
@@ -283,12 +284,13 @@ handlers(global = TRUE)
 start <- Sys.time()
 
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 10000,
+  model, priors, functions, observed, iterations = 100000,
   sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 
 end <- Sys.time()
 end - start # 5.5 hours
+saveRDS(end-start, "time.rds")
 ```
 
 ```{r, eval=!file.exists(data_path)}
@@ -300,16 +302,57 @@ data <- readRDS(data_path)
 ```
 
 ```{r}
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+```
+
+```{r}
+plot_posterior(abc, facets = TRUE)
+```
+
+```{r}
+extract_summary(abc)
+```
+
+```{r, eval=!file.exists(predictions_path)}
+predictions <- predict(abc, samples = 1000)
+```
+
+```{r, eval=!file.exists(predictions_path)}
+saveRDS(predictions, predictions_path)
+```
+
+```{r}
+stop("hello there")
+```
+
+
+```{r, eval=file.exists(predictions_path)}
+predictions <- readRDS(predictions_path)
+```
+
+
+```{r, postpred_bins}
+plot_prediction(predictions, "tract_bins")
+```
+
+```{r, postpred_f4}
+plot_prediction(predictions, "f4") + geom_vline(xintercept = 0)
+```
+
+```{r, postpred_f4ratio}
+plot_prediction(predictions, "f4ratio") + geom_vline(xintercept = 0)
+```
+
+
+
+
+```{r}
 abc_bins <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "tract_bins")
 abc_f4 <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "f4")
 abc_f4ratio <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = "f4ratio")
 abc_binsf4 <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = c("tract_bins", "f4"))
 abc_binsf4ratio <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet", stats = c("tract_bins", "f4ratio"))
 abc_all <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
-```
-
-```{r}
-plot_posterior(abc, facets = TRUE)
 ```
 
 ```{r}
@@ -333,28 +376,10 @@ rbind(
 ```
 
 ```{r}
-extract_summary(abc)
-```
-
-```{r}
-predictions <- predict(abc_bins, samples = 500)
-predictions <- predict(abc_f4, samples = 500)
-predictions <- predict(abc_f4ratio, samples = 500)
-predictions <- predict(abc_binsf4, samples = 500)
-predictions <- predict(abc_binsf4ratio, samples = 500)
-predictions <- predict(abc_all, samples = 500)
-```
-
-```{r, postpred_bins}
-plot_prediction(predictions, "tract_bins")
-```
-
-```{r, postpred_f4}
-plot_prediction(predictions, "f4") + geom_vline(xintercept = 0)
-```
-
-```{r, postpred_f4ratio}
-plot_prediction(predictions, "f4ratio") + geom_vline(xintercept = 0)
+predictions_all <- predict(abc_all, samples = 1000)
+predictions_bins <- predict(abc_bins, samples = 100)
+predictions_f4 <- predict(abc_f4, samples = 100)
+predictions_f4ratio <- predict(abc_f4ratio, samples = 100)
 ```
 
 ```{r}
