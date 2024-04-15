@@ -11,14 +11,14 @@
 #'   by a tree-sequence function), and a column "value" containing its value.
 #'
 #' @export
-extract_prediction <- function(data, stat = NULL) {
+extract_prediction <- function(data, stat) {
   all_stats <- names(attr(data, "components")$observed)
-  if (is.null(stat))
-    stat <- all_stats
   if (!all(stat %in% all_stats))
-    stop("Unknown statistic(s) '", paste(stat, collapse = ", "), "' specified", call. = FALSE)
+    stop("Unknown statistics '", stat, "' specified", call. = FALSE)
 
-  result <- lapply(stat, function(s) unnest_stat(data, s)) %>% do.call(rbind, .)
+  result <- lapply(stat, function(s) unnest_stat(data, s))
+  names(result) <- stat
+
   result
 }
 
@@ -28,20 +28,28 @@ unnest_stat <- function(data, stat) {
 
   # extract just the list-column data frame with the summary statistic of interest
   list_stat_df <- dplyr::select(data, dplyr::all_of(stat)) %>% tidyr::unnest(dplyr::all_of(stat))
-  # in that data frame, identify the (only one possible!) numeric value column
+
+  # in that data frame, identify the numeric value column
   value_col <- vapply(list_stat_df, is.numeric, FUN.VALUE = logical(1))
 
-  # all the remaining non-numeric are some user-defined identifiers of the statistic (population
-  # names etc.) -- collapse them all into a single name of the statistic
-  stat_col <- paste0(stat, "_", apply(list_stat_df[!value_col], 1, paste, collapse = "_"))
+  if (all(value_col)) {
+    stat_df <- list_stat_df
+    stat_df$summary <- stat
+    stat_df <- dplyr::select(stat_df, summary, dplyr::everything())
+  } else {
+    # all the remaining columns are user-defined identifiers of the statistic (population
+    # names, SFS bins, etc.) -- collapse them all into a single name of the statistic,
+    # prepending the statistic name
+    stat_col <- paste0(stat, "_", apply(list_stat_df[!value_col], 1, paste, collapse = "_"))
 
-  # create a new data frame with one column containing the collapsed single-name statistic,
-  # the second column containing the numerical value
-  stat_df <- dplyr::tibble(
-    summary = stat,
-    stat = stat_col,
-    value = list_stat_df[, value_col, drop = TRUE]
-  )
+    # create a new data frame with one column containing the collapsed single-name statistic,
+    # the second column containing the numerical value
+    stat_df <- dplyr::tibble(
+      summary = stat,
+      stat = stat_col,
+      value = list_stat_df[, value_col, drop = TRUE]
+    )
+  }
 
   # extract just the parameter columns into their own data frame (must happen *after* unnesting
   # to have the same number of rows because nested list-column data frames are likely to have

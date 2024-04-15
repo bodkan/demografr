@@ -2,16 +2,11 @@
 # R package infrastructure
 #
 
-.PHONY: docs
+.PHONY: website docs build check windev winrel winold clean
 
 version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/\1/')
 pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
-
-build: $(pkg)
-
-test:
-	R -e 'devtools::test()'
 
 website: README.md $(logo)
 	R -e 'devtools::install(upgrade = "never")'
@@ -77,7 +72,7 @@ TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
 
 PORT ?= 9999
 
-.PHONY: help rstudio bash R r
+.PHONY: rstudio bash R r docker-build docker-push docker-pull local-webapp remote-webapp
 
 rstudio:
 	docker run --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)

@@ -187,8 +187,20 @@ validate_abc <- function(model, priors, functions, observed,
     sim <- simulated_stats[[stat]]
     obs <- observed[[stat]]
 
-    obs_type <- if (is.data.frame(obs)) "data frame" else if (is.vector(obs)) "vector" else "invalid"
-    sim_type <- if (is.data.frame(sim)) "data frame" else if (is.vector(sim)) "vector" else "invalid"
+    if (is.data.frame(obs)) {
+      obs_vals <- vapply(names(obs), function(i) is.numeric(obs[[i]]), FUN.VALUE = logical(1))
+      obs_type <- if (all(obs_vals)) "vector" else "tabular"
+    } else {
+      obs_type <- "invalid"
+    }
+
+    if (is.data.frame(sim)) {
+      sim_vals <- vapply(names(sim), function(i) is.numeric(sim[[i]]), FUN.VALUE = logical(1))
+      sim_type <- if (all(sim_vals)) "vector" else "tabular"
+    } else {
+      obs_type <- "invalid"
+    }
+
     if (obs_type == "invalid" || sim_type == "invalid" || obs_type != sim_type) {
       error_msg <- paste(
         "Observed and simulated statistics must be data frames or vectors\n",
@@ -208,24 +220,9 @@ validate_abc <- function(model, priors, functions, observed,
       stop(error_msg, call. = FALSE)
     }
 
-    if (obs_type == "data frame") {
-      # numeric_cols_obs <- sapply(names(obs), function(i) is.numeric(obs[[i]]))
-      # numeric_cols_sim <- sapply(names(sim), function(i) is.numeric(sim[[i]]))
-
-      # TODO: use the last column by default if there are multiple numeric columns
-      # but raise a warning in that case, and raise an error if the last column is
-      # not numeric
+    if (obs_type == "tabular") {
       numeric_cols_obs <- ncol(obs)
       numeric_cols_sim <- ncol(sim)
-      # # check that only one column with a value of a summary statistic is present
-      # if (sum(numeric_cols_obs) > 1) {
-      #   stop("Multiple numeric value columns present in the observed summary statistic\n",
-      #        "'", stat, "' but only one such column is allowed.", call. = FALSE)
-      # }
-      # if (sum(numeric_cols_sim) > 1) {
-      #   stop("Multiple numeric value columns present in the simulated summary statistic\n",
-      #        "'", stat, "' but only one such column is allowed.", call. = FALSE)
-      # }
 
       # if a summary statistic is given as a data frame, all columns except for the
       # column with its numerical value must be the same (i.e., same statistic name,
@@ -245,22 +242,8 @@ validate_abc <- function(model, priors, functions, observed,
         )
         stop(error_msg, call. = FALSE)
       }
-      msg <- ""
-    } else {
-      msg <- "(but could not verify names of some statistics!)"
-      missing_names <- TRUE
     }
-    cat(" \u2705", msg, "\n")
-  }
-
-  if (missing_names) {
-    cat("\nSome summary statistics have been provided as plain numeric vectors\n")
-    cat("without names. It is much better to provide each statistic in a full\n")
-    cat("data frame with columns containing information about its name etc.,\n")
-    cat("and with the last column containing its value, both for observed\n")
-    cat("and simulated statistics.\n\n")
-    cat("This bit of additional work makes inference much more robust to bugs and\n")
-    cat("typos, as demografr can catch problems before running costly simulations.\n")
+    cat(paste0(" [", obs_type, "]"), "\u2705\n")
   }
 
   cat("======================================================================\n")

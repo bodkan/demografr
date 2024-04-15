@@ -84,10 +84,15 @@ simulate_grid <- function(
   ) %>%
     do.call(rbind, .)
 
+
+  its <- seq_len(nrow(grid))
+  p <- progressr::progressor(along = its)
+
   suppressPackageStartupMessages( # silence the super intrusive sp startup message
   results <- future.apply::future_lapply(
-    X = seq_len(nrow(grid)),
+    X = its,
     FUN = function(grid_i) {
+      p()
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
@@ -128,7 +133,7 @@ simulate_grid <- function(
     msg <- sprintf(paste0("Out of the total %i simulations, %d runs resulted in an error.\n",
       "The most likely explanation for this is that some parameter combinations\n",
       "lead to an invalid model (such as inconsistent order of split times)."),
-      sum(invalid_runs), length(invalid_runs)
+      length(invalid_runs), sum(invalid_runs)
     )
     message(msg)
     results <- results[!invalid_runs]

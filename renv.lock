@@ -599,14 +599,14 @@
     },
     "digest": {
       "Package": "digest",
-      "Version": "0.6.34",
+      "Version": "0.6.35",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "7ede2ee9ea8d3edbf1ca84c1e333ad1a"
+      "Hash": "698ece7ba5a4fa4559e3d537e7ec3d31"
     },
     "doParallel": {
       "Package": "doParallel",
@@ -1497,6 +1497,18 @@
       ],
       "Hash": "f4625e061cb2865f111b47ff163a5ca6"
     },
+    "progressr": {
+      "Package": "progressr",
+      "Version": "0.14.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "digest",
+        "utils"
+      ],
+      "Hash": "ac50c4ffa8f6a46580dd4d7813add3c4"
+    },
     "promises": {
       "Package": "promises",
       "Version": "1.2.1",
@@ -1678,7 +1690,7 @@
       "RemoteRepo": "reticulate",
       "RemoteUsername": "rstudio",
       "RemoteRef": "HEAD",
-      "RemoteSha": "b1c33d5797b1478ebddf876f0284ac953b086c0d",
+      "RemoteSha": "129b6f54411fd6811f91b7afa24a28096b5ac321",
       "Requirements": [
         "Matrix",
         "R",
@@ -1694,7 +1706,7 @@
         "utils",
         "withr"
       ],
-      "Hash": "de8801b410acbdeb1b3cf074496e2d37"
+      "Hash": "bc876ca5eed077b2630131d8fde278bc"
     },
     "rlang": {
       "Package": "rlang",
@@ -1938,14 +1950,14 @@
     },
     "slendr": {
       "Package": "slendr",
-      "Version": "0.9.1",
+      "Version": "0.9.1.9000",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "e6caecde7f214b4c00c2441d7e22dcc1f79193c9",
+      "RemoteSha": "ad7bda770d5c51801a00292b4f639a34f4252639",
       "Requirements": [
         "R",
         "ape",
@@ -1963,7 +1975,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "a1a466cbdc9c40f695358b4a056bb5e2"
+      "Hash": "4ae865a5cab062603b01db4a32457f16"
     },
     "sourcetools": {
       "Package": "sourcetools",
@@ -2189,7 +2201,7 @@
     },
     "tidyselect": {
       "Package": "tidyselect",
-      "Version": "1.2.0",
+      "Version": "1.2.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2201,7 +2213,7 @@
         "vctrs",
         "withr"
       ],
-      "Hash": "79540e5fcd9e0435af547d885f184fd5"
+      "Hash": "829f27b9c4919c16b593794a6344d6c0"
     },
     "tinytex": {
       "Package": "tinytex",

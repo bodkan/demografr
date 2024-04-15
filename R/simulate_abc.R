@@ -85,20 +85,28 @@ simulate_abc <- function(
 
   model_name <- as.character(substitute(model))
 
+  its <- seq_len(iterations)
+  p <- progressr::progressor(along = its)
+
   results <- future.apply::future_lapply(
-    X = seq_len(iterations),
-    FUN = run_iteration,
-    model = model,
-    params = priors,
-    functions = functions,
-    sequence_length = sequence_length,
-    recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate,
-    engine = engine,
-    model_args = model_args,
-    engine_args = engine_args,
-    model_name = model_name,
-    attempts = attempts,
+    X = its,
+    FUN = function(i) {
+      p()
+      run_iteration(
+        i,
+        model = model,
+        params = priors,
+        functions = functions,
+        sequence_length = sequence_length,
+        recombination_rate = recombination_rate,
+        mutation_rate = mutation_rate,
+        engine = engine,
+        model_args = model_args,
+        engine_args = engine_args,
+        model_name = model_name,
+        attempts = attempts,
+      )
+    },
     future.seed = TRUE,
     future.globals = globals,
     future.packages = c("slendr", packages)
@@ -117,8 +125,13 @@ simulate_abc <- function(
         # convert simulated statistics to a matrix, either from a normal data frame
         # result (with each statistic named), or from a simple vector
         if (is.data.frame(x)) {
-          # find the column with the value of a statistic `stat`
-          value_col <- vapply(names(x), function(i) is.numeric(x[[i]]), FUN.VALUE = logical(1))
+          # find the column with the value of a statistic `stat` (this is
+          # always assumed to be the last column)
+          value_cols <- vapply(names(x), function(i) is.numeric(x[[i]]), FUN.VALUE = logical(1))
+          if (all(value_cols))
+            value_col <- seq_along(x) == ncol(x)
+          else
+            value_col <- value_cols
           values <- matrix(x[, value_col, drop = TRUE], nrow = 1)
           names <- x[, !value_col, drop = FALSE] %>%
             apply(MARGIN = 1, FUN = function(row) paste(c(stat, row), collapse = "_"))

@@ -31,7 +31,8 @@ Imports:
     reticulate,
     tidyr,
     GA,
-    slendr
+    slendr,
+    progressr
 Remotes: bodkan/slendr
 Suggests:
     ape,
