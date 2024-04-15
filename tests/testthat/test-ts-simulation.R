@@ -18,7 +18,7 @@ model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
   return(model)
 }
 
-test_that("simulate_ts generates a tree sequence from priors", {
+test_that("simulate_output generates a tree sequence from priors", {
   priors <- list(
     Ne_p1 ~ runif(1, 100),
     Ne_p2 ~ runif(1, 100),
@@ -26,21 +26,21 @@ test_that("simulate_ts generates a tree sequence from priors", {
     Ne_p4 ~ runif(1, 100)
   )
 
-  ts1 <- simulate_ts(model, priors, engine = "msprime")
+  ts1 <- simulate_output(model, priors, engine = "msprime")
   expect_s3_class(ts1, "slendr_ts")
 
   skip_if(Sys.which("slim") == "")
-  ts2 <- simulate_ts(model, priors, engine = "slim")
+  ts2 <- simulate_output(model, priors, engine = "slim")
   expect_s3_class(ts2, "slendr_ts")
 })
 
-test_that("simulate_ts generates a tree sequence from a parameter list", {
+test_that("simulate_output generates a tree sequence from a parameter list", {
   params <- list(Ne_p1 = 1, Ne_p2 = 2, Ne_p3 = 3, Ne_p4 = 4)
 
-  ts1 <- simulate_ts(model, params, engine = "msprime")
+  ts1 <- simulate_output(model, params, engine = "msprime")
   expect_s3_class(ts1, "slendr_ts")
 
   skip_if(Sys.which("slim") == "")
-  ts2 <- simulate_ts(model, params, engine = "slim")
+  ts2 <- simulate_output(model, params, engine = "slim")
   expect_s3_class(ts2, "slendr_ts")
 })

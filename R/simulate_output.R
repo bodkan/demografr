@@ -11,11 +11,14 @@
 #'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
 #'   must be "custom").
 #' @param parameters A list of prior distributions to use for sampling of model parameters
-#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
+#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of base pairs).
+#'   Ignored when custom simulations scripts are provided.
 #' @param recombination_rate Recombination rate to use for the simulation
+#'   Ignored when custom simulations scripts are provided.
 #' @param mutation_rate Mutation rate to use for the simulation
+#'   Ignored when custom simulations scripts are provided.
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
-#'   model (default is 1000)
+#'   model (i.e. model which generates an output without error, default is 1000)
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
@@ -30,14 +33,15 @@
 #' @param random_seed Random seed to be used for simulation and (potentially) adding of mutations
 #'   to a simulated tree sequence
 #'
-#' @return A tree-sequence object of the class \code{slendr_ts}
+#' @return Either a tree-sequence object of the class \code{slendr_ts} when a slendr model
+#'   was simulated, or a path to an output file when a custom simulation script was used.
 #'
 #' @export
-simulate_ts <- function(
-  model, parameters,
-  sequence_length = 1e6, recombination_rate = 0, mutation_rate = 0,
-  attempts = 1000, engine = NULL, model_args = NULL, engine_args = NULL,
-  random_seed = NULL
+simulate_output <- function(
+    model, parameters,
+    sequence_length, recombination_rate, mutation_rate = 0,
+    outputs = NULL, engine = NULL, model_args = NULL, engine_args = NULL,
+    attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
   warning_length <- (length(parameters) + length(model_args)) * 50
@@ -47,8 +51,10 @@ simulate_ts <- function(
 
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
-  if (!check_arg(model) || !check_arg(parameters) || !check_arg(sequence_length) || !check_arg(recombination_rate) || !length(parameters))
-    stop(paste0("A model generating function, parameters and sequence information must be provided"), call. = FALSE)
+  if (!check_arg(model) || !check_arg(parameters) || !length(parameters))
+    stop("A model generating function and parameters must be provided", call. = FALSE)
+  if(is.function(model) && (!check_arg(sequence_length) || !check_arg(recombination_rate)))
+    stop("Sequence length and recombination rate must be provided", call. = FALSE)
 
   if (inherits(parameters, "formula"))
     parameters <- list(parameters)
@@ -73,11 +79,14 @@ simulate_ts <- function(
     invisible(lapply(parameters, sample_prior))
   }
 
-  ts <- run_simulation(model, parameters, sequence_length, recombination_rate, mutation_rate,
-                       engine = engine, model_args = model_args,
-                       engine_args = engine_args,
-                       attempts = attempts, model_name = substitute(model),
-                       random_seed = random_seed)$ts
+  output <- run_simulation(
+    model, parameters, sequence_length, recombination_rate, mutation_rate,
+    engine = engine, model_args = model_args,
+    engine_args = engine_args,
+    attempts = attempts, model_name = substitute(model))$output
 
-  ts
+  if (!is.null(outputs))
+    return(lapply(outputs, function(f) f(output)))
+  else
+    return(output)
 }

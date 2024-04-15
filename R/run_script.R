@@ -9,17 +9,17 @@ run_script <- function(script, ...) {
   else
     script <- normalizePath(script)
 
-  # every single valid demografr SLiM script engine *must* contain the following
+  # every single valid demografr SLiM script engine must contain the following
   # string -- this is how we can tell whether the input script is a SLiM script
   # or an msprime Python script
   script_contents <- readLines(script)
-  if (any(grepl("treeSeqOutput\\(output_path", script_contents)))
+  if (any(grepl("initializeMutationRate", script_contents)))
     engine <- "slim"
   else
     engine <- reticulate::py_exe()
 
-  # compose a path to an output tree-sequence file
-  output_path <- paste0(tempfile(), ".trees")
+  # compose a path to an output file
+  output_path <- paste0(tempfile(), "_script_output")
 
   args <- list(...)
 
@@ -34,9 +34,8 @@ run_script <- function(script, ...) {
   )
 
   if (engine == "slim") { # run the SLiM script on the command line
-    # add the generated output tree-sequence path to the list of CLI arguments (SLiM has a
-    # peculiar way of specifying string-typed CLI arguments)
-    cli_args <- c(cli_args, paste0("-d \"output_path='", output_path, "'\""))
+    # add the generated output path to the list of CLI arguments for SLiM
+    cli_args <- c(cli_args, paste0("-d \"output='", output_path, "'\""))
 
     # compose the whole CLI command
     cli_command <- paste(engine, paste(cli_args, collapse = " "), script, collapse = " ")
@@ -45,22 +44,21 @@ run_script <- function(script, ...) {
     system(cli_command, intern = TRUE)
   } else { # run the msprime Python script in the reticulate'd Python interpreter
     # add the path to the output tree sequence and collapse the whole CLI command
-    cli_args <- c(cli_args, paste0("--output_path=\"", output_path, "\""))
+    cli_args <- c(cli_args, paste0("--output=\"", output_path, "\""))
 
     # compose the whole CLI command
-    cli_command <- paste(engine, script, paste(cli_args, collapse = " "), collapse = " ")
+    cli_command <- paste(c(engine, script, cli_args), collapse = " ")
 
     # execute the command on the Python command line
     reticulate::py_run_string(sprintf("import os; os.system(r'%s')", cli_command))
   }
 
   if (!file.exists(output_path))
-    stop("The provided script did not leave a tree-sequence output. Inspect the log\n",
+    stop("The provided script did not leave any output file. Inspect the log\n",
          "output above for errors and make sure you can run your custom script \n",
-         "on the command-line manually.\n\n",
+         "on the command-line manually without errors.\n\n",
          "The exact command that failed was:\n\n",
          cli_command, call. = FALSE)
 
-  # return the path to the simulated tree sequence
   output_path
 }

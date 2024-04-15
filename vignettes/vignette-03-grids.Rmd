@@ -174,12 +174,12 @@ Exactly as it's the case for ABC, for the purposes of grid-based simulations we 
 functions <- list(direct = direct, indirect = indirect)
 ```
 
-This looks quite neat and tidy, but how can we make sure that our tree-sequence summary functions really work? We need a tree-sequence object as an input first! _demografr_ provides an easy way to get an arbitrary tree sequence from a model function via its helper function `simulate_ts`. The simples way to use it is like this:
+This looks quite neat and tidy, but how can we make sure that our tree-sequence summary functions really work? We need a tree-sequence object as an input first! _demografr_ provides an easy way to get an arbitrary tree sequence from a model function via its helper function `simulate_output`. The simples way to use it is like this:
 
 ```{r}
 # we don't care about the parameter values, as we only want to get *some* tree sequence
 # (also, note we did not specify sequence length, recombination rate, etc.)
-ts <- simulate_ts(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
+ts <- simulate_output(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
 ```
 
 With the tiny tree sequence for testing, we can now check if our tree-sequence functions work as they're supposed to:

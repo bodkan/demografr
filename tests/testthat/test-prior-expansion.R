@@ -38,15 +38,15 @@ individual_priors <- list(
 )
 
 # generate fake setup data for a testing ABC
-ts <- simulate_ts(model, individual_priors, sequence_length = 1)
+ts <- simulate_output(model, individual_priors, sequence_length = 1)
 functions <- list(diversity = function(ts) { slendr::ts_diversity(ts, sample_sets = 0:10) })
 observed <- list(diversity = functions$diversity(ts))
 
 test_that("Nonsensical priors are correctly caught", {
   error_msg <- "Parameters must be given as"
-  expect_error(simulate_ts(model, parameters = "asdf"), error_msg)
-  expect_error(simulate_ts(model, parameters = list(123)), error_msg)
-  expect_error(simulate_ts(model, parameters = list(123, xyz = 42)), error_msg)
+  expect_error(simulate_output(model, parameters = "asdf"), error_msg)
+  expect_error(simulate_output(model, parameters = list(123)), error_msg)
+  expect_error(simulate_output(model, parameters = list(123, xyz = 42)), error_msg)
 })
 
 test_that("Normal prior sampling expressions validate correctly", {
@@ -75,13 +75,13 @@ test_that("With the same seed, both sets of priors give the same tree sequence",
   # first seed is for prior sampling, second for tree sequence generation
 
   set.seed(42)
-  ts1 <- simulate_ts(model, individual_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
+  ts1 <- simulate_output(model, individual_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
 
   set.seed(42)
-  ts2 <- simulate_ts(model, expanded_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
+  ts2 <- simulate_output(model, expanded_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
 
   set.seed(42)
-  ts3 <- simulate_ts(model, templated_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
+  ts3 <- simulate_output(model, templated_priors, sequence_length = 1, engine_args = list(random_seed = 42), mutation_rate = 1e-8)
 
   expect_equal(slendr::ts_table(ts1, "nodes"),       slendr::ts_table(ts2, "nodes"))
   expect_equal(slendr::ts_table(ts1, "edges"),       slendr::ts_table(ts2, "edges"))
@@ -103,7 +103,7 @@ test_that("expand_formulas() catches multiple template matches", {
     N_b     ~ runif(1000,  7000)
   )
   expect_error(
-    simulate_ts(model, templated_priors),
+    simulate_output(model, templated_priors),
     "Multiple matching priors for the model parameter 'T_a1'"
   )
 })
@@ -111,7 +111,7 @@ test_that("expand_formulas() catches multiple template matches", {
 test_that("Sampling from empty prior list is correctly caught", {
   broken_prior <- list()
   expect_error(sample_prior(broken_prior), "A prior expression must take a form of an R formula")
-  expect_error(simulate_ts(model, broken_prior),
+  expect_error(simulate_output(model, broken_prior),
                "A model generating function, parameters and sequence information must be provided")
 })
 
@@ -119,7 +119,7 @@ test_that("Catch attempts at templating of vectorized priors", {
   error_msg <- "Templating of vector priors is not supported"
   broken_prior <- T_a...[10]  ~ runif(50000, 100000)
   expect_error(sample_prior(broken_prior), error_msg)
-  expect_error(quiet(simulate_ts(model, list(broken_prior))), error_msg)
+  expect_error(quiet(simulate_output(model, list(broken_prior))), error_msg)
 })
 
 test_that("catch attempts at templating of vectorized priors", {
@@ -130,6 +130,6 @@ test_that("catch attempts at templating of vectorized priors", {
     N_b    ~ runif(1000,  7000)
   )
 
-  expect_error(simulate_ts(model, broken_priors),
+  expect_error(simulate_output(model, broken_priors),
                "Templating of vector priors is not supported")
 })

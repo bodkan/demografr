@@ -155,11 +155,11 @@ validate_abc <- function(model, priors, functions, observed,
   cat("---------------------------------------------------------------------\n")
 
   cat("Simulating tree sequence from the given model...")
-  ts <- run_simulation(model, priors, sequence_length, recombination_rate,
+  output <- run_simulation(model, priors, sequence_length, recombination_rate,
                        mutation_rate, engine = engine,
                        model_args = model_args,
                        engine_args = engine_args, attempts = 1000,
-                       model_name = substitute(model))$ts
+                       model_name = substitute(model))$output
   cat(" \u2705\n")
 
   cat("---------------------------------------------------------------------\n")
@@ -169,7 +169,7 @@ validate_abc <- function(model, priors, functions, observed,
   simulated_stats <- list()
   for (stat in names(functions)) {
     cat(sprintf("  * %s", stat))
-    simulated_stats[[stat]] <- tryCatch(functions[[stat]](ts),
+    simulated_stats[[stat]] <- tryCatch(functions[[stat]](output),
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)

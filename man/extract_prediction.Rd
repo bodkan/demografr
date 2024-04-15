@@ -4,12 +4,13 @@
 \alias{extract_prediction}
 \title{Unnest the predicted values of a given statistic from the simulated data}
 \usage{
-extract_prediction(data, stat)
+extract_prediction(data, stat = NULL)
 }
 \arguments{
 \item{data}{Data with posterior simulations performed via \code{predict.demografr_abc_sims}}
 
-\item{stat}{Which tree-sequence summary statistic to extract?}
+\item{stat}{Which tree-sequence summary statistic to extract? If \code{NULL}, all summary
+statistics will be returned.}
 }
 \value{
 Data frame object containing columns with values of parameters sampled from the

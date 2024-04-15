@@ -142,7 +142,7 @@ priors <- list(
 As a sanity check, can we simulate a tree sequence from the model and priors?
 
 ```{r}
-ts <- simulate_ts(model, priors, sequence_length = 10e6, recombination_rate = 1e-8)
+ts <- simulate_output(model, priors, sequence_length = 10e6, recombination_rate = 1e-8)
 ```
 
 ## Summary function

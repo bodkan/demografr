@@ -2,7 +2,7 @@
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
                            samples, engine, model_args, engine_args,
-                           model_name, attempts, random_seed = NULL) {
+                           model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
   # its parent, etc.) -- such errors will simply lead to resampling, but all other errors
@@ -38,7 +38,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
 
     n_tries <- n_tries + 1
 
-    ts <- tryCatch(
+    output <- tryCatch(
       {
         # sample model parameters from the prior or use the parameters as given
         if (model_is_sampled)
@@ -71,29 +71,22 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
             model = slendr_model,
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
-            samples = sample_schedule,
-            random_seed = random_seed
+            samples = sample_schedule
           ) %>% c(., engine_args)
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
           # simulate a tree sequence
-          ts <- do.call(engine_fun, engine_fun_args)
+          output <- do.call(engine_fun, engine_fun_args)
 
           # clean up if needed
           if (!is.null(slendr_model$path))
             unlink(slendr_model$path, recursive = TRUE)
-
-          ts
         } else { # if a user-defined script was provided as a model, run it in the background
-          model_engine_args <- c(
-            model, param_args,
-            sequence_length = sequence_length,
-            recombination_rate = recombination_rate
-          )
-          ts_path <- do.call(run_script, model_engine_args)
-          slendr::ts_load(ts_path)
+          model_engine_args <- c(model, c(engine_args, param_args))
+          output <- do.call(run_script, model_engine_args)
         }
+        output
       },
       error = function(cond) {
         msg <- conditionMessage(cond)
@@ -130,16 +123,19 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
       }
     )
 
-    if (inherits(ts, "slendr_ts")) break
+    if (!is.null(output)) break
   }
 
-  if (mutation_rate != 0)
-    ts <- slendr::ts_mutate(ts, mutation_rate = mutation_rate)
+  if (is.function(model)) {
+    if (mutation_rate != 0)
+      ts <- slendr::ts_mutate(output, mutation_rate = mutation_rate)
 
-  # clean up if needed
-  if (!is.null(attr(ts, "path"))) unlink(attr(ts, "path"))
+    # clean up if needed
+    if (!is.null(attr(output, "path")))
+      unlink(attr(output, "path"))
+  }
 
-  list(ts = ts, param_values = unlist(param_args))
+  list(output = output, param_values = unlist(param_args))
 }
 
 collect_param_matrix <- function(prior_values) {

@@ -77,7 +77,7 @@ functions <- list(
 Just to verify we have set up the components of our analysis correctly, let's quickly simulate a tree sequence and try to compute genetic diversity in both populations using our summary function:
 
 ```{r}
-ts <- simulate_ts(model, parameters = list(Ne_p1 = 100, Ne_p2 = 1000), mutation_rate = 1e-8)
+ts <- simulate_output(model, parameters = list(Ne_p1 = 100, Ne_p2 = 1000), mutation_rate = 1e-8)
 
 functions$diversity(ts)
 ```
