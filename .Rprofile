@@ -3,6 +3,7 @@ source("renv/activate.R")
 options(browserNLdisabled = TRUE)
 
 Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
+options("install.packages.compile.from.source" = "never")
 
 # avoid annoyance of having to manually open .Rproj file
 # https://rstudio.github.io/rstudioapi/reference/projects.html
