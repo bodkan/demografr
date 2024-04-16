@@ -39,8 +39,9 @@
 #' @export
 simulate_output <- function(
     model, parameters,
+    outputs = NULL,
     sequence_length, recombination_rate, mutation_rate = 0,
-    outputs = NULL, engine = NULL, model_args = NULL, engine_args = NULL,
+    engine = NULL, model_args = NULL, engine_args = NULL,
     attempts = 1000
 ) {
   # make sure warnings are reported immediately before simulations are even started
@@ -79,14 +80,18 @@ simulate_output <- function(
     invisible(lapply(parameters, sample_prior))
   }
 
-  output <- run_simulation(
-    model, parameters, sequence_length, recombination_rate, mutation_rate,
-    engine = engine, model_args = model_args,
-    engine_args = engine_args,
-    attempts = attempts, model_name = substitute(model))$output
+  result <- run_simulation(
+    model = model, params = parameters,
+    sequence_length = sequence_length, recombination_rate = recombination_rate,
+    engine = engine, model_args = model_args, engine_args = engine_args,
+    attempts = attempts, model_name = substitute(model))
 
-  if (!is.null(outputs))
-    return(lapply(outputs, function(f) f(output)))
-  else
-    return(output)
+  if (is.null(outputs))
+    return(result)
+  else {
+    env <- populate_output_env(result)
+    outputs <- lapply(outputs, execute_output, env = env)
+    if (exists("ts", env)) outputs$ts <- env$ts
+    return(outputs)
+  }
 }

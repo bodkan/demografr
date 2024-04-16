@@ -3,7 +3,7 @@
 # This function will take as input a path to a SLiM or Python script (detecting
 # which one of the two it is based on the script's contents) and run it on the
 # command line with model arguments formatted on the command line automatically.
-run_script <- function(script, ...) {
+run_script <- function(script, output_path, ...) {
   if (!file.exists(script))
     stop("No '", engine, "' script found at '", script, "'", call. = FALSE)
   else
@@ -17,9 +17,6 @@ run_script <- function(script, ...) {
     engine <- "slim"
   else
     engine <- reticulate::py_exe()
-
-  # compose a path to an output file
-  output_path <- paste0(tempfile(), "_script_output")
 
   args <- list(...)
 

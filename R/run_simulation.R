@@ -1,6 +1,6 @@
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
-run_simulation <- function(model, params, sequence_length, recombination_rate, mutation_rate,
+run_simulation <- function(model, params, sequence_length, recombination_rate,
                            samples, engine, model_args, engine_args,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
@@ -53,22 +53,22 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
           model_result <- do.call(model, model_fun_args)
 
           if (inherits(model_result, "slendr_model")) {
-            slendr_model <- model_result
+            compiled_model <- model_result
             sample_schedule <- NULL
           } else if (length(model_result) == 2) {
-            slendr_model <- model_result[[1]]
+            compiled_model <- model_result[[1]]
             sample_schedule <- model_result[[2]]
           } else
             stop("Incorrect format of the returned result of the model function", call. = FALSE)
 
-          engine <- get_engine(slendr_model, engine)
+          engine <- get_engine(compiled_model, engine)
 
           # force no serialization for msprime runs
-          if (engine == "msprime") slendr_model$path <- NULL
+          if (engine == "msprime") compiled_model$path <- NULL
 
           # compose a list of required and optional arguments for msprime / SLiM engine
           engine_fun_args <- list(
-            model = slendr_model,
+            model = compiled_model,
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
             samples = sample_schedule
@@ -76,13 +76,16 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
-          # simulate a tree sequence
+          # run a slendr simulation
           output <- do.call(engine_fun, engine_fun_args)
 
           # clean up if needed
-          if (!is.null(slendr_model$path))
-            unlink(slendr_model$path, recursive = TRUE)
-        } else { # if a user-defined script was provided as a model, run it in the background
+          if (!is.null(compiled_model$path))
+            unlink(compiled_model$path, recursive = TRUE)
+        } else { # a user-defined script was provided as a model
+          compiled_model <- NULL
+
+          # run a cutsom simulation
           model_engine_args <- c(model, c(engine_args, param_args))
           output <- do.call(run_script, model_engine_args)
         }
@@ -126,16 +129,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate, m
     if (!is.null(output)) break
   }
 
-  if (is.function(model)) {
-    if (mutation_rate != 0)
-      ts <- slendr::ts_mutate(output, mutation_rate = mutation_rate)
-
-    # clean up if needed
-    if (!is.null(attr(output, "path")))
-      unlink(attr(output, "path"))
-  }
-
-  list(output = output, param_values = unlist(param_args))
+  list(output = output, param_values = unlist(param_args), model = compiled_model)
 }
 
 collect_param_matrix <- function(prior_values) {
