@@ -86,12 +86,10 @@ simulate_output <- function(
     engine = engine, model_args = model_args, engine_args = engine_args,
     attempts = attempts, model_name = substitute(model))
 
+  # if no user-defined generators were provided, return output as it is
   if (is.null(outputs))
     return(result$output)
-  else {
-    env <- populate_output_env(result)
-    outputs <- lapply(outputs, execute_output, env = env)
-    if (exists("ts", env)) outputs$ts <- env$ts
-    return(outputs)
+  else { # otherwise, apply each generator to the result
+    return(generate_outputs(substitute(outputs), result))
   }
 }
