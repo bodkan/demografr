@@ -87,7 +87,7 @@ simulate_output <- function(
     attempts = attempts, model_name = substitute(model))
 
   if (is.null(outputs))
-    return(result)
+    return(result$output)
   else {
     env <- populate_output_env(result)
     outputs <- lapply(outputs, execute_output, env = env)
