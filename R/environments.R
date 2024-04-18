@@ -63,9 +63,9 @@ check_arguments <- function(fun, valid_args) {
   args <- names(formals(fun))
   match <- args %in% valid_args
   if (sum(match) != length(args))
-    stop("The following arguments are not valid: ", args[!match],
-         ".\nOnly types ", paste(paste0("'", valid_args, "'"), collapse = ", "),
-         "are valid for the selected output type.", call. = FALSE)
+    stop("The following arguments are not valid: \"", args[!match], "\"",
+         ".\nOnly types ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
+         " are valid for the selected output type.", call. = FALSE)
 }
 
 # Check that all given user-defined functions have arguments only among
@@ -83,6 +83,6 @@ validate_functions <- function(funs, valid_args) {
     else if (!first %in% valid_args)
       stop("The following output is not valid: `", first, "`.\n",
            "Outputs or function arguments valid for the selected output type are: ",
-           paste(paste0("'", valid_args, "'"), collapse = ", "), ".", call. = FALSE)
+           paste(paste0("\"", valid_args, "\""), collapse = ", "), ".", call. = FALSE)
   }
 }

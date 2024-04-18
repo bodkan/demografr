@@ -82,7 +82,7 @@ simulate_model <- function(
     stop("Unknown output type '", output_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
 
   if (engine == "msprime" && output_type != "ts")
-    stop("When using the slendr msprime engine, \"ts\" is the only valid output type",
+    stop("When using the slendr msprime engine, \"ts\" is the only valid output type.",
          call. = FALSE)
 
   if (output_type == "ts")
