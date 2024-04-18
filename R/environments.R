@@ -14,6 +14,8 @@ execute_output <- function(fun, env) {
            call. = FALSE)
   }
 
+  # change the environment of the function only to the restricted scope environment
+  environment(fun) <- env
   do.call(fun, arg_list)
 }
 
@@ -28,7 +30,7 @@ generate_outputs <- function(generators, results) {
     first <- as.list(x)[[1]] %>% as.character
     if (first == "function")
       execute_output(eval(x), env = env)
-    else if (exists(first, env))
+    else if (exists(first, envir = env))
       get(first, env)
     else
       stop("Unknown output `", first, "` encountered while population an environment", call. = FALSE)
@@ -37,7 +39,6 @@ generate_outputs <- function(generators, results) {
   return(outputs)
 }
 
-
 # Populate environment with output results from a simulation
 populate_output_env <- function(result) {
   output <- result$output
@@ -45,14 +46,43 @@ populate_output_env <- function(result) {
 
   env <- new.env()
   if (is.character(output))
-    env$path <- output
+    env$path <- normalizePath(output, winslash = "/", mustWork = TRUE)
   else if (inherits(output, "slendr_ts"))
     env$ts <- output
   else
-    stop("Unknown `output` type encountered while population an environment", call. = FALSE)
+    stop("Unknown output encountered while population an internal scope")
 
   if (!is.null(model))
     env$model <- model
 
   env
+}
+
+# Check that a given function has arguments among valid arguments
+check_arguments <- function(fun, valid_args) {
+  args <- names(formals(fun))
+  match <- args %in% valid_args
+  if (sum(match) != length(args))
+    stop("The following arguments are not valid: ", args[!match],
+         ".\nOnly types ", paste(paste0("'", valid_args, "'"), collapse = ", "),
+         "are valid for the selected output type.", call. = FALSE)
+}
+
+# Check that all given user-defined functions have arguments only among
+# valid arguments
+validate_functions <- function(funs, valid_args) {
+  funs <- lapply(funs[-1], function(item) item)
+
+  if (any(names(funs) == ""))
+    stop("All elements of the list of output generators must be named", call. = FALSE)
+
+  for (x in funs) {
+    first <- as.list(x)[[1]] %>% as.character
+    if (first == "function")
+      check_arguments(eval(x), valid_args)
+    else if (!first %in% valid_args)
+      stop("The following output is not valid: `", first, "`.\n",
+           "Outputs or function arguments valid for the selected output type are: ",
+           paste(paste0("'", valid_args, "'"), collapse = ", "), ".", call. = FALSE)
+  }
 }
