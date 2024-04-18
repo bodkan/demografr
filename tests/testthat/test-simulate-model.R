@@ -24,6 +24,14 @@ test_that("simulate_model can also use non-functional data", {
   )
 })
 
+test_that("for customized outputs, data-generating functions must be provided", {
+  expect_error(
+    simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8,
+      engine = "slim", data_type = "custom"),
+    "Models using custom data types must provide a list of data-generating function\\(s\\)"
+  )
+})
+
 test_that("data_type = 'ts' allows only 'ts' and 'model' to be available", {
   expect_error(
     simulate_model(
