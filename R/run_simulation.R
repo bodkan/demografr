@@ -1,7 +1,7 @@
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate,
-                           samples, engine, model_args, engine_args,
+                           samples, output_dir, engine, model_args, engine_args,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
@@ -69,10 +69,16 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
           # compose a list of required and optional arguments for msprime / SLiM engine
           engine_fun_args <- list(
             model = compiled_model,
-            sequence_length = sequence_length,
-            recombination_rate = recombination_rate,
             samples = sample_schedule
           ) %>% c(., engine_args)
+
+          if (engine == "slim")
+            engine_fun_args <- c(engine_fun_args, output_dir = output_dir)
+
+          if (!missing(sequence_length))
+            engine_fun_args <- c(engine_fun_args, sequence_length = sequence_length)
+          if (!missing(recombination_rate))
+            engine_fun_args <- c(engine_fun_args, recombination_rate = recombination_rate)
 
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
