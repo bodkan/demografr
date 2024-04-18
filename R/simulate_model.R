@@ -40,7 +40,7 @@
 simulate_model <- function(
     model, parameters,
     sequence_length, recombination_rate, mutation_rate = 0,
-    outputs = NULL, output_type = c("ts", "custom"),
+    data = NULL, data_type = c("ts", "custom"),
     engine = NULL, model_args = NULL, engine_args = NULL,
     attempts = 1000
 ) {
@@ -72,23 +72,23 @@ simulate_model <- function(
 
   # unless a tree-sequence is supposed to be returned directly, create a
   # temporary directory where a simulation script can store output files
-  output_type <- match.arg(output_type)
-  if (output_type == "ts") {
+  data_type <- match.arg(data_type)
+  if (data_type == "ts") {
     output_dir <- NULL
-  } else if (output_type == "custom") {
+  } else if (data_type == "custom") {
     output_dir <- normalizePath(paste0(tempfile(), "_demografr_outputs/"), winslash = "/", mustWork = FALSE)
     dir.create(output_dir)
   } else
-    stop("Unknown output type '", output_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
+    stop("Unknown output type '", data_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
 
-  if (engine == "msprime" && output_type != "ts")
+  if (engine == "msprime" && data_type != "ts")
     stop("When using the slendr msprime engine, \"ts\" is the only valid output type.",
          call. = FALSE)
 
-  if (output_type == "ts")
-    validate_functions(base::substitute(outputs), valid_args = c("ts", "model"))
+  if (data_type == "ts")
+    validate_functions(base::substitute(data), valid_args = c("ts", "model"))
   else
-    validate_functions(base::substitute(outputs), valid_args = c("path", "model"))
+    validate_functions(base::substitute(data), valid_args = c("path", "model"))
 
   if (contains_priors(parameters)) {
     parameters <- expand_formulas(parameters, model, model_args) #%>% strip_prior_environments()
@@ -106,10 +106,10 @@ simulate_model <- function(
     attempts = attempts, model_name = substitute(model))
 
   # if no user-defined generators were provided, return output as it is
-  outputs_expr <- base::substitute(outputs)
-  if (is.null(outputs_expr))
+  data_expr <- base::substitute(data)
+  if (is.null(data_expr))
     return(result$output)
   else { # otherwise, apply each generator to the result
-    return(generate_outputs(outputs_expr, result))
+    return(generate_data(data_expr, result))
   }
 }

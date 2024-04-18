@@ -1,5 +1,5 @@
 # Execute a given function in a given environment
-execute_output <- function(fun, env) {
+execute_generator <- function(fun, env) {
   # get all arguments used by the user-defined function
   arg_names <- names(formals(fun))
 
@@ -10,7 +10,7 @@ execute_output <- function(fun, env) {
     if (exists(arg, envir = env))
       arg_list[[arg]] <- get(arg, envir = env)
     else
-      stop(paste0("Function argument `", arg, "` not found in the output environment"),
+      stop(paste0("Function argument `", arg, "` not found in the data environment"),
            call. = FALSE)
   }
 
@@ -20,37 +20,37 @@ execute_output <- function(fun, env) {
 }
 
 # Generate data from simulated outputs using user-provided generator functions
-generate_outputs <- function(generators, results) {
-  env <- populate_output_env(results)
+generate_data <- function(generators, results) {
+  env <- populate_data_env(results)
   # the parent had to substitute the user list, so let's revert that back
   # to standard R code
   generators <- lapply(generators[-1], function(item) item)
 
-  outputs <- lapply(generators, function(x) {
+  data <- lapply(generators, function(x) {
     first <- as.list(x)[[1]] %>% as.character
     if (first == "function")
-      execute_output(eval(x), env = env)
+      execute_generator(eval(x), env = env)
     else if (exists(first, envir = env))
       get(first, env)
     else
-      stop("Unknown output `", first, "` encountered while population an environment", call. = FALSE)
+      stop("Unknown data `", first, "` encountered while population an environment", call. = FALSE)
   })
 
-  return(outputs)
+  return(data)
 }
 
-# Populate environment with output results from a simulation
-populate_output_env <- function(result) {
-  output <- result$output
+# Populate environment with data results from a simulation
+populate_data_env <- function(result) {
+  data <- result$output
   model <- result$model
 
   env <- new.env()
-  if (is.character(output))
-    env$path <- normalizePath(output, winslash = "/", mustWork = TRUE)
-  else if (inherits(output, "slendr_ts"))
-    env$ts <- output
+  if (is.character(data))
+    env$path <- normalizePath(data, winslash = "/", mustWork = TRUE)
+  else if (inherits(data, "slendr_ts"))
+    env$ts <- data
   else
-    stop("Unknown output encountered while population an internal scope")
+    stop("Unknown data encountered while population an internal scope")
 
   if (!is.null(model))
     env$model <- model
@@ -65,7 +65,7 @@ check_arguments <- function(fun, valid_args) {
   if (sum(match) != length(args))
     stop("The following arguments are not valid: \"", args[!match], "\"",
          ".\nOnly types ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
-         " are valid for the selected output type.", call. = FALSE)
+         " are valid for the selected data type.", call. = FALSE)
 }
 
 # Check that all given user-defined functions have arguments only among
@@ -74,15 +74,15 @@ validate_functions <- function(funs, valid_args) {
   funs <- lapply(funs[-1], function(item) item)
 
   if (any(names(funs) == ""))
-    stop("All elements of the list of output generators must be named", call. = FALSE)
+    stop("All elements of the list of data generators must be named", call. = FALSE)
 
   for (x in funs) {
     first <- as.list(x)[[1]] %>% as.character
     if (first == "function")
       check_arguments(eval(x), valid_args)
     else if (!first %in% valid_args)
-      stop("The following output is not valid: `", first, "`.\n",
-           "Outputs or function arguments valid for the selected output type are: ",
+      stop("The following data is not valid: `", first, "`.\n",
+           "Data or function arguments valid for the selected output type are: ",
            paste(paste0("\"", valid_args, "\""), collapse = ", "), ".", call. = FALSE)
   }
 }

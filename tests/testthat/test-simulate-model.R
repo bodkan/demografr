@@ -11,26 +11,26 @@ model <- function(N) {
   return(model)
 }
 
-test_that("simulate_model can also use non-functional outputs", {
+test_that("simulate_model can also use non-functional data", {
   expect_type(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      output_type = "custom",
-      outputs = list(path = path)
+      data_type = "custom",
+      data = list(path = path)
     )$path,
     "character"
   )
 })
 
-test_that("output_type = 'ts' allows only 'ts' and 'model' to be available", {
+test_that("data_type = 'ts' allows only 'ts' and 'model' to be available", {
   expect_error(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      outputs = list(
+      data = list(
         ts = function(path, model) file.path(path, "output.trees") %>% ts_load(model),
         gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
@@ -39,29 +39,29 @@ test_that("output_type = 'ts' allows only 'ts' and 'model' to be available", {
   )
 
   expect_true(
-    is.list(outputs <- simulate_model(
+    is.list(data <- simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      output_type = "custom", outputs = list(
+      data_type = "custom", data = list(
         ts = function(path, model) file.path(path, "output.trees") %>% ts_load(model),
         gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
     ))
   )
 
-  expect_s3_class(outputs$ts, "slendr_ts")
-  expect_s3_class(outputs$gt, "data.frame")
+  expect_s3_class(data$ts, "slendr_ts")
+  expect_s3_class(data$gt, "data.frame")
 })
 
-test_that("output_type = \"custom\" allows only \"path\" and \"model\" to be available", {
+test_that("data_type = \"custom\" allows only \"path\" and \"model\" to be available", {
   expect_error(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      output_type = "custom",
-      outputs = list(
+      data_type = "custom",
+      data = list(
         gt = function(ts) ts_mutate(ts, 1e-8) %>% ts_genotypes()
       )
     ),
@@ -73,8 +73,8 @@ test_that("output_type = \"custom\" allows only \"path\" and \"model\" to be ava
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      output_type = "custom",
-      outputs = list(
+      data_type = "custom",
+      data = list(
         gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     )$gt,
@@ -88,8 +88,8 @@ test_that("custom output types are not allowed for slendr/msprime models", {
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
-      output_type = "custom",
-      outputs = list(
+      data_type = "custom",
+      data = list(
         ts = ts,
         gt = function(ts) ts_mutate(ts, 1e-8) %>% ts_genotypes
       )
@@ -98,17 +98,17 @@ test_that("custom output types are not allowed for slendr/msprime models", {
   )
 
   expect_true(
-    is.list(outputs <- simulate_model(
+    is.list(data <- simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
-      outputs = list(
+      data = list(
         ts = ts,
         gt = function(ts) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
     ))
   )
 
-  expect_s3_class(outputs$ts, "slendr_ts")
-  expect_s3_class(outputs$gt, "data.frame")
+  expect_s3_class(data$ts, "slendr_ts")
+  expect_s3_class(data$gt, "data.frame")
 })
