@@ -16,6 +16,15 @@ run_iteration <- function(it,
   output <- sim_result$output
   param_values <- sim_result$param_values
 
+  if (is.function(model)) {
+    if (mutation_rate != 0)
+      ts <- slendr::ts_mutate(output, mutation_rate = mutation_rate)
+
+    # clean up if needed
+    if (!is.null(attr(output, "path")))
+      unlink(attr(output, "path"))
+  }
+
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
   simulated_stats <- lapply(functions, function(f) f(ts))
