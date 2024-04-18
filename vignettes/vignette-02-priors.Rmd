@@ -319,7 +319,7 @@ individual_priors <- list(
 ```
 
 ```{r, echo=FALSE}
-ts <- simulate_output(model, individual_priors, sequence_length = 1)
+ts <- simulate_model(model, individual_priors, sequence_length = 1)
 ```
 
 The second possibility would be to re-parametrize the function to accept, for instance, two pairs of two vectors of `T` and `N`, one for each population. However, we can also use _demografr_'s support for **'templated' prior sampling expressions** (for a lack of a better word). The easiest way to explain this is just to write it down:
@@ -333,14 +333,14 @@ templated_priors <- list(
 )
 ```
 
-When priors like this are plugged in to either `simulate_abc()` or `simulate_output()`, _demografr_ tries to **match model function arguments against the prior names (here, `T_a...` and `T_b...`), assigning each model function argument (i.e., model parameter) to an appropriate prior sampling expression by substituting the `...` on the left hand of each prior sampling statement**.
+When priors like this are plugged in to either `simulate_abc()` or `simulate_model()`, _demografr_ tries to **match model function arguments against the prior names (here, `T_a...` and `T_b...`), assigning each model function argument (i.e., model parameter) to an appropriate prior sampling expression by substituting the `...` on the left hand of each prior sampling statement**.
 
 You can read `T_a... ~ <distribution>` as "sample any parameter starting with 'T_a' from `<distribution>`.
 
 This way, when defining prior sampling expressions, you're not hindered by the complexity of your model function (having to handle vector indexing as you'd have to with vectorized prior sampling statements).
 
 ```{r, echo=FALSE}
-ts <- simulate_output(model, templated_priors, sequence_length = 1)
+ts <- simulate_model(model, templated_priors, sequence_length = 1)
 ```
 
 

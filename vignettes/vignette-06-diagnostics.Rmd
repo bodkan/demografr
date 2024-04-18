@@ -229,9 +229,9 @@ validate_abc(modelZ, priors, functions, observed, quiet = TRUE)
 ```
 
 ```{r, echo=FALSE, eval=FALSE}
-tsX <- simulate_output(modelX, priors)
-tsY <- simulate_output(modelY, priors)
-tsZ <- simulate_output(modelZ, priors)
+tsX <- simulate_model(modelX, priors)
+tsY <- simulate_model(modelY, priors)
+tsZ <- simulate_model(modelZ, priors)
 ```
 
 With that out of the way, we can proceed with generating simulated data for inference using all three models. What we'll do is perform three runs and save them into appropriately named variables `dataX`, `dataY`, and `dataZ`:

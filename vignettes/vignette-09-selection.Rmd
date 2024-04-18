@@ -1,0 +1,159 @@
+---
+title: Non-neutral _slendr_ simulations
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Non-neutral _slendr_ simulations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 80,
+  eval = slendr_present
+)
+
+devtools::load_all()
+
+data_path <- here::here("inst/examples/selection_abc.rds")
+```
+
+```{r}
+devtools::load_all("~/Projects/slendr")
+devtools::load_all()
+init_env(quiet = TRUE)
+```
+
+```{r}
+extension <- r"(
+initialize() {
+    initializeMutationType("m1", 0.5, "f", 0.0);
+
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElement(g1, 0, 99);
+
+    initializeMutationRate(0);
+    initializeRecombinationRate(0);
+}
+
+initialize() {
+    defineConstant("s", {{s}});
+    defineConstant("onset_time", {{onset_time}});
+    defineConstant("origin_pop", "{{origin_pop}}");
+    defineConstant("target_pop", "{{target_pop}}");
+    defineConstant("freq_file", OUTPUT_DIR + "/" + "traj_" + target_pop + "_" + origin_pop + ".tsv");
+}
+
+function (void) add_mutation(void) {
+    // sample one target carrier of the new mutation...
+    target = sample(population(origin_pop).genomes, 1);
+    // ... and add the mutation in the middle of it
+    mut = target.addNewMutation(m1, s, position = 50);
+
+    // save the mutation for later reference
+    defineGlobal("MUTATION", mut);
+
+    log_output("adding beneficial mutation to population " + target_pop);
+}
+
+tick(onset_time) late() {
+    // save simulation state in case we need to restart if the mutation is lost
+    save_state();
+
+    add_mutation();
+    writeFile(freq_file, "time\tfreq");
+}
+
+tick(onset_time):SIMULATION_END late() {
+    // the mutation is not segregating and is not fixed either -- we must restart
+    if (!MUTATION.isSegregating & !MUTATION.isFixed) {
+        log_output("mutation lost -- restarting");
+
+        reset_state();
+
+        add_mutation();
+        writeFile(freq_file, "time\tfreq");
+    }
+
+    // compute the frequency of the mutation of interest and save it (if the
+    // mutation is missing at this time, save its frequency as NA)
+    freq = "NA";
+    if (population(target_pop, check = T))
+      freq = population(target_pop).genomes.mutationFrequenciesInGenomes();
+
+    writeFile(freq_file,
+              community.tick + "\t" +
+              model_time(community.tick) + "\t" +
+              freq, append = T);
+}
+
+SIMULATION_END late() {
+    ts_file = OUTPUT_DIR + "/output.trees";
+    save_ts(ts_file);
+
+    paths = OUTPUT_DIR + "/paths.txt";
+    writeFile(paths, ts_file);
+    writeFile(paths, freq_file, append = T);
+}
+)"
+
+model <- function(s, onset_time, origin_pop = NULL, target_pop = NULL) {
+  extension <- substitute(
+    extension,
+    s = s, onset_time = as.integer(onset_time),
+    origin_pop = origin_pop, target_pop = target_pop
+  )
+  
+  afr <- population("AFR", time = 90000, N = 3000)
+  ooa <- population("OOA", parent = afr, time = 60000, N = 500, remove = 23000) 
+  ehg <- population("EHG", parent = ooa, time = 28000, N = 1000, remove = 6000)
+  eur <- population("EUR", parent = ehg, time = 25000, N = 5000)
+  ana <- population("ANA", time = 28000, N = 3000, parent = ooa, remove = 4000)
+  yam <- population("YAM", time = 8000, N = 500, parent = ehg, remove = 2500)
+  
+  gf <- list(
+    gene_flow(from = ana, to = yam, rate = 0.4, start = 7900, end = 7800),
+    gene_flow(from = ana, to = eur, rate = 0.5, start = 6000, end = 5000),
+    gene_flow(from = yam, to = eur, rate = 0.65, start = 4000, end = 3500)
+  )
+  
+  model <- compile_model(
+    populations = list(afr, ooa, ehg, eur, ana, yam),
+    gene_flow = gf, generation_time = 30,
+    extension = extension
+  )
+
+  samples <- schedule_sampling(model, time = 0, list(eur, 50))
+  
+  return(list(model, samples))
+}
+```
+
+```{r}
+priors <- list(
+  s ~ runif(0, 0.1),
+  onset_time ~ runif(3000, 20000)
+)
+```
+
+```{r}
+simulate_model(
+  model, priors,
+  model_args = list(origin_pop = "EUR", target_pop = "EUR"),
+  outputs = list(
+    ts = function(paths, model) ts_load(paths[1], model) %>% ts_mutate(1e-8),
+    freq = function(paths) readr::read_tsv(paths[2]),
+    paths
+  )
+)
+```
+
+
+

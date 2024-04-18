@@ -4,7 +4,7 @@
 \alias{plot_prediction}
 \title{Plot the results of a posterior predictive check for a given summary statistic}
 \usage{
-plot_prediction(data, stat, file = NULL, facets = TRUE, ...)
+plot_prediction(data, stat = NULL, file = NULL, facets = TRUE, ...)
 }
 \arguments{
 \item{data}{Data frame with predictions generated from ABC posteriors, as generated

@@ -4,7 +4,7 @@
 \alias{extract_prediction}
 \title{Unnest the predicted values of a given statistic from the simulated data}
 \usage{
-extract_prediction(data, stat = NULL)
+extract_prediction(data, stat)
 }
 \arguments{
 \item{data}{Data with posterior simulations performed via \code{predict.demografr_abc_sims}}

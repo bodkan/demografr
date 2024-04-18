@@ -37,10 +37,10 @@
 #'   was simulated, or a path to an output file when a custom simulation script was used.
 #'
 #' @export
-simulate_output <- function(
+simulate_model <- function(
     model, parameters,
-    outputs = NULL,
     sequence_length, recombination_rate, mutation_rate = 0,
+    outputs = NULL, output_type = c("ts", "custom"),
     engine = NULL, model_args = NULL, engine_args = NULL,
     attempts = 1000
 ) {
@@ -52,10 +52,10 @@ simulate_output <- function(
 
   # check the presence of all arguments to avoid cryptic errors when running simulations
   # in parallel
-  if (!check_arg(model) || !check_arg(parameters) || !length(parameters))
+  if (!arg_present(model) || !arg_present(parameters) || !length(parameters))
     stop("A model generating function and parameters must be provided", call. = FALSE)
-  if(is.function(model) && (!check_arg(sequence_length) || !check_arg(recombination_rate)))
-    stop("Sequence length and recombination rate must be provided", call. = FALSE)
+  # if(is.function(model) && (!arg_present(sequence_length) || !arg_present(recombination_rate)))
+  #   stop("Sequence length and recombination rate must be provided", call. = FALSE)
 
   if (inherits(parameters, "formula"))
     parameters <- list(parameters)
@@ -70,7 +70,25 @@ simulate_output <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  init_env(quiet = TRUE)
+  # unless a tree-sequence is supposed to be returned directly, create a
+  # temporary directory where a simulation script can store output files
+  output_type <- match.arg(output_type)
+  if (output_type == "ts") {
+    output_dir <- NULL
+  } else if (output_type == "custom") {
+    output_dir <- normalizePath(paste0(tempfile(), "_demografr_outputs/"), winslash = "/", mustWork = FALSE)
+    dir.create(output_dir)
+  } else
+    stop("Unknown output type '", output_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
+
+  if (engine == "msprime" && output_type != "ts")
+    stop("When using the slendr msprime engine, \"ts\" is the only valid output type",
+         call. = FALSE)
+
+  if (output_type == "ts")
+    validate_functions(base::substitute(outputs), valid_args = c("ts", "model"))
+  else
+    validate_functions(base::substitute(outputs), valid_args = c("path", "model"))
 
   if (contains_priors(parameters)) {
     parameters <- expand_formulas(parameters, model, model_args) #%>% strip_prior_environments()
@@ -80,16 +98,18 @@ simulate_output <- function(
     invisible(lapply(parameters, sample_prior))
   }
 
+  init_env(quiet = TRUE)
   result <- run_simulation(
     model = model, params = parameters,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
-    engine = engine, model_args = model_args, engine_args = engine_args,
+    output_dir = output_dir, engine = engine, model_args = model_args, engine_args = engine_args,
     attempts = attempts, model_name = substitute(model))
 
   # if no user-defined generators were provided, return output as it is
-  if (is.null(outputs))
+  outputs_expr <- base::substitute(outputs)
+  if (is.null(outputs_expr))
     return(result$output)
   else { # otherwise, apply each generator to the result
-    return(generate_outputs(substitute(outputs), result))
+    return(generate_outputs(outputs_expr, result))
   }
 }

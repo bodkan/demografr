@@ -71,7 +71,7 @@ reference:
 
   - title: Helper functions
     contents:
-    - simulate_output
+    - simulate_model
     - combine_data
     - combine_data
     - sample_prior
