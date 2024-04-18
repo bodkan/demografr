@@ -17,6 +17,7 @@ execute_function <- function(fun, env) {
   }
 
   # change the environment of the function only to the restricted scope environment
+  # environment(fun) <- list2env(mget(names(arg_list), envir = env))
   environment(fun) <- env
   do.call(fun, arg_list)
 }
