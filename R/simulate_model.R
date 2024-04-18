@@ -81,14 +81,20 @@ simulate_model <- function(
   } else
     stop("Unknown output type '", data_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
 
+  if (data_type == "custom" && missing(data))
+      stop("Models using custom data types must provide a list of data-generating function(s)", call. = FALSE)
+
   if (engine == "msprime" && data_type != "ts")
     stop("When using the slendr msprime engine, \"ts\" is the only valid output type.",
          call. = FALSE)
 
+  data_expr <- base::substitute(data)
+  if (is.symbol(data_expr))
+    data_expr <- data
   if (data_type == "ts")
-    validate_functions(base::substitute(data), valid_args = c("ts", "model"))
+    validate_user_functions(data_expr, valid_args = c("ts", "model"))
   else
-    validate_functions(base::substitute(data), valid_args = c("path", "model"))
+    validate_user_functions(data_expr, valid_args = c("path", "model"))
 
   if (contains_priors(parameters)) {
     parameters <- expand_formulas(parameters, model, model_args) #%>% strip_prior_environments()
@@ -106,10 +112,10 @@ simulate_model <- function(
     attempts = attempts, model_name = substitute(model))
 
   # if no user-defined generators were provided, return output as it is
-  data_expr <- base::substitute(data)
   if (is.null(data_expr))
     return(result$output)
   else { # otherwise, apply each generator to the result
-    return(generate_data(data_expr, result))
+    env <- populate_data_env(result)
+    return(evaluate_functions(data_expr, env))
   }
 }

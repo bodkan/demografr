@@ -12,6 +12,7 @@ model <- function(N) {
 }
 
 test_that("simulate_model can also use non-functional data", {
+  # data list directly
   expect_type(
     simulate_model(
       model, priors,
@@ -19,6 +20,19 @@ test_that("simulate_model can also use non-functional data", {
       engine = "slim",
       data_type = "custom",
       data = list(path = path)
+    )$path,
+    "character"
+  )
+
+  # data list as a variable
+  data_list <- list(path = function(path) path)
+  expect_type(
+    simulate_model(
+      model, priors,
+      sequence_length = 1e6, recombination_rate = 1e-8,
+      engine = "slim",
+      data_type = "custom",
+      data = data_list
     )$path,
     "character"
   )
@@ -105,6 +119,7 @@ test_that("custom output types are not allowed for slendr/msprime models", {
     "When using the slendr msprime engine, \"ts\" is the only valid output type."
   )
 
+  # data list directly
   expect_true(
     is.list(data <- simulate_model(
       model, priors,
@@ -114,6 +129,23 @@ test_that("custom output types are not allowed for slendr/msprime models", {
         ts = ts,
         gt = function(ts) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
+    ))
+  )
+
+  expect_s3_class(data$ts, "slendr_ts")
+  expect_s3_class(data$gt, "data.frame")
+
+  # data list as a variable
+  data_list <- list(
+      ts = function(ts, model) ts_load(ts, model),
+      gt = function(ts, model) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
+  )
+  expect_true(
+    is.list(data <- simulate_model(
+      model, priors,
+      sequence_length = 1e6, recombination_rate = 1e-8,
+      engine = "msprime",
+      data = data_list
     ))
   )
 

@@ -1,5 +1,7 @@
+# This file contains metaprogramming code for processing and executing user-defined
+# functions
 # Execute a given function in a given environment
-execute_generator <- function(fun, env) {
+execute_function <- function(fun, env) {
   # get all arguments used by the user-defined function
   arg_names <- names(formals(fun))
 
@@ -20,20 +22,24 @@ execute_generator <- function(fun, env) {
 }
 
 # Generate data from simulated outputs using user-provided generator functions
-generate_data <- function(generators, results) {
-  env <- populate_data_env(results)
+evaluate_functions <- function(generators, env) {
   # the parent had to substitute the user list, so let's revert that back
   # to standard R code
-  generators <- lapply(generators[-1], function(item) item)
+  if (is.call(generators))
+    generators <- lapply(generators[-1], function(item) item)
 
   data <- lapply(generators, function(x) {
-    first <- as.list(x)[[1]] %>% as.character
-    if (first == "function")
-      execute_generator(eval(x), env = env)
-    else if (exists(first, envir = env))
-      get(first, env)
-    else
-      stop("Unknown data `", first, "` encountered while population an environment", call. = FALSE)
+    if (is.function(x)) {
+      execute_function(x, env = env)
+    } else {
+      first <- as.list(x)[[1]] %>% as.character
+      if (first == "function")
+        execute_function(eval(x), env = env)
+      else if (exists(first, envir = env))
+        get(first, env)
+      else
+        stop("Unknown data `", first, "` encountered while population an environment", call. = FALSE)
+    }
   })
 
   return(data)
@@ -64,25 +70,48 @@ check_arguments <- function(fun, valid_args) {
   match <- args %in% valid_args
   if (sum(match) != length(args))
     stop("The following arguments are not valid: \"", args[!match], "\"",
-         ".\nOnly types ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
-         " are valid for the selected data type.", call. = FALSE)
+         ".\nOnly arguments ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
+         " are valid for user-defined function in the current model setup.", call. = FALSE)
 }
 
 # Check that all given user-defined functions have arguments only among
 # valid arguments
-validate_functions <- function(funs, valid_args) {
-  funs <- lapply(funs[-1], function(item) item)
+validate_user_functions <- function(funs, valid_args) {
+  if (is.call(funs))
+    funs <- lapply(funs[-1], function(item) item)
 
   if (any(names(funs) == ""))
-    stop("All elements of the list of data generators must be named", call. = FALSE)
+    stop("All elements of the list of functions / variables must be named", call. = FALSE)
 
   for (x in funs) {
-    first <- as.list(x)[[1]] %>% as.character
-    if (first == "function")
+    if (is.function(x)) {
       check_arguments(eval(x), valid_args)
-    else if (!first %in% valid_args)
-      stop("The following data is not valid: `", first, "`.\n",
-           "Data or function arguments valid for the selected output type are: ",
-           paste(paste0("\"", valid_args, "\""), collapse = ", "), ".", call. = FALSE)
+      next
+    } else {
+      first <- as.list(x)[[1]] %>% as.character
+      if (first == "function")
+        check_arguments(eval(x), valid_args)
+      else if (!first %in% valid_args)
+        stop("The following data is not valid: `", first, "`.\n",
+             "Data or function arguments valid for the current model setup are: ",
+             paste(paste0("\"", valid_args, "\""), collapse = ", "), ".", call. = FALSE)
+    }
   }
 }
+
+# # Check that all given user-defined summary functions have arguments only among
+# # valid arguments
+# validate_summary_functions <- function(funs, valid_args) {
+#   if (any(names(funs) == ""))
+#     stop("All elements of the list of data generators must be named", call. = FALSE)
+#
+#   for (fname in names(funs)) {
+#     f <- funs[[fname]]
+#     fargs <- names(formals(f))
+#     missing <- !fargs %in% valid_args
+#     if (any(missing))
+#       stop("The following arguments of the function '", fname, "' are not valid: ",
+#            paste(fargs[missing], collapse = ", "), ".\nValid summary function arguments are: ",
+#            paste(valid_args, collapse = ", "), ".", call. = FALSE)
+#   }
+# }
