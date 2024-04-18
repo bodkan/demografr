@@ -2,8 +2,8 @@
 run_iteration <- function(it,
                           model, params, functions,
                           sequence_length, recombination_rate, mutation_rate,
-                          samples, engine, model_args, engine_args,
-                          model_name, attempts, generators = NULL) {
+                          engine, model_args, engine_args,
+                          model_name, attempts) {
   init_env(quiet = TRUE)
 
   sim_result <- run_simulation(
