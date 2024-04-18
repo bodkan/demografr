@@ -70,7 +70,7 @@ check_arguments <- function(fun, valid_args) {
   args <- names(formals(fun))
   match <- args %in% valid_args
   if (sum(match) != length(args))
-    stop("The following arguments are not valid: \"", args[!match], "\"",
+    stop("The following function arguments are not valid: \"", args[!match], "\"",
          ".\nOnly arguments ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
          " are valid for user-defined function in the current model setup.", call. = FALSE)
 }

@@ -57,7 +57,7 @@ test_that("data_type = 'ts' allows only 'ts' and 'model' to be available", {
         gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
     ),
-    "The following arguments are not valid: \"path\"."
+    "The following function arguments are not valid: \"path\"."
   )
 
   expect_true(
@@ -87,7 +87,7 @@ test_that("data_type = \"custom\" allows only \"path\" and \"model\" to be avail
         gt = function(ts) ts_mutate(ts, 1e-8) %>% ts_genotypes()
       )
     ),
-    "The following arguments are not valid: \"ts\"."
+    "The following function arguments are not valid: \"ts\"."
   )
 
   expect_s3_class(

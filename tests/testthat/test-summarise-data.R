@@ -7,7 +7,8 @@ priors <- list(N ~ 100)
 
 extension <- r"(
 initialize() {
-    initializeMutationType("m1", 0.5, "f", 0.0);
+    // negative s to silence SLiM warning about neutral mutations
+    initializeMutationType("m1", 0.5, "f", -0.0001);
 
     initializeGenomicElementType("g1", m1, 1.0);
     initializeGenomicElement(g1, 0, SEQUENCE_LENGTH - 1);
@@ -65,12 +66,12 @@ data <- simulate_model(
 test_that("summarise_data refuses functions with invalid arguments", {
   functions <- list(stat = function(invalid_arg) random_function(invalid_arg))
   expect_error(summarise_data(data, functions),
-               "The following arguments of the function 'stat' are not valid: invalid_arg.")
+               "The following function arguments are not valid: \"invalid_arg\".")
 
   functions <- list(pi = function(ts, samples) ts_diversity(ts, samples),
                     stat = function(invalid_arg) random_function(invalid_arg))
   expect_error(summarise_data(data, functions),
-               "The following arguments of the function 'stat' are not valid: invalid_arg.")
+               "The following function arguments are not valid: \"invalid_arg\".")
 })
 
 test_that("summarise_data produces data frames for every summary function", {
@@ -102,9 +103,3 @@ test_that("summarise_data can utilize summarise computed already as data", {
     "list"
   )
 })
-
-functions <- list(
-  ts_pi = function(ts) ts,
-  slim_pi = function(ts) ts
-)
-output <- summarise_data(data, functions = functions)
