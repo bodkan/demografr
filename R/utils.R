@@ -3,7 +3,7 @@
 slendr::init_env
 
 # Check that the function argument is really provided by the user
-check_arg <- function(x) {
+arg_present <- function(x) {
   tryCatch({get(deparse(substitute(x))); TRUE}, error = function(e) FALSE) ||
   tryCatch({!is.null(x); TRUE}, error = function(e) FALSE)
 }
@@ -86,7 +86,8 @@ check_model_engine <- function(model, engine) {
 get_engine <- function(slendr_model, engine) {
   if (!is.null(engine)) # if an engine was specified by the user, use that
     engine <- match.arg(engine, c("msprime", "slim"))
-  else if (is.null(slendr_model$world))
+  else if (is.null(slendr_model$world) &&
+           !any(readLines(file.path(slendr_model$path, "script.slim")) %>% grepl("user extension code follows", .)))
     engine <- "msprime" # nonspatial models should use the coalescent slendr/msprime engine
   else
     engine <- "slim" # spatial models must use the slendr/SLiM engine

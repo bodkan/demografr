@@ -54,7 +54,7 @@ simulate_grid <- function(
 
   # check the presence of all arguments to avoid cryptic errors when running
   # simulations in parallel
-  if (!check_arg(model) || !check_arg(grid) || !check_arg(functions))
+  if (!arg_present(model) || !arg_present(grid) || !arg_present(functions))
     stop("A model generating function, parameter grid, and summary functions must be\n",
          "must be provided (check that the variables that you provided really do\n",
          "contain what you think)", call. = FALSE)

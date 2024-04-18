@@ -39,7 +39,7 @@ validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
                          quiet = FALSE, attempts = 1000,
                          engine = NULL, model_args = NULL, engine_args = NULL) {
-  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||!length(priors))
+  if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||!length(priors))
     stop("A model generating function, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
          "really do contain what you think)", call. = FALSE)

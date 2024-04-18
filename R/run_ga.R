@@ -55,8 +55,8 @@ run_ga <- function(
 
   # check the presence of all arguments to avoid cryptic errors when running
   # simulations in parallel
-  if (!check_arg(model) || !check_arg(bounds) || !check_arg(functions) || !check_arg(observed) ||
-      !check_arg(iterations))
+  if (!arg_present(model) || !arg_present(bounds) || !arg_present(functions) || !arg_present(observed) ||
+      !arg_present(iterations))
     stop("A model generating function, parameter bounds, summary functions, observed\n",
          "statistics, and the number of iterations must be provided (check\n",
          "that the variables that you provided really do contain what you think)", call. = FALSE)

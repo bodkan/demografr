@@ -53,8 +53,8 @@ simulate_abc <- function(
 
   # check the presence of all arguments to avoid cryptic errors when running
   # simulations in parallel
-  if (!check_arg(model) || !check_arg(priors) || !check_arg(functions) || !check_arg(observed) ||
-      !check_arg(iterations) || !length(priors))
+  if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||
+      !arg_present(iterations) || !length(priors))
     stop("A model generating function, priors, summary functions, observed\n",
          "statistics, and the number of iterations must be provided (check\n",
          "that the variables that you provided really do contain what you think)", call. = FALSE)
