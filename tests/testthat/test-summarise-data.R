@@ -21,6 +21,10 @@ SIMULATION_END late() {
     ts_file = OUTPUT_DIR + "/output.trees";
     stats_file = OUTPUT_DIR + "/stats.tsv";
 
+    // save tree sequence
+    save_ts(ts_file);
+
+    // save summary statistics values
     writeFile(stats_file, "het_pop1\thet_pop2\tfst");
     het_pop1 = calcHeterozygosity(population("pop1").genomes);
     het_pop2 = calcHeterozygosity(population("pop2").genomes);
@@ -83,7 +87,7 @@ test_that("summarise_data produces data frames for every summary function", {
   expect_true(all(sapply(output, is.data.frame)))
 })
 
-test_that("summarise_data can utilize summarise computed already as data", {
+test_that("summarise_data can utilize summaries computed already as data", {
   data <- simulate_model(
     model, parameters = list(split_time = 100),
     sequence_length = 1e6, recombination_rate = 1e-8,
@@ -94,7 +98,9 @@ test_that("summarise_data can utilize summarise computed already as data", {
         ts <- file.path(path, "output.trees") %>% ts_load(model)
         ts_diversity(ts, ts_names(ts, split = "pop"))
       },
-      slim_pi = function(path) file.path(path, "stats.tsv") %>% read.table(header = TRUE) %>% .[, c("het_pop1", "het_pop2")]
+      slim_pi = function(path) file.path(path, "stats.tsv") %>%
+        read.table(header = TRUE) %>%
+        .[, c("het_pop1", "het_pop2")]
     )
   )
 
