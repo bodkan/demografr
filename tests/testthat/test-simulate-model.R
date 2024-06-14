@@ -11,83 +11,81 @@ model <- function(N) {
   return(model)
 }
 
-test_that("simulate_model can also use non-functional data", {
+test_that("simulate_model can use non-function data", {
   # data list directly
-  expect_type(
+  expect_true(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      data_type = "custom",
+      format = "files",
       data = list(path = path)
-    )$path,
-    "character"
+    )$path %>% dir.exists()
   )
 
   # data list as a variable
   data_list <- list(path = function(path) path)
-  expect_type(
+  expect_true(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      data_type = "custom",
+      format = "files",
       data = data_list
-    )$path,
-    "character"
+    )$path %>% dir.exists()
   )
 })
 
-test_that("for customized outputs, data-generating functions must be provided", {
+test_that("for customized files, data-generating functions must be provided", {
   expect_error(
     simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8,
-      engine = "slim", data_type = "custom"),
-    "Models using custom data types must provide a list of data-generating function\\(s\\)"
+      engine = "slim", format = "files"),
+    "Models which generate custom files require a list of data function\\(s\\)"
   )
 })
 
-test_that("data_type = 'ts' allows only 'ts' and 'model' to be available", {
+test_that("format = 'ts' allows only 'ts' and 'model' to be available in data functions", {
   expect_error(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
       data = list(
-        ts = function(path, model) file.path(path, "output.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
+        ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
     ),
     "The following function arguments are not valid: \"path\"."
   )
 
   expect_true(
-    is.list(data <- simulate_model(
+    is.list(result <- simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      data_type = "custom", data = list(
-        ts = function(path, model) file.path(path, "output.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
+      format = "files", data = list(
+        ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
       )
     ))
   )
 
-  expect_s3_class(data$ts, "slendr_ts")
-  expect_s3_class(data$gt, "data.frame")
+  expect_s3_class(result$ts, "slendr_ts")
+  expect_s3_class(result$gt, "data.frame")
 })
 
-test_that("data_type = \"custom\" allows only \"path\" and \"model\" to be available", {
+test_that("format = 'custom' allows only 'path' and 'model' to be available", {
   expect_error(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      data_type = "custom",
+      format = "files",
       data = list(
         gt = function(ts) ts_mutate(ts, 1e-8) %>% ts_genotypes()
       )
     ),
-    "The following function arguments are not valid: \"ts\"."
+    "The following function arguments are not valid: \"ts\""
   )
 
   expect_s3_class(
@@ -95,33 +93,33 @@ test_that("data_type = \"custom\" allows only \"path\" and \"model\" to be avail
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
-      data_type = "custom",
+      format = "files",
       data = list(
-        gt = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     )$gt,
     "data.frame"
   )
 })
 
-test_that("custom output types are not allowed for slendr/msprime models", {
+test_that("custom outputs are not allowed for slendr/msprime models", {
   expect_error(
     simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
-      data_type = "custom",
+      format = "files",
       data = list(
         ts = ts,
         gt = function(ts) ts_mutate(ts, 1e-8) %>% ts_genotypes
       )
     ),
-    "When using the slendr msprime engine, \"ts\" is the only valid output type."
+    "When using the msprime engine, \"ts\" is the only valid output format"
   )
 
   # data list directly
   expect_true(
-    is.list(data <- simulate_model(
+    is.list(result <- simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
@@ -132,8 +130,8 @@ test_that("custom output types are not allowed for slendr/msprime models", {
     ))
   )
 
-  expect_s3_class(data$ts, "slendr_ts")
-  expect_s3_class(data$gt, "data.frame")
+  expect_s3_class(result$ts, "slendr_ts")
+  expect_s3_class(result$gt, "data.frame")
 
   # data list as a variable
   data_list <- list(
@@ -141,7 +139,7 @@ test_that("custom output types are not allowed for slendr/msprime models", {
       gt = function(ts, model) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
   )
   expect_true(
-    is.list(data <- simulate_model(
+    is.list(result <- simulate_model(
       model, priors,
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
@@ -149,6 +147,6 @@ test_that("custom output types are not allowed for slendr/msprime models", {
     ))
   )
 
-  expect_s3_class(data$ts, "slendr_ts")
-  expect_s3_class(data$gt, "data.frame")
+  expect_s3_class(result$ts, "slendr_ts")
+  expect_s3_class(result$gt, "data.frame")
 })

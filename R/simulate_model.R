@@ -9,7 +9,7 @@
 #' @param model Either a slendr model generating function (in which case \code{engine} must
 #'   be either "msprime" or "slim", i.e. one of the two of slendr's simulation back ends),
 #'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
-#'   must be "custom").
+#'   must be "files").
 #' @param parameters A list of prior distributions to use for sampling of model parameters
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of base pairs).
 #'   Ignored when custom simulations scripts are provided.
@@ -40,7 +40,7 @@
 simulate_model <- function(
     model, parameters,
     sequence_length, recombination_rate, mutation_rate = 0,
-    data = NULL, data_type = c("ts", "custom"),
+    data_funs = NULL, format = c("ts", "files"),
     engine = NULL, model_args = NULL, engine_args = NULL,
     attempts = 1000
 ) {
@@ -70,28 +70,20 @@ simulate_model <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  # unless a tree-sequence is supposed to be returned directly, create a
-  # temporary directory where a simulation script can store output files
-  data_type <- match.arg(data_type)
-  if (data_type == "ts") {
-    output_dir <- NULL
-  } else if (data_type == "custom") {
-    output_dir <- normalizePath(paste0(tempfile(), "_demografr_outputs/"), winslash = "/", mustWork = FALSE)
-    dir.create(output_dir)
-  } else
-    stop("Unknown output type '", data_type, "'. Valid values are 'ts' or 'custom'.", call. = FALSE)
+  format <- match.arg(format)
+  if (format == "files" && missing(data_funs))
+      stop("Models which generate custom files require a list of data function(s)\n",
+           "which will process them for computation of summary statistics.", call. = FALSE)
 
-  if (data_type == "custom" && missing(data))
-      stop("Models using custom data types must provide a list of data-generating function(s)", call. = FALSE)
-
-  if (engine == "msprime" && data_type != "ts")
-    stop("When using the slendr msprime engine, \"ts\" is the only valid output type.",
+  if (engine == "msprime" && format != "ts")
+    stop("When using the msprime engine, \"ts\" is the only valid output format",
          call. = FALSE)
 
-  data_expr <- base::substitute(data)
+  data_expr <- base::substitute(data_funs)
   if (is.symbol(data_expr))
-    data_expr <- data
-  if (data_type == "ts")
+    data_expr <- data_funs
+
+  if (format == "ts")
     validate_user_functions(data_expr, valid_args = c("ts", "model"))
   else
     validate_user_functions(data_expr, valid_args = c("path", "model"))
@@ -108,12 +100,13 @@ simulate_model <- function(
   result <- run_simulation(
     model = model, params = parameters,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
-    output_dir = output_dir, engine = engine, model_args = model_args, engine_args = engine_args,
+    engine = engine, model_args = model_args, engine_args = engine_args,
+    format = format,
     attempts = attempts, model_name = substitute(model))
 
   # if no user-defined generators were provided, return output as it is
   if (is.null(data_expr))
-    return(result$output)
+    return(result$data)
   else { # otherwise, apply each generator to the result
     env <- populate_data_env(result)
     return(evaluate_functions(data_expr, env))
