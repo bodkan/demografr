@@ -52,7 +52,7 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       engine = "slim",
       data = list(
         ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ),
     "The following function arguments are not valid: \"path\"."
@@ -65,7 +65,7 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       engine = "slim",
       format = "files", data = list(
         ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ))
   )
@@ -125,7 +125,7 @@ test_that("custom outputs are not allowed for slendr/msprime models", {
       engine = "msprime",
       data = list(
         ts = ts,
-        gt = function(ts) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
+        gt = function(ts) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ))
   )
@@ -136,7 +136,7 @@ test_that("custom outputs are not allowed for slendr/msprime models", {
   # data list as a variable
   data_list <- list(
       ts = function(ts, model) ts_load(ts, model),
-      gt = function(ts, model) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes
+      gt = function(ts, model) ts_load(ts, model) %>% ts_mutate(1e-8) %>% ts_genotypes()
   )
   expect_true(
     is.list(result <- simulate_model(
