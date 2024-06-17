@@ -1,7 +1,7 @@
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate,
-                           samples, output_dir, engine, model_args, engine_args,
+                           samples, engine, model_args, engine_args, format,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
@@ -66,14 +66,18 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
           # force no serialization for msprime runs
           if (engine == "msprime") compiled_model$path <- NULL
 
+          if (format == "ts")
+            path <- NULL
+          else {
+            path <- paste0(tempdir(), "demografr_", sample.int(n = .Machine$integer.max, size = 1)) %>%
+              normalizePath(winslash = "/", mustWork = FALSE)
+          }
+
           # compose a list of required and optional arguments for msprime / SLiM engine
           engine_fun_args <- list(
             model = compiled_model,
             samples = sample_schedule
-          ) %>% c(., engine_args)
-
-          if (engine == "slim")
-            engine_fun_args <- c(engine_fun_args, output_dir = output_dir)
+          ) %>% c(., engine_args, path = path)
 
           if (!missing(sequence_length))
             engine_fun_args <- c(engine_fun_args, sequence_length = sequence_length)
@@ -83,19 +87,21 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
           engine_fun <- get(engine, envir = asNamespace("slendr"))
 
           # run a slendr simulation
-          output <- do.call(engine_fun, engine_fun_args)
+          result <- do.call(engine_fun, engine_fun_args)
 
-          # clean up if needed
-          if (!is.null(compiled_model$path))
-            unlink(compiled_model$path, recursive = TRUE)
+          # TODO: take care of this upstream now that the model path stores customized
+          # user output files
+          # # clean up if needed
+          # if (!is.null(compiled_model$path))
+          #   unlink(compiled_model$path, recursive = TRUE)
         } else { # a user-defined script was provided as a model
           compiled_model <- NULL
 
           # run a cutsom simulation
           model_engine_args <- c(model, c(engine_args, param_args))
-          output <- do.call(run_script, model_engine_args)
+          result <- do.call(run_script, model_engine_args)
         }
-        output
+        result
       },
       error = function(cond) {
         msg <- conditionMessage(cond)
@@ -132,10 +138,10 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
       }
     )
 
-    if (!is.null(output)) break
+    if (!is.null(result)) break
   }
 
-  list(output = output, param_values = unlist(param_args), model = compiled_model)
+  list(data = result, param_values = unlist(param_args), model = compiled_model)
 }
 
 collect_param_matrix <- function(prior_values) {
