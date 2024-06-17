@@ -83,7 +83,7 @@ execute_function <- function(fun, env) {
 
 # Populate environment with data results from a simulation
 populate_data_env <- function(result) {
-  data <- result$output
+  data <- result$data
   model <- result$model
 
   env <- new.env()
