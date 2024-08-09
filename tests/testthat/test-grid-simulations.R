@@ -1,12 +1,15 @@
 skip_if(!slendr::check_dependencies(python = TRUE))
 
-model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3) {
-  popA <- slendr::population("popA", time = 1,   N = Ne_A)
-  popB <- slendr::population("popB", time = T_1, N = Ne_B, parent = popA)
-  popC <- slendr::population("popC", time = T_2, N = Ne_C, parent = popB)
-  popD <- slendr::population("popD", time = T_3, N = Ne_D, parent = popC)
+library(slendr)
+init_env(quiet = TRUE)
 
-  model <- slendr::compile_model(
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3) {
+  popA <- population("popA", time = 1,   N = Ne_A)
+  popB <- population("popB", time = T_1, N = Ne_B, parent = popA)
+  popC <- population("popC", time = T_2, N = Ne_C, parent = popB)
+  popD <- population("popD", time = T_3, N = Ne_D, parent = popC)
+
+  model <- compile_model(
     populations = list(popA, popB, popC, popD),
     generation_time = 1, simulation_length = 10000,
     direction = "forward"
@@ -42,7 +45,7 @@ test_that("broken grid leads to an expected error (strict = TRUE)", {
   expect_error(
     simulate_grid(model, grid, functions, replicates = 1,
                   sequence_length = 1e5, recombination_rate = 0, strict = TRUE),
-    "unused arguments"
+    "An unexpected error was raised"
   )
 })
 
