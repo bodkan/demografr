@@ -54,8 +54,8 @@ simulate_model <- function(
   # in parallel
   if (!arg_present(model) || !arg_present(parameters) || !length(parameters))
     stop("A model generating function and parameters must be provided", call. = FALSE)
-  # if(is.function(model) && (!arg_present(sequence_length) || !arg_present(recombination_rate)))
-  #   stop("Sequence length and recombination rate must be provided", call. = FALSE)
+  if (is.function(model) && (!arg_present(sequence_length) || !arg_present(recombination_rate)))
+    stop("Sequence length and recombination rate must be provided", call. = FALSE)
 
   if (inherits(parameters, "formula"))
     parameters <- list(parameters)

@@ -26,21 +26,21 @@ test_that("simulate_model generates a tree sequence from priors", {
     Ne_p4 ~ runif(1, 100)
   )
 
-  ts1 <- simulate_model(model, priors, engine = "msprime")
+  ts1 <- simulate_model(model, priors, engine = "msprime", sequence_length = 1e6, recombination_rate = 0)
   expect_s3_class(ts1, "slendr_ts")
 
   skip_if(Sys.which("slim") == "")
-  ts2 <- simulate_model(model, priors, engine = "slim")
+  ts2 <- simulate_model(model, priors, engine = "slim", sequence_length = 1e6, recombination_rate = 0)
   expect_s3_class(ts2, "slendr_ts")
 })
 
 test_that("simulate_model generates a tree sequence from a parameter list", {
   params <- list(Ne_p1 = 1, Ne_p2 = 2, Ne_p3 = 3, Ne_p4 = 4)
 
-  ts1 <- simulate_model(model, params, engine = "msprime")
+  ts1 <- simulate_model(model, params, engine = "msprime", sequence_length = 1e6, recombination_rate = 0)
   expect_s3_class(ts1, "slendr_ts")
 
   skip_if(Sys.which("slim") == "")
-  ts2 <- simulate_model(model, params, engine = "slim")
+  ts2 <- simulate_model(model, params, engine = "slim",, sequence_length = 1e6, recombination_rate = 0)
   expect_s3_class(ts2, "slendr_ts")
 })
