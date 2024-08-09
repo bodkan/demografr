@@ -97,4 +97,6 @@ get_engine <- function(slendr_model, engine) {
   engine
 }
 
+norm_path <- function(path) normalizePath(path, winslash = "/", mustWork = FALSE)
+
 utils::globalVariables(c("value", "."))
