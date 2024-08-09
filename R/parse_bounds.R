@@ -1,5 +1,6 @@
 call_stop <- function(f) {
   stop("A bounds expression must take the form of an R formula such as:\n\n",
+       "     <parameter> ~ between(<lower bound>, <upper bound>)\n",
        "     N_pop1 ~ between(1000, 5000)\n",
        "     T_pop2 ~ between(1, 10000)\n\n",
        "Alternatively, you can specify the bounds of multiple parameters as:\n\n",
@@ -32,6 +33,9 @@ parse_bound <- function(f) {
 }
 
 parse_bounds <- function(bounds, model, model_args) {
+  if (!is.list(bounds))
+    stop("Bounds expressions must be wrapped in a list", call. = FALSE)
+
   parsed_bounds <- lapply(bounds, parse_bound)
 
   # the order of parameters in the list of parsed parameter boundaries is not
