@@ -41,6 +41,6 @@ test_that("simulate_model generates a tree sequence from a parameter list", {
   expect_s3_class(ts1, "slendr_ts")
 
   skip_if(Sys.which("slim") == "")
-  ts2 <- simulate_model(model, params, engine = "slim",, sequence_length = 1e6, recombination_rate = 0)
+  ts2 <- simulate_model(model, params, engine = "slim", sequence_length = 1e6, recombination_rate = 0)
   expect_s3_class(ts2, "slendr_ts")
 })
