@@ -42,10 +42,12 @@
 simulate_grid <- function(
   model, grid, functions, replicates,
   sequence_length, recombination_rate, mutation_rate = 0,
-  packages = NULL, file = NULL,
+  data = NULL, format = c("ts", "files"), packages = NULL, file = NULL,
   engine = NULL, model_args = NULL, engine_args = NULL,
   strict = TRUE
 ) {
+  format <- match.arg(format)
+
   # make sure warnings are reported immediately before simulations are even started
   warning_length <- (length(colnames(grid)) + length(model_args)) * 50
   if (warning_length < 1000) warning_length <- 1000
@@ -88,7 +90,6 @@ simulate_grid <- function(
   its <- seq_len(nrow(grid))
   p <- progressr::progressor(along = its)
 
-  suppressPackageStartupMessages( # silence the super intrusive sp startup message
   results <- future.apply::future_lapply(
     X = its,
     FUN = function(grid_i) {
@@ -96,7 +97,7 @@ simulate_grid <- function(
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
-          quiet(res <- run_iteration(
+          res <- run_iteration(
             grid_i,
             model = model,
             params = parameters,
@@ -104,12 +105,14 @@ simulate_grid <- function(
             sequence_length = sequence_length,
             recombination_rate = recombination_rate,
             mutation_rate = mutation_rate,
+            data = data,
+            format = format,
             engine = engine,
             model_args = model_args,
             engine_args = engine_args,
             model_name = as.character(substitute(model)),
             attempts = 1
-          ))
+          )
           res$rep <- grid[grid_i, ]$rep
           res
         },
@@ -125,7 +128,6 @@ simulate_grid <- function(
     future.seed = TRUE,
     future.globals = globals,
     future.packages = c("slendr", packages)
-  )
   )
 
   invalid_runs <- vapply(results, function(run) all(is.na(run)), FUN.VALUE = logical(1))
