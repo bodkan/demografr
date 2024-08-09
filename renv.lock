@@ -1956,7 +1956,7 @@
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "output-path-handling",
-      "RemoteSha": "f3d8f0b7e7d15cdce7bac8bc27fe66c5b205e00f",
+      "RemoteSha": "a666fa19f6e5ba6f96f7234d98f917e04bcc39c2",
       "Requirements": [
         "R",
         "ape",
@@ -1974,7 +1974,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "54844180dd6bf9e46fb653bd77c25bdd"
+      "Hash": "82794b7c343179f3706182f4925da6e7"
     },
     "sourcetools": {
       "Package": "sourcetools",
