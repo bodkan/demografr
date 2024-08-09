@@ -33,7 +33,7 @@ ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = 42
 
 set.seed(SEED)
 
-samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
+samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
 
 pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
 d_df <- ts_divergence(ts, sample_sets = samples, mode = "branch")
@@ -51,11 +51,11 @@ priors <- list(
 )
 
 compute_diversity <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
+  samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
   ts_diversity(ts, sample_sets = samples, mode = "branch")
 }
 compute_divergence <- function(ts) {
-  samples <- ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
+  samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
   ts_divergence(ts, sample_sets = samples, mode = "branch")
 }
 functions <- list(diversity = compute_diversity, divergence = compute_divergence)
