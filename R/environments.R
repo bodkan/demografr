@@ -30,7 +30,7 @@ check_arguments <- function(fun, valid_args) {
   if (sum(match) != length(args))
     stop("The following function arguments are not valid: \"", args[!match], "\"",
          ".\nOnly arguments ", paste(paste0("\"", valid_args, "\""), collapse = ", "),
-         " are valid for user-defined function in the current model setup.", call. = FALSE)
+         " are valid in data-generating functions when format = \"ts\".", call. = FALSE)
 }
 
 # Generate data from simulated outputs using user-provided generator functions
