@@ -12,11 +12,12 @@ validate_abc(
   sequence_length = 10000,
   recombination_rate = 0,
   mutation_rate = 0,
-  quiet = FALSE,
-  attempts = 1000,
+  format = c("ts", "files"),
   engine = NULL,
   model_args = NULL,
-  engine_args = NULL
+  engine_args = NULL,
+  quiet = FALSE,
+  attempts = 1000
 )
 }
 \arguments{
@@ -38,12 +39,6 @@ tree sequences}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
-\item{quiet}{Should the log output of the validation be printed to the console?
-(Default is \code{TRUE}.)}
-
-\item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
-model (default is 1000)}
-
 \item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
 the built-in slendr simulation back ends. Which engine will be used is determined
 by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
@@ -57,6 +52,12 @@ Setting this argument for custom simulation script has no effect.}
 
 \item{engine_args}{Optional arguments for the slendr simulation back end. Setting this
 argument for custom simulation script has no effect.}
+
+\item{quiet}{Should the log output of the validation be printed to the console?
+(Default is \code{TRUE}.)}
+
+\item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
+model (default is 1000)}
 }
 \value{
 No return value. The function is ran for its terminal output.

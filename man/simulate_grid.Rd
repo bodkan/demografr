@@ -12,6 +12,8 @@ simulate_grid(
   sequence_length,
   recombination_rate,
   mutation_rate = 0,
+  data = NULL,
+  format = c("ts", "files"),
   packages = NULL,
   file = NULL,
   engine = NULL,
