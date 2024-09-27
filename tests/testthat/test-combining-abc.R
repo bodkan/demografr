@@ -1,15 +1,17 @@
 skip_if(!slendr::check_dependencies(python = TRUE))
-slendr::init_env(quiet = TRUE)
+
+library(slendr)
+init_env(quiet = TRUE)
 
 SEED <- 42
 
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
-  p1 <- slendr::population("p1", time = 1, N = 1000)
-  p2 <- slendr::population("p2", time = 2000, N = 3000, parent = p1)
-  p3 <- slendr::population("p3", time = 4000, N = 10000, parent = p2)
-  p4 <- slendr::population("p4", time = 6000, N = 5000, parent = p3)
+  p1 <- population("p1", time = 1, N = 1000)
+  p2 <- population("p2", time = 2000, N = 3000, parent = p1)
+  p3 <- population("p3", time = 4000, N = 10000, parent = p2)
+  p4 <- population("p4", time = 6000, N = 5000, parent = p3)
 
-  model <- slendr::compile_model(
+  model <- compile_model(
     populations = list(p1, p2, p3, p4),
     generation_time = 1,
     simulation_length = 10000, serialize = FALSE
@@ -27,13 +29,13 @@ samples <- list(
 
 m <- model(100, 2000, 5000, 800)
 
-ts <- slendr::msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = 42)
+ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = 42)
 
 set.seed(SEED)
 
-samples <- slendr::ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
+samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
 
-pi_df <- slendr::ts_diversity(ts, sample_sets = samples, mode = "branch")
+pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
 
 observed <- list(diversity = pi_df)
 
@@ -45,8 +47,8 @@ priors <- list(
 )
 
 compute_diversity <- function(ts) {
-  samples <- slendr::ts_samples(ts) %>% split(., .$pop) %>% lapply(`[[`, "name") %>% lapply(sample, 5)
-  slendr::ts_diversity(ts, sample_sets = samples, mode = "branch")
+  samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
+  ts_diversity(ts, sample_sets = samples, mode = "branch")
 }
 functions <- list(diversity = compute_diversity)
 

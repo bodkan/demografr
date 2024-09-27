@@ -1,11 +1,11 @@
 skip_if(!slendr::check_dependencies(python = TRUE))
-slendr::init_env(quiet = TRUE)
+init_env(quiet = TRUE)
 
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
-  p1 <- slendr::population("p1", time = 1, N = 1000)
-  p2 <- slendr::population("p2", time = 2000, N = 3000, parent = p1)
+  p1 <- population("p1", time = 1, N = 1000)
+  p2 <- population("p2", time = 2000, N = 3000, parent = p1)
 
-  model <- slendr::compile_model(
+  model <- compile_model(
     populations = list(p1, p2),
     generation_time = 1,
     simulation_length = 10000, serialize = FALSE
@@ -20,8 +20,8 @@ grid <- tidyr::crossing(
 )
 
 compute_diversity <- function(ts) {
-  samples <- list(slendr::ts_samples(ts)$name)
-  slendr::ts_diversity(ts, sample_sets = samples, mode = "branch")
+  samples <- list(ts_samples(ts)$name)
+  ts_diversity(ts, sample_sets = samples, mode = "branch")
 }
 functions <- list(diversity = compute_diversity)
 

@@ -42,6 +42,7 @@
 simulate_abc <- function(
   model, priors, functions, observed, iterations,
   sequence_length, recombination_rate, mutation_rate = 0,
+  data = NULL, format = c("ts", "files"),
   file = NULL, packages = NULL, attempts = 1000,
   engine = NULL, model_args = NULL, engine_args = NULL
 ) {
@@ -88,6 +89,33 @@ simulate_abc <- function(
   its <- seq_len(iterations)
   p <- progressr::progressor(along = its)
 
+  # unless a tree-sequence is supposed to be returned directly, create a
+  # temporary directory where a simulation script can store output files
+  format <- match.arg(format)
+  if (format == "ts") {
+    output_dir <- NULL
+  } else if (format == "files") {
+    output_dir <- normalizePath(paste0(tempfile(), "_demografr_outputs/"), winslash = "/", mustWork = FALSE)
+    dir.create(output_dir)
+  } else
+    stop("Unknown output format type '", format, "'. Valid values are 'ts' or 'files'.", call. = FALSE)
+
+  if (format == "files" && is.null(data))
+    stop("Models which generate custom files must provide a list of function(s)\n",
+         "which will convert them to inputs for summary statistics.", call. = FALSE)
+
+  if (engine == "msprime" && format != "ts")
+    stop("When using the slendr msprime engine, \"ts\" is the only valid output format",
+         call. = FALSE)
+
+  data_expr <- base::substitute(data)
+  if (is.symbol(data_expr))
+    data_expr <- data
+  if (format == "ts")
+    validate_user_functions(data_expr, valid_args = c("ts", "model"))
+  else
+    validate_user_functions(data_expr, valid_args = c("path", "model"))
+
   results <- future.apply::future_lapply(
     X = its,
     FUN = function(i) {
@@ -100,11 +128,13 @@ simulate_abc <- function(
         sequence_length = sequence_length,
         recombination_rate = recombination_rate,
         mutation_rate = mutation_rate,
+        data = data,
+        format = format,
         engine = engine,
         model_args = model_args,
         engine_args = engine_args,
         model_name = model_name,
-        attempts = attempts,
+        attempts = attempts
       )
     },
     future.seed = TRUE,

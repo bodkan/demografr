@@ -38,7 +38,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
 
     n_tries <- n_tries + 1
 
-    output <- tryCatch(
+    result <- tryCatch(
       {
         # sample model parameters from the prior or use the parameters as given
         if (model_is_sampled)
@@ -112,7 +112,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
         if (model_is_sampled && any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
           return(NULL)
         } else { # if an unexpected error ocurred, report it in full
-          cat(" \u274C\n\n")
+          cross <- " \u274C\n\n"
           if (is.function(model)) {
             # compose parameters for the complete model function call
             # (i.e. priors and non-prior arguments to the model generating function)
@@ -124,7 +124,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
                     FUN.VALUE = character(1)),
               collapse = ", "
             )
-            stop("An unexpected error was raised when generating data from a slendr model\n",
+            stop(cross, "An unexpected error was raised when generating data from a slendr model\n",
                 "using the provided slendr function.\n\nThe error message received was:\n",
                 msg,
                 "\n\nPerhaps re-running the model function with the sampled parameters will\n",

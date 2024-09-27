@@ -37,8 +37,11 @@
 #' @export
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
-                         quiet = FALSE, attempts = 1000,
-                         engine = NULL, model_args = NULL, engine_args = NULL) {
+                         format = c("ts", "files"),
+                         engine = NULL, model_args = NULL, engine_args = NULL,
+                         quiet = FALSE, attempts = 1000) {
+  format <- match.arg(format)
+
   if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||!length(priors))
     stop("A model generating function, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
@@ -155,11 +158,11 @@ validate_abc <- function(model, priors, functions, observed,
   cat("---------------------------------------------------------------------\n")
 
   cat("Simulating tree sequence from the given model...")
-  output <- run_simulation(model, priors, sequence_length, recombination_rate,
-                       mutation_rate, engine = engine,
-                       model_args = model_args,
-                       engine_args = engine_args, attempts = 1000,
-                       model_name = substitute(model))$output
+  data <- run_simulation(model, priors, sequence_length, recombination_rate,
+                         mutation_rate, engine = engine,
+                         model_args = model_args,
+                         engine_args = engine_args, format = format,
+                         attempts = 1000, model_name = substitute(model))$data
   cat(" \u2705\n")
 
   cat("---------------------------------------------------------------------\n")
@@ -169,7 +172,7 @@ validate_abc <- function(model, priors, functions, observed,
   simulated_stats <- list()
   for (stat in names(functions)) {
     cat(sprintf("  * %s", stat))
-    simulated_stats[[stat]] <- tryCatch(functions[[stat]](output),
+    simulated_stats[[stat]] <- tryCatch(functions[[stat]](data),
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)

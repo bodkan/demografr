@@ -40,7 +40,7 @@
 simulate_model <- function(
     model, parameters,
     sequence_length, recombination_rate, mutation_rate = 0,
-    data_funs = NULL, format = c("ts", "files"),
+    data = NULL, format = c("ts", "files"),
     engine = NULL, model_args = NULL, engine_args = NULL,
     attempts = 1000
 ) {
@@ -71,17 +71,13 @@ simulate_model <- function(
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   format <- match.arg(format)
-  if (format == "files" && missing(data_funs))
+  if (format == "files" && missing(data))
       stop("Models which generate custom files require a list of data function(s)\n",
            "which will process them for computation of summary statistics.", call. = FALSE)
 
-  if (engine == "msprime" && format != "ts")
-    stop("When using the msprime engine, \"ts\" is the only valid output format",
-         call. = FALSE)
-
-  data_expr <- base::substitute(data_funs)
+  data_expr <- base::substitute(data)
   if (is.symbol(data_expr))
-    data_expr <- data_funs
+    data_expr <- data
 
   if (format == "ts")
     validate_user_functions(data_expr, valid_args = c("ts", "model"))
