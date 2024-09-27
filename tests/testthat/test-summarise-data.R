@@ -18,7 +18,7 @@ initialize() {
 }
 
 SIMULATION_END late() {
-    ts_file = PATH + "/output.trees";
+    ts_file = PATH + "/slim.trees";
     stats_file = PATH + "/stats.tsv";
 
     // save tree sequence
@@ -53,7 +53,7 @@ model <- function(split_time) {
 }
 
 # m <- model(10)
-# slim(m$model, samples = m$samples, sequence_length = 1e6, recombination_rate = 1e-8, output_dir = "/tmp/testing")
+# slim(m$model, samples = m$samples, sequence_length = 1e6, recombination_rate = 1e-8, path = "/tmp/testing")
 
 data <- simulate_model(
   model, parameters = list(split_time = 100),
