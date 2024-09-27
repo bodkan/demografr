@@ -18,8 +18,8 @@ initialize() {
 }
 
 SIMULATION_END late() {
-    ts_file = OUTPUT_DIR + "/output.trees";
-    stats_file = OUTPUT_DIR + "/stats.tsv";
+    ts_file = PATH + "/output.trees";
+    stats_file = PATH + "/stats.tsv";
 
     // save tree sequence
     save_ts(ts_file);
@@ -59,10 +59,10 @@ data <- simulate_model(
   model, parameters = list(split_time = 100),
   sequence_length = 1e6, recombination_rate = 1e-8,
   engine = "slim",
-  data_type = "custom",
+  format = "files",
   data = list(
-    ts = function(path, model) file.path(path, "output.trees") %>% ts_load(model),
-    samples = function(path, model) file.path(path, "output.trees") %>% ts_load(model) %>% ts_names(split = "pop"),
+    ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
+    samples = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_names(split = "pop"),
     stats = function(path) file.path(path, "stats.tsv") %>% read.table(header = TRUE)
   )
 )
@@ -92,10 +92,10 @@ test_that("summarise_data can utilize summaries computed already as data", {
     model, parameters = list(split_time = 100),
     sequence_length = 1e6, recombination_rate = 1e-8,
     engine = "slim",
-    data_type = "custom",
+    format = "files",
     data = list(
       ts_pi = function(path, model) {
-        ts <- file.path(path, "output.trees") %>% ts_load(model)
+        ts <- file.path(path, "slim.trees") %>% ts_load(model)
         ts_diversity(ts, ts_names(ts, split = "pop"))
       },
       slim_pi = function(path) file.path(path, "stats.tsv") %>%
