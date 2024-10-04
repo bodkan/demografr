@@ -26,7 +26,7 @@ must be "files").}
 
 \item{parameters}{A list of prior distributions to use for sampling of model parameters}
 
-\item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of base pairs).
+\item{sequence_length}{Amount of sequence to simulate using slendr (in base pairs).
 Ignored when custom simulations scripts are provided.}
 
 \item{recombination_rate}{Recombination rate to use for the simulation

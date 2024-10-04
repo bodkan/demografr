@@ -28,12 +28,13 @@ must be "custom").}
 
 \item{priors}{A list of prior distributions to use for sampling of model parameters}
 
-\item{functions}{A named list of summary statistic functions to apply on simulated
-tree sequences}
+\item{functions}{A named list of summary statistic functions to apply on different
+simulated results (tree sequences or custom files)}
 
 \item{observed}{A named list of observed summary statistics}
 
-\item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
+\item{sequence_length}{Amount of sequence to simulate using slendr (in base pairs).
+Ignored when custom simulations scripts are provided.}
 
 \item{recombination_rate}{Recombination rate to use for the simulation}
 

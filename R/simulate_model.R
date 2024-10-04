@@ -11,7 +11,7 @@
 #'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
 #'   must be "files").
 #' @param parameters A list of prior distributions to use for sampling of model parameters
-#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of base pairs).
+#' @param sequence_length Amount of sequence to simulate using slendr (in base pairs).
 #'   Ignored when custom simulations scripts are provided.
 #' @param recombination_rate Recombination rate to use for the simulation
 #'   Ignored when custom simulations scripts are provided.

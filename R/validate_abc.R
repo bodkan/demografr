@@ -10,10 +10,11 @@
 #'   or a path to a custom user-defined SLiM or msprime script (in which case \code{engine}
 #'   must be "custom").
 #' @param priors A list of prior distributions to use for sampling of model parameters
-#' @param functions A named list of summary statistic functions to apply on simulated
-#'   tree sequences
+#' @param functions A named list of summary statistic functions to apply on different
+#'   simulated results (tree sequences or custom files)
 #' @param observed A named list of observed summary statistics
-#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
+#' @param sequence_length Amount of sequence to simulate using slendr (in base pairs).
+#'   Ignored when custom simulations scripts are provided.
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param quiet Should the log output of the validation be printed to the console?

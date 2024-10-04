@@ -9,7 +9,8 @@
 #' @param functions A named list of summary statistic functions to apply on simulated
 #'   tree sequences
 #' @param replicates How many simulation replicates to run for each parameter combination?
-#' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
+#' @param sequence_length Amount of sequence to simulate using slendr (in base pairs).
+#'   Ignored when custom simulations scripts are provided.
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
 #' @param packages A character vector with package names used by user-defined summary statistic

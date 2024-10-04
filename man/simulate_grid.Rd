@@ -33,7 +33,8 @@ tree sequences}
 
 \item{replicates}{How many simulation replicates to run for each parameter combination?}
 
-\item{sequence_length}{Amount of sequence to simulate using slendr (in numbers of basepairs)}
+\item{sequence_length}{Amount of sequence to simulate using slendr (in base pairs).
+Ignored when custom simulations scripts are provided.}
 
 \item{recombination_rate}{Recombination rate to use for the simulation}
 
