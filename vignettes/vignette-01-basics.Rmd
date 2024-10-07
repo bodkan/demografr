@@ -23,7 +23,6 @@ knitr::opts_chunk$set(
 data_path <- here::here("inst/examples/basics_abc.rds")
 
 devtools::load_all()
-devtools::load_all("~/Projects/slendr")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -53,7 +52,7 @@ example_model <- compile_model(
 ts <- msprime(example_model, sequence_length = 200e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
-samples <- slendr::ts_names(ts, split = "pop")
+samples <- ts_names(ts, split = "pop")
 A <- samples["popA"]
 B <- samples["popB"]
 C <- samples["popC"]
