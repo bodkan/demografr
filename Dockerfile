@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.3.1
+FROM rocker/rstudio:4.4.1
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
@@ -61,7 +61,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.1.tar.gz -O slim.tar.gz; \
+RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
@@ -77,13 +77,15 @@ WORKDIR $PROJECT
 ENV R_INSTALL_STAGED=FALSE
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV RENV_CONFIG_INSTALL_TRANSACTIONAL=FALSE
-ENV RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.5.tar.gz"
-RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.5.tar.gz -O $RENV_BOOTSTRAP_TARBALL
+ENV RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.10.tar.gz"
+RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.10.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 
 # run this when first setting up the container to create an renv.lock file:
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
-#   - renv::init(bare = TRUE, bioconductor = "3.17")
+#   - export GITHUB_PAT=''
+#   - renv::init(bare = TRUE, bioconductor = "3.19")
 #   - options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
+#   - renv::snapshot()
 
 # for 'production' builds, restore all R dependencies at their locked-in versions
 COPY DESCRIPTION .
@@ -95,7 +97,7 @@ RUN R -e 'renv::restore()'
 # rather than installing a separate Python interpreter, use the Python environment
 # that's installed and used by slendr, in order to avoid version compatibility issues
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-ENV PATH="${BIN}:${HOME}/.local/share/Python-3.12_msprime-1.3.0_tskit-0.5.6_pyslim-1.0.4_tspop-0.0.2:${PATH}"
+ENV PATH="${BIN}:${HOME}/.local/share/Python-3.12_msprime-1.3.3_tskit-0.5.8_pyslim-1.0.4_tspop-0.0.2:${PATH}"
 
 # put personal dotfiles into the container
 ENV IN_DOCKER=true
