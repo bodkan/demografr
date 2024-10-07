@@ -73,6 +73,11 @@ ENV PROJECT=/project
 # setup all required R and Python packages
 WORKDIR $PROJECT
 
+# put personal dotfiles into the container
+ENV IN_DOCKER=true
+RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
+    cd ~/.dotfiles; ./install.sh
+
 # install R dependencies
 ENV R_INSTALL_STAGED=FALSE
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
@@ -85,7 +90,7 @@ RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.10.tar.gz -O $RE
 #   - export GITHUB_PAT=''
 #   - renv::init(bare = TRUE, bioconductor = "3.19")
 #   - options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
-#   - renv::snapshot()
+#   - renv::snapshot(dev = TRUE)
 
 # for 'production' builds, restore all R dependencies at their locked-in versions
 COPY DESCRIPTION .
@@ -98,11 +103,6 @@ RUN R -e 'renv::restore()'
 # that's installed and used by slendr, in order to avoid version compatibility issues
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
 ENV PATH="${BIN}:${HOME}/.local/share/Python-3.12_msprime-1.3.3_tskit-0.5.8_pyslim-1.0.4_tspop-0.0.2:${PATH}"
-
-# put personal dotfiles into the container
-ENV IN_DOCKER=true
-RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
-    cd ~/.dotfiles; ./install.sh
 
 # set the default directory of RStudio Server to the project directory
 RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
