@@ -3,6 +3,26 @@
     "Version": "4.4.1",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.19/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.19/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.19/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.19/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.19/books"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://p3m.dev/cran/latest"
       }
@@ -1903,9 +1923,14 @@
     },
     "slendr": {
       "Package": "slendr",
-      "Version": "0.9.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
+      "Version": "0.9.1.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "slendr",
+      "RemoteUsername": "bodkan",
+      "RemoteRef": "output-path-handling",
+      "RemoteSha": "3a55cbe1bc052a78be226853876245e71b729ab0",
       "Requirements": [
         "R",
         "ape",
@@ -1923,7 +1948,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "c717e37c46acf7e032c9f35de192a606"
+      "Hash": "f6f3a04c01bc0a46150430f5aba84335"
     },
     "sourcetools": {
       "Package": "sourcetools",
