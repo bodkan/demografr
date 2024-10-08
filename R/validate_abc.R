@@ -110,7 +110,7 @@ validate_abc <- function(model, priors, functions, observed,
 
     # check that a prior for each argument of a model generating function is provided
     # (and that other function arguments are also provided)
-    cat("Checking the presence of required function arguments...")
+    cat("Checking the presence of required model function arguments...")
 
     # first expand any generic "..." prior sampling expressions (if needed)
     priors <- tryCatch(

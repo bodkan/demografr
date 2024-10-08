@@ -79,7 +79,8 @@ simulate_abc <- function(
     names(model_args),
     names(engine_args)
   ) %>%
-    unlist()
+    unlist() %>%
+    unique()
 
   if (is.function(model))
     priors <- expand_formulas(priors, model, model_args) #%>% strip_prior_environments()
@@ -95,17 +96,17 @@ simulate_abc <- function(
   if (format == "ts") {
     output_dir <- NULL
   } else if (format == "files") {
-    output_dir <- normalizePath(paste0(tempfile(), "_demografr_outputs/"), winslash = "/", mustWork = FALSE)
+    output_dir <- normalizePath(paste0(tempfile(), "_demografr_files/"), winslash = "/", mustWork = FALSE)
     dir.create(output_dir)
   } else
     stop("Unknown output format type '", format, "'. Valid values are 'ts' or 'files'.", call. = FALSE)
 
   if (format == "files" && is.null(data))
     stop("Models which generate custom files must provide a list of function(s)\n",
-         "which will convert them to inputs for summary statistics.", call. = FALSE)
+         "which will convert them for computing summary statistics.", call. = FALSE)
 
   if (engine == "msprime" && format != "ts")
-    stop("When using the slendr msprime engine, \"ts\" is the only valid output format",
+    stop("When using the slendr msprime engine, \"ts\" is the only valid data format",
          call. = FALSE)
 
   data_expr <- base::substitute(data)
