@@ -99,10 +99,15 @@ Imagine that we sequenced genomes of individuals from populations "popA", "popB"
 Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about the values of $N_e$, split times, or gene-flow rates):
 
 ```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
+orig_par <- par(no.readonly = TRUE)
+
 par(mar = c(0, 0, 0, 0))
+
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree)
 arrows(2.5, 2, 2.5, 3, col="blue")
+
+par(orig_par)
 ```
 
 After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a one $f_4$ statistic, observing the following values of these summary statistics (which we saved in standard R data frames&mdash;perhaps saved by software we used for computing these from empirical sequence data):
@@ -279,7 +284,7 @@ tstart <- Sys.time()
 
 ```{r, eval=!file.exists(data_path)}
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 100,
+  model, priors, functions, observed, iterations = 10000,
   sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
@@ -353,7 +358,7 @@ plot_prediction(predictions, "divergence")
 ```
 
 ```{r, postpred_f4}
-plot_prediction(predictions, "f4")
+plot_prediction(predictions, "f4") + ggplot2::geom_vline(xintercept = 0)
 ```
 
 **Nice! It appears that the posterior from our simplistic model captures the observed summary statistics (dashed vertical lines) quite well.**
@@ -409,7 +414,7 @@ plot_posterior(abc, param = "T") + ggplot2::coord_cartesian(xlim = c(0, 10000))
 And the same is true for the gene-flow rate:
 
 ```{r, posterior_gf, fig.width=8, fig.height=5}
-plot_posterior(abc, param = "gf") + ggplot2::coord_cartesian(xlim = c(0, 1))
+plot_posterior(abc, param  = "gf") + ggplot2::coord_cartesian(xlim = c(0, 1))
 ```
 
 Because the internals of _demografr_ ABC objects are represented by standard objects created by the _abc_ package, we have many of the standard diagnostics functions of the _abc_ R package at our disposal. For instance, we can use the standard function `plot()` to verify that the posterior (red line) for one of the split times matches the prior (dashed line), suggesting that the data we provided (nucleotide diversity and pairwise divergence) are not sufficient statistics to capture enough information about population divergences.
