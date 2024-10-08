@@ -78,16 +78,12 @@ ENV IN_DOCKER=true
 RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
     cd ~/.dotfiles; ./install.sh
 
-# install R dependencies
-ENV R_INSTALL_STAGED=FALSE
+# save R packages to home inside the container to avoid cluttering the project directory
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
-ENV RENV_CONFIG_INSTALL_TRANSACTIONAL=FALSE
-ENV RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.10.tar.gz"
 
 # do this when first setting up the container to create an renv.lock file:
-# RUN wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.10.tar.gz -O $RENV_BOOTSTRAP_TARBALL
-#
-# then run these:
+#   - export RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.10.tar.gz"
+#   - wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.10.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   - export GITHUB_PAT=''
 #   - renv::init(bare = TRUE, bioconductor = "3.19")
