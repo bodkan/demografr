@@ -29,7 +29,7 @@ devtools::load_all()
 library(demografr)
 library(slendr)
 
-init_env()
+init_env(quiet = TRUE)
 
 SEED <- 42
 set.seed(SEED)
@@ -249,6 +249,8 @@ Of course, having to run ABC simulations in order to check that the summary func
 
 ```{r}
 ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8)
+
+ts
 ```
 
 With this `ts` object, we can, for instance, test that our `compute_f4` summary function is defined correctly (meaning that it returns $f_4$` statistics table formatted in exactly the same way as the observed table above):
@@ -277,7 +279,7 @@ tstart <- Sys.time()
 
 ```{r, eval=!file.exists(data_path)}
 data <- simulate_abc(
-  model, priors, functions, observed, iterations = 10000,
+  model, priors, functions, observed, iterations = 100,
   sequence_length = 50e6, recombination_rate = 1e-8, mutation_rate = 1e-8
 )
 ```
