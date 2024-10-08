@@ -93,12 +93,7 @@ simulate_abc <- function(
   # unless a tree-sequence is supposed to be returned directly, create a
   # temporary directory where a simulation script can store output files
   format <- match.arg(format)
-  if (format == "ts") {
-    output_dir <- NULL
-  } else if (format == "files") {
-    output_dir <- normalizePath(paste0(tempfile(), "_demografr_files/"), winslash = "/", mustWork = FALSE)
-    dir.create(output_dir)
-  } else
+  if (!format %in% c("ts", "files"))
     stop("Unknown output format type '", format, "'. Valid values are 'ts' or 'files'.", call. = FALSE)
 
   if (format == "files" && is.null(data))
