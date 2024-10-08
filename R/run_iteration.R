@@ -30,7 +30,7 @@ run_iteration <- function(it,
 
   if (format == "ts") {
     if (mutation_rate != 0)
-      result_data <- ts = slendr::ts_mutate(result_data, mutation_rate = mutation_rate)
+      result_data <- slendr::ts_mutate(result_data, mutation_rate = mutation_rate)
 
     # clean up if needed
     if (!is.null(attr(result_data, "path")))
