@@ -14,6 +14,7 @@
 #'   plots are instead saved to a file.
 #'
 #' @export
+#' @import ggplot2
 plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) {
   observed <- attr(data, "components")$observed
 
