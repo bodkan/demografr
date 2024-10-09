@@ -450,7 +450,7 @@ abc::gfitpca(target = observed_stats, sumstat = model_stats, index = model_names
 ```
 
 <!-- ```{r} -->
-<!-- abcX <- readRDS("inst/examples/basics_abc.rds") -->
+<!-- abcX <- readRDS("inst/examples/basic_abc.rds") -->
 <!-- ``` -->
 
 

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
   dpi = 80
 )
 
-data_path <- here::here("inst/examples/basics_abc.rds")
+data_path <- here::here("inst/examples/basic_abc.rds")
 
 if (!file.exists(data_path))
   stop("Run vignette-01-basics first to generate data", call. = FALSE)
