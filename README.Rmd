@@ -97,11 +97,16 @@ Imagine that we sequenced genomes of individuals from populations "popA", "popB"
 
 Let's also assume that we know that the three populations are phylogenetically related in the following way with an indicated gene-flow event at a certain time in the past, but we don't know anything else (i.e., we have no idea about their $N_e$ or split times):
 
-```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5, fig.align="center"}
+```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
+orig_par <- par(no.readonly = TRUE)
+
 par(mar = c(0, 0, 0, 0))
+
 tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
 plot(tree)
 arrows(2.5, 2, 2.5, 3, col="blue")
+
+par(orig_par)
 ```
 
 After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations as well as their pairwise genetic divergence, and observed the following values which we saved in two standard R data frames:
@@ -220,9 +225,9 @@ compute_f4 <- function(ts) {
   A <- samples["popA"]; B <- samples["popB"]
   C <- samples["popC"]; D <- samples["popD"]
   rbind(
-    ts_f4(ts, A, B, C, D),
-    ts_f4(ts, A, C, B, D),
-    ts_f4(ts, A, D, B, C)
+    ts_f4(ts, A, B, C, D)
+    # ts_f4(ts, A, C, B, D),
+    # ts_f4(ts, A, D, B, C)
   )
 }
 
