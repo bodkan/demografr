@@ -389,7 +389,7 @@ data <- simulate_abc(
 
 end <- Sys.time()
 end - start # 5.5 hours
-saveRDS(end-start, "time.rds")
+saveRDS(end-start, here::here("inst/examples/tracts_time.rds"))
 ```
 
 ```{r, eval=!file.exists(data_path)}
