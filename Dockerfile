@@ -101,7 +101,7 @@ RUN R -e 'renv::restore()'
 # rather than installing a separate Python interpreter, use the Python environment
 # that's installed and used by slendr, in order to avoid version compatibility issues
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.3_tskit-0.5.6_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
+ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.3_tskit-0.5.8_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 # set the default directory of RStudio Server to the project directory
