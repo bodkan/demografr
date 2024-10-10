@@ -100,6 +100,15 @@ simulate_model <- function(
     format = format,
     attempts = attempts, model_name = substitute(model))
 
+  if (format == "ts") {
+    if (mutation_rate != 0)
+      result$data <- slendr::ts_mutate(result$data, mutation_rate = mutation_rate)
+
+    # clean up if needed
+    if (!is.null(attr(result$data, "path")))
+      unlink(attr(result$data, "path"))
+  }
+
   # if no user-defined generators were provided, return output as it is
   if (is.null(data_expr))
     return(result$data)
