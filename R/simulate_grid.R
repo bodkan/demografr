@@ -17,7 +17,8 @@
 #'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 #'   sure that the parallelized tree-sequence summary statistic functions have all of their
 #'   packages available.
-#' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
+#' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results.
+#'   If this path is set, the results data frame is returned but invisibly.
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
 #'   the built-in slendr simulation back ends. Which engine will be used is determined
 #'   by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
@@ -177,6 +178,8 @@ simulate_grid <- function(
 
   if (is.null(file))
     return(results_df)
-  else
+  else {
     saveRDS(results_df, file)
+    return(invisible(results_df))
+  }
 }

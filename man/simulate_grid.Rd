@@ -45,7 +45,8 @@ functions. Only relevant when parallelization is set up using \code{future::plan
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.}
 
-\item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
+\item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results.
+If this path is set, the results data frame is returned but invisibly.}
 
 \item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
 the built-in slendr simulation back ends. Which engine will be used is determined
