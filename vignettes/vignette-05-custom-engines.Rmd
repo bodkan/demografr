@@ -52,15 +52,13 @@ In order to be able to use a custom SLiM or msprime script with _demografr_, the
 
 - **For a SLiM script**, this means something like `slim <command-line arguments> <your script>.slim`.
 
-### 2. It must accept three mandatory arguments with these exact names
+### 2. It must accept `--path` argument pointing to a directory where results will be saved
 
-- `sequence_length`: the amount of sequence to simulated
-- `recombination_rate`: the recombination rate along the simulated sequence (in units of crossovers per basepair pergeneration)
-- `output_path`: the path where the simulated tree-sequence object will be saved
+This is analogous to the `path =` argument of _slendr_ functions `slim()` and `msprime()`.
 
-**For an msprime script**, these parameters can be specified via the Python built-in module `argparse`, and provided on the command-line as `--sequence_length <value>`, `--recombination_rate <value>`, and `--output_path <path>`. In the script itself, if you use the `argparse` module and have thus the values of provided arguments (for instance) in an `args` object, you can then refer to these arguments as `args.sequence_length`, etc.
+**For an msprime script**, this parameter can be specified via the Python built-in module `argparse`, and provided on the command-line as `--path <path to a directory>`. In the script itself, if you use the `argparse` module and have thus the values of provided arguments (for instance) in an `args` object, you can then refer to these arguments as `args.path`, etc.
 
-**For a SLiM script**, these parameters can be specified via SLiM's standard way of supplying command-line arguments as `-d sequence_length=<value>`, `-d recombination_rate=<value>`, and `-d "output_path='<path>'"`. Importantly, note SLiM's format of specifying string arguments for the `output_path` argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to these arguments via constants `sequence_length`, `recombination_rate`, and `output_path`.
+**For a SLiM script**, this parameter can be specified via SLiM's standard way of supplying command-line arguments as `-d "path='<path to a directory>'"`. Importantly, note SLiM's format of specifying string arguments for the `path` argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to this argument via constant `path`.
 
 ### 3. All model parameters must be provided as additional command-line arguments
 
@@ -71,9 +69,7 @@ You can refer to them in your script as you would to the mandatory arguments as 
 ```
 python \
   <path to your Python script>                   \
-  --sequence_length <number>                     \
-  --recombination_rate <number>                  \
-  --output_path <path to the output .trees file> \
+  --path <path to the directory with simulation results> \
   <... your model parameters ...>
 ```
 
@@ -81,15 +77,13 @@ Or, if you want to run a SLiM-powered ABC, like this:
 
 ```
 slim \
-  -d sequence_length=<number>                         \
-  -d recombination_rate=<number>                      \
-  -d "output_path='<path to the output .trees file>'" \
+  -d "path='<path to the directory with simulation results>'" \
   <... your model parameters ...>
 ```
 
-Then, if you get a `.trees` file, you're good to go!
+Then, if you get a your desired simulation results in the given directory, you're good to go!
 
-**Note** that mutation rate is not among the list of mandatory parameters for your script. Neutral mutations are taken care of via tree-sequence mutation process after the simulation is finished. If this sounds weird to you, take a look at some tree-sequence-related materials like [this](https://tskit.dev/tutorials/no_mutations.html).
+**Below you are going to see how to actually read back simulation results from disk and use them for computing summary statistics. For now, just note that you can name your output files however you like.**
 
 ## ABC analysis using custom-defined simulation scripts
 
@@ -166,9 +160,9 @@ functions <- list(
   }
 )
 
-# summary-input generating functions
-inputs <- list(
-  ts = ts_load
+# data-generating functions for computing summary statistics
+data <- list(
+  ts = function(path) ts_load(file.path(path, "result.trees"))
 )
 ```
 
@@ -181,11 +175,7 @@ As we explained elsewhere, a useful function for developing inference pipelines 
 For instance, we can simulate a couple of Mb of testing sequence from our _msprime_ script like this:
 
 ```{r}
-output <- simulate_model(
-  model = python_script, parameters = list(Ne = 1234),
-  engine_args = list(seq_len = 10e6, rec_rate = 1e-8, mut_rate = 1e-8),
-  inputs = inputs
-)
+result_msprime <- simulate_model(model = python_script, parameters = list(Ne = 123), format = "files", data = data)
 ```
 
 (Of course we could've plugged in the `python_script` instead.)
@@ -193,10 +183,16 @@ output <- simulate_model(
 Now we can finally test our little toy tree-sequence summary function, verifying that we can indeed compute the summary statistic we want to:
 
 ```{r}
-functions$diversity(output)
+functions$diversity(result_msprime$ts)
 ```
 
 The function works as expected&mdash;we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.
+
+```{r}
+result_slim <- simulate_model(model = slim_script, parameters = list(Ne = 123), format = "files", data = data)
+
+functions$diversity(result_slim$ts)
+```
 
 ### Running an ABC analysis
 
@@ -205,7 +201,7 @@ Having all components of our pipeline set up we should, again, validate everythi
 Let's first validate all components of our pipeline:
 
 ```{r}
-validate_abc(python_script, priors, functions, observed)
+validate_abc(python_script, priors, functions, observed, data = data, format = "files")
 ```
 
 Looking good! Now let's first run ABC simulations. Again, note the use of the Python script where we would normally plug in a _slendr_ model function in place of the `model` argument:

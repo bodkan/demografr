@@ -33,7 +33,7 @@ check_arguments <- function(fun, valid_args) {
          " are valid in data-generating functions when format = \"ts\".", call. = FALSE)
 }
 
-# Generate data from simulated outputs using user-provided generator functions
+# Evaluate functions in a given environment (list of objects)
 evaluate_functions <- function(generators, env) {
   # the parent had to substitute the user list, so let's revert that back
   # to standard R code

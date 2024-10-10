@@ -12,7 +12,7 @@ summarise_data <- function(data, functions) {
   # a variable), evaluate it to get the actual list
   if (is.symbol(functions_expr))
     functions <- eval(functions_expr, envir = parent.frame())
-  else
+  else if (!is.list(functions))
     functions <- functions_expr
 
   validate_user_functions(functions, valid_args = names(data))

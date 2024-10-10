@@ -38,7 +38,7 @@
 #' @export
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
-                         format = c("ts", "files"),
+                         format = c("ts", "files"), data = NULL,
                          engine = NULL, model_args = NULL, engine_args = NULL,
                          quiet = FALSE, attempts = 1000) {
   format <- match.arg(format)
@@ -59,13 +59,28 @@ validate_abc <- function(model, priors, functions, observed,
   cat("======================================================================\n")
 
   prior_samples <- list()
+  format <- match.arg(format)
+  if (format == "files" && missing(data))
+      stop("Models which generate custom files require a list of data function(s)\n",
+           "which will process them for computation of summary statistics.", call. = FALSE)
 
+  data_expr <- base::substitute(data)
+  if (is.symbol(data_expr))
+    data_expr <- data
+
+  if (!is.function(model) && format != "files")
+    stop("Custom simulation scripts must be run with `format = \"files\"`", call. = FALSE)
+
+  if (format == "ts")
+    validate_user_functions(data_expr, valid_args = c("ts", "model"))
+  else
+    validate_user_functions(data_expr, valid_args = c("path", "model"))
   prior_names <- get_param_names(priors)
 
   cat("Testing sampling of each prior parameter:\n")
 
   for (i in seq_along(priors)) {
-    cat(sprintf("  * %s", prior_names[i]))
+    cat(sprintf("  - %s", prior_names[i]))
 
     prior_sample <- tryCatch(
       sample_prior(priors[[i]]),
@@ -142,7 +157,7 @@ validate_abc <- function(model, priors, functions, observed,
     cat(" \u2705\n")
   } else {
     script_contents <- readLines(model)
-    script_engine <- if (any(grepl("treeSeqOutput\\(output_path", script_contents))) "SLiM" else "msprime"
+    script_engine <- if (any(grepl("treeSeqOutput\\(", script_contents))) "SLiM" else "msprime"
 
     cat("The model is a custom user-defined", script_engine, "script\n")
 
@@ -159,21 +174,63 @@ validate_abc <- function(model, priors, functions, observed,
   cat("---------------------------------------------------------------------\n")
 
   cat("Simulating tree sequence from the given model...")
-  data <- run_simulation(model, priors, sequence_length, recombination_rate,
+  result <- run_simulation(model, priors, sequence_length, recombination_rate,
                          mutation_rate, engine = engine,
                          model_args = model_args,
                          engine_args = engine_args, format = format,
-                         attempts = 1000, model_name = substitute(model))$data
+                         attempts = 1000, model_name = substitute(model))
   cat(" \u2705\n")
+
+  if (is.null(data)) {
+    data <- list(ts = result$data)
+  } else {
+    cat("---------------------------------------------------------------------\n")
+
+    cat("Validating custom data-generating functions... ")
+
+    format <- match.arg(format)
+    if (format == "files" && missing(data))
+      stop("Models which generate custom files require a list of data function(s)\n",
+           "which will process them for computation of summary statistics.", call. = FALSE)
+
+    data_expr <- base::substitute(data)
+    if (is.symbol(data_expr))
+      data_expr <- data
+
+    if (!is.function(model) && format != "files")
+      stop("Custom simulation scripts must be run with `format = \"files\"`", call. = FALSE)
+
+    if (format == "ts")
+      validate_user_functions(data_expr, valid_args = c("ts", "model"))
+    else
+      validate_user_functions(data_expr, valid_args = c("path", "model"))
+
+    cat(" \u2705\n")
+
+    cat("---------------------------------------------------------------------\n")
+
+    cat("Generating data from simulation results:\n")
+
+    env <- populate_data_env(result)
+    data <- evaluate_functions(data_expr, env)
+    for (x in names(data)) {
+      cat(sprintf("  - %s (type %s) ", x, as.character(class(data[[x]])[1])))
+      cat("\u2705\n")
+    }
+
+  }
 
   cat("---------------------------------------------------------------------\n")
 
   cat("Computing user-defined summary functions:\n")
 
+  env <- list2env(data)
   simulated_stats <- list()
   for (stat in names(functions)) {
-    cat(sprintf("  * %s", stat))
-    simulated_stats[[stat]] <- tryCatch(functions[[stat]](data),
+    cat(sprintf("  - %s", stat))
+    simulated_stats[[stat]] <- tryCatch(
+      # functions[[stat]](data),
+      evaluate_functions(functions[stat], env)[[stat]],
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)
@@ -187,20 +244,20 @@ validate_abc <- function(model, priors, functions, observed,
 
   missing_names <- FALSE
   for (stat in names(functions)) {
-    cat(sprintf("  * %s", stat))
+    cat(sprintf("  - %s", stat))
     sim <- simulated_stats[[stat]]
     obs <- observed[[stat]]
 
     if (is.data.frame(obs)) {
       obs_vals <- vapply(names(obs), function(i) is.numeric(obs[[i]]), FUN.VALUE = logical(1))
-      obs_type <- if (all(obs_vals)) "vector" else "tabular"
+      obs_type <- if (all(obs_vals)) "vector" else "data frame"
     } else {
       obs_type <- "invalid"
     }
 
     if (is.data.frame(sim)) {
       sim_vals <- vapply(names(sim), function(i) is.numeric(sim[[i]]), FUN.VALUE = logical(1))
-      sim_type <- if (all(sim_vals)) "vector" else "tabular"
+      sim_type <- if (all(sim_vals)) "vector" else "data frame"
     } else {
       obs_type <- "invalid"
     }
@@ -224,7 +281,7 @@ validate_abc <- function(model, priors, functions, observed,
       stop(error_msg, call. = FALSE)
     }
 
-    if (obs_type == "tabular") {
+    if (obs_type == "data frame") {
       numeric_cols_obs <- ncol(obs)
       numeric_cols_sim <- ncol(sim)
 

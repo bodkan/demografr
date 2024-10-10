@@ -3,7 +3,7 @@
 # This function will take as input a path to a SLiM or Python script (detecting
 # which one of the two it is based on the script's contents) and run it on the
 # command line with model arguments formatted on the command line automatically.
-run_script <- function(script, output_path, ...) {
+run_script <- function(script, path, ...) {
   if (!file.exists(script))
     stop("No '", engine, "' script found at '", script, "'", call. = FALSE)
   else
@@ -32,7 +32,7 @@ run_script <- function(script, output_path, ...) {
 
   if (engine == "slim") { # run the SLiM script on the command line
     # add the generated output path to the list of CLI arguments for SLiM
-    cli_args <- c(cli_args, paste0("-d \"output='", output_path, "'\""))
+    cli_args <- c(cli_args, paste0("-d \"path='", path, "'\""))
 
     # compose the whole CLI command
     cli_command <- paste(engine, paste(cli_args, collapse = " "), script, collapse = " ")
@@ -41,7 +41,7 @@ run_script <- function(script, output_path, ...) {
     system(cli_command, intern = TRUE)
   } else { # run the msprime Python script in the reticulate'd Python interpreter
     # add the path to the output tree sequence and collapse the whole CLI command
-    cli_args <- c(cli_args, paste0("--output=\"", output_path, "\""))
+    cli_args <- c(cli_args, paste0("--path=\"", path, "\""))
 
     # compose the whole CLI command
     cli_command <- paste(c(engine, script, cli_args), collapse = " ")
@@ -50,12 +50,12 @@ run_script <- function(script, output_path, ...) {
     reticulate::py_run_string(sprintf("import os; os.system(r'%s')", cli_command))
   }
 
-  if (!file.exists(output_path))
-    stop("The provided script did not leave any output file. Inspect the log\n",
-         "output above for errors and make sure you can run your custom script \n",
-         "on the command-line manually without errors.\n\n",
+  if (dir(path) == 0)
+    stop("The provided simulation script did not generate any files. Inspect the log\n",
+         "information above for errors and make sure you can run your custom script \n",
+         "on the command-line manually without any issues.\n\n",
          "The exact command that failed was:\n\n",
          cli_command, call. = FALSE)
 
-  output_path
+  path
 }

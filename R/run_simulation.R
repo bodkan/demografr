@@ -28,6 +28,14 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
 
   model_is_sampled <- contains_priors(params)
 
+  if (format == "ts")
+    path <- NULL
+  else {
+    path <- paste0(tempdir(), "demografr_", sample.int(n = .Machine$integer.max, size = 1)) %>%
+      normalizePath(winslash = "/", mustWork = FALSE)
+    dir.create(path, showWarnings = FALSE)
+  }
+
   n_tries <- 0
   repeat {
     if (n_tries == attempts && model_is_sampled)
@@ -66,13 +74,6 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
           # force no serialization for msprime runs
           if (engine == "msprime") compiled_model$path <- NULL
 
-          if (format == "ts")
-            path <- NULL
-          else {
-            path <- paste0(tempdir(), "demografr_", sample.int(n = .Machine$integer.max, size = 1)) %>%
-              normalizePath(winslash = "/", mustWork = FALSE)
-          }
-
           # compose a list of required and optional arguments for msprime / SLiM engine
           engine_fun_args <- list(
             model = compiled_model,
@@ -98,7 +99,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
           compiled_model <- NULL
 
           # run a cutsom simulation
-          model_engine_args <- c(model, c(engine_args, param_args))
+          model_engine_args <- c(model, c(engine_args, param_args, path = path))
           result <- do.call(run_script, model_engine_args)
         }
         result

@@ -79,6 +79,9 @@ simulate_model <- function(
   if (is.symbol(data_expr))
     data_expr <- data
 
+  if (!is.function(model) && format != "files")
+    stop("Custom simulation scripts must be run with `format = \"files\"`", call. = FALSE)
+
   if (format == "ts")
     validate_user_functions(data_expr, valid_args = c("ts", "model"))
   else
@@ -109,7 +112,7 @@ simulate_model <- function(
       unlink(attr(result$data, "path"))
   }
 
-  # if no user-defined generators were provided, return output as it is
+  # if no user-defined generators were provided, return tree-sequence as it is
   if (is.null(data_expr))
     return(result$data)
   else { # otherwise, apply each generator to the result
