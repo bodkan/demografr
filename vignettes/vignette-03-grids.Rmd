@@ -65,6 +65,7 @@ init_env()
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(cowplot)
 
 # setup parallelization across all CPUs
 library(future)
@@ -129,7 +130,7 @@ Let's check the model function by visualizing it (we set the gene-flow rates to 
 test_model <- model(rate_ea = 0.42, rate_aa = 0.42)[[1]]
 
 # we don't plot the gene flow arrows here for clarity
-cowplot::plot_grid(
+plot_grid(
   plot_model(test_model, gene_flow = FALSE),
   plot_model(test_model, log = TRUE, gene_flow = FALSE)
 )
@@ -168,7 +169,8 @@ direct <- function(ts) {
 }
 ```
 
-Exactly as it's the case for ABC, for the purposes of grid-based simulations we have to
+Exactly as it's the case for ABC, for the purposes of grid-based simulations we have to define functions which will be used to compute summary statistics whose behavior across a parameter grid we want to investigate:
+
 ```{r}
 # bind both functions in a named list
 functions <- list(direct = direct, indirect = indirect)
@@ -179,13 +181,15 @@ This looks quite neat and tidy, but how can we make sure that our tree-sequence 
 ```{r}
 # we don't care about the parameter values, as we only want to get *some* tree sequence
 # (also, note we did not specify sequence length, recombination rate, etc.)
-ts <- simulate_model(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15), mutation_rate = 1e-8)
+ts <- simulate_model(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15),
+                     sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
 With the tiny tree sequence for testing, we can now check if our tree-sequence functions work as they're supposed to:
 
 ```{r}
 functions$direct(ts)
+
 functions$indirect(ts)
 ```
 
@@ -193,6 +197,7 @@ Excellent, we get the output tables from `ts_f4ratio` functions as we're suppose
 
 ```{r}
 functions$direct(ts) %>% nrow
+
 functions$indirect(ts) %>% nrow
 ```
 
@@ -277,10 +282,10 @@ The function `simulate_grid()` returns all results in a data frame object in the
 print(results, n = 10)
 ```
 
-The first column indicates a replicate number, the following few columns are the values of the parameter grid. Most important are the last columns, though, each named after a single summary statistics. For conciseness, these summary statistics are stored as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html)&mdash;for each replicate and each parameter combination, these columns store the summary statistics as "nested" data frames like this:
+The first column indicates a replicate number, the following few columns are the values of the parameter grid. Most important are the last columns, though, each named after a single summary statistics. For conciseness, these summary statistics are stored as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html)&mdash;for each replicate and each parameter combination, these columns store the summary statistics as "nested" data frames. For instance, here are the results for the "direct" $f_4-ratio$ statistic across the first three simulation runs. You can see that the list-column `"direct"` contains a list of data frames, one data frame for each simulation replicate:
 
 ```{r}
-results$direct[1:2]
+results$direct[1:3]
 ```
 
 List columns are very efficient and concise for storing complex data like this, but in order to be able to analyze data stored in them, we need a function [`unnest()`](https://tidyr.tidyverse.org/reference/unnest.html) from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed. In this example:
