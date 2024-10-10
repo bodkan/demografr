@@ -77,7 +77,8 @@ functions <- list(
 Just to verify we have set up the components of our analysis correctly, let's quickly simulate a tree sequence and try to compute genetic diversity in both populations using our summary function:
 
 ```{r}
-ts <- simulate_model(model, parameters = list(Ne_p1 = 100, Ne_p2 = 1000), mutation_rate = 1e-8)
+ts <- simulate_model(model, parameters = list(Ne_p1 = 100, Ne_p2 = 1000),
+                     sequence_length = 1e6, recombination_rate = 0, mutation_rate = 1e-8)
 
 functions$diversity(ts)
 ```
@@ -184,7 +185,7 @@ In short, the _future_ R package (and it's support provided by _demografr_) make
 
 ### For completeness
 
-By default, if you don't set up any `plan()` at all, the sequential simulation runs of _demografr_ are implicitly organized by:
+By default, if you don't set up any `plan()` at all, the simulation runs of _demografr_ will be run in a sequential manner, because the default mode of operation for the _future_ R package is the following plan:
 
 ```{r}
 plan(sequential)
