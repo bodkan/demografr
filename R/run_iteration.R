@@ -4,7 +4,7 @@ run_iteration <- function(it,
                           sequence_length, recombination_rate, mutation_rate,
                           data, format, engine, model_args, engine_args,
                           model_name, attempts) {
-  if (format == "files" && missing(data_funs))
+  if (format == "files" && missing(data))
     stop("Models which generate custom files require a list of data function(s)\n",
          "which will process them for computation of summary statistics.", call. = FALSE)
 
@@ -32,10 +32,6 @@ run_iteration <- function(it,
     if (mutation_rate != 0)
       result_data <- slendr::ts_mutate(result_data, mutation_rate = mutation_rate)
 
-    # clean up if needed
-    if (!is.null(attr(result_data, "path")))
-      unlink(attr(result_data, "path"))
-
     result_data <- list(ts = result_data)
   }
 
@@ -44,6 +40,15 @@ run_iteration <- function(it,
     env <- populate_data_env(result)
     result_data <- evaluate_functions(data_expr, env)
   }
+
+  # clean up if needed
+  if (format == "ts")
+    result_path <- attr(result_data, "path")
+  else
+    result_path <- result$data
+
+  if (!is.null(result_path))
+    unlink(result_path, recursive = TRUE)
 
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions

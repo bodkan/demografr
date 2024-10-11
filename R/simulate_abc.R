@@ -60,6 +60,12 @@ simulate_abc <- function(
          "statistics, and the number of iterations must be provided (check\n",
          "that the variables that you provided really do contain what you think)", call. = FALSE)
 
+  # unless a tree-sequence is supposed to be returned directly, create a
+  # temporary directory where a simulation script can store output files
+  format <- match.arg(format)
+  if (!format %in% c("ts", "files"))
+    stop("Unknown output format type '", format, "'. Valid values are 'ts' or 'files'.", call. = FALSE)
+
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
@@ -67,7 +73,7 @@ simulate_abc <- function(
   utils::capture.output(validate_abc(
     model, priors, functions, observed,
     sequence_length = sequence_length, recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate,
+    mutation_rate = mutation_rate, format = format, data = data,
     engine = engine, model_args = model_args,
     engine_args = engine_args
   ))
@@ -90,17 +96,11 @@ simulate_abc <- function(
   its <- seq_len(iterations)
   p <- progressr::progressor(along = its)
 
-  # unless a tree-sequence is supposed to be returned directly, create a
-  # temporary directory where a simulation script can store output files
-  format <- match.arg(format)
-  if (!format %in% c("ts", "files"))
-    stop("Unknown output format type '", format, "'. Valid values are 'ts' or 'files'.", call. = FALSE)
-
   if (format == "files" && is.null(data))
     stop("Models which generate custom files must provide a list of function(s)\n",
          "which will convert them for computing summary statistics.", call. = FALSE)
 
-  if (engine == "msprime" && format != "ts")
+  if (!is.null(engine) && engine == "msprime" && format != "ts")
     stop("When using the slendr msprime engine, \"ts\" is the only valid data format",
          call. = FALSE)
 
@@ -182,14 +182,15 @@ simulate_abc <- function(
   )
 
   opts <- list(
-    sequence_length = sequence_length,
-    recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate,
     engine = engine,
     model_args = model_args,
     engine_args = engine_args,
     packages = packages
   )
+  if (!missing(sequence_length)) opts$sequence_length <- sequence_length
+  if (!missing(recombination_rate)) opts$recombination_rate <- recombination_rate
+  if (!missing(mutation_rate)) opts$mutation_rate <- mutation_rate
+
   attr(result, "options") <- opts
 
   class(result) <- "demografr_abc_sims"
