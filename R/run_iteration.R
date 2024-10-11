@@ -21,7 +21,7 @@ run_iteration <- function(it,
   result <- run_simulation(
     model = model, params = params, sequence_length = sequence_length,
     recombination_rate = recombination_rate,
-    model_name = model_name, engine = engine, samples = samples,
+    model_name = model_name, engine = engine,
     model_args = model_args, engine_args = engine_args, format = format,
     attempts = attempts
   )

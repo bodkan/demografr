@@ -1,7 +1,7 @@
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate,
-                           samples, engine, model_args, engine_args, format,
+                           engine, model_args, engine_args, format,
                            model_name, attempts) {
   # only a well-defined slendr errors are allowed to be ignored during ABC simulations
   # (i.e. split time of a daughter population sampled from a prior at an older time than
