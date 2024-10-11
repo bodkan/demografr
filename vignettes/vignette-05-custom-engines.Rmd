@@ -83,7 +83,7 @@ slim \
 
 Then, if you get a your desired simulation results in the given directory, you're good to go!
 
-**Below you are going to see how to actually read back simulation results from disk and use them for computing summary statistics. For now, just note that you can name your output files however you like.**
+**Below you are going to see how to actually read back simulation results from disk and use them for computing summary statistics. For now, just note that you can name your output files however you'd like and can have as many as you'd like, as long as they are all in that one directory given by `path`.**
 
 ## ABC analysis using custom-defined simulation scripts
 
@@ -133,7 +133,7 @@ python_script <- system.file("examples/custom.py", package = "demografr")
 cat(readLines(python_script), sep = "\n")
 ```
 
-**Note that the Python script specifies all model parameters (here, $N_e$) and mandatory arguments, via a command-line interface provided by the Python module `argparse`**.
+**Note that the Python script specifies all model parameters (here just $N_e$) and mandatory arguments via a command-line interface provided by the Python module `argparse`**.
 
 **The SLiM script, on the other hand, uses SLiM's features for command-line specification of parameters and simply refers to each parameter by its symbolic name.** No other setup is necessary.
 
@@ -188,7 +188,7 @@ functions$diversity(result_msprime$ts)
 
 The function works as expected&mdash;we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.
 
-```{r}
+```{r, echo=FALSE}
 result_slim <- simulate_model(model = slim_script, parameters = list(Ne = 123), format = "files", data = data)
 
 functions$diversity(result_slim$ts)
@@ -204,6 +204,10 @@ Let's first validate all components of our pipeline:
 validate_abc(python_script, priors, functions, observed, data = data, format = "files")
 ```
 
+```{r, echo=FALSE, results='hide'}
+validate_abc(slim_script, priors, functions, observed, data = data, format = "files")
+```
+
 Looking good! Now let's first run ABC simulations. Again, note the use of the Python script where we would normally plug in a _slendr_ model function in place of the `model` argument:
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -214,10 +218,7 @@ tstart <- Sys.time()
 library(future)
 plan(multicore, workers = availableCores()) # parallelize across all 96 CPUs
 
-data <- simulate_abc(
-  model = python_script, priors, functions, observed, iterations = 1000,
-  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
-)
+data <- simulate_abc(python_script, priors, functions, observed, data = data, iterations = 1000, format = "files")
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
