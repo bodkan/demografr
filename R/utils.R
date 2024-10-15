@@ -86,14 +86,12 @@ check_model_engine <- function(model, engine) {
 get_engine <- function(slendr_model, engine) {
   if (!is.null(engine)) # if an engine was specified by the user, use that
     engine <- match.arg(engine, c("msprime", "slim"))
-  else if (is.null(slendr_model$path))
-    engine <- "msprime" # non-serialized models must be run with msprime
-  else if (!any(readLines(file.path(slendr_model$path, "script.slim")) %>% grepl("user extension code follows", .)))
+  else if (any(grepl("user extension code follows", readLines(file.path(slendr_model$path, "script.slim")))))
     engine <- "slim" # user-customized models are assumed to be SLiM models
   else if (!is.null(slendr_model$world))
     engine <- "slim" # spatial models must use the slendr/SLiM engine
   else
-    stop("Unknown slendr model engine type", call. = FALSE)
+    engine <- "msprime"
   engine
 }
 
