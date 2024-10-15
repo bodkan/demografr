@@ -37,7 +37,7 @@
 #'
 #' @export
 validate_abc <- function(model, priors, functions, observed,
-                         sequence_length = 10000, recombination_rate = 0, mutation_rate = 0,
+                         sequence_length, recombination_rate, mutation_rate = 0,
                          format = c("ts", "files"), data = NULL,
                          engine = NULL, model_args = NULL, engine_args = NULL,
                          quiet = FALSE, attempts = 1000) {
@@ -98,6 +98,10 @@ validate_abc <- function(model, priors, functions, observed,
   cat("---------------------------------------------------------------------\n")
 
   if (is.function(model)) {
+    if (missing(sequence_length)) sequence_length <- 1e6
+    if (missing(recombination_rate)) recombination_rate <- 0
+    if (missing(mutation_rate)) mutation_rate <- 0
+
     cat("The model is a slendr function\n")
 
     cat("---------------------------------------------------------------------\n")
@@ -175,10 +179,10 @@ validate_abc <- function(model, priors, functions, observed,
 
   cat("Simulating tree sequence from the given model...")
   result <- run_simulation(model, priors, sequence_length, recombination_rate,
-                         mutation_rate, engine = engine,
-                         model_args = model_args,
-                         engine_args = engine_args, format = format,
-                         attempts = 1000, model_name = substitute(model))
+                           engine = engine,
+                           model_args = model_args,
+                           engine_args = engine_args, format = format,
+                           attempts = 1000, model_name = substitute(model))
   cat(" \u2705\n")
 
   if (is.null(data)) {
