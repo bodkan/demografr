@@ -136,6 +136,7 @@ modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
 
   return(list(model, samples))
 }
+
 modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   popA <- population("popA", time = 1,   N = Ne_A)
   popB <- population("popB", time = T_1, N = Ne_B, parent = popA)
@@ -211,10 +212,12 @@ compute_diversity <- function(ts) {
   samples <- ts_names(ts, split = "pop")
   ts_diversity(ts, sample_sets = samples)
 }
+
 compute_divergence <- function(ts) {
   samples <- ts_names(ts, split = "pop")
   ts_divergence(ts, sample_sets = samples)
 }
+
 compute_f4 <- function(ts) {
   samples <- ts_names(ts, split = "pop")
   A <- samples["popA"]; B <- samples["popB"]
@@ -295,12 +298,6 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 
 **The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
 
-```{r, eval=!abc_exists, echo=FALSE}
-abcX <- readRDS(abcX_path)
-abcY <- readRDS(abcY_path)
-abcZ <- readRDS(abcZ_path)
-```
-
 ```{r, eval=!abc_exists, results="hide"}
 abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
 abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
@@ -313,7 +310,7 @@ saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
 ```
 
-```{r, eval=abc_exists, echo=FALSE}
+```{r, eval=!abc_exists, echo=FALSE}
 abcX <- readRDS(abcX_path)
 abcY <- readRDS(abcY_path)
 abcZ <- readRDS(abcZ_path)
