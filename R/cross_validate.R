@@ -13,20 +13,15 @@
 #'
 #' @export
 cross_validate <- function(models, nval, tols, method, ...) {
-  if (is.null(names(models)) || any(names(models) == ""))
-    names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
-
   if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
       !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
     stop("The list of models must be either all objects produced by the function\n",
          "`simulate_abc()` or function `run_abc()` as they store full information\n",
          "about an ABC model being run, namely the simulated summary statistics", call. = FALSE)
 
-  model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
-  model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
-  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+  parts <- unpack(models)
 
-  result <- abc::cv4postpr(model_names, model_stats, nval = nval, tols = tols, method = method)
+  result <- abc::cv4postpr(index = parts$index, sumstat = parts$sumstat, nval = nval, tols = tols, method = method)
 
   class(result) <- c("demografr_cv", class(result))
 
