@@ -4,10 +4,10 @@
 #'
 #' @return Used exclusively for printing
 #'
-#' @export print.demografr_cv
+#' @export print.demografr_cv_modsel
 #' @export
 #' @keywords internal
-print.demografr_cv <- function(x, ...) {
-  class(x) <- "cv4postpr"
+print.demografr_cv_abc <- function(x, ...) {
+  class(x) <- "cv4abc"
   invisible(summary(x))
 }
