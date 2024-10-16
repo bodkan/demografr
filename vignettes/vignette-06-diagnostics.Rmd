@@ -32,8 +32,6 @@ abcX_path <- here::here("inst/examples/downstream_abcX.rds")
 abcY_path <- here::here("inst/examples/downstream_abcY.rds")
 abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
 abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
-
-cv_path <- here::here("inst/examples/downstream_cv.rds")
 ```
 
 ```{r, collapse=TRUE}
@@ -322,36 +320,28 @@ stop("hello there ;)")
 
 ## Cross-validation
 
-Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models.
+Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models. Without having the power to do this, trying to select the best model wouldn't make much sense.
 
-This can be done using _demografr_'s `cross_validate()` function which is built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments on behalf of a user to avoid unnecessary manual data munging. For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
+This can be done using _demografr_'s `cross_validate()` function which is built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments on behalf of a user to avoid unnecessary manual data munging (creating the `index` vector, merging the summary statistics into `sumstat` parameter, etc.). For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
 The one difference between the two functions is that `cross_validate()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
 
 ```{r, eval=!file.exists(cv_path), results="hide", warning=FALSE}
 models <- list(abcX, abcY, abcZ)
 
-cv_result <- cross_validate(models = models, nval = 100, tol = 0.01, method = "neuralnet")
-```
-
-```{r, eval=!file.exists(cv_path), echo=FALSE}
-saveRDS(cv_result, cv_path)
-```
-
-```{r, eval=file.exists(cv_path), echo=FALSE}
-cv_result <- readRDS(cv_path)
+cv_selection <- cross_validate(models, nval = 100, tol = 0.01, method = "neuralnet")
 ```
 
 If we print out the result, we get a quick summary with confusion matrices and other information:
 
 ```{r}
-cv_result
+cv_selection
 ```
 
 Similarly, you can use the `plot()` function to visualize the result. This function, yet again, internally calls _abc_'s own plotting method internall, with a bonus option to save a figure to a PDF right from the `plot()` call (useful when working on a remote server):
 
 ```{r plot_cv}
-plot(cv_result)
+plot(cv_selection)
 ```
 
 Because we have three models, each of the three barplots shows how often were summary statistics sampled from each model classified as likely coming from one of the three models. In other words, with absolutely perfect classification, each barplot would show just one of the three colors. If a barplot (results for one model) shows multiple colors, this means that some fraction of simulated statistics from that model was incorrectly classified as another model. Again, for more detail on interpretation, caveats, and best practices, please consult the _abc_ R package [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) and a relevant statistical textbook.
@@ -397,6 +387,27 @@ example_model <- compile_model(
 )
 
 plot_model(example_model, proportions = TRUE)
+```
+
+
+## ABC cross-validation
+
+```{r}
+cv_abc <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "rejection")
+cv_abc_loclinear <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "loclinear")
+```
+
+```{r}
+summary(cv_abc)
+summary(cv_abc_rejection)
+summary(cv_abc_loclinear)
+```
+
+```{r}
+plot(cv_abc)
+plot(cv_abc_rejection)
+plot(cv_abc_loclinear)
 ```
 
 
