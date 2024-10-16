@@ -2,28 +2,36 @@
 #' @export
 unpack <- function(object) {
   if (inherits(object, "demografr_abc_sims")) {
+    type <- "data"
     data <- list(data)
   } else if (inherits(object, "demografr_abc.abc")) {
+    type <- "abc"
     data <- list(attr(object, "components"))
-  } else if (is.list(object) && inherits(object[[1]], "demografr_abc.abc")) {
-    data <- lapply(object, attr, "components")
   } else if (is.list(object) && inherits(object[[1]], "demografr_abc_sims")) {
+    type <- "data"
     data <- object
+  } else if (is.list(object) && inherits(object[[1]], "demografr_abc.abc")) {
+    type <- "abc"
+    data <- lapply(object, attr, "components")
   } else {
     stop("Unknown object type", call. = FALSE)
   }
 
   sumstat <- list()
   index <- c()
+  param <- list()
 
   for (model_data in data) {
     sumstat[[length(sumstat) + 1]] <- model_data$simulated
     index <- c(index, rep(model_data$model_name, nrow(model_data$simulated)))
+    if (type == "abc")
+      param[[length(param) + 1]] <- model_data$parameters
   }
 
   sumstat <- do.call(rbind, sumstat)
+  param <- do.call(rbind, param)
 
-  list(sumstat = sumstat, index = index)
+  list(sumstat = sumstat, index = index, param = param)
 }
 
 # cv4postpr(index, sumstat,
