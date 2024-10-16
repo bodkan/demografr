@@ -1,7 +1,17 @@
 #' Unpack demografr object into individual components of the abc package
 #' @export
-unpack <- function(data) {
-  if (inherits(data, "demografr_abc_sims")) data <- list(data)
+unpack <- function(object) {
+  if (inherits(object, "demografr_abc_sims")) {
+    data <- list(data)
+  } else if (inherits(object, "demografr_abc.abc")) {
+    data <- list(attr(object, "components"))
+  } else if (is.list(object) && inherits(object[[1]], "demografr_abc.abc")) {
+    data <- lapply(object, attr, "components")
+  } else if (is.list(object) && inherits(object[[1]], "demografr_abc_sims")) {
+    data <- object
+  } else {
+    stop("Unknown object type", call. = FALSE)
+  }
 
   sumstat <- list()
   index <- c()
