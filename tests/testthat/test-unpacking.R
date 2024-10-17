@@ -11,7 +11,7 @@ abc <- lapply(abc_files, readRDS)
 test_that("unpacking data generates the correct merged summary statistics (single model)", {
   unpacked <- unpack(data[["X"]])
 
-  expect_true(all(unpacked$sumstat[unpacked$index == "modelX", ] == dataX$simulated))
+  expect_true(all(unpacked$sumstat[unpacked$index == "modelX", ] == data[["X"]]$simulated))
   expect_true(all(unpacked$index == "modelX"))
 })
 

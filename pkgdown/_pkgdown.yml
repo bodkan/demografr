@@ -29,9 +29,8 @@ navbar:
           href: articles/vignette-05-custom-engines.html
         - text: ABC diagnostics
           href: articles/vignette-06-diagnostics.html
-    mastodon:
-      icon: fa-mastodon
-      href: https://fosstodon.org/bodkan
+        - text: Selection inference
+          href: articles/vignette-07-selection.html
 
 reference:
 
