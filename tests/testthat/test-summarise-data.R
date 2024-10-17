@@ -87,7 +87,30 @@ test_that("summarise_data produces data frames for every summary function", {
   expect_true(all(sapply(output, is.data.frame)))
 })
 
-test_that("summarise_data can utilize summaries computed already as data", {
+test_that("summarise_data can utilize pre-computed statistics as data (pre-defined data functions)", {
+  data_functions <- list(
+    ts_pi = function(path, model) {
+      ts <- file.path(path, "slim.trees") %>% ts_load(model)
+      ts_diversity(ts, ts_names(ts, split = "pop"))
+    },
+    slim_pi = function(path) file.path(path, "stats.tsv") %>%
+      read.table(header = TRUE) %>%
+      .[, c("het_pop1", "het_pop2")]
+  )
+
+  data <- simulate_model(
+    model, parameters = list(split_time = 100),
+    sequence_length = 1e6, recombination_rate = 1e-8,
+    engine = "slim",
+    format = "files",
+    data = data_functions
+  )
+
+  expect_type(summarise_data(data, functions = list(ts_pi = ts_pi, slim_pi = slim_pi)), "list")
+  expect_type(summarise_data(data, functions = list(ts_pi = function(ts_pi) ts_pi, slim_pi = function(slim_pi) slim_pi)), "list")
+})
+
+test_that("summarise_data can utilize pre-computed statistics as data (inline data functions)", {
   data <- simulate_model(
     model, parameters = list(split_time = 100),
     sequence_length = 1e6, recombination_rate = 1e-8,
@@ -104,8 +127,6 @@ test_that("summarise_data can utilize summaries computed already as data", {
     )
   )
 
-  expect_type(
-    output <- summarise_data(data, functions = list(ts_pi = ts_pi, slim_pi = slim_pi)),
-    "list"
-  )
+  expect_type(summarise_data(data, functions = list(ts_pi = ts_pi, slim_pi = slim_pi)), "list")
+  expect_type(summarise_data(data, functions = list(ts_pi = function(ts_pi) ts_pi, slim_pi = function(slim_pi) slim_pi)), "list")
 })
