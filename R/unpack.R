@@ -3,7 +3,7 @@
 unpack <- function(object) {
   if (inherits(object, "demografr_abc_sims")) {
     type <- "data"
-    data <- list(data)
+    data <- list(object)
   } else if (inherits(object, "demografr_abc.abc")) {
     type <- "abc"
     data <- list(attr(object, "components"))
@@ -26,12 +26,13 @@ unpack <- function(object) {
     index <- c(index, rep(model_data$model_name, nrow(model_data$simulated)))
     if (type == "abc")
       param[[length(param) + 1]] <- model_data$parameters
+    target <- bind_observed(model_data$observed)
   }
 
   sumstat <- do.call(rbind, sumstat)
   param <- do.call(rbind, param)
 
-  list(sumstat = sumstat, index = index, param = param)
+  list(sumstat = sumstat, index = index, param = param, target = target)
 }
 
 # cv4postpr(index, sumstat,

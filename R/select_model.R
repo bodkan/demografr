@@ -23,23 +23,15 @@ select_model <- function(models, ...) {
       stop("The `method` argument must be provided to use postpr function from the abc package.\n",
            "See `?abc::abc` for more details.", call. = FALSE)
 
-  if (is.null(names(models)) || any(names(models) == ""))
-    names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
-
   if (!all(vapply(models, inherits, "demografr_abc_sims", FUN.VALUE = logical(1))) &&
       !all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1))))
     stop("The list of models must be either all objects produced by the function\n",
          "`simulate_abc()` or function `run_abc()` as they store full information\n",
          "about an ABC model being run, namely the simulated summary statistics", call. = FALSE)
 
-  model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
-  model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
-  model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
+  parts <- unpack(models)
 
-  observed_list <- attr(models[[1]], "components")$observed
-  observed_stats <- bind_observed(observed_list)
-
-  result <- abc::postpr(observed_stats, model_names, model_stats, ...)
+  result <- abc::postpr(parts$target, parts$index, parts$sumstat, ...)
 
   class(result) <- c("demografr_postpr", class(result))
 
