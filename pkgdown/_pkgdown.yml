@@ -52,11 +52,11 @@ reference:
 
   - title: ABC cross-validation and posterior checks
     contents:
+    - unpack
     - cross_validate
     - select_model
     - goodness_of_fit
     - predict.demografr_abc.abc
-    - plot.demografr_cv
     - extract_prediction
     - plot_prediction
 
@@ -71,6 +71,7 @@ reference:
 
   - title: Helper functions
     contents:
+    - summarise_data
     - simulate_model
     - combine_data
     - combine_data
