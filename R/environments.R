@@ -34,7 +34,7 @@ check_arguments <- function(fun, valid_args) {
 }
 
 # Evaluate functions in a given environment (list of objects)
-evaluate_functions <- function(generators, env) {
+evaluate <- function(generators, env) {
   # the parent had to substitute the user list, so let's revert that back
   # to standard R code
   if (is.call(generators))
@@ -45,12 +45,15 @@ evaluate_functions <- function(generators, env) {
       execute_function(x, env = env)
     } else {
       first <- as.list(x)[[1]] %>% as.character
-      if (first == "function")
+      if (first == "function") {
         execute_function(eval(x), env = env)
-      else if (exists(first, envir = env))
+      } else if (exists(first, envir = env)) {
+        # if the generator is not a function but a symbol (variable), look it up
+        # in the environment
         get(first, env)
-      else
+      } else {
         stop("Unknown data `", first, "` encountered while population an environment", call. = FALSE)
+      }
     }
   })
 

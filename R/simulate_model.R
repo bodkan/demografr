@@ -117,6 +117,6 @@ simulate_model <- function(
     return(result$data)
   else { # otherwise, apply each generator to the result
     env <- populate_data_env(result)
-    return(evaluate_functions(data_expr, env))
+    return(evaluate(data_expr, env))
   }
 }

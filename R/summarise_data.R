@@ -10,15 +10,16 @@ summarise_data <- function(data, functions) {
 
   # if the functions expression is just a symbol (i.e. was given as
   # a variable), evaluate it to get the actual list
-  if (is.symbol(functions_expr))
+  if (is.symbol(functions_expr)) {
     functions <- eval(functions_expr, envir = parent.frame())
-  else if (!is.list(functions))
+  } else if (is.call(functions_expr)) {
     functions <- functions_expr
+  }
 
   validate_user_functions(functions, valid_args = names(data))
 
   env <- list2env(data)
-  stats <- evaluate_functions(base::substitute(functions), env)
+  stats <- evaluate(base::substitute(functions), env)
 
   stats
 }

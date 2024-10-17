@@ -38,7 +38,7 @@ run_iteration <- function(it,
   # if user-defined generators were provided, apply each generator to the result
   if (!is.null(data_expr)) {
     env <- populate_data_env(result)
-    result_data <- evaluate_functions(data_expr, env)
+    result_data <- evaluate(data_expr, env)
   }
 
   # clean up if needed

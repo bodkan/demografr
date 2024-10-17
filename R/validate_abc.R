@@ -216,7 +216,7 @@ validate_abc <- function(model, priors, functions, observed,
     cat("Generating data from simulation results:\n")
 
     env <- populate_data_env(result)
-    data <- evaluate_functions(data_expr, env)
+    data <- evaluate(data_expr, env)
     for (x in names(data)) {
       cat(sprintf("  - %s (type %s) ", x, as.character(class(data[[x]])[1])))
       cat("\u2705\n")
@@ -234,7 +234,7 @@ validate_abc <- function(model, priors, functions, observed,
     cat(sprintf("  - %s", stat))
     simulated_stats[[stat]] <- tryCatch(
       # functions[[stat]](data),
-      evaluate_functions(functions[stat], env)[[stat]],
+      evaluate(functions[stat], env)[[stat]],
       error = function(e) {
         stop(sprintf("Computation of '%s' function on simulated tree sequence has failed\nwith the following error:\n  %s",
              stat, e$message), call. = FALSE)
