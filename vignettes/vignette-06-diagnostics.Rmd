@@ -332,7 +332,7 @@ models <- list(abcX, abcY, abcZ)
 cv_selection <- cross_validate(models, nval = 100, tol = 0.01, method = "neuralnet")
 ```
 
-If we print out the result, we get a quick summary with confusion matrices and other information:
+If we print out the result, we get a quick summary of the resulting confusion matrices and other diagnostic information:
 
 ```{r}
 cv_selection
@@ -361,7 +361,7 @@ modsel <- select_model(models, tol = 0.03, method = "neuralnet")
 We can make a decision on the model selection by inspecting the `summary()` of the produced result:
 
 ```{r}
-summary(modsel)
+modsel
 ```
 
 As we can see, `modelX` shows the highest rate of acceptance among all simulations. Specifically, we see that the proportion of acceptance is `r sprintf("%.1f", max(quiet(summary(modsel))$rejection$Prob) * 100)`%.
@@ -394,20 +394,20 @@ plot_model(example_model, proportions = TRUE)
 
 ```{r}
 cv_abc <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
-cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "rejection")
 cv_abc_loclinear <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "loclinear")
+cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "rejection")
 ```
 
 ```{r}
 summary(cv_abc)
-summary(cv_abc_rejection)
 summary(cv_abc_loclinear)
+summary(cv_abc_rejection)
 ```
 
 ```{r}
 plot(cv_abc)
-plot(cv_abc_rejection)
 plot(cv_abc_loclinear)
+plot(cv_abc_rejection)
 ```
 
 
