@@ -9,5 +9,5 @@
 #' @keywords internal
 print.demografr_cv_modsel <- function(x, ...) {
   class(x) <- "cv4postpr"
-  invisible(summary(x))
+  print(summary(x))
 }

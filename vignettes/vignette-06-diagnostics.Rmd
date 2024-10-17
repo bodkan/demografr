@@ -1,4 +1,4 @@
---
+---
 title: "Downstream analyses, model selection, troubleshooting"
 output: rmarkdown::html_vignette
 vignette: >
@@ -314,10 +314,6 @@ abcY <- readRDS(abcY_path)
 abcZ <- readRDS(abcZ_path)
 ```
 
-```{r}
-stop("hello there ;)")
-```
-
 ## Cross-validation
 
 Before doing model selection, it's important to perform cross-validation to answer the question whether our ABC setup can even distinguish between the competing models. Without having the power to do this, trying to select the best model wouldn't make much sense.
@@ -325,6 +321,10 @@ Before doing model selection, it's important to perform cross-validation to answ
 This can be done using _demografr_'s `cross_validate()` function which is built around _abc_'s own function `cv4postpr()`. We will not go into too much detail, as this function simply calls `cv4postpr()` under the hood, passing to it all specified function arguments on behalf of a user to avoid unnecessary manual data munging (creating the `index` vector, merging the summary statistics into `sumstat` parameter, etc.). For more details, read section "Model selection" in the [vignette](https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf) of the _abc_ R package.
 
 The one difference between the two functions is that `cross_validate()` removes the need to prepare character indices and bind together summary statistic matrices from different models&mdash;given that _demografr_'s ABC output objects track all this information along in their internals, this is redundant, and you can perform cross-validation of different ABC models simply by calling this:
+
+```{r, echo=FALSE}
+set.seed(42)
+```
 
 ```{r, eval=!file.exists(cv_path), results="hide", warning=FALSE}
 models <- list(abcX, abcY, abcZ)
@@ -389,7 +389,6 @@ example_model <- compile_model(
 plot_model(example_model, proportions = TRUE)
 ```
 
-
 ## ABC cross-validation
 
 ```{r}
@@ -399,9 +398,9 @@ cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05),
 ```
 
 ```{r}
-summary(cv_abc)
-summary(cv_abc_loclinear)
-summary(cv_abc_rejection)
+cv_abc
+cv_abc_loclinear
+cv_abc_rejection
 ```
 
 ```{r}
