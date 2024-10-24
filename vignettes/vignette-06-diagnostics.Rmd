@@ -313,7 +313,7 @@ saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
 ```
 
-```{r, eval=!abc_exists, echo=FALSE}
+```{r, eval=abc_exists, echo=FALSE}
 abcX <- readRDS(abcX_path)
 abcY <- readRDS(abcY_path)
 abcZ <- readRDS(abcZ_path)
@@ -331,7 +331,7 @@ The one difference between the two functions is that `cross_validate()` removes 
 set.seed(42)
 ```
 
-```{r, eval=!file.exists(cv_path), results="hide", warning=FALSE}
+```{r, results="hide", warning=FALSE}
 models <- list(abcX, abcY, abcZ)
 
 cv_selection <- cross_validate(models, nval = 100, tol = 0.01, method = "neuralnet")
@@ -621,7 +621,7 @@ plot_posterior(abcX, param = "Ne") +
     geom_vline(xintercept = c(2000, 800, 9000, 4000), linetype = "dashed")
 ```
 
-```{r, posterior_Ne, warning=FALSE, fig.width=8, fig.height=5}
+```{r, posterior_gf, warning=FALSE, fig.width=8, fig.height=5}
 plot_posterior(abcX, param = "gf") +
   geom_vline(xintercept = 0.1, linetype = "dashed") +
   coord_cartesian(xlim = c(0, 1))
