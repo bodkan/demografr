@@ -76,11 +76,11 @@ observed_f4 <- rbind(
   # ts_f4(ts, A, D, B, C)
 )
 
-write.table(observed_diversity, file = here::here("inst/examples/observed_diversity.tsv"),
+write.table(observed_diversity, file = here::here("inst/examples/basics_diversity.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_divergence, file = here::here("inst/examples/observed_divergence.tsv"),
+write.table(observed_divergence, file = here::here("inst/examples/basics_divergence.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_f4, file = here::here("inst/examples/observed_f4.tsv"),
+write.table(observed_f4, file = here::here("inst/examples/basics_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
@@ -115,7 +115,7 @@ After sequencing the genomes of individuals from these populations, we computed 
 1. Nucleotide diversity in each population:
 
 ```{r}
-observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", package = "demografr"), header = TRUE)
 
 observed_diversity
 ```
@@ -123,7 +123,7 @@ observed_diversity
 2. Pairwise divergence d_X_Y between populations X and Y:
 
 ```{r}
-observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
 
 observed_divergence
 ```
@@ -131,7 +131,7 @@ observed_divergence
 3. Value of the following $f_4$-statistic:
 
 ```{r}
-observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demografr"), header = TRUE)
 
 observed_f4
 ```

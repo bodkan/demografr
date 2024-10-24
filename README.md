@@ -86,7 +86,7 @@ After sequencing the genomes of individuals from these populations, we computed 
 
 
 ```r
-observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
+observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", package = "demografr"), header = TRUE)
 
 observed_diversity
 #>    set    diversity
@@ -100,7 +100,7 @@ observed_diversity
 
 
 ```r
-observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
 
 observed_divergence
 #>      x    y   divergence
@@ -116,7 +116,7 @@ observed_divergence
 
 
 ```r
-observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demografr"), header = TRUE)
 
 observed_f4
 #>      W    X    Y    Z            f4

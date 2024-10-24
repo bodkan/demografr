@@ -49,9 +49,9 @@ set.seed(SEED)
 Load empirical summary statistics computed from the observed data:
 
 ```{r}
-observed_diversity <- read.table(system.file("examples/observed_diversity.tsv", package = "demografr"), header = TRUE)
-observed_divergence <- read.table(system.file("examples/observed_divergence.tsv", package = "demografr"), header = TRUE)
-observed_f4  <- read.table(system.file("examples/observed_f4.tsv", package = "demografr"), header = TRUE)
+observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
+observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demografr"), header = TRUE)
 
 observed <- list(
   diversity  = observed_diversity,
