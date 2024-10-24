@@ -402,7 +402,7 @@ Let's start with the posterior predictive checks.
 
 ## Posterior predictive checks
 
-Link: [](http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf)
+Link: http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf
 
 It is one thing to 
 Simply speaking, when fitting a model and estimating its parameters using ABC, we rely on a set of summary statistics, which we assume capture the most important features of the true model represented by the data we gathered. Performing posterior predictive checks involves estimating the posterior distributions of the parameters of interest from the data (i.e. doing ABC inference) -- something we've done above on our `modelX`, `modelY`, and `modelZ` -- and then sampling parameters from these distributions and generating distributions of simulated summary statistics from those estimated models. Then, we plot the distributions of each of our _simulated_ summary statistics together with a vertical line representing the values of the _observed_ statistics. Naturally, only if the model can generate statistics compatible with the values observed in real data can we regard the model as sensible and usable for inference.
@@ -440,7 +440,7 @@ plot_prediction(predY)
 
 We can compare the divergences between models directly to see which model gives the most reasonable posterior predictive check results more clearly:
 
-```{r, fig.width=10, fig.height=13}
+```{r, fig.width=8, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "divergence"),
   plot_prediction(predY, "divergence"),
@@ -451,7 +451,7 @@ cowplot::plot_grid(
 
 We can see that posterior predictive checks for nucleotide diversity are a little less clear as there are no extremely dramatic outliers as it's the case for divergence above:
 
-```{r, fig.width=10, fig.height=13}
+```{r, fig.width=8, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "diversity"),
   plot_prediction(predY, "diversity"),
@@ -460,7 +460,7 @@ cowplot::plot_grid(
 )
 ```
 
-```{r, fig.width=10, fig.height=13}
+```{r, fig.width=8, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "f4"),
   plot_prediction(predY, "f4"),
