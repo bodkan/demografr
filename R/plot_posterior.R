@@ -38,6 +38,7 @@ plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), fac
     ggplot2::geom_density(ggplot2::aes(value, color = param, fill = param), alpha = 0.5) +
     ggplot2::scale_fill_discrete(drop = FALSE) +
     ggplot2::scale_color_discrete(drop = FALSE) +
+    guides(color = guide_legend("parameter"), fill = guide_legend("parameter")) +
     ggplot2::theme_minimal() +
     # ggplot2::coord_cartesian(xlim = xlim) +
     ggplot2::theme(strip.text.x = ggplot2::element_text(face = "bold", size = 13)) +
