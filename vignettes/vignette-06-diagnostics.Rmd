@@ -414,7 +414,7 @@ predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
 ```
 
-```{r, echo=FALSE, eval=pred_exists}
+```{r, echo=FALSE, eval=!pred_exists}
 saveRDS(predX, predX_path)
 saveRDS(predY, predY_path)
 saveRDS(predZ, predZ_path)
