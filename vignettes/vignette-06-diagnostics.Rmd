@@ -32,6 +32,11 @@ abcX_path <- here::here("inst/examples/downstream_abcX.rds")
 abcY_path <- here::here("inst/examples/downstream_abcY.rds")
 abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
 abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
+
+predX_path <- here::here("inst/examples/downstream_predX.rds")
+predY_path <- here::here("inst/examples/downstream_predY.rds")
+predZ_path <- here::here("inst/examples/downstream_predZ.rds")
+pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
 ```
 
 ```{r, collapse=TRUE}
@@ -412,6 +417,37 @@ plot(cv_abc_rejection)
 
 ## Goodness-of-fit
 
+```{r}
+parts <- unpack(abcX)
+gfit_X <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
+plot(gfit_X, main="Histogram under H0")
+summary(gfit_X)
+```
+
+```{r}
+parts <- unpack(abcY)
+gfit_Y <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
+plot(gfit_Y, main="Histogram under H0")
+summary(gfit_Y)
+```
+
+```{r}
+parts <- unpack(abcZ)
+gfit_Z <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
+plot(gfit_Z, main="Histogram under H0")
+summary(gfit_Z)
+```
+
+```{r}
+library(locfit)
+parts <- unpack(list(abcX, abcY, abcZ))
+gfitpca(target = parts$target, sumstat = parts$sumstat, index = parts$index, cprob = 0.01)
+```
+
+
+
+
+
 http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf
 
 So, it appears that we can be quite confident in which of the three models best represents the data. However, before we move on to inferring parameters of the model, we should check whether the best selected model can indeed capture the most important features of the data, which is in case of ABC represented by our summary statistics.
@@ -475,11 +511,23 @@ abc::gfitpca(target = observed_stats, sumstat = model_stats, index = model_names
 ## Posterior predictive checks
 
 
-```{r}
+```{r, eval=!file.exists(pred_exists)}
 plan(multisession, workers = availableCores())
-predX <- predict(abcX, 1000, posterior = "unadj")
-predY <- predict(abcY, 1000, posterior = "unadj")
-predZ <- predict(abcZ, 1000, posterior = "unadj")
+predX <- predict(abcX, samples = 1000, posterior = "unadj")
+predY <- predict(abcY, samples = 1000, posterior = "unadj")
+predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
+```
+
+```{r, echo=FALSE, eval=file.exists(pred_exists)}
+saveRDS(predX, predX_path)
+saveRDS(predY, predY_path)
+saveRDS(predZ, predZ_path)
+```
+
+```{r, echo=FALSE, eval=file.exists(pred_exists)}
+predX <- readRDS(predX_path)
+predY <- readRDS(predY_path)
+predZ <- readRDS(predZ_path)
 ```
 
 Looking at the posterior predictive plots from the _model X_, we can see that the observed statistics (vertical dashed lines) fall very well within the distributions of statistics simulated from the posterior parameters of the model. This suggests that are model (simplified that it must be given the more complex reality), captures the empoirical statistics quite well:

@@ -69,7 +69,7 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
                  fill = guide_legend("simulated"),
                  linetype = guide_legend("observed")) +
         scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
-        theme(legend.position = "right")
+        theme(legend.position = "bottom")
     }
 
     if (facets && !is_vector_stat) p <- p + ggplot2::facet_wrap(~ stat, scales = scales)
