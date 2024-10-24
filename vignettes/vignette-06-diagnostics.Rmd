@@ -407,20 +407,20 @@ Link: [](http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf)
 It is one thing to 
 Simply speaking, when fitting a model and estimating its parameters using ABC, we rely on a set of summary statistics, which we assume capture the most important features of the true model represented by the data we gathered. Performing posterior predictive checks involves estimating the posterior distributions of the parameters of interest from the data (i.e. doing ABC inference) -- something we've done above on our `modelX`, `modelY`, and `modelZ` -- and then sampling parameters from these distributions and generating distributions of simulated summary statistics from those estimated models. Then, we plot the distributions of each of our _simulated_ summary statistics together with a vertical line representing the values of the _observed_ statistics. Naturally, only if the model can generate statistics compatible with the values observed in real data can we regard the model as sensible and usable for inference.
 
-```{r, eval=!file.exists(pred_exists)}
+```{r, eval=!pred_exists}
 plan(multisession, workers = availableCores())
 predX <- predict(abcX, samples = 1000, posterior = "unadj")
 predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
 ```
 
-```{r, echo=FALSE, eval=file.exists(pred_exists)}
+```{r, echo=FALSE, eval=pred_exists}
 saveRDS(predX, predX_path)
 saveRDS(predY, predY_path)
 saveRDS(predZ, predZ_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(pred_exists)}
+```{r, echo=FALSE, eval=pred_exists}
 predX <- readRDS(predX_path)
 predY <- readRDS(predY_path)
 predZ <- readRDS(predZ_path)
