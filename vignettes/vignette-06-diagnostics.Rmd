@@ -394,122 +394,18 @@ example_model <- compile_model(
 plot_model(example_model, proportions = TRUE)
 ```
 
-## ABC cross-validation
+It appears that we can be quite confident in which of the three models is most compatible with the data. However, before we move on to inferring parameters of the model, we should check whether the best selected model can indeed capture the most important features of the data, which is in case of ABC represented by our summary statistics.
 
-```{r}
-cv_abc <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
-cv_abc_loclinear <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "loclinear")
-cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "rejection")
-```
+In order to do this, _demografr_ provides a function call `predict()` which performs posterior predictive check. Below, we we also look at how to use functions `gfit()` and `gfitpca()` implemented by the _abc_ R package itself.
 
-```{r}
-cv_abc
-cv_abc_loclinear
-cv_abc_rejection
-```
-
-```{r}
-plot(cv_abc)
-plot(cv_abc_loclinear)
-plot(cv_abc_rejection)
-```
-
-
-## Goodness-of-fit
-
-```{r}
-parts <- unpack(abcX)
-gfit_X <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
-plot(gfit_X, main="Histogram under H0")
-summary(gfit_X)
-```
-
-```{r}
-parts <- unpack(abcY)
-gfit_Y <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
-plot(gfit_Y, main="Histogram under H0")
-summary(gfit_Y)
-```
-
-```{r}
-parts <- unpack(abcZ)
-gfit_Z <- gfit(target = parts$target, sumstat = parts$sumstat, statistic = mean, nb.replicate = 100)
-plot(gfit_Z, main="Histogram under H0")
-summary(gfit_Z)
-```
-
-```{r}
-library(locfit)
-parts <- unpack(list(abcX, abcY, abcZ))
-gfitpca(target = parts$target, sumstat = parts$sumstat, index = parts$index, cprob = 0.01)
-```
-
-
-
-
-
-http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf
-
-So, it appears that we can be quite confident in which of the three models best represents the data. However, before we move on to inferring parameters of the model, we should check whether the best selected model can indeed capture the most important features of the data, which is in case of ABC represented by our summary statistics.
-
-The _abc_ R package provides two functions, `gfit()` and `gfitpca()`, for which _demografr_ yet again provides convenient wrappers which leverage various model metadata stored in each _demografr_ inference object.
-
-First, there is a function `goodness_of_fit()` which can be used in the following way:
-
-```{r}
-gfitX <- goodness_of_fit(abcX, replicates = 1000)
-
-summary(gfitX)
-
-plot(gfitX, main = "Histogram for modelX under H0")
-```
-
-```{r}
-gfitY <- goodness_of_fit(abcY, replicates = 1000)
-
-summary(gfitY)
-
-plot(gfitY, main = "Histogram for modelY under H0")
-```
-
-```{r}
-gfitZ <- goodness_of_fit(abcZ, replicates = 1000)
-
-summary(gfitZ)
-
-plot(gfitZ, main = "Histogram for modelZ under H0")
-```
-
-
-
-```{r}
-models <- list(abcX, abcY, abcZ)
-
-names(models) <- vapply(models, function(m) attr(m, "components")$model_name, FUN.VALUE = character(1))
-model_nsims <- vapply(models, function(x) nrow(attr(x, "components")$simulated), FUN.VALUE = integer(1))
-model_stats <- lapply(models, function(x) attr(x, "components")$simulated) %>% do.call(rbind, .) %>% as.matrix()
-model_names <- lapply(seq_along(models), function(i) rep(names(models)[i], model_nsims[i])) %>% unlist()
-
-observed_stats <- bind_observed(attr(models[[1]], "components")$observed)
-
-if (length(colnames(observed_stats)) != length(colnames(observed_stats)) || 
-  any(colnames(observed_stats) != colnames(model_stats))) {
-  stop("Observed and simulated statistics matrices are not compatible", call. = FALSE)
-}
-
-library(locfit)
-abc::gfitpca(target = observed_stats, sumstat = model_stats, index = model_names, cprob = 0.1)
-```
-
-<!-- ```{r} -->
-<!-- abcX <- readRDS("inst/examples/basic_abc.rds") -->
-<!-- ``` -->
-
-
-
+Let's start with the posterior predictive checks.
 
 ## Posterior predictive checks
 
+Link: [](http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf)
+
+It is one thing to 
+Simply speaking, when fitting a model and estimating its parameters using ABC, we rely on a set of summary statistics, which we assume capture the most important features of the true model represented by the data we gathered. Performing posterior predictive checks involves estimating the posterior distributions of the parameters of interest from the data (i.e. doing ABC inference) -- something we've done above on our `modelX`, `modelY`, and `modelZ` -- and then sampling parameters from these distributions and generating distributions of simulated summary statistics from those estimated models. Then, we plot the distributions of each of our _simulated_ summary statistics together with a vertical line representing the values of the _observed_ statistics. Naturally, only if the model can generate statistics compatible with the values observed in real data can we regard the model as sensible and usable for inference.
 
 ```{r, eval=!file.exists(pred_exists)}
 plan(multisession, workers = availableCores())
@@ -580,3 +476,156 @@ extract_prediction(predX, "diversity")
 ```
 
 However, note that `extract_prediction` is a convenience function which only unnests, reformats, and renames the list-columns with summary statistics stored in the `predictions` data frame above. You can do all the processing based on the `predictions` object above.
+
+
+
+## Additional diagnostics and backwards compatibility with the _abc_ package
+
+As mentioned above, the functionality behind `cross_validate()` is implemented by reformatting the results of _demografr_ simulation and inference functionality in a form necessary to run the functions of the _abc_ package `cv4abc()` and `cv4postpr()` behind the scenes -- a task that normally requires a significant amount of potentially error-prone bookkeeping on part of the user.
+
+In addition to _demografr_'s own function `predict()` which implements posterior predictive checks, the _abc_ package provides additional functionality for evaluating the quality of the fit of an ABC model to the data, namely `gfit()` and `gfitpca()`. In this section we demonstrate how this functionality (and potentially other future _abc_ functions) can be applied on _demografr_ data with very little additional work.
+
+First, _demografr_ provides a function `unpack()` which -- when applied on an object generated either by `simulate_abc()` or `run_abc()` -- _unpacks_ the object encapsulating all information describing the simulation and inference which produced it, into individual components with names matching the "low-level" function arguments of all relevant functions of the _anc_ package. This includes `gfit()` and `gfitpca()` mentioned above, but also functions `cv4abc()` and `cv4postpr()`. Here is how `unpack()` works.
+
+### "Unpacking" a _demografr_ object to low-level components used by the _abc_ package
+
+```{r}
+partsX <- unpack(abcX)
+
+class(partsX)
+names(partsX)
+```
+
+As we can see, the `unpack()` function produced a list object with several elements: `r names(parts)`. It's not a coincidence that the names of these list elements correspond to function arguments of various diagnostic functions of the _abc_ package. In this way, _demografr_ pre-generates the information required by those functions (which normally need to be prepared manually), which can then be run without any additional work whatsoever. For instance, we could perform the cross-validation of the model selection using _abc_'s own functionality like this.
+
+First, because model-selection requires, well, multiple models to select from, we will unpack information from all the three models:
+
+```{r}
+parts <- unpack(list(abcX, abcY, abcZ))
+
+class(parts)
+names(parts)
+```
+
+Then, we simply run `cv4postpr()` as we normally would, using the information pre-generated by `unpack()`:
+
+```{r}
+cv4postpr_res <- cv4postpr(index = parts$index, sumstat = parts$sumstat, nval = 10, tols = 0.01, method = "neuralnet")
+```
+
+Unlike the result of `cross_validate()` above, typing out the object `cv4postpr_res` will not help us, but we can get the overview of the results by applying the function `summary()`:
+
+```{r}
+summary(cv4postpr_res)
+```
+
+As you can see, we can replicate the result of `cross_validate()` for model selection by combining the functions `unpack()`, `cv4postpr()` and `summary()`. Of course, using `cross_validate()` allows us to do this all in one go in a straightforward way, but the above hopefully demonstrates that there's no magic behind _demografr_'s convenient functionality. It just streamlines the process of ABC diagnostics and avoids unnecessary (and potentially error-prone) data processing.
+
+On a similar note, we can also run _abc_ functions `gfit()` and `gfitpca()` (as described in [this vignette](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf)) in exactly the same way. We will focus just on the code, and leave the interpretation to the discussion in the vignette:
+
+First, we will unpack the results of the selected best-fitting model from the appropriate `abc` object obtained by the _demografr_ function `run_abc()` above:
+
+```{r}
+partsX <- unpack(abcX)
+
+class(partsX)
+names(partsX)
+```
+
+Then we use the elements of the parts list that we just created as inputs for `gfit()`:
+
+```{r}
+gfitX <- gfit(target = partsX$target, sumstat = partsX$sumstat, statistic = mean, nb.replicate = 100)
+
+plot(gfitX, main="Histogram under H0 (model X)")
+
+summary(gfitX)
+```
+
+```{r}
+partsY <- unpack(abcY)
+
+gfitY <- gfit(target = partsY$target, sumstat = partsY$sumstat, statistic = mean, nb.replicate = 100)
+
+plot(gfitY, main="Histogram under H0 (model Y)")
+
+summary(gfitY)
+```
+
+```{r}
+partsZ <- unpack(abcZ)
+
+gfitZ <- gfit(target = partsZ$target, sumstat = partsZ$sumstat, statistic = mean, nb.replicate = 100)
+
+plot(gfitZ, main="Histogram under H0 (model Z)")
+
+summary(gfitZ)
+```
+
+For completeness, here is how we can run `gfitpca()` on _demografr_ results:
+
+```{r}
+parts <- unpack(list(abcX, abcY, abcZ))
+
+# this needs to be loaded because of a bug in abc dependency handling
+library(locfit)
+gfitpca(target = parts$target, sumstat = parts$sumstat, index = parts$index, cprob = 0.01,
+        xlim = c(-7, 7), ylim = c(-6, 3))
+```
+
+Based on the PCA, it appears that although model X and model Y are able to generate summary statistics (the areas captured by the colored "envelopes" in 2D space) compatible with the observed values (the cross), modelZ clearly cannot.
+
+
+## ABC cross-validation
+
+Now we are finally at a point at which we can infer the parameters of our model against the data. However, before we do so, we should first check if our ABC setup can even estimate the model parameters at all. As we have seen just above, the _abc_ package provides a ABC cross-validation function `cv4abc()` for which _demografr_ implements a convenient interface in the form of the method `cross_validate()`. Above we have seen how to use this method to perform model selection, if given a list of multiple ABC objects as input. Instead, if given a single _demografr_ ABC object (generated by the function `run_abc()`), it performs ABC cross-validation which we can use to gauge the accuracy of ABC and the sensitivity of the parameter estimates to the tolerance rate.
+
+```{r}
+cv_abc <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+cv_abc_loclinear <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "loclinear")
+cv_abc_rejection <- cross_validate(abcX, nval = 10, tols = c(0.005, 0.01, 0.05), method = "rejection")
+```
+
+```{r}
+cv_abc
+```
+
+```{r}
+plot(cv_abc)
+```
+
+
+## Parameter inference
+
+Now we can finally estimate the model parameters. Because we simulated the data from a (hidden) true, known model, we will also visualize the true parameter values as vertical dashed lines:
+
+```{r}
+abcX
+```
+
+```{r}
+extract_summary(abcX)
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r, posterior_Tsplit, warning=FALSE, fig.width=8, fig.height=5}
+plot_posterior(abcX, param = "T") +
+  geom_vline(xintercept = c(2000, 6000, 8000), linetype = "dashed")
+```
+
+```{r, posterior_Ne, warning=FALSE, fig.width=8, fig.height=5}
+plot_posterior(abcX, param = "Ne") +
+    geom_vline(xintercept = c(2000, 800, 9000, 4000), linetype = "dashed")
+```
+
+```{r, posterior_Ne, warning=FALSE, fig.width=8, fig.height=5}
+plot_posterior(abcX, param = "gf") +
+  geom_vline(xintercept = 0.1, linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 1))
+```
+
+Not bad, considering how few simulations we've thrown at the inference in order to save computational resources!
+
