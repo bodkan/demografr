@@ -440,32 +440,32 @@ plot_prediction(predY)
 
 We can compare the divergences between models directly to see which model gives the most reasonable posterior predictive check results more clearly:
 
-```{r}
+```{r, fig.width=10, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "divergence"),
   plot_prediction(predY, "divergence"),
   plot_prediction(predZ, "divergence"),
-  nrow = 1
+  ncol = 1
 )
 ```
 
 We can see that posterior predictive checks for nucleotide diversity are a little less clear as there are no extremely dramatic outliers as it's the case for divergence above:
 
-```{r}
+```{r, fig.width=10, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "diversity"),
   plot_prediction(predY, "diversity"),
   plot_prediction(predZ, "diversity"),
-  nrow = 1
+  ncol = 1
 )
 ```
 
-```{r}
+```{r, fig.width=10, fig.height=13}
 cowplot::plot_grid(
   plot_prediction(predX, "f4"),
   plot_prediction(predY, "f4"),
   plot_prediction(predZ, "f4"),
-  nrow = 1
+  ncol = 1
 )
 ```
 
