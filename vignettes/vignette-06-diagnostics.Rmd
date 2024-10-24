@@ -627,5 +627,13 @@ plot_posterior(abcX, param = "gf") +
   coord_cartesian(xlim = c(0, 1))
 ```
 
-Not bad, considering how few simulations we've thrown at the inference in order to save computational resources in this small vignette!
+Not bad, considering how few simulations we've thrown at the inference in order to save computational resources in this small vignette! We can see that the modes of the inferred posterior distributions of the model parameters (the colorful densities plotted above) line up pretty much perfectly with the true values (dashed vertical lines).
 
+To make this concluding point even clearer (and also to demonstrate the importance of the various validation procedures described above, such as the posterior predictive checks!) let's say that we weren't careful enough with model selection and simply assumed that the structure of `modelZ` is the most appropriate model for our data and used it for inference of the split time parameters instead. **This is complete non-sense and we show this purely for demonstration purposes!**
+
+```{r posteriorZ_Tsplit, warning=FALSE, fig.width=8, fig.height=5}
+plot_posterior(abcZ, param = "T") +
+  geom_vline(xintercept = c(2000, 6000, 8000), linetype = "dashed")
+```
+
+We can clearly see that posterior distributions inferred by ABC for this particular model completely failed to capture the true values.
