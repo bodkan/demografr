@@ -162,7 +162,7 @@ functions <- list(
 
 # data-generating functions for computing summary statistics
 data <- list(
-  ts = function(path) ts_load(file.path(path, "result.trees"))
+  ts = function(path) ts_read(file.path(path, "result.trees"))
 )
 ```
 

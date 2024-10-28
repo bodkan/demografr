@@ -45,7 +45,7 @@ test_that("basic simulate_model() runs produce a tree-sequence file (SLiM)", {
     format = "files",
     data = data_list
   )
-  expect_s3_class(ts_load(norm_path(file.path(result$path, "slim.trees"))), "slendr_ts")
+  expect_s3_class(ts_read(norm_path(file.path(result$path, "slim.trees"))), "slendr_ts")
 })
 
 test_that("basic simulate_model() runs produce a tree-sequence file (msprime)", {
@@ -57,7 +57,7 @@ test_that("basic simulate_model() runs produce a tree-sequence file (msprime)", 
     format = "files",
     data = data_list
   )
-  expect_s3_class(ts_load(norm_path(file.path(result$path, "msprime.trees"))), "slendr_ts")
+  expect_s3_class(ts_read(norm_path(file.path(result$path, "msprime.trees"))), "slendr_ts")
 })
 
 test_that("for customized files, data-generating functions must be provided", {
@@ -76,8 +76,8 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       engine = "slim",
       format = "ts",
       data = list(
-        ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model),
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ),
     "The following function arguments are not valid: \"path\"."
@@ -89,8 +89,8 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "slim",
       format = "files", data = list(
-        ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model),
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ))
   )
@@ -107,8 +107,8 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       engine = "msprime",
       format = "ts",
       data = list(
-        ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model),
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ),
     "The following function arguments are not valid: \"path\"."
@@ -120,8 +120,8 @@ test_that("format = 'ts' allows only 'ts' and 'model' to be available in data fu
       sequence_length = 1e6, recombination_rate = 1e-8,
       engine = "msprime",
       format = "files", data = list(
-        ts = function(path, model) file.path(path, "msprime.trees") %>% ts_load(model),
-        gt = function(path, model) file.path(path, "msprime.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        ts = function(path, model) file.path(path, "msprime.trees") %>% ts_read(model),
+        gt = function(path, model) file.path(path, "msprime.trees") %>% ts_read(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     ))
   )
@@ -151,7 +151,7 @@ test_that("format = 'custom' allows only 'path' and 'model' to be available", {
       engine = "slim",
       format = "files",
       data = list(
-        gt = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
+        gt = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8) %>% ts_genotypes()
       )
     )$gt,
     "data.frame"

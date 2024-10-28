@@ -148,7 +148,7 @@ simulate_model(
   model, priors,
   model_args = list(origin_pop = "EUR", target_pop = "EUR"),
   outputs = list(
-    ts = function(paths, model) ts_load(paths[1], model) %>% ts_mutate(1e-8),
+    ts = function(paths, model) ts_read(paths[1], model) %>% ts_mutate(1e-8),
     freq = function(paths) readr::read_tsv(paths[2]),
     paths
   )

@@ -61,8 +61,8 @@ data <- simulate_model(
   engine = "slim",
   format = "files",
   data = list(
-    ts = function(path, model) file.path(path, "slim.trees") %>% ts_load(model),
-    samples = function(path, model) file.path(path, "slim.trees") %>% ts_load(model) %>% ts_names(split = "pop"),
+    ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model),
+    samples = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_names(split = "pop"),
     stats = function(path) file.path(path, "stats.tsv") %>% read.table(header = TRUE)
   )
 )
@@ -90,7 +90,7 @@ test_that("summarise_data produces data frames for every summary function", {
 test_that("summarise_data can utilize pre-computed statistics as data (pre-defined data functions)", {
   data_functions <- list(
     ts_pi = function(path, model) {
-      ts <- file.path(path, "slim.trees") %>% ts_load(model)
+      ts <- file.path(path, "slim.trees") %>% ts_read(model)
       ts_diversity(ts, ts_names(ts, split = "pop"))
     },
     slim_pi = function(path) file.path(path, "stats.tsv") %>%
@@ -118,7 +118,7 @@ test_that("summarise_data can utilize pre-computed statistics as data (inline da
     format = "files",
     data = list(
       ts_pi = function(path, model) {
-        ts <- file.path(path, "slim.trees") %>% ts_load(model)
+        ts <- file.path(path, "slim.trees") %>% ts_read(model)
         ts_diversity(ts, ts_names(ts, split = "pop"))
       },
       slim_pi = function(path) file.path(path, "stats.tsv") %>%
