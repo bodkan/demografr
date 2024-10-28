@@ -880,7 +880,7 @@
     },
     "gtable": {
       "Package": "gtable",
-      "Version": "0.3.5",
+      "Version": "0.3.6",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -889,9 +889,10 @@
         "glue",
         "grid",
         "lifecycle",
-        "rlang"
+        "rlang",
+        "stats"
       ],
-      "Hash": "e18861963cbc65a27736e02b3cd3c4a0"
+      "Hash": "de949855009e2d4d0e52a844e30617ae"
     },
     "here": {
       "Package": "here",
@@ -1929,7 +1930,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
-      "RemoteSha": "cf6caa5cb23e42aadab613ea9c074d55b241f3b8",
+      "RemoteSha": "0639cb0e60067a416d8f3b1370e65d5b9e2ea57b",
       "Requirements": [
         "R",
         "ape",
@@ -1947,7 +1948,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "f321d86bbd04ec2be2314e192ef3ad05"
+      "Hash": "e5e0bbeda402afb989d8b38f1bca44ec"
     },
     "sourcetools": {
       "Package": "sourcetools",
