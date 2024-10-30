@@ -1930,7 +1930,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
-      "RemoteSha": "0639cb0e60067a416d8f3b1370e65d5b9e2ea57b",
+      "RemoteSha": "29404e75b59277b69b920273bf7f9bdeb5c7bbe8",
       "Requirements": [
         "R",
         "ape",
@@ -1948,7 +1948,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "e5e0bbeda402afb989d8b38f1bca44ec"
+      "Hash": "33c1b50a67589e3e010dfb9347033522"
     },
     "sourcetools": {
       "Package": "sourcetools",
