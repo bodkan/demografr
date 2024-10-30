@@ -20,47 +20,69 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
+devtools::load_all("/home/slendr")
 devtools::load_all()
 
 data_path <- here::here("inst/examples/selection_abc.rds")
 ```
 
 ```{r}
-devtools::load_all("~/Projects/slendr")
-devtools::load_all()
+library(demografr)
+library(slendr)
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+library(future)
+plan(multisession)
+
 init_env(quiet = TRUE)
 ```
 
 ```{r}
-extension <- r"(
-initialize() {
-    initializeMutationType("m1", 0.5, "f", 0.0);
-
-    initializeGenomicElementType("g1", m1, 1.0);
-    initializeGenomicElement(g1, 0, 99);
-
-    initializeMutationRate(0);
-    initializeRecombinationRate(0);
-}
-
+extension_code <- r"(
+// Define model constants (to be substituted) all in one place
+// (each {{placeholder}} will be replaced by a value passed from R).
+// Note that string constant template patterns are surrounded by "quotes"!
 initialize() {
     defineConstant("s", {{s}});
     defineConstant("onset_time", {{onset_time}});
-    defineConstant("origin_pop", "{{origin_pop}}");
     defineConstant("target_pop", "{{target_pop}}");
-    defineConstant("freq_file", OUTPUT_DIR + "/" + "traj_" + target_pop + "_" + origin_pop + ".tsv");
+    defineConstant("origin_pop", "{{origin_pop}}");
+
+    // compose a trajectory file based on given parameters
+    defineConstant("traj_file", PATH + "/" +
+                                "traj_" + target_pop + "_" + origin_pop + ".tsv");
+}
+// Because we want to simulate non-neutral evolution, we have to provide a
+// custom initialization callback -- slendr will use it to replace its default
+// neutral genomic architecture (i.e. the initialize() {...} callback it uses
+// by default for neutral simulations). Note that we can refer to slendr's
+// constants SEQUENCE_LENGTH and RECOMBINATION_RATE, which will carry values
+// passed through from R via slendr's slim() R function.
+initialize() {
+    initializeMutationType("m1", 0.5, "f", s);
+
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElement(g1, 0, SEQUENCE_LENGTH - 1);
+
+    initializeMutationRate(0);
+    initializeRecombinationRate(RECOMBINATION_RATE);
 }
 
 function (void) add_mutation(void) {
     // sample one target carrier of the new mutation...
     target = sample(population(origin_pop).genomes, 1);
     // ... and add the mutation in the middle of it
-    mut = target.addNewMutation(m1, s, position = 50);
+    mut = target.addNewDrawnMutation(m1, position = asInteger(SEQUENCE_LENGTH / 2));
 
     // save the mutation for later reference
     defineGlobal("MUTATION", mut);
 
-    log_output("adding beneficial mutation to population " + target_pop);
+    write_log("adding beneficial mutation to population " + target_pop);
+
+    writeFile(traj_file, "time\tfreq_origin\tfreq_target");
 }
 
 tick(onset_time) late() {
@@ -68,51 +90,43 @@ tick(onset_time) late() {
     save_state();
 
     add_mutation();
-    writeFile(freq_file, "time\tfreq");
 }
 
 tick(onset_time):SIMULATION_END late() {
     // the mutation is not segregating and is not fixed either -- we must restart
     if (!MUTATION.isSegregating & !MUTATION.isFixed) {
-        log_output("mutation lost -- restarting");
+        write_log("mutation lost -- restarting");
 
         reset_state();
 
         add_mutation();
-        writeFile(freq_file, "time\tfreq");
     }
 
     // compute the frequency of the mutation of interest and save it (if the
     // mutation is missing at this time, save its frequency as NA)
-    freq = "NA";
+    freq_origin = "NA";
+    freq_target = "NA";
+    if (population(origin_pop, check = T))
+      freq_origin = population(origin_pop).genomes.mutationFrequenciesInGenomes();
     if (population(target_pop, check = T))
-      freq = population(target_pop).genomes.mutationFrequenciesInGenomes();
+      freq_target = population(target_pop).genomes.mutationFrequenciesInGenomes();
 
-    writeFile(freq_file,
-              community.tick + "\t" +
+    writeFile(traj_file,
               model_time(community.tick) + "\t" +
-              freq, append = T);
-}
-
-SIMULATION_END late() {
-    ts_file = OUTPUT_DIR + "/output.trees";
-    save_ts(ts_file);
-
-    paths = OUTPUT_DIR + "/paths.txt";
-    writeFile(paths, ts_file);
-    writeFile(paths, freq_file, append = T);
+              freq_origin + "\t" +
+              freq_target, append = T);
 }
 )"
 
-model <- function(s, onset_time, origin_pop = NULL, target_pop = NULL) {
-  extension <- substitute(
-    extension,
+model <- function(s, onset_time, origin_pop, target_pop) {
+  extension <- substitute_values(
+    extension_code,
     s = s, onset_time = as.integer(onset_time),
     origin_pop = origin_pop, target_pop = target_pop
   )
   
   afr <- population("AFR", time = 90000, N = 3000)
-  ooa <- population("OOA", parent = afr, time = 60000, N = 500, remove = 23000) 
+  ooa <- population("OOA", parent = afr, time = 60000, N = 500, remove = 23000)
   ehg <- population("EHG", parent = ooa, time = 28000, N = 1000, remove = 6000)
   eur <- population("EUR", parent = ehg, time = 25000, N = 5000)
   ana <- population("ANA", time = 28000, N = 3000, parent = ooa, remove = 4000)
@@ -137,6 +151,18 @@ model <- function(s, onset_time, origin_pop = NULL, target_pop = NULL) {
 ```
 
 ```{r}
+devtools::load_all("/home/slendr")
+
+m <- model(s = 0.1, onset_time = 5000, origin_pop = "EUR", target_pop = "EUR")
+m
+```
+
+```{r}
+result <- slim(m[[1]], samples = m[[2]], sequence_length = 1e6, recombination_rate = 1e-8, path = TRUE)
+result <- slim(m[[1]], samples = m[[2]], sequence_length = 1e6, recombination_rate = 1e-8, path = TRUE, ts = FALSE)
+```
+
+```{r}
 priors <- list(
   s ~ runif(0, 0.1),
   onset_time ~ runif(3000, 20000)
@@ -144,16 +170,59 @@ priors <- list(
 ```
 
 ```{r}
-simulate_model(
+data <- simulate_model(
   model, priors,
+  sequence_length = 1e6, recombination_rate = 0,
   model_args = list(origin_pop = "EUR", target_pop = "EUR"),
-  outputs = list(
-    ts = function(paths, model) ts_read(paths[1], model) %>% ts_mutate(1e-8),
-    freq = function(paths) readr::read_tsv(paths[2]),
-    paths
+  engine = "msprime",
+  format = "files",
+  data = list(
+    ts = function(path, model) ts_read(file.path(path, "msprime.trees"), model) %>% ts_mutate(1e-8)
   )
 )
 ```
 
+```{r}
+data <- simulate_model(
+  model, priors,
+  sequence_length = 1e6, recombination_rate = 0,
+  model_args = list(origin_pop = "EUR", target_pop = "EUR"),
+  format = "files",
+  data = list(
+    ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8),
+    trajectory = function(path) readr::read_tsv(file.path(path, "traj_EUR_EUR.tsv"), show_col_types = FALSE)
+  )
+)
+```
+
+```{r}
+functions <- quote(list(trajectory = trajectory))
+summarise_data(data, functions = functions)
+
+summarise_data(data, functions = list(trajectory = trajectory))
+```
+
+
+```{r}
+grid <- expand_grid(s = seq(0, 0.2, 0.02), onset_time = seq(2000, 20000, by = 2000)) %>% head(3)
+grid
+
+data <- simulate_grid(
+  model, grid, functions = list(target_trajectory = function(df) df[c("time", "freq_target")],
+                                origin_trajectory = function(df) df[c("time", "freq_origin")]),
+  format = "files", data = list(df = function(path) readr::read_tsv(file.path(path, "traj_EUR_EUR.tsv"), show_col_types = FALSE)),
+  replicates = 5, sequence_length = 1e6, recombination_rate = 1e-8,
+  model_args = list(origin_pop = "EUR", target_pop = "EUR")
+)
+```
+
+```{r}
+data %>%
+  unnest(target_trajectory) %>%
+  ggplot(aes(time, freq_target)) +
+  geom_line(aes(color = factor(s), group = rep)) +
+  ylim(c(0, 1)) +
+  facet_wrap(~ onset_time)
+```
 
 
