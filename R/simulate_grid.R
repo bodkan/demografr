@@ -78,7 +78,8 @@ simulate_grid <- function(
     names(model_args),
     names(engine_args)
   ) %>%
-    unlist()
+    unlist() %>%
+    unique()
   if (is.null(globals)) globals <- TRUE
 
   # prepare the grid data frame for storing the results
@@ -87,7 +88,6 @@ simulate_grid <- function(
     function(rep_i) dplyr::mutate(grid, rep = rep_i)
   ) %>%
     do.call(rbind, .)
-
 
   its <- seq_len(nrow(grid))
   p <- progressr::progressor(along = its)
