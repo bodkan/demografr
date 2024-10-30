@@ -72,6 +72,8 @@ simulate_grid <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
+  model_name <- as.character(substitute(model))
+
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   globals <- c(
@@ -79,7 +81,8 @@ simulate_grid <- function(
     names(engine_args)
   ) %>%
     unlist() %>%
-    unique()
+    unique() %>%
+    c(model_name, .) # TODO: Check if this is really needed in all instances
   if (is.null(globals)) globals <- TRUE
 
   # prepare the grid data frame for storing the results
@@ -112,7 +115,7 @@ simulate_grid <- function(
             engine = engine,
             model_args = model_args,
             engine_args = engine_args,
-            model_name = as.character(substitute(model)),
+            model_name = model_name,
             attempts = 1
           )
           res$rep <- grid[grid_i, ]$rep
