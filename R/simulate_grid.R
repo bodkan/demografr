@@ -118,7 +118,7 @@ simulate_grid <- function(
             model_args = model_args,
             engine_args = engine_args,
             model_name = model_name,
-            attempts = 1
+            attempts = NULL
           )
           res$rep <- grid[grid_i, ]$rep
           res
