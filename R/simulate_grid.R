@@ -157,7 +157,8 @@ simulate_grid <- function(
   results_df$rep <- vapply(results, `[[`, "rep", FUN.VALUE = integer(1))
 
   # similarly, convert computed simulation summary statistics into a matrix
-  for (stat in names(functions)) {
+  summary_names <- if (is.call(functions)) names(as.list(functions)[-1]) else names(functions)
+  for (stat in summary_names) {
     results_df[[stat]] <- lapply(results, `[[`, "simulated") %>% lapply(`[[`, stat)
   }
 
