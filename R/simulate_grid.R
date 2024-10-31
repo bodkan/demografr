@@ -66,8 +66,8 @@ simulate_grid <- function(
   if (!inherits(grid, "data.frame") && !nrow(grid))
     stop("The parameter `grid` must be a non-empty R data frame object", call. = FALSE)
 
-  if (!all(vapply(grid, is.numeric, logical(1))))
-    stop("The parameter `grid` must contain only numerical columns", call. = FALSE)
+  # if (!all(vapply(grid, is.numeric, logical(1))))
+  #   stop("The parameter `grid` must contain only numerical columns", call. = FALSE)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
