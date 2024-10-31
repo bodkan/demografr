@@ -52,9 +52,9 @@ model <- function(s, onset_time, origin_pop, target_pop) {
       defineConstant("target_pop", "{{target_pop}}");
       defineConstant("origin_pop", "{{origin_pop}}");
 
-      // compose a trajectory file based on given parameters
-      defineConstant("traj_file", PATH + "/" +
-                                  "traj_" + target_pop + "_" + origin_pop + ".tsv");
+      // paths to trajectory files
+      defineConstant("origin_file", PATH + "/" + "origin_traj.tsv");
+      defineConstant("target_file", PATH + "/" + "target_traj.tsv");
   }
   // Because we want to simulate non-neutral evolution, we have to provide a
   // custom initialization callback -- slendr will use it to replace its default
@@ -83,7 +83,8 @@ model <- function(s, onset_time, origin_pop, target_pop) {
   
       write_log("adding beneficial mutation to population " + target_pop);
   
-      writeFile(traj_file, "time\tfreq_origin\tfreq_target");
+      writeFile(origin_file, "time\tfrequency");
+      writeFile(target_file, "time\tfrequency");
   }
   
   tick(onset_time) late() {
@@ -112,10 +113,8 @@ model <- function(s, onset_time, origin_pop, target_pop) {
       if (population(target_pop, check = T))
         freq_target = population(target_pop).genomes.mutationFrequenciesInGenomes();
   
-      writeFile(traj_file,
-                model_time(community.tick) + "\t" +
-                freq_origin + "\t" +
-                freq_target, append = T);
+      writeFile(origin_file, model_time(community.tick) + "\t" + freq_origin, append = T);
+      writeFile(target_file, model_time(community.tick) + "\t" + freq_target, append = T);
   }
   )"
 
@@ -184,42 +183,92 @@ data <- simulate_model(
 data <- simulate_model(
   model, priors,
   sequence_length = 1e6, recombination_rate = 0,
-  model_args = list(origin_pop = "EUR", target_pop = "EUR"),
   format = "files",
   data = list(
     ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8),
-    trajectory = function(path) readr::read_tsv(file.path(path, "traj_EUR_EUR.tsv"), show_col_types = FALSE)
-  )
-)
-```
-
-```{r}
-functions <- quote(list(trajectory = trajectory))
-summarise_data(data, functions = functions)
-
-summarise_data(data, functions = list(trajectory = trajectory))
-```
-
-
-```{r}
-grid <- expand_grid(s = seq(0, 0.2, 0.02), onset_time = seq(2000, 20000, by = 2000)) %>% head(3)
-grid
-
-data <- simulate_grid(
-  model, grid, functions = list(target_trajectory = function(df) df[c("time", "freq_target")],
-                                origin_trajectory = function(df) df[c("time", "freq_origin")]),
-  format = "files", data = list(df = function(path) readr::read_tsv(file.path(path, "traj_EUR_EUR.tsv"), show_col_types = FALSE)),
-  replicates = 5, sequence_length = 1e6, recombination_rate = 1e-8,
+    origin_traj = function(path) readr::read_tsv(file.path(path, "origin_traj.tsv"), show_col_types = FALSE),
+    target_traj = function(path) readr::read_tsv(file.path(path, "target_traj.tsv"), show_col_types = FALSE)
+  ),
   model_args = list(origin_pop = "EUR", target_pop = "EUR")
 )
 ```
 
 ```{r}
+functions <- quote(list(
+  pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = "pop")["EUR"]),
+  origin_traj = origin_traj,
+  target_traj = target_traj)
+)
+summarise_data(data, functions = functions)
+
+summarise_data(
+  data,
+  functions = list(
+    pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = "pop")["EUR"]),
+    origin_traj = origin_traj,
+    target_traj = target_traj
+  )
+)
+```
+
+```{r}
+grid <- expand_grid(
+  s = seq(0, 0.2, 0.02),
+  onset_time = seq(2000, 20000, by = 2000),
+  origin_pop = c("ANA", "YAM"),
+  target_pop = "EUR"
+) %>% filter(onset_time == 2000, origin_pop == "ANA")
+
+grid <- sample_n(grid, 4)
+grid
+```
+
+
+```{r}
+# grid <- grid %>% bind_rows(data.frame(s = 0, onset_time = 1000, origin_pop = "EUR", target_pop = "EUR"))
+
+# plan(multisession)
+data <- simulate_grid(
+  model, grid, functions = list(
+  origin_traj = function(origin_df) origin_df[c("time", "frequency")],
+  target_traj = function(target_df) target_df[c("time", "frequency")]
+),
+  format = "files",
+  data = list(
+ origin_df = function(path) read.table(file.path(path, "origin_traj.tsv"), header = TRUE, sep = "\t"),
+ target_df = function(path) read.table(file.path(path, "target_traj.tsv"), header = TRUE, sep = "\t")
+),
+  replicates = 1, sequence_length = 1e6, recombination_rate = 1e-8
+)
+```
+
+```{r}
+data_funs <- list(
+ origin_df = function(path) read.table(file.path(path, "origin_traj.tsv"), header = TRUE, sep = "\t"),
+ target_df = function(path) read.table(file.path(path, "target_traj.tsv"), header = TRUE, sep = "\t")
+)
+  
+summary_funs <- list(
+  origin_traj = function(origin_df) origin_df[c("time", "frequency")],
+  target_traj = function(target_df) target_df[c("time", "frequency")]
+)
+
+# plan(multisession)
+data <- simulate_grid(
+  model, grid, functions = summary_funs,
+  format = "files",
+  data = data_funs,
+  replicates = 2, sequence_length = 1e6, recombination_rate = 1e-8
+)
+```
+
+```{r}
 data %>%
-  unnest(target_trajectory) %>%
-  ggplot(aes(time, freq_target)) +
+  unnest(origin) %>%
+  ggplot(aes(time, frequency)) +
   geom_line(aes(color = factor(s), group = rep)) +
   ylim(c(0, 1)) +
+  scale_x_reverse() +
   facet_wrap(~ onset_time)
 ```
 
