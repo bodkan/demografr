@@ -73,6 +73,8 @@ simulate_grid <- function(
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   model_name <- as.character(substitute(model))
+  summary_name <- NULL #as.character(substitute(functions))
+  data_name <- NULL #as.character(substitute(data))
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
@@ -82,7 +84,7 @@ simulate_grid <- function(
   ) %>%
     unlist() %>%
     unique() %>%
-    c(model_name, .) # TODO: Check if this is really needed in all instances
+    c(model_name, summary_name, data_name, .) # TODO: Check if this is really needed in all instances
   if (is.null(globals)) globals <- TRUE
 
   # prepare the grid data frame for storing the results
