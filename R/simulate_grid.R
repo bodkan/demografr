@@ -73,8 +73,8 @@ simulate_grid <- function(
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
   model_name <- as.character(substitute(model))
-  summary_name <- NULL #as.character(substitute(functions))
-  data_name <- NULL #as.character(substitute(data))
+  summary_name <- as.character(substitute(functions))
+  data_name <- as.character(substitute(data))
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
@@ -104,7 +104,8 @@ simulate_grid <- function(
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
-          res <- run_iteration(
+          wrap <- if (strict) identity else capture.output
+          wrap(res <- run_iteration(
             grid_i,
             model = model,
             params = parameters,
@@ -119,7 +120,7 @@ simulate_grid <- function(
             engine_args = engine_args,
             model_name = model_name,
             attempts = NULL
-          )
+          ))
           res$rep <- grid[grid_i, ]$rep
           res
         },
@@ -142,7 +143,8 @@ simulate_grid <- function(
     msg <- sprintf(paste0(
       "Out of the total %i simulations, %d runs resulted in an error. The most\n",
       "likely explanation for this is that some parameter combinations lead to\n",
-      "an invalid model (such as inconsistent order of split times)."),
+      "an invalid model (such as inconsistent order of split times).\n",
+      "If you don't think this is right, run this function with `strict = TRUE`."),
       length(invalid_runs), sum(invalid_runs)
     )
     message(msg)
