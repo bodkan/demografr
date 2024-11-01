@@ -128,8 +128,9 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
             stop(cross, "An unexpected error was raised when generating data from a slendr model\n",
                 "using the provided slendr function.\n\nThe error message received was:\n",
                 msg,
-                "\n\nPerhaps re-running the model function with the sampled parameters will\n",
-                "identify the problem. You can do so by calling:\n\n",
+                "\n\nPerhaps re-running the model function with the sampled parameters\n",
+                "(potentially also through a respective simulation engine) will help\n",
+                "to identify the problem. You can do so by calling:\n\n",
                 paste0(model_name, "(", model_fun_params, ")"),
                 call. = FALSE)
           } else
