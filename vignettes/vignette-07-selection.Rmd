@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 
 # devtools::install()
 devtools::load_all()
+devtools::load_all("/home/slendr")
 
 data_path <- here::here("inst/examples/selection_abc.rds")
 ```
@@ -190,6 +191,21 @@ data <- simulate_model(
     target_traj = function(path) readr::read_tsv(file.path(path, "target_traj.tsv"), show_col_types = FALSE)
   ),
   model_args = list(origin_pop = "EUR", target_pop = "EUR")
+)
+```
+
+```{r}
+expect_error(
+  quiet(data <- simulate_model(
+    model, parameters = list(s = 0, onset_time = 1000, origin_pop = "ANA", target_pop = "EUR"),
+    sequence_length = 1e6, recombination_rate = 0,
+    format = "files",
+    data = list(
+      ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8),
+      origin_traj = function(path) readr::read_tsv(file.path(path, "origin_traj.tsv"), show_col_types = FALSE),
+      target_traj = function(path) readr::read_tsv(file.path(path, "target_traj.tsv"), show_col_types = FALSE)
+    ),
+  ))
 )
 ```
 
