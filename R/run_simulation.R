@@ -129,8 +129,8 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
                 "using the provided slendr function.\n\nThe error message received was:\n",
                 msg,
                 "\n\nPerhaps re-running the model function with the sampled parameters\n",
-                "(potentially also through a respective simulation engine) will help\n",
-                "to identify the problem. You can do so by calling:\n\n",
+                "(ideally also running the model by a respective simulation engine) will\n",
+                "help to identify the problem. You can do so by calling:\n\n",
                 paste0(model_name, "(", model_fun_params, ")"),
                 call. = FALSE)
           } else
