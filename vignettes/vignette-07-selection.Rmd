@@ -235,26 +235,49 @@ grid <- expand_grid(
   target_pop = "EUR"
 ) %>% filter(onset_time == 2000, origin_pop == "ANA")
 
-grid <- sample_n(grid, 4)
+grid <- sample_n(grid, 2)
+
+grid <- grid %>% bind_rows(data.frame(s = 0, onset_time = 1000, origin_pop = "EUR", target_pop = "EUR"))
 grid
 ```
 
 
-```{r}
-# grid <- grid %>% bind_rows(data.frame(s = 0, onset_time = 1000, origin_pop = "EUR", target_pop = "EUR"))
+IMPLEMENT THE UNIT TESTS BELOW INTO THE UNIT TESTS FOR EXTENSIONS (OR MAYBE A NEW SCRIPT BECAUSE THESE
+ARE A BIT MORE COMPLEX?)
 
-# plan(multisession)
-data <- simulate_grid(
-  model, grid, functions = list(
-  origin_traj = function(origin_df) origin_df[c("time", "frequency")],
-  target_traj = function(target_df) target_df[c("time", "frequency")]
-),
-  format = "files",
-  data = list(
+```{r}
+data_funs <- list(
  origin_df = function(path) read.table(file.path(path, "origin_traj.tsv"), header = TRUE, sep = "\t"),
  target_df = function(path) read.table(file.path(path, "target_traj.tsv"), header = TRUE, sep = "\t")
-),
-  replicates = 1, sequence_length = 1e6, recombination_rate = 1e-8
+)
+  
+summary_funs <- list(
+  origin_traj = function(origin_df) origin_df[c("time", "frequency")],
+  target_traj = function(target_df) target_df[c("time", "frequency")]
+)
+
+grid <- data.frame(s = 0, onset_time = 2000, origin_pop = "ANA", target_pop = "EUR")
+
+# error when no grid combination gives a valid simulation
+expect_error(
+  data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
+                        replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE),
+  "All model simulation runs were invalid"
+)
+
+# a warning message when only part of grid combinations gives a valid result
+grid <- data.frame(s = c(0, 0), onset_time = c(15000, 2000), origin_pop = c("ANA", "ANA"), target_pop = c("EUR", "EUR"))
+expect_message(
+  data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
+                        replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE),
+  "Out of the total 2 simulations, 1 runs resulted in an error."
+)
+
+# even partially valid grid combinations give error under strict mode
+expect_error(
+  quiet(data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
+                              replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = TRUE)),
+  "An unexpected error was raised when generating data from a slendr model"
 )
 ```
 
