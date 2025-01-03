@@ -1930,7 +1930,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
-      "RemoteSha": "0639cb0e60067a416d8f3b1370e65d5b9e2ea57b",
+      "RemoteSha": "8026f2bd83e83393d6f4877bf172b58bbb3c9f53",
       "Requirements": [
         "R",
         "ape",
@@ -1948,7 +1948,7 @@
         "shinyWidgets",
         "tidyr"
       ],
-      "Hash": "e5e0bbeda402afb989d8b38f1bca44ec"
+      "Hash": "7cc4ff5d620695727cc090cf3db211bb"
     },
     "sourcetools": {
       "Package": "sourcetools",
@@ -2335,7 +2335,7 @@
     },
     "withr": {
       "Package": "withr",
-      "Version": "3.0.1",
+      "Version": "3.0.2",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2343,7 +2343,7 @@
         "grDevices",
         "graphics"
       ],
-      "Hash": "07909200e8bbe90426fbfeb73e1e27aa"
+      "Hash": "cc2d62c76458d425210d1eb1478b30b4"
     },
     "wk": {
       "Package": "wk",

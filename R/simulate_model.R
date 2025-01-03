@@ -61,8 +61,7 @@ simulate_model <- function(
     parameters <- list(parameters)
 
   if (!contains_priors(parameters) &&
-      !(is.numeric(unlist(parameters)) &&
-        !is.null(names(parameters)) &&
+      !(!is.null(names(parameters)) &&
         all(names(parameters) != "")))
     stop("Parameters must be given as:\n  - a list of formula objects, or\n",
          "  - a named list of numerical values", call. = FALSE)

@@ -38,7 +38,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
 
   n_tries <- 0
   repeat {
-    if (n_tries == attempts && model_is_sampled)
+    if ((!is.null(attempts) && n_tries == attempts) && model_is_sampled)
       stop("\n\nGenerating a valid slendr model using the provided generation function\n",
            "and priors failed even after ", attempts, " repetitions. Please make sure\n",
            "that your model function can produce a valid model assuming the specified\n",
@@ -112,7 +112,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
         # a parameter grid must lead to a valid simulation, so any error is reported
         if (model_is_sampled && any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
           return(NULL)
-        } else { # if an unexpected error ocurred, report it in full
+        } else { # if an unexpected error occurred, report it in full
           cross <- " \u274C\n\n"
           if (is.function(model)) {
             # compose parameters for the complete model function call
@@ -128,8 +128,9 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
             stop(cross, "An unexpected error was raised when generating data from a slendr model\n",
                 "using the provided slendr function.\n\nThe error message received was:\n",
                 msg,
-                "\n\nPerhaps re-running the model function with the sampled parameters will\n",
-                "identify the problem. You can do so by calling:\n\n",
+                "\n\nPerhaps re-running the model function with the sampled parameters\n",
+                "(ideally also running the model by a respective simulation engine) will\n",
+                "help to identify the problem. You can do so by calling:\n\n",
                 paste0(model_name, "(", model_fun_params, ")"),
                 call. = FALSE)
           } else

@@ -66,11 +66,15 @@ simulate_grid <- function(
   if (!inherits(grid, "data.frame") && !nrow(grid))
     stop("The parameter `grid` must be a non-empty R data frame object", call. = FALSE)
 
-  if (!all(vapply(grid, is.numeric, logical(1))))
-    stop("The parameter `grid` must contain only numerical columns", call. = FALSE)
+  # if (!all(vapply(grid, is.numeric, logical(1))))
+  #   stop("The parameter `grid` must contain only numerical columns", call. = FALSE)
 
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
+
+  model_name <- as.character(substitute(model))
+  summary_name <- as.character(substitute(functions))
+  data_name <- as.character(substitute(data))
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
@@ -78,7 +82,9 @@ simulate_grid <- function(
     names(model_args),
     names(engine_args)
   ) %>%
-    unlist()
+    unlist() %>%
+    unique() %>%
+    c(model_name, summary_name, data_name, .) # TODO: Check if this is really needed in all instances
   if (is.null(globals)) globals <- TRUE
 
   # prepare the grid data frame for storing the results
@@ -87,7 +93,6 @@ simulate_grid <- function(
     function(rep_i) dplyr::mutate(grid, rep = rep_i)
   ) %>%
     do.call(rbind, .)
-
 
   its <- seq_len(nrow(grid))
   p <- progressr::progressor(along = its)
@@ -99,7 +104,8 @@ simulate_grid <- function(
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
-          res <- run_iteration(
+          wrap <- if (strict) identity else capture.output
+          wrap(res <- run_iteration(
             grid_i,
             model = model,
             params = parameters,
@@ -112,9 +118,9 @@ simulate_grid <- function(
             engine = engine,
             model_args = model_args,
             engine_args = engine_args,
-            model_name = as.character(substitute(model)),
-            attempts = 1
-          )
+            model_name = model_name,
+            attempts = NULL
+          ))
           res$rep <- grid[grid_i, ]$rep
           res
         },
@@ -134,9 +140,11 @@ simulate_grid <- function(
 
   invalid_runs <- vapply(results, function(run) all(is.na(run)), FUN.VALUE = logical(1))
   if (any(invalid_runs)) {
-    msg <- sprintf(paste0("Out of the total %i simulations, %d runs resulted in an error.\n",
-      "The most likely explanation for this is that some parameter combinations\n",
-      "lead to an invalid model (such as inconsistent order of split times)."),
+    msg <- sprintf(paste0(
+      "Out of the total %i simulations, %d runs resulted in an error. The most\n",
+      "likely explanation for this is that some parameter combinations lead to\n",
+      "an invalid model (such as inconsistent order of split times).\n",
+      "If you don't think this is right, run this function with `strict = TRUE`."),
       length(invalid_runs), sum(invalid_runs)
     )
     message(msg)
@@ -154,7 +162,8 @@ simulate_grid <- function(
   results_df$rep <- vapply(results, `[[`, "rep", FUN.VALUE = integer(1))
 
   # similarly, convert computed simulation summary statistics into a matrix
-  for (stat in names(functions)) {
+  summary_names <- if (is.call(functions)) names(as.list(functions)[-1]) else names(functions)
+  for (stat in summary_names) {
     results_df[[stat]] <- lapply(results, `[[`, "simulated") %>% lapply(`[[`, stat)
   }
 

@@ -40,7 +40,7 @@ compute_fitness <- function(
         recombination_rate = recombination_rate,
         mutation_rate = mutation_rate,
         engine = NULL, model_args = NULL, engine_args = NULL,
-        attempts = 1, samples = NULL, model_name = model_name
+        attempts = 1, model_name = model_name
       )
     )
     },
