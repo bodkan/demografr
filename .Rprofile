@@ -1,5 +1,3 @@
-setwd("/project")
-
 source("renv/activate.R")
 
 options(browserNLdisabled = TRUE)
