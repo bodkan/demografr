@@ -1,0 +1,43 @@
+---
+title: "Benchmarking tree sequences"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Benchmarking tree sequences}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+slendr_present <- slendr::check_dependencies(python = TRUE, quit = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 80,
+  eval = slendr_present
+)
+
+data_path <- here::here("inst/examples/basic_abc.rds")
+
+devtools::load_all()
+```
+
+```{r}
+library(slendr)
+init_env(quiet = TRUE)
+
+popA <- population("popA", time = 3000, N = 5000, remove = 1499)
+popB <- population("popB", time = 1500, N = 5000, parent = popA)
+popC <- population("popC", time = 1500, N = 5000, parent = popA)
+
+gf <- gene_flow(from = popB, to = popC, start = 1000, end = 900, rate = 0.1)
+
+model <- compile_model(list(popA, popB, popC), gene_flow = gf, generation_time = 1)
+
+schedule <- schedule_sampling(model, times = 0, list(popB, 50), list(popC, 50))
+
+plot_model(model, proportions = TRUE, samples = schedule)
+```
