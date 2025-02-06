@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present
+  eval = slendr_present && Sys.which("vcftools") != "" && Sys.which("convertf") != ""
 )
 
 data_path <- here::here("inst/examples/basic_abc.rds")
@@ -26,18 +26,137 @@ devtools::load_all()
 ```
 
 ```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(admixr)
+
 library(slendr)
 init_env(quiet = TRUE)
 
-popA <- population("popA", time = 3000, N = 5000, remove = 1499)
-popB <- population("popB", time = 1500, N = 5000, parent = popA)
-popC <- population("popC", time = 1500, N = 5000, parent = popA)
+chimp <- population("CHIMP", time = 7e6, N = 5000)
+afr <- population("AFR", parent = chimp, time = 6e6, N = 15000)
+eur <- population("EUR", parent = afr, time = 70e3, N = 3000)
+nea <- population("NEA", parent = afr, time = 600e3, N = 1000, remove = 40e3)
 
-gf <- gene_flow(from = popB, to = popC, start = 1000, end = 900, rate = 0.1)
+gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 50000)
 
-model <- compile_model(list(popA, popB, popC), gene_flow = gf, generation_time = 1)
+model <- compile_model(
+  populations = list(chimp, nea, afr, eur),
+  gene_flow = gf,
+  generation_time = 30
+)
 
-schedule <- schedule_sampling(model, times = 0, list(popB, 50), list(popC, 50))
+nea_samples <- schedule_sampling(model, times = c(70000, 40000), list(nea, 1))
 
-plot_model(model, proportions = TRUE, samples = schedule)
+present_samples <- schedule_sampling(
+  model, times = 0,
+  list(chimp, 1),
+  list(afr, 100), list(eur, 100)
+)
+
+schedule <- rbind(nea_samples, present_samples)
+
+cowplot::plot_grid(
+  plot_model(model, proportions = TRUE, samples = schedule),
+  plot_model(model, proportions = TRUE, log = TRUE, samples = schedule),
+  nrow = 1
+)
+```
+
+```{r}
+disk_run <- function(ts) {
+  prefix <- file.path(tempdir(), "eigendata")
+  suppressMessages(ts_eigenstrat(ts, prefix))
+  eigen <- eigenstrat(prefix)
+
+  suppressMessages(df <- f4ratio(data = eigen,
+                                 X = ts_names(ts, split = "pop")$EUR,
+                A = "NEA_1", B = "NEA_2", C = "AFR_1", O = "CHIMP_1", 
+                params = list(blgsize = ts$sequence_length / 1e6 * 0.0025)) %>%
+    .[c("X", "A", "B", "C", "O", "alpha")])
+
+  nblocks <- capture.output(loginfo(df)) %>%
+    grep("number of blocks for block jackknife", ., value = TRUE) %>%
+    gsub("number of blocks for block jackknife: ", "", .) %>%
+    as.integer
+
+  result <- tibble(
+    result = list(df),
+    size = file.size(eigen$geno) + file.size(eigen$snp) + file.size(eigen$ind),
+    nblocks = nblocks
+  )
+
+  unlink(eigen$geno)
+  unlink(eigen$snp)
+  unlink(eigen$ind)
+  
+  result
+}
+
+ts_run <- function(ts) {
+  df <- ts_f4ratio(ts,
+                   X = ts_names(ts, split = "pop")$EUR,
+                   A = "NEA_1", B = "NEA_2", C = "AFR_1", O = "CHIMP_1")
+  tibble(result = list(df),
+         size = as.numeric(object.size(ts)),
+         nblocks = NA)
+}
+```
+
+```{r}
+# bench_df <- lapply(c(1, 10, 100, 1000, 10000, 100000) * 1e3, function(sequence_length) {
+x <- Sys.time()
+bench_df <- lapply(c(1, seq(1000, 100000, by = 1000)) * 1e3, function(sequence_length) {
+  # sequence_length <- 100e3
+
+  ts <- msprime(model, samples = schedule, sequence_length = sequence_length,
+                recombination_rate = 1e-8) %>%
+    ts_mutate(mutation_rate = 1e-8)
+
+  disk_time <- system.time(disk_result <- disk_run(ts))
+  ts_time <- system.time(ts_result <- ts_run(ts))
+  
+  df <- rbind(
+    tibble(run = "disk",
+           time = disk_time["elapsed"],
+           size = disk_result$size,
+           result = disk_result$result),
+    tibble(run = "ts",
+           time = ts_time["elapsed"],
+           size = ts_result$size,
+           result = ts_result$result)
+  ) %>%
+    mutate(sequence_length = sequence_length) %>%
+    tidyr::unnest(cols = c(result))
+}) %>% do.call(rbind, .)
+y <- Sys.time()
+y - x
+```
+
+```{r}
+p_bench <- bench_df %>%
+  mutate(time = as.numeric(time)) %>%
+  ggplot(aes(sequence_length  /1e6, time, color = run, group = run)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "sequence length [Mb]", y = "time (s)", color = "run") +
+  theme_minimal()
+
+cowplot::plot_grid(p_bench, p_bench + scale_x_log10() + scale_y_log10())
+```
+
+
+```{r}
+bench_df %>%
+  mutate(time = as.numeric(time)) %>%
+  select(run, X, alpha, sequence_length) %>%
+  pivot_wider(names_from = run, values_from = alpha, names_prefix = "alpha_") %>%
+  ggplot(aes(alpha_disk, alpha_ts, color = sequence_length  / 1e6)) +
+  geom_point() +
+  geom_abline(linetype = "dashed") +
+  geom_hline(yintercept = 0, linetype = "dotted") +
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  coord_fixed() +
+  theme_minimal()
 ```
