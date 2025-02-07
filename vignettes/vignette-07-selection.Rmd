@@ -186,7 +186,7 @@ data <- simulate_model(
   sequence_length = 1e6, recombination_rate = 0,
   format = "files",
   data = list(
-    ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8),
+    ts = function(path, model) ts_read(file.path(path, "slim.trees"), model) %>% ts_mutate(1e-8),
     origin_traj = function(path) readr::read_tsv(file.path(path, "origin_traj.tsv"), show_col_types = FALSE),
     target_traj = function(path) readr::read_tsv(file.path(path, "target_traj.tsv"), show_col_types = FALSE)
   ),
@@ -201,7 +201,7 @@ expect_error(
     sequence_length = 1e6, recombination_rate = 0,
     format = "files",
     data = list(
-      ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_mutate(1e-8),
+      ts = function(path, model) ts_read(file.path(path, "slim.trees"), model) %>% ts_mutate(1e-8),
       origin_traj = function(path) readr::read_tsv(file.path(path, "origin_traj.tsv"), show_col_types = FALSE),
       target_traj = function(path) readr::read_tsv(file.path(path, "target_traj.tsv"), show_col_types = FALSE)
     ),
@@ -260,23 +260,30 @@ grid <- data.frame(s = 0, onset_time = 2000, origin_pop = "ANA", target_pop = "E
 
 # error when no grid combination gives a valid simulation
 expect_error(
-  data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
-                        replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE),
+  suppressMessages(
+    data <- simulate_grid(
+      model, grid, functions = summary_funs, format = "files", data = data_funs,
+      replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE)
+  ),
   "All model simulation runs were invalid"
 )
 
 # a warning message when only part of grid combinations gives a valid result
 grid <- data.frame(s = c(0, 0), onset_time = c(15000, 2000), origin_pop = c("ANA", "ANA"), target_pop = c("EUR", "EUR"))
 expect_message(
-  data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
-                        replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE),
+  data <- simulate_grid(
+    model, grid, functions = summary_funs, format = "files", data = data_funs,
+    replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = FALSE
+  ),
   "Out of the total 2 simulations, 1 runs resulted in an error."
 )
 
 # even partially valid grid combinations give error under strict mode
 expect_error(
-  quiet(data <- simulate_grid(model, grid, functions = summary_funs, format = "files", data = data_funs,
-                              replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = TRUE)),
+  quiet(data <- simulate_grid(
+    model, grid, functions = summary_funs, format = "files", data = data_funs,
+    replicates = 1, sequence_length = 1e6, recombination_rate = 0, strict = TRUE
+  )),
   "An unexpected error was raised when generating data from a slendr model"
 )
 ```
