@@ -98,40 +98,48 @@ ts_run <- function(ts) {
   df <- ts_f4ratio(ts,
                    X = ts_names(ts, split = "pop")$EUR,
                    A = "NEA_1", B = "NEA_2", C = "AFR_1", O = "CHIMP_1")
-  tibble(result = list(df),
-         size = as.numeric(object.size(ts)),
-         nblocks = NA)
+  tibble(result = list(df), nblocks = NA)
 }
 ```
 
 ```{r}
-# bench_df <- lapply(c(1, 10, 100, 1000, 10000, 100000) * 1e3, function(sequence_length) {
 x <- Sys.time()
-bench_df <- lapply(c(1, seq(1000, 100000, by = 1000)) * 1e3, function(sequence_length) {
+bench_df <- lapply(
+  c(1, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000) * 1e3,
+  function(sequence_length) {
+# bench_df <- lapply(c(1, seq(1000, 100000, by = 3000)) * 1e3, function(sequence_length) {
   # sequence_length <- 100e3
 
-  ts <- msprime(model, samples = schedule, sequence_length = sequence_length,
-                recombination_rate = 1e-8) %>%
-    ts_mutate(mutation_rate = 1e-8)
+  ts_time <- system.time(
+    ts <- msprime(model, samples = schedule, sequence_length = sequence_length,
+                  recombination_rate = 1e-8) %>%
+      ts_mutate(mutation_rate = 1e-8)
+  )
 
   disk_time <- system.time(disk_result <- disk_run(ts))
-  ts_time <- system.time(ts_result <- ts_run(ts))
+  memory_time <- system.time(memory_result <- ts_run(ts))
   
   df <- rbind(
-    tibble(run = "disk",
+    tibble(run = "ts simulation",
+           time = ts_time["elapsed"],
+           size = as.numeric(object.size(ts)),
+           result = NA),
+    tibble(run = "disk-based computation",
            time = disk_time["elapsed"],
            size = disk_result$size,
            result = disk_result$result),
-    tibble(run = "ts",
-           time = ts_time["elapsed"],
-           size = ts_result$size,
-           result = ts_result$result)
+    tibble(run = "memory-based computation",
+           time = memory_time["elapsed"],
+           size = NA,
+           result = memory_result$result)
   ) %>%
     mutate(sequence_length = sequence_length) %>%
     tidyr::unnest(cols = c(result))
 }) %>% do.call(rbind, .)
 y <- Sys.time()
 y - x
+
+saveRDS(bench_df, "~/Desktop/bench_df.rds")
 ```
 
 ```{r}
@@ -149,14 +157,19 @@ cowplot::plot_grid(p_bench, p_bench + scale_x_log10() + scale_y_log10())
 
 ```{r}
 bench_df %>%
+  filter(run != "ts simulation") %>%
   mutate(time = as.numeric(time)) %>%
   select(run, X, alpha, sequence_length) %>%
   pivot_wider(names_from = run, values_from = alpha, names_prefix = "alpha_") %>%
-  ggplot(aes(alpha_disk, alpha_ts, color = sequence_length  / 1e6)) +
+  ggplot(aes(`alpha_disk-based computation`,
+             `alpha_memory-based computation`,
+             color = sequence_length  / 1e6)) +
   geom_point() +
   geom_abline(linetype = "dashed") +
-  geom_hline(yintercept = 0, linetype = "dotted") +
-  geom_vline(xintercept = 0, linetype = "dotted") +
-  coord_fixed() +
+  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = 0.03, linetype = "dotted") +
+  geom_vline(xintercept = 0) +
+  geom_vline(xintercept = 0.03, linetype = "dotted") +
+  coord_cartesian(xlim = c(-0.1, 0.25), ylim = c(-0.1, 0.25)) +
   theme_minimal()
 ```
