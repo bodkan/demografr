@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.4.1
+FROM rocker/rstudio:4.4.2
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
@@ -49,8 +49,20 @@ RUN apt-get update -y \
         tree \
         vim \
         wget \
-        zlib1g-dev; \
-    yes | unminimize
+        zlib1g-dev
+
+# unminimize
+# https://forums.docker.com/t/unminimize-command-missing-from-nginx-debian-images/144140/4
+RUN #rm /etc/dpkg/dpkg.cfg.d/docker; \
+    dpkg --verify --verify-format rpm \
+      | awk '$1=="missing"{print $2}' \
+      | xargs --no-run-if-empty -n 120 dpkg -S \
+      | grep -v diversion \
+      | cut -d: -f1 \
+      | tr ',' '\n' \
+      | awk '{print $1}' \
+      | sort -u \
+      | DEBIAN_FRONTEND=noninteractive xargs -n 120 apt install --reinstall -y man-db
 
 # location for compiled binaries, renv R libraries, and Python modules
 ENV HOME="/root"
@@ -61,7 +73,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.tar.gz -O slim.tar.gz; \
+RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.3.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
@@ -83,11 +95,11 @@ ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV R_INSTALL_STAGED=FALSE
 
 # do this when first setting up the container to create an renv.lock file:
-#   - export RENV_BOOTSTRAP_TARBALL="/tmp/v1.0.10.tar.gz"
-#   - wget https://github.com/rstudio/renv/archive/refs/tags/v1.0.10.tar.gz -O $RENV_BOOTSTRAP_TARBALL
+#   - export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.0.tar.gz"
+#   - wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.0.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 #   - R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   - export GITHUB_PAT=''
-#   - renv::init(bare = TRUE, bioconductor = "3.19")
+#   - renv::init(bare = TRUE, bioconductor = "3.29")
 #   - options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   - renv::snapshot(dev = TRUE)
 
