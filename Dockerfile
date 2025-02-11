@@ -18,6 +18,7 @@ RUN apt-get update -y \
         libbz2-dev \
         libcurl4-openssl-dev \
         libffi-dev \
+        libfftw3-dev \
         libfontconfig1-dev \
         libfribidi-dev \
         libgdal-dev \
@@ -47,22 +48,12 @@ RUN apt-get update -y \
         rename \
         tmux \
         tree \
+        unminimize \
         vim \
         wget \
         zlib1g-dev
-
-# unminimize
-# https://forums.docker.com/t/unminimize-command-missing-from-nginx-debian-images/144140/4
-RUN #rm /etc/dpkg/dpkg.cfg.d/docker; \
-    dpkg --verify --verify-format rpm \
-      | awk '$1=="missing"{print $2}' \
-      | xargs --no-run-if-empty -n 120 dpkg -S \
-      | grep -v diversion \
-      | cut -d: -f1 \
-      | tr ',' '\n' \
-      | awk '{print $1}' \
-      | sort -u \
-      | DEBIAN_FRONTEND=noninteractive xargs -n 120 apt install --reinstall -y man-db
+# Fix for 'Errors were encountered while processing: fontconfig' during unminimize
+RUN fc-cache -f; yes | unminimize
 
 # location for compiled binaries, renv R libraries, and Python modules
 ENV HOME="/root"
@@ -86,7 +77,6 @@ ENV PROJECT=/project
 WORKDIR $PROJECT
 
 # put personal dotfiles into the container
-ENV IN_DOCKER=true
 RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
     cd ~/.dotfiles; ./install.sh
 
@@ -102,22 +92,3 @@ ENV R_INSTALL_STAGED=FALSE
 #   - renv::init(bare = TRUE, bioconductor = "3.29")
 #   - options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   - renv::snapshot(dev = TRUE)
-
-# for 'production' builds, restore all R dependencies at their locked-in versions
-COPY DESCRIPTION .
-COPY renv.lock .Rprofile ./
-COPY renv/ renv/
-ARG GITHUB_PAT="''"
-RUN R -e 'renv::restore()'
-
-# rather than installing a separate Python interpreter, use the Python environment
-# that's installed and used by slendr, in order to avoid version compatibility issues
-RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.3_tskit-0.5.8_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
-RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
-
-# set the default directory of RStudio Server to the project directory
-RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
-
-# clean up compilation sources and other redundant files
-RUN rm -r /tmp/* /home/rstudio
