@@ -4566,15 +4566,15 @@
       ],
       "Encoding": "UTF-8",
       "RoxygenNote": "7.3.2",
-      "Roxygen": "list(markdown = TRUE)",
       "VignetteBuilder": "knitr",
       "Config/Needs/website": "tidyverse/tidytemplate",
       "Config/testthat/edition": "3",
       "Config/testthat/parallel": "true",
       "Config/testthat/start-first": "bioconductor,python,install,restore,snapshot,retrieve,remotes",
+      "NeedsCompilation": "no",
       "Author": "Kevin Ushey [aut, cre] (<https://orcid.org/0000-0003-2880-7407>), Hadley Wickham [aut] (<https://orcid.org/0000-0003-4757-117X>), Posit Software, PBC [cph, fnd]",
       "Maintainer": "Kevin Ushey <kevin@rstudio.com>",
-      "Repository": "CRAN"
+      "Repository": "RSPM"
     },
     "reticulate": {
       "Package": "reticulate",
@@ -5308,15 +5308,14 @@
       "URL": "https://github.com/bodkan/slendr",
       "BugReports": "https://github.com/bodkan/slendr/issues",
       "Config/testthat/edition": "3",
+      "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
+      "Maintainer": "Martin Petr <contact@bodkan.net>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "bbdb83b05ae92a3cde7272869f7bd818a796e3d3",
-      "NeedsCompilation": "no",
-      "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
-      "Maintainer": "Martin Petr <contact@bodkan.net>"
+      "RemoteSha": "bbdb83b05ae92a3cde7272869f7bd818a796e3d3"
     },
     "sourcetools": {
       "Package": "sourcetools",
