@@ -50,7 +50,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
 
   posterior <- match.arg(posterior)
   if (posterior == "adj")
-    warning("Please note that sampling adjusted parameters from the posterior\n",
+    warning("Note that sampling adjusted parameters from the posterior\n",
             "can lead to invalid models (i.e. inconsistent orders of split times or\n",
             "nonsensical values of parameters in general). If you get an error, you\n",
             "can either sample unadjusted parameters by setting `posterior = \"unadj\"`\n",
