@@ -23,27 +23,39 @@ devtools::load_all()
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
+**Note:** The _demografr_ R package is still under active development. As a
+result, its documentation is in a draft stage at best. Typos, inconsistencies,
+and other issues are unfortunately expected.
 
 ⚠️⚠️⚠️⚠️
 
-In order to perform probabilistic inference using a method such as Approximate Bayesian Computation, we need a way to specify prior distributions of parameters.
+In order to perform probabilistic inference using a method such as Approximate
+Bayesian Computation, we need a way to specify prior distributions of
+parameters.
 
-Different frameworks and languages approach this from different angles. This vignette describes a method used by _demografr_. **The description provided here is quite detailed and technical.** Unless you're very curious about metaprogramming tricks provided by the R language, you're very unlikely to need this.
+Different frameworks and languages approach this from different angles.
+This vignette describes a method used by _demografr_. **The description
+provided here is quite detailed and technical.** Unless you're very curious
+about metaprogramming tricks provided by the R language, you're very unlikely
+to need this.
 
-With that out of the way, imagine the following probabilistic statements. Which features does _demografr_ provide to encode them in an R script?
+Imagine the following probabilistic statements.
+Which features does _demografr_ provide to encode them in an R script?
 
-- $$N_e \sim Unif(1000, 10000)$$
+$$N_e \sim Unif(1000, 10000)$$
 
-- $$\textrm{geneflow} \sim Unif(0, 1)$$
+$$\textrm{geneflow} \sim Unif(0, 1)$$
 
-- $$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 5\}$$
+$$T_{\textrm{split}}^i \sim Norm(10, 10000), \textrm{for } i \in \{1, 2, ..., 5\}$$
 
-**If you don't care about technical details of _demografr_ internals, feel free to jump [here](#final-result).**
+**If you don't care about technical details of _demografr_ internals, feel
+free to jump [here](#final-result).**
 
 ## One trivial option
 
-Possibly the most trivial solution to this problem in R would be to write something like this. Indeed, some probabilistic inference R packages do exactly the following:
+Possibly the most trivial solution to this problem in R would be to write
+something like the following. Indeed, some probabilistic inference R packages
+do exactly that:
 
 ```{r, eval=FALSE}
 list(
@@ -53,7 +65,7 @@ list(
 )
 ```
 
-In Python, you might create some objects like:
+In Python, you might write object-oriented code like this:
 
 ```{python, eval=FALSE}
 import tensorflow_probability as tfp
@@ -69,17 +81,26 @@ geneflow_sample = geneflow.sample()
 T_split_sample = T_split.sample(5)
 ```
 
-The question I asked as I began drafting the design of _demografr_ was whether it would be possible to do this more "elegantly"&mdash;with less code and closer to actual mathematical notation.
+The question I asked as I began drafting the design of _demografr_ was whether
+it would be possible to do this more "elegantly"&mdash;with less code and
+closer to actual mathematical notation.
 
 ## Fancier metaprogramming solution
 
-Despite being _"a silly calculator language"_ (quote by a former colleague of mine), R is a very powerful functional programming language with advanced [metaprogramming](https://en.wikipedia.org/wiki/Metaprogramming) options. To paraphrase information from Wikipedia:
+Despite being _"a silly calculator language"_ (quote by a former colleague of
+mine), R is a very powerful functional programming language with advanced
+[metaprogramming](https://en.wikipedia.org/wiki/Metaprogramming) options.
+To paraphrase information from Wikipedia:
 
-> Metaprogramming is a **programming technique in which computer programs have the ability to treat other programs as their data**. It means that a program can be designed to read, generate, analyze or transform other programs, and even modify itself while running.
+> Metaprogramming is a **programming technique in which computer programs have
+the ability to treat other programs as their data**. It means that a program
+can be designed to read, generate, analyze or transform other programs, and
+even modify itself while running.
 >
 > In other words, **metaprogramming is when code is writing other code.**
 
-What does this mean in practice in R? You might be familiar with the syntax for fitting linear models in R:
+What does this mean in practice in R? You might be familiar with the syntax for
+fitting linear models in R:
 
 ```{r}
 head(mtcars)
@@ -89,14 +110,25 @@ head(mtcars)
 lm(cyl ~ mpg, data = mtcars)
 ```
 
-The **`~` operator creates a so-called "formula object"**, which captures the expression provided by the user (relationship between columns of the data frame, `"cyl"` and `"mpg"`), and can then be manipulated or interpreted by the function that the formula is passed to.
+The **`~` operator creates a so-called "formula object"**, which captures the
+expression provided by the user (relationship between columns of the data
+frame, `"cyl"` and `"mpg"`), and can then be manipulated or interpreted by the
+function that the formula is passed to.
 
-Importantly, if you type `cyl ~ mpg` into your R console, you get the same thing back. It doesn't do anything by itself! In fact, if you were to type `cyl` or `mpg` into your R console on their own, you would get an error.
+Importantly, if you type `cyl ~ mpg` into your R console, you get the same
+thing back. It doesn't do anything by itself! In fact, if you were to type
+`cyl` or `mpg` into your R console on their own, you would get an error.
 
-However, when you execute the `lm` command above, the function uses R's metaprogramming features to interpret the information in the formula to extract appropriate information (column vectors `"cyl"` and `"mpg"`) from the data frame, and perform the necessary computation for the linear regression fit. In this context, one could also say that the formula syntax provides a [domain-specific language](https://en.wikipedia.org/wiki/Domain-specific_language) for encoding statistical modeling equations in R.
+However, when you execute the `lm` command above, the function uses R's
+metaprogramming features to interpret the information in the formula to extract
+appropriate information (column vectors `"cyl"` and `"mpg"`) from the data
+frame, and perform the necessary computation for the linear regression fit.
+In this context, one could also say that the formula syntax provides a
+[domain-specific language](https://en.wikipedia.org/wiki/Domain-specific_language)
+for encoding statistical modeling equations in R.
 
-Our goal in _demografr_, then, is to provide a similar functionality for encoding prior sampling statements.
-
+Our goal in _demografr_, then, is to provide a similar functionality for
+encoding prior sampling statements.
 
 ## How to use this for the problem above?
 
@@ -104,7 +136,8 @@ Imagine then that we want to write an R interface for doing something like this:
 
 $$N_e \sim Unif(1000, 10000).$$
 
-Obviously, we have functions such as `runif`, `rnorm`, etc., which generate a number from a distribution:
+Obviously, we have functions such as `runif`, `rnorm`, etc., which generate a
+number from a distribution:
 
 ```{r}
 runif(n = 1, min = 1000, max = 10000)
@@ -118,15 +151,21 @@ prior <- Ne ~ runif(1000, 10000)
 prior
 ```
 
-**Note that this expression is not evaluated! Formula is simply an object carrying a bit of syntax.** Just as we demonstrated above in the discussion of formula used in an `lm` call, simply entering `Ne ~ runif(1000, 10000)` into the R console doesn't do anything on its own.
+**Note that this expression is not evaluated! Formula is simply an object
+carrying a bit of syntax.** Just as we demonstrated above in the discussion of
+formula used in an `lm` call, simply entering `Ne ~ runif(1000, 10000)` into
+the R console doesn't do anything on its own.
 
 This is important, because the `runif(1000, 10000)` on the right is not a valid R code.
 
-**This is called [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation).** R does not evaluate something at the time unless it's "needed" at that time. The opposite to this is "eager evaluation" done by something like Python or C.
+**This is called [lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation).**
+R does not evaluate something at the time unless it's "needed" at that time.
+The opposite to this is "eager evaluation" done by something like Python or C.
 
 ## Metaprogramming in R in practice
 
-Metaprogramming is often magic requiring lots of complicated tools, but to do very basic metaprogramming in R is very simple.
+Metaprogramming is often magic requiring lots of complicated tools, but to do
+very basic metaprogramming in R is very simple.
 
 How can we "manipulate" code and give it our own meaning?
 
@@ -134,31 +173,43 @@ How can we "manipulate" code and give it our own meaning?
 prior
 ```
 
-When given a formula, the R function **`as.list` parses the language expression into smallest possible "atomic pieces"**:
+When given a formula, the R function **`as.list` parses the language expression
+into smallest possible "atomic pieces"**:
 
 ```{r}
 as.list(prior)
 ```
 
-This is called an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) in programming language design.
+This is called an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+in programming language design.
 
-Note that this works generally for any language expression (even those that are much deeper):
+Note that this works generally for any language expression (even those that are
+much deeper):
 
 ```{r, eval=FALSE}
 (a + b) * (c - d / e)
 ```
 
-Although fut for expressions like the above it is easier to use a proper metaprogramming tool such as the function `ast` provided by the R package [_lobstr_](https://lobstr.r-lib.org):
+Although fut for expressions like the above it is easier to use a proper
+metaprogramming tool such as the function `ast` provided by the R package 
+[_lobstr_](https://lobstr.r-lib.org):
 
 ```{r}
 lobstr::ast((a + b) * (c - d / e))
 ```
 
-Even if you haven't heard abotu AST before, if you look closely at the result just above, you will notice that it captures the same expression as `(a + b) * (c - d / e)` except that it dissassembled it into smalles possible atomic pieces and decomposed it via so-called [prefix notation](https://en.wikipedia.org/wiki/Polish_notation). This is a standard representation of AST data structure (in fact, the simpler version we obtained via `as.list` above does the same thing).
+Even if you haven't heard about AST before, if you look closely at the result
+above, you will notice that it captures the same expression as
+`(a + b) * (c - d / e)` except that it dissassembled it into smallest possible
+atomic pieces and decomposed it via so-called
+[prefix notation](https://en.wikipedia.org/wiki/Polish_notation). This is a
+standard representation of AST data structure (in fact, the simpler version we
+obtained via `as.list` above does the same thing).
 
 ## Back to _demografr_
 
-Let's now return to our original goal of encoding prior sampling statements such as $\textrm{variable} \sim \textrm{distribution}$:
+Let's now return to our original goal of encoding prior sampling statements
+such as $\textrm{variable} \sim \textrm{distribution}$:
 
 ```{r}
 prior
@@ -170,10 +221,11 @@ which we can parse like this:
 as.list(prior)
 ```
 
-And which we hope to interpret in a way that's compatible with something like $N_e \sim Unif(1000, 10000)$.
+And which we hope to interpret in a way that's compatible with something like
+$N_e \sim Unif(1000, 10000)$.
 
-_demografr_ implements a way to parse each such prior sampling statement, and automatically convert the "invalid" expression:
-
+_demografr_ implements a way to parse each such prior sampling statement, and
+automatically convert the "invalid" expression:
 
 ```{r, eval=FALSE}
 Ne ~ runif(1000, 10000)
@@ -189,7 +241,10 @@ This is then used during the ABC simulation process.
 
 ### `sample_prior()` function
 
-The above feature of _demografr_ is implemented by a function `sample_prior`. Although this function is exported to the user space in your R console, you shouldn't need to use it for any of your work besides simple debugging of your priors:
+The above feature of _demografr_ is implemented by a function `sample_prior`.
+Although this function is exported to the user space in your R console, you
+shouldn't need to use it for any of your work besides simple debugging of
+your priors:
 
 ```{r}
 library(demografr)
@@ -207,13 +262,17 @@ sample_prior(Ne ~ runif(1000, 10000))
 sample_prior(Ne ~ runif(1000, 10000))
 ```
 
-This function takes in a formula statement (our DLS for encoding prior sampling events), parses it into individual components, and simulates a value of a random variable from a provided distribution function.
+This function takes in a formula statement (our DLS for encoding prior sampling
+events), parses it into individual components, and simulates a value of a
+random variable from a provided distribution function.
 
 ## Sampling random vectors
 
-To provide support for random vectors, _demografr_ uses a similar metaprogramming trick as above.
+To provide support for random vectors, _demografr_ uses a similar
+metaprogramming trick as above.
 
-Imagine this syntax for vectorized statements (the `T_split[5]` is my made up syntax, not R syntax!):
+Imagine this syntax for vectorized statements (the `T_split[5]` is _demografr_'s
+made up syntax, not R syntax!):
 
 ```{r}
 prior <- T_split[5] ~ runif(10, 10000)
@@ -223,9 +282,11 @@ prior <- T_split[5] ~ runif(10, 10000)
 as.list(prior)
 ```
 
-Note that this expression is one layer "deeper" than would be with a plain `T_split ~ runif(10, 10000)`.
+Note that this expression is one layer "deeper" than would be with a plain
+`T_split ~ runif(10, 10000)`.
 
-This means that for "vector variables" of _demografr_, we need to take care of the nesting:
+This means that for "vector variables" of _demografr_, we need to take care of
+the nesting:
 
 ```{r}
 variable <- as.list(prior)[[2]]
@@ -242,11 +303,13 @@ as.list(variable)
 sample_prior(T_split[5] ~ runif(10, 10000))
 ```
 
-Which internally turns the prior expression into `runif(n = 10, min = 10, max = 10000)`.
+Which internally turns the prior expression into
+`runif(n = 10, min = 10, max = 10000)`.
 
 ## Final list of all priors {#final-result}
 
-In conclusion, using _demografr_'s features it's possible to define the example prior sampling statements from the top of this vignette in R code like this:
+In conclusion, using _demografr_'s features it's possible to define the example
+prior sampling statements from the top of this vignette in R code like this:
 
 ```{r}
 priors <- list(
@@ -273,7 +336,8 @@ data <- simulate_abc(model, <priors>, functions, observed, ...)
 
 ## Prior parameter templates
 
-Imagine we have the following _slendr_ model function (hilariously overcomplicated, purely for demonstration purposes!):
+Imagine we have the following _slendr_ model function (hilariously
+overcomplicated, purely for demonstration purposes!):
 
 ```{r}
 library(slendr)
@@ -292,13 +356,18 @@ model <- function(T_a1, T_a2, T_a3, T_a4, T_a5, T_b1, T_b2, T_b3, T_b4, T_b5, N_
   b4 <- population("b4", time = T_b4, N = N_b, parent = b1)
   b5 <- population("b5", time = T_b5, N = N_b, parent = b1)
 
-  compile_model(
+  model <- compile_model(
     list(a1, a2, a3, a4, a5, b1, b2, b3, b4, b5),
-    generation_time = 30, direction = "backward")
+    generation_time = 30,
+  )
+
+  return(model)
 }
 ```
 
-This functions has a huge number of parameters, so if we were to specify them with the normal DSL described above for the purposes of ABC inference, we would either have to write down the following monstrosity:
+This functions has a huge number of parameters, so if we were to specify them
+with the normal DSL described above for the purposes of ABC inference, we would
+have to write down the following monstrosity:
 
 ```{r}
 individual_priors <- list(
@@ -318,7 +387,11 @@ individual_priors <- list(
 )
 ```
 
-The second possibility would be to re-parametrize the function to accept, for instance, two pairs of two vectors of `T` and `N`, one for each population. However, we can also use _demografr_'s support for **'templated' prior sampling expressions** (for a lack of a better word). The easiest way to explain this is just to write it down:
+The second possibility would be to re-parametrize the function to accept, for
+instance, two pairs of two vectors of `T` and `N`, one for each population.
+However, we can also use _demografr_'s support for **'templated' prior sampling
+expressions** (for a lack of a better word). The easiest way to explain this is
+just to write it down:
 
 ```{r}
 templated_priors <- list(
@@ -329,18 +402,27 @@ templated_priors <- list(
 )
 ```
 
-When priors like this are plugged in to either `simulate_abc()` or `simulate_model()`, _demografr_ tries to **match model function arguments against the prior names (here, `T_a...` and `T_b...`), assigning each model function argument (i.e., model parameter) to an appropriate prior sampling expression by substituting the `...` on the left hand of each prior sampling statement**.
+When priors like this are plugged in to either `simulate_abc()` or
+`simulate_model()`, _demografr_ tries to **match model function arguments
+against the prior names (here, `T_a...` and `T_b...`), assigning each model
+function argument (i.e., model parameter) to an appropriate prior sampling
+expression by substituting the `...` on the left hand of each prior sampling
+statement**.
 
-You can read `T_a... ~ <distribution>` as "sample any parameter starting with 'T_a' from `<distribution>`.
+You can read `T_a... ~ <distribution>` as "sample any parameter starting with
+'T_a' from `<distribution>`.
 
-This way, when defining prior sampling expressions, you're not hindered by the complexity of your model function (having to handle vector indexing as you'd have to with vectorized prior sampling statements).
-
+This way, when defining prior sampling expressions, you're not hindered by
+the complexity of your model function (having to handle vector indexing as
+you'd have to with vectorized prior sampling statements).
 
 ### Custom functions
 
-The DSL for specification of parameter priors also allows custom-defined prior distribution functions, not just built-in `runif()`, `rnorm()`, etc.
+The DSL for specification of parameter priors also allows custom-defined prior
+distribution functions, not just built-in `runif()`, `rnorm()`, etc.
 
-For instance, imagine this function simulating a sampling from a distribution of a loaded casino die, `rcasino()`:
+For instance, imagine this function simulating a sampling from a distribution
+of a loaded casino die, `rcasino()`:
 
 ```{r}
 rcasino <- function(n = 1) {
@@ -351,19 +433,25 @@ rcasino <- function(n = 1) {
 }
 ```
 
-We can use our custom function in exactly the same way as standard R sampling functions. First, we define a prior for sampling a parameter value from the loaded die casino die (actually, do demonstrate that `rcasino` really works as it should, let's sample a vector of 100 random die rolls):
+We can use our custom function in exactly the same way as standard R sampling
+functions. First, we define a prior for sampling a parameter value from the
+loaded die casino die (actually, do demonstrate that `rcasino` really works as
+it should, let's sample a vector of 100 random die rolls):
 
 ```{r}
 par <- rolls[100] ~ rcasino()
 ```
 
-During a hypothetical ABC sampling process, _demografr_ would then sample the parameter `par` (internally and automatically) via its function `sample_prior()`:
+During a hypothetical ABC sampling process, _demografr_ would then sample the
+parameter `par` (internally and automatically) via its function `sample_prior()`:
+
 ```{r}
 samples <- sample_prior(par)
 samples
 ```
 
-Finally, we can verify that the sampled values really correspond to a loaded die which throws a six much more often than others:
+Finally, we can verify that the sampled values really correspond to a loaded
+die which throws a six much more often than others:
 
 ```{r}
 table(samples$value)
