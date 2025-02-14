@@ -479,25 +479,25 @@ First, we can get a data frame with summary statistics of the posterior
 distributions of our parameters. For instance, we can easily read the maximum
 _a posteriori_ probability (MAP) of the parameters in the row labelled "Mode:":
 
-```{r}
+```{r, warning=FALSE}
 extract_summary(abc)
 ```
 
 Because large tables can get a little hard to read, it is possible to subset to
 only a specific _type_ of parameter:
 
-```{r}
+```{r, warwarning=FALSE}
 extract_summary(abc, param = "Ne")
 ```
 
-```{r}
+```{r, warwarning=FALSE}
 extract_summary(abc, param = "T")
 ```
 
 Alternatively, we can also extract the posterior summary for a single model
 parameter like this:
 
-```{r}
+```{r, warwarning=FALSE}
 extract_summary(abc, param = "gf_BC")
 ```
 
