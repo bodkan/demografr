@@ -17,7 +17,7 @@ navbar:
       icon: fa-book
       text: Articles
       menu:
-        - text: A basic ABC analysis
+        - text: A basic ABC workflow
           href: articles/vignette-01-basics.html
         - text: Specifying prior distributions
           href: articles/vignette-02-priors.html

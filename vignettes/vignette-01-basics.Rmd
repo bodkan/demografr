@@ -1,8 +1,8 @@
 ---
-title: "A basic ABC analysis"
+title: "A basic ABC workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{A basic ABC analysis}
+  %\VignetteIndexEntry{A basic ABC workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,7 +22,8 @@ knitr::opts_chunk$set(
 
 data_path <- here::here("inst/examples/basic_abc.rds")
 
-devtools::load_all()
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -36,38 +37,30 @@ set.seed(SEED)
 ```
 
 ```{r, eval=!file.exists(data_path), echo=FALSE, message=FALSE}
-popA <- population("popA", time = 1, N = 2000)
-popB <- population("popB", time = 2000, N = 800, parent = popA)
-popC <- population("popC", time = 6000, N = 9000, parent = popB)
-popD <- population("popD", time = 8000, N = 4000, parent = popC)
+A <- population("A", time = 1, N = 2000)
+B <- population("B", time = 2000, N = 800, parent = A)
+C <- population("C", time = 6000, N = 9000, parent = B)
+D <- population("D", time = 8000, N = 4000, parent = C)
 
-gf <- gene_flow(from = popB, to = popC, start = 9000, end = 9301, rate = 0.1)
+gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = 0.1)
 
-example_model <- compile_model(
-  populations = list(popA, popB, popC, popD), gene_flow = gf,
+true_model <- compile_model(
+  populations = list(A, B, C, D), gene_flow = gf,
   generation_time = 1,
   simulation_length = 10000
 )
 
-ts <- msprime(example_model, sequence_length = 200e6, recombination_rate = 1e-8, random_seed = SEED) %>%
+ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
 samples <- ts_names(ts, split = "pop")
-A <- samples["popA"]
-B <- samples["popB"]
-C <- samples["popC"]
-D <- samples["popD"]
+A <- samples["A"]
+B <- samples["B"]
+C <- samples["C"]
+D <- samples["D"]
 
 observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
-
-# I keep forgetting the rules for the symmetry of f4 quadruplets so let's double check that
-# - generate all quadruples:
-# perms <- combinat::permn(c(A, B, C, D))
-# - compute theoretical values of all possible f4 statistics
-# all_f4s <- lapply(perms, function(p) {
-#   ts_f4(ts, p[1], p[2], p[3], p[4], mode = "branch")
-# }) %>% do.call(rbind, .) %>% dplyr::arrange(abs(f4)) %>% as.data.frame()
 
 # compute only unique f4 stats (up to a sign)
 observed_f4 <- rbind(
@@ -86,31 +79,43 @@ write.table(observed_f4, file = here::here("inst/examples/basics_f4.tsv"),
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
+**Note:** The _demografr_ R package is still under active development. As
+a result, its documentation is in a draft stage at best. Typos,
+inconsistencies, and other issues are unfortunately expected.
 
 ⚠️⚠️⚠️
 
-This vignette contains an expanded version of the basic ABC inference example from the [homepage](https://bodkan.net/demografr/) of _demografr_. It walks through the process of setting up a _demografr_ ABC pipeline step by step.
+This vignette contains an expanded version of the basic ABC inference example
+from the [homepage](https://bodkan.net/demografr/) of _demografr_. It walks
+through the process of setting up a _demografr_ ABC inference pipeline step
+by step.
 
 ## Introduction
 
-Imagine that we sequenced genomes of individuals from populations "popA", "popB", "popC", and "popD".
+Imagine that we sequenced genomes of individuals from populations "A",
+"B", "C", and "D".
 
-Let's also assume that we know that the three populations are phylogenetically related in the following way but we don't know anything else (i.e., we have no idea about the values of $N_e$, split times, or gene-flow rates):
+Let's also assume that we know that the populations are phylogenetically
+related in the following way but we don't know anything else (i.e., we have no
+idea about the values of $N_e$, split times, or gene-flow proportions):
 
 ```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
 orig_par <- par(no.readonly = TRUE)
 
 par(mar = c(0, 0, 0, 0))
 
-tree <- ape::read.tree(text="(popA,(popB,(popC,popD)));")
+tree <- ape::read.tree(text="(A,(B,(C,D)));")
 plot(tree)
 arrows(2.5, 2, 2.5, 3, col="blue")
 
 par(orig_par)
 ```
 
-After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a one $f_4$ statistic, observing the following values of these summary statistics (which we saved in standard R data frames&mdash;perhaps saved by software we used for computing these from empirical sequence data):
+After sequencing the genomes of individuals from these populations, we computed
+nucleotide diversity in these populations as well as their pairwise genetic
+divergence and a one $f_4$ statistic, observing the following values of these
+summary statistics (which we saved in standard R data frames&mdash;perhaps
+saved by the software we used for computing these from empirical sequence data):
 
 1. Nucleotide diversity in each population:
 
