@@ -129,6 +129,7 @@ simulate_grid <- function(
             stop(conditionMessage(cond), call. = FALSE)
           else
             NA
+            #list(error = TRUE, grid_i = grid_i)
         }
       )
       iter_result
