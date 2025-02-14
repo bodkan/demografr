@@ -421,9 +421,11 @@ posterior distribution of the parameters:
 predictions <- predict(abc, samples = 1000)
 ```
 
+```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
+saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
+```
+
 ```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
-# because we set up a parallelization plan() above, the predictions are
-# computed in parallel across all available CPUs
 predictions <- readRDS(here::here("inst/examples/basics_predictions.rds"))
 ```
 
