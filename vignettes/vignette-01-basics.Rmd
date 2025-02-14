@@ -486,18 +486,18 @@ extract_summary(abc)
 Because large tables can get a little hard to read, it is possible to subset to
 only a specific _type_ of parameter:
 
-```{r, warwarning=FALSE}
+```{r, warning=FALSE}
 extract_summary(abc, param = "Ne")
 ```
 
-```{r, warwarning=FALSE}
+```{r, warning=FALSE}
 extract_summary(abc, param = "T")
 ```
 
 Alternatively, we can also extract the posterior summary for a single model
 parameter like this:
 
-```{r, warwarning=FALSE}
+```{r, warning=FALSE}
 extract_summary(abc, param = "gf_BC")
 ```
 
