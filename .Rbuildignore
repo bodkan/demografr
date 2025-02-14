@@ -11,4 +11,4 @@ pkgdown
 docs
 .github
 .binder
-paper.R
+paper/*
