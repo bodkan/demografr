@@ -42,6 +42,7 @@ plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), fac
     ggplot2::theme_minimal() +
     # ggplot2::coord_cartesian(xlim = xlim) +
     ggplot2::theme(strip.text.x = ggplot2::element_text(face = "bold", size = 13)) +
+    theme(legend.position = "bottom") +
     p_facet
 
   if (!is.null(file))

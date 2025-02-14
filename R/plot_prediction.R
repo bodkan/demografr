@@ -69,6 +69,7 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
                  fill = guide_legend("simulated"),
                  linetype = guide_legend("observed")) +
         scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
+        theme_minimal() +
         theme(legend.position = "bottom")
     }
 
