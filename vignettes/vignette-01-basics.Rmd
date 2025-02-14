@@ -538,4 +538,4 @@ plot(abc, param = "gf_BC")
 ```
 
 Again, there are numerous tools for additional diagnostics, which you can
-learn about [here](vignette-06-diagnostics.html).
+learn about [here](https://bodkan.net/demografr/articles/vignette-06-diagnostics.html).
