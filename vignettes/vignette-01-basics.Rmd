@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
