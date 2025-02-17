@@ -40,8 +40,8 @@ and other issues are unfortunately expected.
 
 Although Approximate Bayesian Computation is arguably the most popular method
 for simulation-based inference, it's certainly not the only one. Another useful
-method for exploring the behavior of statistics under given combination of
-model parameters, and perhaps even very simple model parameter fitting are grid
+technique for exploring the behavior of statistics under given combination of
+model parameters, and perhaps even very simple model fitting are grid
 simulations. Briefly, we define a set of parameters of a model, run simulation
 replicates for each combination of parameters, computing summary statistics of
 interest for each replicate, and then&mdash;for instance&mdash;inspect which
@@ -51,21 +51,39 @@ affect the statistics in general.
 
 ## Example analysis
 
-To demonstrate the features of _demografr_ for grid-based simulation inference, let's try to reproduce (at least qualitatively) the result from Petr _et al._ (PNAS 2018). Briefly, this paper made an attempt to explain discrepancies between two different ways to estimate the proportion of Neanderthal ancestry in Europe over tens of thousands of years.
+To demonstrate the features of _demografr_ for grid-based simulation inference,
+let's try to reproduce the result from Petr _et al._ (PNAS 2018). Briefly,
+this paper made an attempt to explain discrepancies between two different ways
+to estimate the proportion of Neanderthal ancestry in Europe over tens of
+thousands of years.
 
-1. The first statistic (dubbed the "indirect $f_4$-ratio" statistic) showed the following pattern of Neanderthal ancestry significantly declining over time (figure from [Fu _et al., Nature 2016](https://www.nature.com/articles/nature17993))
+1. The first statistic (dubbed the "indirect $f_4$-ratio" statistic) showed the
+following pattern of Neanderthal ancestry significantly declining over time
+(figure from [Fu _et al._, Nature 2016](https://www.nature.com/articles/nature17993))
 
 ![](images/fu_2016.png){width="80%"}
 
-2. An alternative statistic (called "direct $f_4$-ratio" statistic, shown in the figure below in solid line in contrast to the "indirect $f_4$-statistic" as dashed line) did not find any significant decline at all as shown in this figure from Petr _et al._ (PNAS 2018).
+2. An alternative statistic (called "direct $f_4$-ratio" statistic, shown
+in the figure below in solid line in contrast to the "indirect $f_4$-statistic"
+as dashed line) did not find any significant decline at all as shown in this
+figure from Petr _et al._ (PNAS 2018).
 
 ![](images/petr_2018a.png){width="80%"}
 
-**The question was, why are these two measures of Neanderthal ancestry leading to different conclusions?** Could some violations of their assumptions (such as unnacounted-for gene-flow events between modern human populations) break one of them?
+**The question was, why are these two measures of Neanderthal ancestry leading
+to different conclusions?** Could some violations of their assumptions (such as
+an unaccounted-for gene-flow events between modern human populations) break
+one of them?
 
-The way the PNAS 2018 study approached the problem was tu run many simulation replicates across a large parameter grid. This required writing custom coalescent simulations, orchestrating running them across the parameter grid, collecting outputs, and computing population genetic statistics (here direct and indirect $f_4$-ratios)&mdash;all in all, a couple of hundred lines of Python, R, and bash.
+The way the PNAS 2018 study approached the problem was to run many simulation
+replicates across a large parameter grid. This required writing custom
+coalescent simulations, orchestrating running them across the parameter grid,
+collecting the genotypes the simulations produced, and computing population
+genetic statistics (here direct and indirect $f_4$-ratios)&mdash;all in all,
+a couple of hundred lines of Python, R, and bash.
 
-This vignette shows how to use _demografr_ to perform this kind of analyses in a much more straightforward and reproducible manner, entirely in R.
+This vignette shows how to use _demografr_ to perform these kind of workflows
+in a much more straightforward and reproducible manner, entirely in R.
 
 ## Grid simulation with _demografr_
 
@@ -86,9 +104,17 @@ plan(multisession, workers = availableCores())
 
 ### 1. Define a _slendr_ model function capturing the demographic history
 
-As in any standard ABC pipeline using _demografr_, we leverage the _slendr_ R package to first define a demografic model, encoding it as a simple R function. Again, as with standard ABC, **the arguments of this function correspond to model parameters**. Note that those will come from the parameter grid, not via sampling from priors as with ABC!
+As in any standard ABC pipeline using _demografr_, we leverage the _slendr_ R
+package to first define a demografic model, encoding it as a simple R function.
+Again, as with standard ABC, **the arguments of this function correspond to
+model parameters**. Note that those will come from the parameter grid, not via
+sampling from priors as with ABC.
 
-In our example, because the research question of interest involved various gene-flow rates between populations in the model, we fix split times and $N_e$ values because they are not that interesting or important for this simple analysis (we ignore the Eurasia to Africa "backflow" for the same reason):
+In our example, because the research question of interest involved various
+gene-flow rates between populations in the model, we fix split times and $N_e$
+values because they are not that interesting or important for this simple
+inference workflow (we ignore the Eurasia to Africa "backflow" for the same
+reason):
 
 ```{r}
 model <- function(rate_ea, rate_aa) {
@@ -136,34 +162,49 @@ model <- function(rate_ea, rate_aa) {
 }
 ```
 
-Let's check the model function by visualizing it (we set the gene-flow rates to arbitrary values, because this is purely a visualization test):
+Let's check the model function by visualizing it (we set the gene-flow rates
+to arbitrary values, because this is purely a visualization test):
 
 ```{r, plot_model}
 test_model <- model(rate_ea = 0.42, rate_aa = 0.42)[[1]]
 
-# we don't plot the gene flow arrows here for clarity
 plot_grid(
   plot_model(test_model, gene_flow = FALSE),
-  plot_model(test_model, log = TRUE, gene_flow = FALSE)
+  plot_model(test_model, log = TRUE, gene_flow = TRUE)
 )
 ```
 
-The model looks OK, so in the next step we define tree-sequence popgen summary statistics we are interested in (again, just as we would for an ABC pipeline).
+The model looks OK, so in the next step we define summary statistics
+statistics we are interested in (again, just as we would for an ABC pipeline).
 
 ### 2. Define summary statistics
 
-Recall that we want to explore the impact of modern-human gene flow on Neanderthal ancestry as inferred using two ways of computing it: "indirect" and "direct" $f_4$-ratio statistics.
+Recall that we want to explore the impact of modern-human gene flow on
+Neanderthal ancestry as inferred using two ways of computing it: "indirect"
+and "direct" $f_4$-ratio statistics.
 
-Because our model samples `r length(seq(40000, 0, -2000))` European individuals across the last 40 thousand years, we will compute the $f_4$-ratio statistics on all of these individuals in sequence.
+Because our model samples `r length(seq(40000, 0, -2000))` European individuals
+across the last 40 thousand years, we will compute the $f_4$-ratio statistics
+on all of these individuals in sequence.
 
-_demografr_ uses the R package _slendr_ not just for encoding demographic models and popgen simulations, but also for analysis of tree sequences via its interface to the powerful library [_tskit_](https://tskit.dev/tskit/docs/stable/introduction.html). One advantage of _slendr_ is that it allows referring to simulated samples via their "symbolic names". This means that, for instance, the first individual sampled from a population "eur" is named "eur_1", the second is named as "eur_2", etc. Therefore, we can capture the names of every European individual in a vector `X` by running:
+_demografr_ uses the R package _slendr_ not just for encoding demographic
+models and popgen simulations, but also for tree-sequences computation via its
+interface to the powerful library
+[_tskit_](https://tskit.dev/tskit/docs/stable/introduction.html).
+One advantage of _slendr_ is that it allows referring to simulated samples via
+their "symbolic names". This means that, for instance, the first individual
+sampled from a population "eur" is named "eur_1", the second is named as
+"eur_2", etc. Therefore, we can capture the names of every European individual
+in a vector `X` by running:
 
 ```{r}
 X <- paste0("eur_", 1:21)
 X
 ```
 
-and use this vector as input for any tree-sequence function of _slendr_/_tskit_. Specifically, we can define the "indirect" and "direct" $f_4$-ratio statistics in this way (using the equations defined in the figure above):
+and use this vector in any tree-sequence function of _slendr_/_tskit_.
+Specifically, we can define the "indirect" and "direct" $f_4$-ratio statistics
+in this way (using the equations defined in the figure above):
 
 ```{r}
 # compute the "indirect" f4-ratio statistic via slendr/tskit function ts_f4ratio,
@@ -181,23 +222,32 @@ direct <- function(ts) {
 }
 ```
 
-Exactly as it's the case for ABC, for the purposes of grid-based simulations we have to define functions which will be used to compute summary statistics whose behavior across a parameter grid we want to investigate:
+Exactly as it's the case for ABC, for the purposes of grid-based simulations we
+have to define functions which will be used to compute summary statistics whose
+behavior across a parameter grid we want to investigate:
 
 ```{r}
 # bind both functions in a named list
 functions <- list(direct = direct, indirect = indirect)
 ```
 
-This looks quite neat and tidy, but how can we make sure that our tree-sequence summary functions really work? We need a tree-sequence object as an input first! _demografr_ provides an easy way to get an arbitrary tree sequence from a model function via its helper function `simulate_model`. The simples way to use it is like this:
+This looks quite neat and tidy, but how can we make sure that our tree-sequence
+summary functions really work? We need a simulated tree-sequence object first!
+_demografr_ provides an easy way to get an arbitrary tree sequence from a model
+function via its helper function `simulate_model`. The simples way to use it
+is like this:
 
 ```{r}
-# we don't care about the parameter values, as we only want to get *some* tree sequence
+# we don't care about the parameter values, as we only want to get a tree sequence
 # (also, note we did not specify sequence length, recombination rate, etc.)
-ts <- simulate_model(model, parameters = list(rate_ea = 0.1, rate_aa = 0.15),
-                     sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+ts <- simulate_model(
+  model, parameters = list(rate_ea = 0.1, rate_aa = 0.15),
+  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
 ```
 
-With the tiny tree sequence for testing, we can now check if our tree-sequence functions work as they're supposed to:
+With the tiny tree sequence for testing, we can now check if our tree-sequence
+functions work as they're supposed to:
 
 ```{r}
 functions$direct(ts)
@@ -205,7 +255,9 @@ functions$direct(ts)
 functions$indirect(ts)
 ```
 
-Excellent, we get the output tables from `ts_f4ratio` functions as we're supposed to (and get one estimate for each of the `r length(seq(40000, 0, -2000))`):
+Excellent, we get the output tables from `ts_f4ratio` functions as we're
+supposed to (and get one estimate for each of the
+`r length(seq(40000, 0, -2000))`):
 
 ```{r}
 functions$direct(ts) %>% nrow
@@ -215,10 +267,17 @@ functions$indirect(ts) %>% nrow
 
 ### 3. Define a parameter grid
 
-Finally (and yet again, analogously to an equivalent ABC pipeline) we define parameters. Specifically, for a grid simulation, we define a data frame with one column for each parameter of the _slendr_ model function (the names of parameter columns must match the model function arguments!). For this purpose, the function `crossing` from the _tidyr_ R package is particularly helpful, so let's use it here:
+Finally (and yet again, analogously to an equivalent ABC pipeline) we define
+parameters to simulate over. Specifically, for a grid simulation, we define a
+data frame with one column for each parameter of the _slendr_ model function
+(the names of parameter columns must match the model function arguments!).
+For this purpose, the function `crossing` from the _tidyr_ R package is
+particularly helpful, so let's use it here:
 
 ```{r}
-grid <- tidyr::crossing(
+library(tidyr)
+
+grid <- crossing(
   rate_aa = seq(0, 0.25, 0.025),
   rate_ea = seq(0, 0.25, 0.025)
 )
@@ -226,11 +285,18 @@ grid <- tidyr::crossing(
 head(grid)
 ```
 
-In this way, we defined `r nrow(grid)` parameter combinations and can finally proceed to the simulation inference.
+In this way, we defined `r nrow(grid)` parameter combinations and can finally
+proceed to the simulation inference.
 
 ### 4. Perform grid-based simulations, compute summary statistics for each
 
-In a final analogy to the ABC inference with _demografr_, we have a function `simulate_grid()` which performs the equivalent to `simulate_abc()`. In fact, the function has a nearly identical interface&mdash;we plug in the model function, our parameter grid, the list of summary tree-sequence functions, the number of simulation replicates to perform for each parameter combination (and a few other obvious parameters shown here).
+In a final analogy to the ABC inference with _demografr_, we have a function
+`simulate_grid()` which works a little similarly to `simulate_abc()` introduced
+[in the first vignette](https://bodkan.net/demografr/articles/vignette-01-basics.html).
+In fact, the function has a nearly identical interface&mdash;we plug in the
+model function, our parameter grid, the list of summary tree-sequence
+functions, the number of simulation replicates to perform for each parameter
+combination (and a few other obvious parameters shown here).
 
 First, we will set up an automated parallelization scheme using the [_future_](https://cran.r-project.org/package=future) R package:
 
@@ -241,7 +307,8 @@ library(future)
 plan(multisession, workers = availableCores())
 ```
 
-(See much more detail on parallelization of _demografr_ inference pipelines in [this vignette](vignette-04-parallelization.html)).
+(See much more detail on parallelization of _demografr_ inference pipelines in
+[this vignette](vignette-04-parallelization.html)).
 
 ```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
@@ -276,7 +343,9 @@ minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
 ```
 
-**The total runtime for the grid simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+**The total runtime for the grid simulations was
+`r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
+parallelized across `r ncores` CPUs.**
 
 ```{r, eval=!file.exists(data_path), echo=FALSE}
 saveRDS(results, data_path)
@@ -286,21 +355,39 @@ saveRDS(results, data_path)
 results <- readRDS(data_path)
 ```
 
-### 5. Analyze results
+### 5. Examine results
 
-The function `simulate_grid()` returns all results in a data frame object in the following format:
+The function `simulate_grid()` returns all results in a data frame object in
+the following format:
 
 ```{r}
 print(results, n = 10)
 ```
 
-The first column indicates a replicate number, the following few columns are the values of the parameter grid. Most important are the last columns, though, each named after a single summary statistics. For conciseness, these summary statistics are stored as so-called ["list columns"](https://dcl-prog.stanford.edu/list-columns.html)&mdash;for each replicate and each parameter combination, these columns store the summary statistics as "nested" data frames. For instance, here are the results for the "direct" $f_4-ratio$ statistic across the first three simulation runs. You can see that the list-column `"direct"` contains a list of data frames, one data frame for each simulation replicate:
+The first column indicates a replicate number, the following few columns are
+the values of the parameter grid. Most important are the last columns, though,
+each named after a single summary statistics (i.e., their symbolic names are
+taken from the named-list of summary functions above). For conciseness,
+the values of these summary
+statistics are stored as so-called
+["list columns"](https://dcl-prog.stanford.edu/list-columns.html)&mdash;
+for each
+replicate and each parameter combination, these columns store the summary
+statistics as "nested" data frames. For instance, here are the results for
+the "direct" $f_4-ratio$ statistic across the first three simulation runs.
+You can see that the list-column `"direct"` contains a list of data frames,
+one data frame for each simulation replicate:
 
 ```{r}
 results$direct[1:3]
 ```
 
-List columns are very efficient and concise for storing complex data like this, but in order to be able to analyze data stored in them, we need a function [`unnest()`](https://tidyr.tidyverse.org/reference/unnest.html) from _tidyverse_, which "explodes" a list-column with stored data frames into a wider data frame which can be immediately analyzed. In this example:
+List columns are very efficient and concise for storing complex data like this,
+but in order to be able to analyze data stored in them, we need a function 
+[`unnest()`](https://tidyr.tidyverse.org/reference/unnest.html) from
+_tidyverse_, which "unpacks" a list-column with stored data frames into a
+wider data frame which stores the actual values of a given statistic as normal
+numerical column. In this example:
 
 **Direct f4-ratio:**
 
@@ -314,9 +401,12 @@ results %>% unnest(direct)
 results %>% unnest(indirect)
 ```
 
-**Note that unnesting each results column creates a plain old data frame which can be analyzed by whatever means you find convenient.**
-
-Because we were interested in the behavior of trajectories of indirect and direct estimates of Neanderthal ancestry over time, we will first create a small data frame indicating the times of sampling of each simulated European individual. We will use this small data frame for join operations for the purpose of plotting below:
+Because we are interested in the behavior of trajectories of indirect and
+direct estimates of Neanderthal ancestry over time assuming different values
+of some demographic parameters, we will first create a small data frame
+indicating the times of sampling of each simulated European
+individual. We will use this small data frame for join operations for the
+purpose of plotting below:
 
 ```{r}
 samples <- tibble(
@@ -327,6 +417,11 @@ samples <- tibble(
 
 ### Within-African gene flow vs inference of Neanderthal ancestry
 
+Let's look at the values of indirect and direct $f_4$-ratio statistics assuming
+different values of gene flow between the two African subpopulations:
+
+#### Indirect $f_4$-ratio
+
 ```{r, aa_indirect, class.source = 'fold-hide'}
 results %>%
   unnest(indirect) %>%
@@ -335,13 +430,15 @@ results %>%
   ggplot(aes(time, 1 - alpha, color = rate_aa, group = rate_aa)) +
     geom_line(stat = "smooth", se = FALSE) +
     geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dotted") +
     labs(x = "years before present", y = "Neanderthal ancestry proportion") +
     xlim(40000, 0) +
     coord_cartesian(y = c(0, 0.1)) +
     ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'indirect f4-ratio'",
             "Red line indicates the true Neanderthal ancestry proportion")
 ```
+
+#### Direct $f_4$-ratio
 
 ```{r, aa_direct, class.source = 'fold-hide'}
 results %>%
@@ -351,17 +448,25 @@ results %>%
   ggplot(aes(time, alpha, color = rate_aa, group = rate_aa)) +
     geom_line(stat = "smooth", se = FALSE) +
     geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dotted") +
     labs(x = "years before present", y = "Neanderthal ancestry proportion") +
     xlim(40000, 0) +
     coord_cartesian(y = c(0, 0.1)) +
     ggtitle("The effect of within-Africa gene flow (afr1 <-> afr2) on 'direct f4-ratio'",
-            "Red line indicates the true Neanderthal ancestry proportion")
+            "Dashed line indicates the true Neanderthal ancestry proportion")
 ```
 
-**We can see that increasing rates of gene flows _within Africa_ shifts apparent Neanderthal ancestry proportions inferred using "indirect" $f_4$-ratio increasingly upwards** (compare the estimated trajectories to the true proportion shown as dashed line). However, the "direct" $f_4$-ratio remains stable.
+**We can see that increasing rates of gene flow _within Africa_ shifts apparent
+Neanderthal ancestry proportions inferred using "indirect" $f_4$-ratio
+increasingly upwards** (compare the estimated trajectories to the true
+proportion shown as dashed line). However, the "direct" $f_4$-ratio remains
+stable, and relatively closer to the true admixture proportion indicated by the
+dashed line.
 
 ### Eurasia -> Africa gene flow vs inference of Neanderthal ancestry
+
+Now let's investigate the behavior of both statistic in models in which there's
+some proportion of backflow from Eurasia back into Africa:
 
 ```{r, ea_indirect, class.source = 'fold-hide'}
 results %>%
@@ -371,12 +476,12 @@ results %>%
   ggplot(aes(time, 1 - alpha, color = rate_ea, group = rate_ea)) +
     geom_line(stat = "smooth", se = FALSE) +
     geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dotted") +
     labs(x = "years before present", y = "Neanderthal ancestry proportion") +
     xlim(40000, 0) +
     coord_cartesian(y = c(0, 0.1)) +
     ggtitle("The effect of Eurasia -> Africa gene flow on 'indirect f4-ratio'",
-            "Red line indicates the true Neanderthal ancestry proportion")
+            "Dashed line indicates the true Neanderthal ancestry proportion")
 ```
 
 
@@ -388,18 +493,24 @@ results %>%
   ggplot(aes(time, alpha, color = rate_ea, group = rate_ea)) +
     geom_line(stat = "smooth", se = FALSE) +
     geom_hline(yintercept = 0.03, color = "red", linetype = "dashed") +
-    geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+    geom_hline(yintercept = 0, color = "black", linetype = "dotted") +
     labs(x = "years before present", y = "Neanderthal ancestry proportion") +
     xlim(40000, 0) +
     coord_cartesian(y = c(0, 0.1)) +
     ggtitle("The effect of Eurasia -> Africa gene flow on 'direct f4-ratio'",
-            "Red line indicates the true Neanderthal ancestry proportion")
+            "Dashed line indicates the true Neanderthal ancestry proportion")
 ```
 
-**Even more importantly, gene flow from Eurasia back into Africa creates an artificial decline of Neanderthal ancestry if measured via "indirect" $f_4$-ratio statistic!** However, the "direct" $f_4$-ratio remains stable.
+**We can see that gene flow from Eurasia back into Africa creates an artificial
+decline of Neanderthal ancestry if measured via "indirect" $f_4$-ratio
+statistic! However, the "direct" $f_4$-ratio remains stable and, again,
+relatively close to the true admixture proportion.**
 
 ## Comparison with the result by Petr _et al._ (PNAS 2018)
 
-As we can see, the very simple analysis described in this code (worth a couple of dozen lines of easy-to-read R code) can qualitatively replicate the much more elaborate original result:
+As we can see, the very simple simulation-based investigation described in this
+vignette (in total just a couple of dozen lines of easy-to-read R code) can
+qualitatively replicate the much original result from the ppaerpaper (which
+required a couple of hundreds of lines of Python / shell / R scripts):
 
 ![](images/petr_2018b.png){width="80%"}
