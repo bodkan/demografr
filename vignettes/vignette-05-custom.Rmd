@@ -1,8 +1,8 @@
 ---
-title: Custom SLiM or Python simulations
+title: Custom inference using SLiM or Python
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Custom SLiM or Python simulations}
+  %\VignetteIndexEntry{Custom inference using SLiM or Python}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -40,9 +40,14 @@ to do inference using your own scripts? Perhaps _slendr_'s opinionated
 interface doesn't allow you to do all that you need to do, such as using some
 of the powerful simulation features and options of "raw"
 [SLiM](https://messerlab.org/slim/) or
-[_msprime_](https://tskit.dev/msprime/docs/stable/intro.html)? This vignette
+[_msprime_](https://tskit.dev/msprime/docs/stable/intro.html)? Alternatively,
+perhaps you don't want to compute summary statistics (just) with _slendr_'s
+tree-sequence interface to _tskit_ (you might want to compute statistics using
+other software), or you want to compute statistics with fully customized
+Python functions. This vignette
 explains how you can use any standard SLiM or _msprime_ script as a simulation
-engine in a standard _demografr_ pipeline without _slendr_.
+engine in a standard _demografr_ pipeline without _slendr_, as well as how to
+utilize customized, non-_slendr_ summary statistic functions.
 
 First, let's load _demografr_ itself and also _slendr_ (which, in this
 vignette, will serve only for working with simulated tree sequences, but not
@@ -54,7 +59,36 @@ library(slendr)
 init_env(quiet = TRUE)
 ```
 
-## Restrictions on user-defined simulation scripts
+## Toy inference problem
+
+Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
+population given that we observed the following value of nucleotide diversity:
+
+```{r, echo=FALSE}
+ts <- population("pop", N = 1000, time = 10000) %>%
+  compile_model(generation_time = 1, direction = "backward") %>%
+  msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
+  ts_mutate(mutation_rate = 1e-8, random_seed = 42)
+observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
+```
+
+```{r}
+observed_diversity
+```
+
+We want to infer the posterior distribution of $N_e$. In this vignette, we're
+going to show how to accomplish first not via the normal
+_slendr_ interface (as shown [here](vignette-01-basics.html)) but using a
+simple SLiM or Python script. In a later section, we're also going to
+use this example to demonstrate how to compute population genetic summary
+statistic (like nucleotide diversity) using external software.
+
+**We acknowledge that this is a completely trivial example, not really worth
+spending so much effort on doing an ABC for.** The example was chosen because
+it runs fast and demonstrates all the features of _demografr_ that you would
+use regardless of the complexity of your model.
+
+## Using custom scripts as simulation engines
 
 In order to be able to use a custom SLiM or msprime script with _demografr_,
 the script must conform to a couple of rules:
@@ -118,35 +152,7 @@ can name the files produced by your simulation script however you'd like and
 can have as many as you'd like, as long as they are all in that one directory
 given by `path`.**
 
-## ABC pipeline using custom-defined simulation scripts
-
-### Toy problem
-
-Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
-population given that we observed the following value of nucleotide diversity:
-
-```{r, echo=FALSE}
-ts <- population("pop", N = 1000, time = 10000) %>%
-  compile_model(generation_time = 1, direction = "backward") %>%
-  msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
-  ts_mutate(mutation_rate = 1e-8, random_seed = 42)
-observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
-```
-
-```{r}
-observed_diversity
-```
-
-We want to infer the posterior distribution of $N_e$ but not via the normal
-_slendr_ interface (as shown [here](vignette-01-basics.html)) but using a
-simple SLiM or Python script.
-
-**We acknowledge that this is a completely trivial example, not really worth
-spending so much effort on doing an ABC for.** The example was chosen because
-it runs fast and demonstrates all the features of _demografr_ that you would
-use regardless of the complexity of your model.
-
-## Example pure SLiM and msprime script
+### Example pure SLiM and msprime script
 
 To demonstrate the requirements 1-3 above in practice, let's run an ABC
 inference using an example _msprime_ script and a SLiM script as
@@ -158,7 +164,7 @@ The scripts have only **one _model parameter_, $N_e$ of the single modeled
 population**. The **other parameters are mandatory**, just discussed in the
 previous section.
 
-### SLiM script
+#### SLiM script
 
 ```{r}
 slim_script <- system.file("examples/custom.slim", package = "demografr")
@@ -168,7 +174,7 @@ slim_script <- system.file("examples/custom.slim", package = "demografr")
 cat(readLines(slim_script), sep = "\n")
 ```
 
-### Python script
+#### Python script
 
 ```{r}
 python_script <- system.file("examples/custom.py", package = "demografr")
@@ -194,7 +200,7 @@ _demografr_ (i.e., $N_e$ often being a floating-point value after sampling from
 a continuous prior), you might have to perform explicit type conversion in your
 custom scripts (such as `sim.addSubPop("p0", asInteger(Ne)` as above).
 
-### Individual ABC components
+### ABC inference using custom _msprime_ script
 
 Apart from the user-defined simulation SLiM and _msprime_ scripts, the
 components of our toy inference remains the same&mdash;we need to define the
@@ -213,11 +219,11 @@ priors <- list(Ne ~ runif(100, 5000))
 observed <- list(diversity = observed_diversity)
 
 # a single tree-sequence summary function
-functions <- list(
-  diversity = function(ts) {
-    ts_diversity(ts, list(pop = seq(0, 99))) # compute using 100 chromosomes
-  }
-)
+compute_diversity <- function(ts) {
+  # compute diversity using 100 chromosomes
+  ts_diversity(ts, list(pop = seq(0, 99)))
+}
+functions <- list(diversity = compute_diversity)
 
 # data-generating functions for computing summary statistics
 gens <- list(
@@ -229,7 +235,7 @@ gens <- list(
 metadata, we have to refer to individuals' chromosomes using numerical indices
 rather than _slendr_ symbolic names like we do in all of our other vignettes.)
 
-### Simulating a testing tree sequence
+#### Simulating a testing tree sequence
 
 As we explained elsewhere, a useful function for developing inference pipelines
 using _demografr_ is a function `simulate_model()`, which normally accepts a
@@ -273,7 +279,7 @@ summarise_data(result_slim, functions)
 ```
 
 
-### ABC inference
+#### ABC inference
 
 Having all components of our pipeline set up we should, again, validate
 everything before we proceed to (potentially very costly) simulations. In the
@@ -373,3 +379,30 @@ plot_posterior(abc) +
   geom_vline(xintercept = 1000, linetype = "dashed") +
   coord_cartesian(xlim = c(100, 5000))
 ```
+
+## Using external programs to compute summary statistics
+
+Now let's move things one step forward. What if we either don't find _slendr_'s
+tree-sequence interface to _tskit_ sufficient and want to compute summary
+statistics from the simulated data using some external software, like PLINK or
+EIGENSTRAT?
+
+To keep things as easy as possible (and avoid dragging in multiple software
+dependencies), let's say we have a program `vcf_diversity`, which is run in
+the following way:
+
+```
+./vcf_diversity --vcf <path to a VCF> --output <path to a TSV table>
+```
+
+This program takes in a VCF file and computes the nucleotide diversity across
+all individuals in that VCF file. For simplicity, it produces a table of
+results in exactly the same format as the `observed_diversity` data frame
+above.
+
+In this particular example, we want to replace the computation of statistics
+performed by the R function `compute_diversity` above (which also produces
+a data frame) with the product of the external software `vcf_diversity`.
+
+(We provide this `vcf_diversity` program as an example script, but it could
+of course be any other program you could imagine.)

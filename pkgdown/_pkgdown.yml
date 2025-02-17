@@ -25,8 +25,8 @@ navbar:
           href: articles/vignette-03-grids.html
         - text: Parallelization options
           href: articles/vignette-04-parallelization.html
-        - text: Custom SLiM or Python simulations
-          href: articles/vignette-05-custom-engines.html
+        - text: Custom inference using SLiM or Python
+          href: articles/vignette-05-custom.html
         - text: ABC diagnostics
           href: articles/vignette-06-diagnostics.html
         - text: Selection inference
