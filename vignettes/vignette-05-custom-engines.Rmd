@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-data_path <- here::here("inst/examples/custom_abc.rds")
+abc_path <- here::here("inst/examples/custom_abc.rds")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
@@ -128,7 +128,7 @@ population given that we observed the following value of nucleotide diversity:
 ```{r, echo=FALSE}
 ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
-  msprime(sequence_length = 100e6, recombination_rate = 1e-8, random_seed = 42) %>%
+  msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
   ts_mutate(mutation_rate = 1e-8, random_seed = 42)
 observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
 ```
@@ -207,7 +207,7 @@ in _demografr_'s documentation vignettes):
 
 ```{r}
 # a single prior parameter
-priors <- list(Ne ~ runif(100, 3000))
+priors <- list(Ne ~ runif(100, 5000))
 
 # a single observed statistic
 observed <- list(diversity = observed_diversity)
@@ -304,12 +304,14 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(data_path)}
+```{r, eval=!file.exists(abc_path)}
 library(future)
-plan(multisession, workers = availableCores()) # parallelize across all 96 CPUs
+plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
-data <- simulate_abc(python_script, priors, functions, observed, iterations = 5000,
-                     data = gens, format = "files")
+data <- simulate_abc(
+  model = python_script, priors, functions, observed, iterations = 10000,
+  data = gens, format = "files"
+)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -318,12 +320,12 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE, eval=!file.exists(abc_path)}
 saveRDS(tdelta, here::here("inst/examples/custom_tdelta.rds"))
 saveRDS(ncores, here::here("inst/examples/custom_ncores.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(data_path)}
+```{r, echo=FALSE, eval=file.exists(abc_path)}
 tdelta <- readRDS(here::here("inst/examples/custom_tdelta.rds"))
 ncores <- readRDS(here::here("inst/examples/custom_ncores.rds"))
 ```
@@ -341,16 +343,16 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(data_path)}
+```{r, eval=!file.exists(abc_path)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
-saveRDS(abc, data_path)
+```{r, echo=FALSE, eval=!file.exists(abc_path)}
+saveRDS(abc, abc_path)
 ```
 
-```{r, echo=FALSE, eval=file.exists(data_path)}
-abc <- readRDS(data_path)
+```{r, echo=FALSE, eval=file.exists(abc_path)}
+abc <- readRDS(abc_path)
 ```
 
 Having done so, we can again look at the summary statistics of the posterior
@@ -368,5 +370,6 @@ extract_summary(abc)
 library(ggplot2)
 
 plot_posterior(abc) +
-  geom_vline(xintercept = 1000, linetype = "dashed")
+  geom_vline(xintercept = 1000, linetype = "dashed") +
+  coord_cartesian(xlim = c(100, 5000))
 ```
