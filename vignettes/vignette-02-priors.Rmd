@@ -27,7 +27,7 @@ devtools::load_all()
 result, its documentation is in a draft stage at best. Typos, inconsistencies,
 and other issues are unfortunately expected.
 
-⚠️⚠️⚠️⚠️
+⚠️️⚠️⚠️
 
 In order to perform probabilistic inference using a method such as Approximate
 Bayesian Computation, we need a way to specify prior distributions of

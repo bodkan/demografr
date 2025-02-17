@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-devtools::install(upgrade = FALSE)
-devtools::load_all()
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 
 dataX_path <- here::here("inst/examples/downstream_dataX.rds")
 dataY_path <- here::here("inst/examples/downstream_dataY.rds")
@@ -53,11 +53,21 @@ set.seed(SEED)
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
+**Note:** The _demografr_ R package is still under active development. As a
+result, its documentation is in a draft stage at best. Typos, inconsistencies,
+and other issues are unfortunately expected.
 
-⚠️⚠️⚠️
+⚠️⚠️⚠
 
-Let's return to our [first](vignette-01-basics.html) example. However, this time, imagine that we don't really know which of the three following phylogenetic relationships is the one that captures the features of our data best, perhaps with different sources of evidence being consistent with each one of them so we want to consider all three in our modeling (as always, this is purely a toy example). These models differ both in terms of tree topology of the population relationships as well as in the gene flow, and we want to perform *model selection*.
+Let's return to our [first](vignette-01-basics.html) example. However, this
+time, imagine that we don't really know which of the three following
+phylogenetic relationships is the one that captures the features of our data
+best, perhaps with different sources of evidence being consistent with each
+one of them so we want to consider all three in our modeling (as always, this
+is supposed to be a hypothetical example for demonstration purposes).
+These models differ both in terms of tree topology of the population
+relationships as well as in the gene flow, and we want to perform _model
+selection_.
 
 ```{r ape_tree_modelX, echo=FALSE, fig.width=5, fig.height=5}
 orig_par <- par(no.readonly = TRUE)
@@ -108,13 +118,22 @@ observed_f4
 We will again bind them into a list:
 
 ```{r}
-observed <- list(diversity  = observed_diversity, divergence = observed_divergence, f4 = observed_f4)
+observed <- list(
+  diversity  = observed_diversity,
+  divergence = observed_divergence,
+  f4 = observed_f4
+)
 ```
 
 
 ### Three competing models
 
-First, in order to perform model selection, we need to specify models themselves. We do this by defining three separate _slendr_ functions, each of them encoding the three phylogenetic relationships from the diagrams above. Note that we're not trying to infer the time of gene flow, for simplicity, but we do fix the gene flow event to different times (again, reflected in the alternative model sketches above):
+First, in order to perform model selection, we need to specify models
+themselves. We do this by defining three separate _slendr_ functions, each of
+them encoding the three phylogenetic relationships from the diagrams above.
+Note that we're not trying to infer the time of gene flow, for simplicity,
+but we do fix the gene flow event to different times (again, reflected in the
+alternative model sketches above):
 
 ```{r}
 modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {

@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -20,56 +20,84 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-devtools::load_all()
-
 data_path <- here::here("inst/examples/custom_abc.rds")
+
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a result, its documentation is in a draft stage at best. Typos, inconsistencies, and other issues are unfortunately expected.
+**Note:** The _demografr_ R package is still under active development. As a
+result, its documentation is in a draft stage at best. Typos, inconsistencies,
+and other issues are unfortunately expected.
 
-⚠️⚠️⚠️️⚠️
+⚠️⚠⚠️
 
-By default, _demografr_ uses the [_slendr_](https://github.com/bodkan/slendr) simulation framework for defining models and simulating data from them. But what if you need to do inference using your own scripts? Perhaps _slendr_'s opinionated interface doesn't allow you to do all that you need to do, such as using some of the powerful simulation features and options of "raw" [SLiM](https://messerlab.org/slim/) or [_msprime_](https://tskit.dev/msprime/docs/stable/intro.html)? This vignette explains how you can use any standard SLiM or _msprime_ script which produces a tree sequence file as its output as an engine in a standard _demografr_ inference pipeline.
+By default, _demografr_ uses the [_slendr_](https://github.com/bodkan/slendr)
+package for defining models and simulating data from them. But what if you need
+to do inference using your own scripts? Perhaps _slendr_'s opinionated
+interface doesn't allow you to do all that you need to do, such as using some
+of the powerful simulation features and options of "raw"
+[SLiM](https://messerlab.org/slim/) or
+[_msprime_](https://tskit.dev/msprime/docs/stable/intro.html)? This vignette
+explains how you can use any standard SLiM or _msprime_ script as a simulation
+engine in a standard _demografr_ pipeline without _slendr_.
 
-First, let's load _demografr_ itself and also _slendr_ (which, in this vignette, will serve only for analyzing simulated tree-sequence data, but not simulations themselves).
+First, let's load _demografr_ itself and also _slendr_ (which, in this
+vignette, will serve only for working with simulated tree sequences, but not
+simulations themselves).
 
 ```{r}
 library(demografr)
 library(slendr)
-
 init_env(quiet = TRUE)
 ```
 
 ## Restrictions on user-defined simulation scripts
 
-In order to be able to use a custom SLiM or msprime script with _demografr_, the script must conform to a couple of rules:
+In order to be able to use a custom SLiM or msprime script with _demografr_,
+the script must conform to a couple of rules:
 
 ### 1. It must be runnable on the command-line as any other command-line script
 
-- **For an msprime script**, this means something like `python <your script>.py <command-line arguments>`.
+- **For an _msprime_ script**, this means something like `python <your script>.py <command-line arguments>`.
 
 - **For a SLiM script**, this means something like `slim <command-line arguments> <your script>.slim`.
 
-### 2. It must accept `--path` argument pointing to a directory where results will be saved
+### 2. It must accept `--path` argument pointing to a directory where it will save output files
 
 This is analogous to the `path =` argument of _slendr_ functions `slim()` and `msprime()`.
 
-**For an msprime script**, this parameter can be specified via the Python built-in module `argparse`, and provided on the command-line as `--path <path to a directory>`. In the script itself, if you use the `argparse` module and have thus the values of provided arguments (for instance) in an `args` object, you can then refer to these arguments as `args.path`, etc.
+**For an _msprime_ script**, this parameter can be specified via the Python
+built-in module `argparse`, and provided on the command-line as
+`--path <path to directory>`. In the script itself, if you use the `argparse`
+module and have thus the values of provided arguments (for instance) in an
+`args` object, you can then refer to these arguments as `args.path`, etc.
+Given that you're reading this, I assume you know what the above information
+means, but here's a [link to the relevant section](https://docs.python.org/3/library/argparse.html)
+of the Python documentation for completeness.
 
-**For a SLiM script**, this parameter can be specified via SLiM's standard way of supplying command-line arguments as `-d "path='<path to a directory>'"`. Importantly, note SLiM's format of specifying string arguments for the `path` argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to this argument via constant `path`.
+**For a SLiM script**, this parameter can be specified via SLiM's standard way
+of supplying command-line arguments as `-d "path='<path to a directory>'"`.
+Importantly, note SLiM's format of specifying string arguments for the `path`
+argument. If you need further detail, see Section 20.2 of the SLiM manual.
+In the script itself, you can then refer to this argument via the constant
+`path`.
 
 ### 3. All model parameters must be provided as additional command-line arguments
 
-You can refer to them in your script as you would to the mandatory arguments as described in the previous section.
+You can refer to them in your script as you would to the mandatory arguments
+as described in the previous section.
 
-**A useful check to see whether you script would make a valid engine for a _demografr_ analysis is to run it manually on the command line like this:**
+**A useful check to see whether you script would make a valid engine for a
+_demografr_ inference pipeline is to run it manually on the command line like
+this:**
 
 ```
 python \
   <path to your Python script>                   \
-  --path <path to the directory with simulation results> \
+  --path <path to a directory> \
   <... your model parameters ...>
 ```
 
@@ -77,22 +105,28 @@ Or, if you want to run a SLiM-powered ABC, like this:
 
 ```
 slim \
-  -d "path='<path to the directory with simulation results>'" \
+  -d "path='<path to a directory>'" \
   <... your model parameters ...>
 ```
 
-Then, if you get a your desired simulation results in the given directory, you're good to go!
+Then, if you look into the directory and see the desired files produced by your
+simulation script, you're good to go!
 
-**Below you are going to see how to actually read back simulation results from disk and use them for computing summary statistics. For now, just note that you can name your output files however you'd like and can have as many as you'd like, as long as they are all in that one directory given by `path`.**
+**Below you are going to see how to actually read back simulation results from
+disk and use them for computing summary statistics. For now, just note that you
+can name the files produced by your simulation script however you'd like and
+can have as many as you'd like, as long as they are all in that one directory
+given by `path`.**
 
-## ABC analysis using custom-defined simulation scripts
+## ABC pipeline using custom-defined simulation scripts
 
 ### Toy problem
 
-Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized population given that we observed the following value of nucleotide diversity:
+Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
+population given that we observed the following value of nucleotide diversity:
 
 ```{r, echo=FALSE}
-ts <- population("pop", N = 500, time = 10000) %>%
+ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
   msprime(sequence_length = 100e6, recombination_rate = 1e-8, random_seed = 42) %>%
   ts_mutate(mutation_rate = 1e-8, random_seed = 42)
@@ -103,15 +137,26 @@ observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
 observed_diversity
 ```
 
-We want to infer the posterior distribution of $N_e$ but not via the normal _slendr_ interface (as shown [here](vignette-01-basics.html)) but using a simple SLiM or Python script.
+We want to infer the posterior distribution of $N_e$ but not via the normal
+_slendr_ interface (as shown [here](vignette-01-basics.html)) but using a
+simple SLiM or Python script.
 
-**We acknowledge that this is a completely trivial example, not really worth spending so much effort on doing an ABC for.** The example was chosen because it runs fast and demonstrates all the features of _demografr_ that you would use regardless of the complexity of your model.
+**We acknowledge that this is a completely trivial example, not really worth
+spending so much effort on doing an ABC for.** The example was chosen because
+it runs fast and demonstrates all the features of _demografr_ that you would
+use regardless of the complexity of your model.
 
 ## Example pure SLiM and msprime script
 
-To demonstrate the requirements 1-3 above in practice, let's perform ABC using each of those scripts as tree-sequence simulation engines.
+To demonstrate the requirements 1-3 above in practice, let's run an ABC
+inference using an example _msprime_ script and a SLiM script as
+simulation engines.
 
-Imagine we have the following two scripts which we want to use as simulation engines instead of _slendr_'s own functions `slim()` and `msprime()`. The scripts have only **one _model parameter_, $N_e$ of the single modelled population**. The **other parameters are mandatory**, just discussed in the previous section.
+Imagine we have the following two scripts which we want to use as simulation
+engines instead of _slendr_'s own functions `slim()` and `msprime()`.
+The scripts have only **one _model parameter_, $N_e$ of the single modeled
+population**. The **other parameters are mandatory**, just discussed in the
+previous section.
 
 ### SLiM script
 
@@ -133,82 +178,127 @@ python_script <- system.file("examples/custom.py", package = "demografr")
 cat(readLines(python_script), sep = "\n")
 ```
 
-**Note that the Python script specifies all model parameters (here just $N_e$) and mandatory arguments via a command-line interface provided by the Python module `argparse`**.
+**Note that the Python script specifies all model parameters (here just $N_e$)
+and mandatory arguments via a command-line interface provided by the Python
+module `argparse`**.
 
-**The SLiM script, on the other hand, uses SLiM's features for command-line specification of parameters and simply refers to each parameter by its symbolic name.** No other setup is necessary.
+**The SLiM script, on the other hand, uses SLiM's features for command-line
+specification of parameters and simply refers to each parameter by its symbolic
+name.** No other setup is necessary.
 
-Please also note that given that there are can be discrepancies between values of arguments of some SLiM or Python methods (such as `addSubPop` of SLiM which expects an integer value for a population size, or the `samples` argument of `msprime.sim_ancestry`), and values of parameters sampled from priors by _demografr_ (i.e., $N_e$ often being a floating-point value after sampling from a continuous prior), you might have to perform explicit type conversion in your custom scripts (such as `sim.addSubPop("p0", asInteger(Ne)` as above).
+Please also note that given that there are can be discrepancies between values
+of arguments of some SLiM or Python methods (such as `addSubPop` of SLiM which
+expects an integer value for a population size, or the `samples` argument of
+`msprime.sim_ancestry`), and values of parameters sampled from priors by
+_demografr_ (i.e., $N_e$ often being a floating-point value after sampling from
+a continuous prior), you might have to perform explicit type conversion in your
+custom scripts (such as `sim.addSubPop("p0", asInteger(Ne)` as above).
 
 ### Individual ABC components
 
-Apart from the user-defined simulation SLiM and _msprime_ scripts, the components of our toy inference remains the same&mdash;we need to define the observed statistics, tree-sequence summary functions, and priors. We don't need a model function&mdash;that will be served by our custom script.
+Apart from the user-defined simulation SLiM and _msprime_ scripts, the
+components of our toy inference remains the same&mdash;we need to define the
+observed statistics, tree-sequence summary functions, and priors. We don't need
+a model function&mdash;that will be served by our custom script.
 
-Here are the _demografr_ pipeline components (we won't be discussing them here because that's extensively taken care of [elsewhere](vignette-01-basics.html) in _demografr_'s documentation vignettes):
+Here are the _demografr_ pipeline components (we won't be discussing them here
+because that's extensively taken care of [elsewhere](vignette-01-basics.html)
+in _demografr_'s documentation vignettes):
 
 ```{r}
 # a single prior parameter
-priors <- list(Ne ~ runif(10, 1000))
+priors <- list(Ne ~ runif(100, 3000))
 
 # a single observed statistic
 observed <- list(diversity = observed_diversity)
 
-# a single tree-sequence summary function producing output in the same
-# format as the observed statistic table
+# a single tree-sequence summary function
 functions <- list(
   diversity = function(ts) {
-    ts_diversity(ts, list(pop = seq(0, 19))) # compute using 20 chromosomes
+    ts_diversity(ts, list(pop = seq(0, 99))) # compute using 100 chromosomes
   }
 )
 
 # data-generating functions for computing summary statistics
-data <- list(
+gens <- list(
   ts = function(path) ts_read(file.path(path, "result.trees"))
 )
 ```
 
-(Note that because our simulated tree sequences won't be coming with _slendr_ metadata, we have to refer to individuals' chromosomes using numerical indices rather than _slendr_ symbolic names like we do in all of our other vignettes.)
+(Note that because our simulated tree sequences won't be coming with _slendr_
+metadata, we have to refer to individuals' chromosomes using numerical indices
+rather than _slendr_ symbolic names like we do in all of our other vignettes.)
 
 ### Simulating a testing tree sequence
 
-As we explained elsewhere, a useful function for developing inference pipelines using _demografr_ is a function `simulate_model()`, which normally accepts a _slendr_ model generating function and the model parameters (either given as priors or as a list of named values), and simulates a tree-sequence object. This function (as any other _demografr_ function operating with models) accepts our custom-defined simulation scripts in place of standard _slendr_ models.
+As we explained elsewhere, a useful function for developing inference pipelines
+using _demografr_ is a function `simulate_model()`, which normally accepts a
+_slendr_ model generating function and the model parameters (either given as
+priors or as a list of named values), and simulates a tree-sequence object.
+This function (as any other _demografr_ function operating with models) accepts
+our custom-defined simulation scripts in place of standard _slendr_ models.
 
-For instance, we can simulate a couple of Mb of testing sequence from our _msprime_ script like this:
+For instance, we can simulate a couple of Mb of testing sequence from our
+_msprime_ script like this:
 
 ```{r}
-result_msprime <- simulate_model(model = python_script, parameters = list(Ne = 123), format = "files", data = data)
+result_msprime <- simulate_model(python_script, parameters = list(Ne = 123), format = "files", data = gens)
 ```
 
-(Of course we could've plugged in the `python_script` instead.)
-
-Now we can finally test our little toy tree-sequence summary function, verifying that we can indeed compute the summary statistic we want to:
+Now we can finally test our toy tree-sequence summary function, verifying that
+we can indeed compute the summary statistic we want to:
 
 ```{r}
 functions$diversity(result_msprime$ts)
 ```
 
-The function works as expected&mdash;we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.
+The function works as expected&mdash;we have a single population and want to
+compute nucleotide diversity in the whole population, and this is exactly what
+we get.
 
 ```{r, echo=FALSE}
-result_slim <- simulate_model(model = slim_script, parameters = list(Ne = 123), format = "files", data = data)
+result_slim <- simulate_model(slim_script, parameters = list(Ne = 123), format = "files", data = gens)
 
 functions$diversity(result_slim$ts)
 ```
 
-### Running an ABC analysis
+Note that we are also able to use a dedicated function for this, called
+`summarise_data()`, which takes in a product of a simulation (tree sequence
+and/or a path to a directory with simulation results), and apply all summary
+functions to this data:
 
-Having all components of our pipeline set up we should, again, validate everything before we proceed to (potentially very costly) simulations. In the remainder of this vignette we'll only continue with the Python msprime custom script in order to save some computational time. That said, it's important to realize that you could use this sort of workflow for any kind of SLiM script, including very elaborate spatial simulations, non-WF models, and all kinds of phenotypic simulations too! **Although primarily designed to work with _slendr_, the _demografr_ package intends to fully support any kind of SLiM or _msprime_ simulation.**
+```{r}
+summarise_data(result_msprime, functions)
+summarise_data(result_slim, functions)
+```
+
+
+### ABC inference
+
+Having all components of our pipeline set up we should, again, validate
+everything before we proceed to (potentially very costly) simulations. In the
+remainder of this vignette we'll only continue with the Python msprime custom
+script in order to save some computational time. That said, it's important to
+realize that you could use this sort of workflow for any kind of SLiM script,
+including very elaborate spatial simulations, non-WF models, and all kinds of
+phenotypic simulations too! **Although primarily designed to work with
+_slendr_, the _demografr_ package intends to fully support any kind of SLiM or
+_msprime_ simulation. If something doesn't work, consider it a _demografr_
+bug!**
 
 Let's first validate all components of our pipeline:
 
 ```{r}
-validate_abc(python_script, priors, functions, observed, data = data, format = "files")
+validate_abc(python_script, priors, functions, observed, data = gens, format = "files")
 ```
 
 ```{r, echo=FALSE, results='hide'}
-validate_abc(slim_script, priors, functions, observed, data = data, format = "files")
+validate_abc(slim_script, priors, functions, observed, data = gens, format = "files")
 ```
 
-Looking good! Now let's first run ABC simulations. Again, note the use of the Python script where we would normally plug in a _slendr_ model function in place of the `model` argument:
+Looking good! Now let's first run ABC simulations. Again, note the use of the
+Python script where we would normally provide a _slendr_ model function in
+place of the `model` argument:
 
 ```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
@@ -216,9 +306,10 @@ tstart <- Sys.time()
 
 ```{r, eval=!file.exists(data_path)}
 library(future)
-plan(multicore, workers = availableCores()) # parallelize across all 96 CPUs
+plan(multisession, workers = availableCores()) # parallelize across all 96 CPUs
 
-data <- simulate_abc(python_script, priors, functions, observed, data = data, iterations = 1000, format = "files")
+data <- simulate_abc(python_script, priors, functions, observed, iterations = 5000,
+                     data = gens, format = "files")
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -243,12 +334,15 @@ minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
 ```
 
-**The total runtime for the ABC simulations was `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")` parallelized across `r ncores` CPUs.**
+**The total runtime for the ABC simulations was
+`r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
+parallelized across `r ncores` CPUs.**
 
-Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, $N_e$:
+Once the simulations are finished, we can perform inference of the posterior
+distribution of the single parameter of our model, $N_e$:
 
 ```{r, eval=!file.exists(data_path)}
-abc <- run_abc(data, engine = "abc", tol = 0.03, method = "neuralnet")
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
@@ -259,12 +353,20 @@ saveRDS(abc, data_path)
 abc <- readRDS(data_path)
 ```
 
-Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results (we're skipping diagnostics such as posterior predictive checks but you can read more about those [here](vignette-01-basics.html) and [here](vignette-06-diagnostics.html)):
+Having done so, we can again look at the summary statistics of the posterior
+distribution and also plot the results (we're skipping diagnostics such as
+posterior predictive checks but you can read more about those
+[here](vignette-01-basics.html) and [here](vignette-06-diagnostics.html)).
+Because this `observed` diversity is based on simulated data from a known
+model, we'll indicate the true "hidden" $N_e$ value with a vertical line.
 
 ```{r}
 extract_summary(abc)
 ```
 
 ```{r, custom_Ne_posterior}
-plot_posterior(abc)
+library(ggplot2)
+
+plot_posterior(abc) +
+  geom_vline(xintercept = 1000, linetype = "dashed")
 ```
