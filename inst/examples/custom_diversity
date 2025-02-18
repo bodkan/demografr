@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+import argparse
+
+import allel
+import pandas as pd
+
+# vcf_path = "/project/genotypes.vcf"
+# tsv_path = "/project/diversity.tsv"
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--vcf", type=str, required=True)
+parser.add_argument("--tsv", type=str, required=True)
+
+args = parser.parse_args()
+vcf_path = args.vcf
+tsv_path = args.tsv
+
+vcf = allel.read_vcf(vcf_path)
+
+gt = allel.GenotypeArray(vcf["calldata/GT"])
+pos = vcf["variants/POS"]
+ac = gt.count_alleles()
+
+pi = allel.sequence_diversity(pos, ac)
+
+df = pd.DataFrame({"set": ["pop"], "diversity": pi})
+
+df.to_csv(tsv_path, sep="\t", index=False)
