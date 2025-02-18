@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc_path <- here::here("inst/examples/custom_abc.rds")
+abc1_path <- here::here("inst/examples/custom_abc1.rds")
+abc2_path <- here::here("inst/examples/custom_abc2.rds")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
@@ -309,7 +310,7 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path)}
+```{r, eval=!file.exists(abc_path1)}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -325,14 +326,14 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path)}
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta.rds"))
-saveRDS(ncores, here::here("inst/examples/custom_ncores.rds"))
+```{r, echo=FALSE, eval=!file.exists(abc_path1)}
+saveRDS(tdelta, here::here("inst/examples/custom_tdelta1.rds"))
+saveRDS(ncores, here::here("inst/examples/custom_ncores1.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores.rds"))
+```{r, echo=FALSE, eval=file.exists(abc_path1)}
+tdelta <- readRDS(here::here("inst/examples/custom_tdelta1.rds"))
+ncores <- readRDS(here::here("inst/examples/custom_ncores1.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -348,16 +349,16 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(abc_path)}
+```{r, eval=!file.exists(abc_path1)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path)}
-saveRDS(abc, abc_path)
+```{r, echo=FALSE, eval=!file.exists(abc_path1)}
+saveRDS(abc, abc_path1)
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path)}
-abc <- readRDS(abc_path)
+```{r, echo=FALSE, eval=file.exists(abc_path1)}
+abc <- readRDS(abc_path1)
 ```
 
 Having done so, we can again look at the summary statistics of the posterior
@@ -411,16 +412,6 @@ reticulate::py_install("scikit-allel", pip = TRUE)
 ```
 
 ```{r}
-# pkg_path <- system.file("examples/", package = "demografr")
-pkg_path <- "/project/inst/examples"
-Sys.setenv(PATH = paste0(dirname(reticulate::py_config()$python),
-                         ":",
-                         Sys.getenv("PATH"),
-                         ":",
-                         pkg_path))
-```
-
-```{r}
 # a single prior parameter
 priors <- list(Ne ~ runif(100, 5000))
 
@@ -429,16 +420,14 @@ observed <- list(diversity = observed_diversity)
 
 # a single tree-sequence summary function
 compute_diversity <- function(vcf) {
-  # get the path to an external command-line example program
-  program_path <- system.file("examples/custom_diversity", package = "demografr")
-
-  # where to save diversity computed by the program
+  python <- reticulate::py_config()$python
+  program <- system.file("examples/custom_diversity", package = "demografr")
   tsv <- tempfile()
 
-  # compose the shell command and run it, saving the diversity to a file
-  cmd <- paste(program_path, "--vcf", vcf, "--tsv", tsv)
+  cmd <- paste(python, program, "--vcf", vcf, "--tsv", tsv)
   system(cmd)
 
+  # read the computed table with nucleotide diversity in the simulated# VCF
   read.table(tsv, header = TRUE)
 }
 functions <- list(diversity = compute_diversity)
@@ -468,4 +457,57 @@ result_msprime <- simulate_model(python_script, parameters = list(Ne = 123), for
 summarise_data(result_msprime, functions)
 ```
 
+```{r, echo=FALSE, eval=TRUE}
+tstart <- Sys.time()
+```
 
+```{r, eval=!file.exists(abc_path)}
+library(future)
+plan(multisession, workers = availableCores()) # parallelize across all CPUs
+
+data <- simulate_abc(
+  model = python_script, priors, functions, observed, iterations = 10000,
+  data = gens, format = "files"
+)
+```
+
+```{r, echo=FALSE, eval=TRUE}
+tend <- Sys.time()
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+ncores <- future::availableCores()
+```
+
+```{r, echo=FALSE, eval=!file.exists(abc_path2)}
+saveRDS(tdelta, here::here("inst/examples/custom_tdelta2.rds"))
+saveRDS(ncores, here::here("inst/examples/custom_ncores2.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(abc_path2)}
+tdelta <- readRDS(here::here("inst/examples/custom_tdelta2.rds"))
+ncores <- readRDS(here::here("inst/examples/custom_ncores2.rds"))
+```
+
+```{r, echo=FALSE, eval=TRUE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the ABC simulations was
+`r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
+parallelized across `r ncores` CPUs.**
+
+Once the simulations are finished, we can perform inference of the posterior
+distribution of the single parameter of our model, $N_e$:
+
+```{r, eval=!file.exists(abc_path2)}
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+```
+
+```{r, echo=FALSE, eval=!file.exists(abc_path2)}
+saveRDS(abc, abc_path)
+```
+
+```{r, echo=FALSE, eval=file.exists(abc_path2)}
+abc <- readRDS(abc_path)
+```
