@@ -372,7 +372,7 @@ model, we'll indicate the true "hidden" $N_e$ value with a vertical line.
 extract_summary(abc)
 ```
 
-```{r, custom_Ne_posterior}
+```{r, custom_Ne_posterior1}
 library(ggplot2)
 
 plot_posterior(abc) +
@@ -461,7 +461,7 @@ summarise_data(result_msprime, functions)
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path)}
+```{r, eval=!file.exists(abc_path2)}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -505,9 +505,20 @@ abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path2)}
-saveRDS(abc, abc_path)
+saveRDS(abc, abc_path2)
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path2)}
-abc <- readRDS(abc_path)
+abc <- readRDS(abc_path2)
+```
+```{r}
+extract_summary(abc)
+```
+
+```{r, custom_Ne_posterior2}
+library(ggplot2)
+
+plot_posterior(abc) +
+  geom_vline(xintercept = 1000, linetype = "dashed") +
+  coord_cartesian(xlim = c(100, 5000))
 ```
