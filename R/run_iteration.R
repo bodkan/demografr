@@ -46,15 +46,15 @@ run_iteration <- function(it,
   else
     result_path <- result$data
 
-  if (!is.null(result_path))
-    unlink(result_path, recursive = TRUE)
-
   # collect data for a downstream ABC inference:
   #   1. compute summary statistics using user-defined tree-sequence functions
   simulated_stats <- summarise_data(result_data, functions)
   #   2. collect all parameter values (sampled from priors or given) into a single parameter matrix
   if (contains_priors(params))
     result_params <- collect_param_matrix(result_params)
+
+  if (!is.null(result_path))
+    unlink(result_path, recursive = TRUE)
 
   list(
     parameters = result_params,
