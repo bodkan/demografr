@@ -56,7 +56,7 @@ simulate_abc <- function(
   # simulations in parallel
   if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||
       !arg_present(iterations) || !length(priors))
-    stop("A model generating function, priors, summary functions, observed\n",
+    stop("A model to simulate from, priors, summary functions, observed\n",
          "statistics, and the number of iterations must be provided (check\n",
          "that the variables that you provided really do contain what you think)", call. = FALSE)
 

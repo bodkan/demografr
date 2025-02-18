@@ -44,7 +44,7 @@ validate_abc <- function(model, priors, functions, observed,
   format <- match.arg(format)
 
   if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||!length(priors))
-    stop("A model generating function, priors, summary functions, and observed\n",
+    stop("A model to simulate from, priors, summary functions, and observed\n",
          "statistics must be provided (check that the variables that you provided\n",
          "really do contain what you think)", call. = FALSE)
 
