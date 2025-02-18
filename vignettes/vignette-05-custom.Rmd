@@ -218,9 +218,8 @@ priors <- list(Ne ~ runif(100, 5000))
 # a single observed statistic
 observed <- list(diversity = observed_diversity)
 
-# a single tree-sequence summary function
+# compute diversity using 100 chromosomes
 compute_diversity <- function(ts) {
-  # compute diversity using 100 chromosomes
   ts_diversity(ts, list(pop = seq(0, 99)))
 }
 functions <- list(diversity = compute_diversity)
@@ -392,7 +391,7 @@ dependencies), let's say we have a program `vcf_diversity`, which is run in
 the following way:
 
 ```
-./vcf_diversity --vcf <path to a VCF> --output <path to a TSV table>
+./vcf_diversity --vcf <path to a VCF> --tsv <path to a TSV table>
 ```
 
 This program takes in a VCF file and computes the nucleotide diversity across
@@ -406,3 +405,67 @@ a data frame) with the product of the external software `vcf_diversity`.
 
 (We provide this `vcf_diversity` program as an example script, but it could
 of course be any other program you could imagine.)
+
+```{r}
+reticulate::py_install("scikit-allel", pip = TRUE)
+```
+
+```{r}
+# pkg_path <- system.file("examples/", package = "demografr")
+pkg_path <- "/project/inst/examples"
+Sys.setenv(PATH = paste0(dirname(reticulate::py_config()$python),
+                         ":",
+                         Sys.getenv("PATH"),
+                         ":",
+                         pkg_path))
+```
+
+```{r}
+# a single prior parameter
+priors <- list(Ne ~ runif(100, 5000))
+
+# a single observed statistic
+observed <- list(diversity = observed_diversity)
+
+# a single tree-sequence summary function
+compute_diversity <- function(vcf) {
+  # get the path to an external command-line example program
+  program_path <- system.file("examples/custom_diversity", package = "demografr")
+
+  # where to save diversity computed by the program
+  tsv <- tempfile()
+
+  # compose the shell command and run it, saving the diversity to a file
+  cmd <- paste(program_path, "--vcf", vcf, "--tsv", tsv)
+  system(cmd)
+
+  read.table(tsv, header = TRUE)
+}
+functions <- list(diversity = compute_diversity)
+
+# data-generating functions for computing summary statistics
+gens <- list(
+  vcf = function(path) {
+    # read the simulated tree sequence from a given path and subset it
+    ts_path <- file.path(path, "result.trees")
+    ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
+
+    # write a VCF to the same directory
+    vcf_path <- file.path(path, "genotypes.vcf.gz")
+    ts_vcf(ts, vcf_path)
+
+    # return the path to the VCF for use in computing summary statistics
+    return(vcf_path)
+  }
+)
+```
+
+```{r}
+result_msprime <- simulate_model(python_script, parameters = list(Ne = 123), format = "files", data = gens)
+```
+
+```{r}
+summarise_data(result_msprime, functions)
+```
+
+
