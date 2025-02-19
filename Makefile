@@ -80,8 +80,13 @@ rstudio:
 bash:
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) bash
 
-R r:
+R:
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) R
+
+attach:
+	container_id=`docker ps | awk -v name="$$(basename "$$PWD")" '$$2 ~ name {print $$1}'`; \
+	docker exec -it $$container_id /bin/bash
+
 
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
@@ -114,3 +119,4 @@ endif
 	    }; \
 	fi; \
 	GOOGLE_API_KEY="" chromium --app=http://localhost:$(PORT) &
+
