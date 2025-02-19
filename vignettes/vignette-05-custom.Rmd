@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc1_path <- here::here("inst/examples/custom_abc1.rds")
-abc2_path <- here::here("inst/examples/custom_abc2.rds")
+abc_path1 <- here::here("inst/examples/custom_abc1.rds")
+abc_path2 <- here::here("inst/examples/custom_abc2.rds")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
