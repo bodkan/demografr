@@ -3004,7 +3004,7 @@
     },
     "jsonlite": {
       "Package": "jsonlite",
-      "Version": "1.8.9",
+      "Version": "1.9.0",
       "Source": "Repository",
       "Title": "A Simple and Robust JSON Parser and Generator for R",
       "License": "MIT + file LICENSE",
@@ -5314,7 +5314,7 @@
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "301e313d96d6be4194ef0d29309cc530137d18c3",
+      "RemoteSha": "6a66709c6c735510f08ae0eb93e00f18a82ce8f6",
       "NeedsCompilation": "no",
       "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
       "Maintainer": "Martin Petr <contact@bodkan.net>"
