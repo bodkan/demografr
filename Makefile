@@ -59,9 +59,9 @@ clean:
 
 # check the OS type to assign appropriate Docker image tag
 ifeq ($(shell uname -s), Darwin)
-PLATFORM ?= arm64
+    PLATFORM ?= arm64
 else
-PLATFORM ?= amd64
+    PLATFORM ?= amd64
 endif
 
 IMAGE := bodkan/$(shell basename $(shell pwd)):$(PLATFORM)
@@ -70,7 +70,9 @@ CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
 # if present, extract GitHub access token
 TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
 
-PORT ?= 9999
+ifndef PORT
+    $(error PORT variable must be set explicitly)
+endif
 
 .PHONY: rstudio bash R r docker-build docker-push docker-pull local-webapp remote-webapp
 
@@ -86,7 +88,6 @@ R:
 attach:
 	container_id=`docker ps | awk -v name="$$(basename "$$PWD")" '$$2 ~ name {print $$1}'`; \
 	docker exec -it $$container_id /bin/bash
-
 
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
