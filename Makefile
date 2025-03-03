@@ -70,14 +70,7 @@ CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
 # if present, extract GitHub access token
 TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
 
-ifndef PORT
-    $(error PORT variable must be set explicitly)
-endif
-
 .PHONY: rstudio bash R r docker-build docker-push docker-pull local-webapp remote-webapp
-
-rstudio:
-	docker run --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)
 
 bash:
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) bash
@@ -88,6 +81,12 @@ R:
 attach:
 	container_id=`docker ps | awk -v name="$$(basename "$$PWD")" '$$2 ~ name {print $$1}'`; \
 	docker exec -it $$container_id /bin/bash
+
+rstudio:
+ifndef PORT
+	$(error PORT variable must be set explicitly)
+endif
+	docker run --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)
 
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
@@ -103,11 +102,17 @@ docker-pull:
 	docker pull $(IMAGE)
 
 local-webapp:
+ifndef PORT
+	$(error PORT variable must be set explicitly)
+endif
 	GOOGLE_API_KEY="" chromium --app=http://localhost:$(PORT) &
 
 remote-webapp:
 ifndef SERVER
 	$(error SERVER variable must be set to start a web app)
+endif
+ifndef PORT
+	$(error PORT variable must be set explicitly)
 endif
 	@if [[ "$(SERVER)" != "localhost" ]]; then \
 	    PID=$$(lsof -ti:$(PORT)); \
@@ -121,3 +126,20 @@ endif
 	fi; \
 	GOOGLE_API_KEY="" chromium --app=http://localhost:$(PORT) &
 
+port-forward:
+ifndef SERVER
+	$(error SERVER variable must be set to start a web app)
+endif
+ifndef PORT
+	$(error PORT variable must be set explicitly)
+endif
+	@if [[ "$(SERVER)" != "localhost" ]]; then \
+	    PID=$$(lsof -ti:$(PORT)); \
+	    if [[ -n "$$PID" ]]; then \
+		kill -9 $$PID; \
+	    fi; \
+	    autossh -M 0 -f -N -L localhost:$(PORT):localhost:$(PORT) $(SERVER) || { \
+		echo "SSH connection failed. Exiting."; \
+		exit 1; \
+	    }; \
+	fi
