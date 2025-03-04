@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 
+# This script implements an example of an external command-line program which
+# can be used by demografr to compute summary statistics from a non-tree-sequence
+# data (in this example, a program which computes a pairwise nucleotide
+# diversity between all samples in a VCF file).
+#
+# Please be aware that it's implemented in an extremely inefficient way to avoid
+# any dependencies on third-party Python modules! It should never be used for
+# inference in practice.
+
 import argparse
 import gzip
 import sys
-from statistics import mean
+from collections import defaultdict
 from itertools import combinations
-
-import pandas as pd
+from statistics import mean
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--vcf", type=str, required=True)
@@ -36,9 +44,11 @@ for line in vcf:
     sample_names = header[9:]
     break
 
+chromosomes = [f'{sample}_chr{chr}' for chr in [1, 2] for sample in sample_names]
+
 # iterate over each line, collecting alleles from each "phased" chromoosome
 pos = []
-alleles = []
+genotypes = defaultdict(list)
 for line in vcf:
     parts = line.strip().split("\t")
 
@@ -46,27 +56,31 @@ for line in vcf:
     pos.append(int(parts[1]))
 
     # collect alleles for each chromosome at this locus
-    gts = [p.split(':')[0] for p in parts[9:]]  # extract GT fields
-    split_gts = [g.split('|') for g in gts]  # split phased genotypes
-    row = [allele for g in split_gts for allele in g]
-
-    alleles.append(row)
+    gt_str = [p.split(':')[0] for p in parts[9:]]  # extract GT fields
+    gt_pair = [g.split('|') for g in gt_str]  # split phased genotypes
+    gt_list = [int(allele) for g in gt_pair for allele in g]
     
+    for i, gt in enumerate(gt_list):
+      genotypes[chromosomes[i]].append(gt)
+
 if not pos:
   sys.exit("The VCF file does not contain any genotypes!")
   
-# convert the list of alleles at each locus to a pandas DataFrame
-columns = [f'{sample}_chr{chr}' for chr in [1, 2] for sample in sample_names]
-gt_df = pd.DataFrame(alleles, columns=columns)
-
 # compute pairwise nucleotide diversity
-pairs = list(combinations(columns, 2))
-diffs = []
+pairs = list(combinations(chromosomes, 2))
+all_diffs = []
 for pair in pairs:
-  diffs.append(sum(gt_df[pair[0]] != gt_df[pair[1]]))
-pi = mean(diffs) / (pos[-1] - pos[0] + 1)
+  pair_diffs = 0
+  pair_genotypes1 = genotypes[pair[0]]
+  pair_genotypes2 = genotypes[pair[1]]
+  for locus1, locus2 in zip(pair_genotypes1, pair_genotypes2):
+    pair_diffs += locus1 != locus2
+  all_diffs.append(pair_diffs)
+
+pi = mean(all_diffs) / (pos[-1] - pos[0] + 1)
 
 # save the result to a TSV file
-df = pd.DataFrame({"set": ["pop"], "diversity": [pi]})
-
-df.to_csv(tsv_path, sep="\t", index=False)
+tsv = open(tsv_path, "w")
+tsv.write("set\tdiversity\n")
+tsv.write(f"pop\t{pi}\n")
+tsv.close()
