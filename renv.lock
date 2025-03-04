@@ -5314,7 +5314,7 @@
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "6a66709c6c735510f08ae0eb93e00f18a82ce8f6",
+      "RemoteSha": "47d4c8d8d314b625c1bf6aa47abad16e819a2ae2",
       "NeedsCompilation": "no",
       "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
       "Maintainer": "Martin Petr <contact@bodkan.net>"
