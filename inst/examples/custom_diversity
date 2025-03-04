@@ -6,6 +6,7 @@ import pandas as pd
 
 # vcf_path = "/project/genotypes.vcf"
 # tsv_path = "/project/diversity.tsv"
+# vcf_path = r["vcf"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--vcf", type=str, required=True)
@@ -17,12 +18,19 @@ tsv_path = args.tsv
 
 vcf = allel.read_vcf(vcf_path)
 
+# convert GenotypeArray to HaplotypeArray to work on "phased chromosomes""
+# like we do with the tskit-based summary statistic
 gt = allel.GenotypeArray(vcf["calldata/GT"])
 pos = vcf["variants/POS"]
 ac = gt.count_alleles()
 
-pi = allel.sequence_diversity(pos, ac)
+pi1 = allel.sequence_diversity(pos, ac)
 
-df = pd.DataFrame({"set": ["pop"], "diversity": pi})
+gt = gt.to_haplotypes()
+pos = vcf["variants/POS"]
+ac = gt.count_alleles()
+pi2 = allel.sequence_diversity(pos, ac)
+
+df = pd.DataFrame({"set": ["pop", "pop"], "diversity": [pi1, pi2]})
 
 df.to_csv(tsv_path, sep="\t", index=False)
