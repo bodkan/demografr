@@ -2,9 +2,9 @@
 
 import argparse
 import gzip
+import sys
 from statistics import mean
 from itertools import combinations
-
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ args = parser.parse_args()
 vcf_path = args.vcf
 tsv_path = args.tsv
 
-# scikit allel version of computing nucleotide diversity
+# scikit allel version of the nucleotide diversity computation
 # (included here as a sanity check)
 # import allel
 # vcf = allel.read_vcf(vcf_path)
@@ -52,6 +52,9 @@ for line in vcf:
 
     alleles.append(row)
     
+if not pos:
+  sys.exit("The VCF file does not contain any genotypes!")
+  
 # convert the list of alleles at each locus to a pandas DataFrame
 columns = [f'{sample}_chr{chr}' for chr in [1, 2] for sample in sample_names]
 gt_df = pd.DataFrame(alleles, columns=columns)
@@ -64,6 +67,6 @@ for pair in pairs:
 pi = mean(diffs) / (pos[-1] - pos[0] + 1)
 
 # save the result to a TSV file
-df = pd.DataFrame({"set": ["pop", "pop_"], "diversity": [pi, pi_]})
+df = pd.DataFrame({"set": ["pop"], "diversity": [pi]})
 
 df.to_csv(tsv_path, sep="\t", index=False)
