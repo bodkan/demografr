@@ -422,6 +422,7 @@ observed <- list(diversity = observed_diversity)
 compute_diversity1 <- function(vcf) {
   python <- reticulate::py_config()$python
   program <- system.file("examples/custom_diversity", package = "demografr")
+  program <- "/project/inst/examples/custom_diversity"
   tsv <- tempfile()
 
   cmd <- paste(python, program, "--vcf", vcf, "--tsv", tsv)
@@ -430,41 +431,42 @@ compute_diversity1 <- function(vcf) {
   # read the computed table with nucleotide diversity in the simulated# VCF
   read.table(tsv, header = TRUE)
 }
+
 # a single tree-sequence summary function
 compute_diversity2 <- function(gt) {
+  gt <- gt[-1]
   pi <- c()
   for (i in 1:(ncol(gt) - 1)) {
     for (j in (i + 1):ncol(gt)) {
        pi <- c(pi, mean(gt[[i]] != gt[[j]]))
     }
   }
-  mean(pi)
+  mean(pi) / 1e6
 }
+
+# a single tree-sequence summary function
+compute_diversity2_ <- function(gt) {
+  start <- gt$pos[1]
+  end <- gt$pos[nrow(gt)]
+  gt <- gt[, -1]
+  diffs <- c()
+  for (i in 1:(ncol(gt) - 1)) {
+    for (j in (i + 1):ncol(gt)) {
+       diffs <- c(diffs, sum(gt[[i]] != gt[[j]]))
+    }
+  }
+  mean(diffs) / (end - start + 1)
+  mean(diffs) / 1e6
+}
+
 compute_diversity3 <- function(ts) {
   ts_diversity(ts, list(pop = seq(0, 99)))
 }
-compute_allele_pi <- function(gt) {
-  num_sites <- nrow(gt)  # Number of SNP sites
-  
-  # Compute allele counts for each site
-  allele_counts <- gt %>%
-    summarise(across(everything(), ~ sum(.))) %>%  # Sum columns (allele counts)
-    as.numeric()
-  
-  # Compute frequency of the major allele at each site
-  total_alleles <- 2 * ncol(gt)  # Assuming diploid genomes (2 alleles per individual)
-  p <- allele_counts / total_alleles  # Major allele frequency
-  
-  # Compute nucleotide diversity π
-  pi_values <- 2 * p * (1 - p)  # Formula for nucleotide diversity at each site
-  pi <- sum(pi_values) / num_sites  # Average across all sites
-  
-  return(pi)
-}
+
 compute_pairwise_pi <- function(gt) {
   chromosome_pairs <- combn(names(gt), 2, simplify = FALSE)  # Generate all chromosome pairs
   num_sites <- nrow(gt)  # Number of SNP sites
-  results <- tibble(Chromosome1 = character(), Chromosome2 = character(), NucleotideDiversity = numeric())
+  results <- data.frame(Chromosome1 = character(), Chromosome2 = character(), NucleotideDiversity = numeric())
 
   for (pair in chromosome_pairs) {
     chr1 <- pair[1]
@@ -477,12 +479,19 @@ compute_pairwise_pi <- function(gt) {
     pi_value <- differences / num_sites
     
     # Store results
-    results <- results %>% add_row(Chromosome1 = chr1, Chromosome2 = chr2, NucleotideDiversity = pi_value)
+    results <- results %>% tibble::add_row(Chromosome1 = chr1, Chromosome2 = chr2, NucleotideDiversity = pi_value)
   }
   
   return(mean(results$NucleotideDiversity))
 }
-functions <- list(diversity1 = compute_diversity1, diversity2 = compute_diversity2, diversity3 = compute_diversity3, allele_pi = compute_allele_pi, pairwise_pi = compute_pairwise_pi)
+
+functions <- list(
+  compute_diversity1 = compute_diversity1,
+  compute_diversity2 = compute_diversity2,
+  compute_diversity2_ = compute_diversity2_,
+  compute_diversity3 = compute_diversity3,
+  compute_pairwise_pi = compute_pairwise_pi
+)
 
 # data-generating functions for computing summary statistics
 gens <- list(
@@ -502,7 +511,7 @@ gens <- list(
     # read the simulated tree sequence from a given path and subset it
     ts_path <- file.path(path, "result.trees")
     ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
-    ts_genotypes(ts)[-1]
+    ts_genotypes(ts)
   },
   ts = function(path) {
     ts_path <- file.path(path, "result.trees")
