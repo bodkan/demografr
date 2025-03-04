@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 
 abc_path1 <- here::here("inst/examples/custom_abc1.rds")
 abc_path2 <- here::here("inst/examples/custom_abc2.rds")
+abc_path3 <- here::here("inst/examples/custom_abc3.rds")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
@@ -622,7 +623,8 @@ gens <- list(
     # read the simulated tree sequence from a given path and subset it
     ts_path <- file.path(path, "result.trees")
     ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
-    ts_genotypes(ts)
+    # suppress warnings due to multiallelic sites
+    suppressWarnings(ts_genotypes(ts))
   }
 )
 ```
@@ -655,3 +657,68 @@ simulations on the problem!
 validate_abc(python_script, priors, functions, observed, data = gens, format = "files")
 ```
 
+```{r, echo=FALSE, eval=TRUE}
+tstart <- Sys.time()
+```
+
+```{r, eval=!file.exists(abc_path3)}
+library(future)
+plan(multisession, workers = availableCores())
+
+data <- simulate_abc(
+  model = python_script, priors, functions, observed, iterations = 10000,
+  data = gens, format = "files"
+)
+```
+
+```{r, echo=FALSE, eval=TRUE}
+tend <- Sys.time()
+tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
+ncores <- future::availableCores()
+```
+
+```{r, echo=FALSE, eval=!file.exists(abc_path3)}
+saveRDS(tdelta, here::here("inst/examples/custom_tdelta3.rds"))
+saveRDS(ncores, here::here("inst/examples/custom_ncores3.rds"))
+```
+
+```{r, echo=FALSE, eval=file.exists(abc_path3)}
+tdelta <- readRDS(here::here("inst/examples/custom_tdelta3.rds"))
+ncores <- readRDS(here::here("inst/examples/custom_ncores3.rds"))
+```
+
+```{r, echo=FALSE, eval=TRUE}
+hours <- floor(tdelta / 3600)
+minutes <- floor((tdelta - hours * 3600) / 60)
+seconds <- round(tdelta - hours * 3600 - minutes * 60)
+```
+
+**The total runtime for the ABC simulations was
+`r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
+parallelized across `r ncores` CPUs.**
+
+Once the simulations are finished, we can perform inference of the posterior
+distribution of the single parameter of our model, $N_e$:
+
+```{r, eval=!file.exists(abc_path3)}
+abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+```
+
+```{r, echo=FALSE, eval=!file.exists(abc_path3)}
+saveRDS(abc, abc_path3)
+```
+
+```{r, echo=FALSE, eval=file.exists(abc_path3)}
+abc <- readRDS(abc_path3)
+```
+```{r}
+extract_summary(abc)
+```
+
+```{r, custom_Ne_posterior3}
+library(ggplot2)
+
+plot_posterior(abc) +
+  geom_vline(xintercept = 1000, linetype = "dashed") +
+  coord_cartesian(xlim = c(100, 5000))
+```
