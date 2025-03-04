@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+
+import argparse
+import gzip
+from statistics import mean
+from itertools import combinations
+
+
+import pandas as pd
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--vcf", type=str, required=True)
+parser.add_argument("--tsv", type=str, required=True)
+
+args = parser.parse_args()
+vcf_path = args.vcf
+tsv_path = args.tsv
+
+# scikit allel version of computing nucleotide diversity
+# (included here as a sanity check)
+# import allel
+# vcf = allel.read_vcf(vcf_path)
+# 
+# gt = allel.GenotypeArray(vcf["calldata/GT"]).to_haplotypes()
+# pos = vcf["variants/POS"]
+# ac = gt.count_alleles()
+# pi = allel.sequence_diversity(pos, ac)
+# pi
+
+vcf = gzip.open(vcf_path, "rt")
+
+# parse the VCF header to get the sample names
+for line in vcf:
+  if line.startswith("#CHROM"):
+    header = line.strip().split("\t")
+    sample_names = header[9:]
+    break
+
+# iterate over each line, collecting alleles from each "phased" chromoosome
+pos = []
+alleles = []
+for line in vcf:
+    parts = line.strip().split("\t")
+
+    # collect positions of each locus
+    pos.append(int(parts[1]))
+
+    # collect alleles for each chromosome at this locus
+    gts = [p.split(':')[0] for p in parts[9:]]  # extract GT fields
+    split_gts = [g.split('|') for g in gts]  # split phased genotypes
+    row = [allele for g in split_gts for allele in g]
+
+    alleles.append(row)
+    
+# convert the list of alleles at each locus to a pandas DataFrame
+columns = [f'{sample}_chr{chr}' for chr in [1, 2] for sample in sample_names]
+gt_df = pd.DataFrame(alleles, columns=columns)
+
+# compute pairwise nucleotide diversity
+pairs = list(combinations(columns, 2))
+diffs = []
+for pair in pairs:
+  diffs.append(sum(gt_df[pair[0]] != gt_df[pair[1]]))
+pi = mean(diffs) / (pos[-1] - pos[0] + 1)
+
+# save the result to a TSV file
+df = pd.DataFrame({"set": ["pop", "pop_"], "diversity": [pi, pi_]})
+
+df.to_csv(tsv_path, sep="\t", index=False)
