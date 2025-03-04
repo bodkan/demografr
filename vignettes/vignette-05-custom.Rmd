@@ -388,28 +388,27 @@ statistics from the simulated data using some external software, like PLINK or
 EIGENSTRAT?
 
 To keep things as easy as possible (and avoid dragging in multiple software
-dependencies), let's say we have a program `vcf_diversity`, which is run in
+dependencies), let's say we have a program `vcfpi`, which is run in
 the following way:
 
 ```
-./vcf_diversity --vcf <path to a VCF> --tsv <path to a TSV table>
+./vcfpi --vcf <path to a VCF> --tsv <path to a TSV table>
 ```
+
+You can find it at `r system.file("examples/vcfpi", package = "demografr")`) and
+run it yourself in the terminal.
 
 This program takes in a VCF file and computes the nucleotide diversity across
 all individuals in that VCF file. For simplicity, it produces a table of
 results in exactly the same format as the `observed_diversity` data frame
-above.
+above. 
 
 In this particular example, we want to replace the computation of statistics
 performed by the R function `compute_diversity` above (which also produces
-a data frame) with the product of the external software `vcf_diversity`.
+a data frame) with the product of the external software `vcfpi`.
 
-(We provide this `vcf_diversity` program as an example script, but it could
+(We provide this `vcfpi` program as an example script, but it could
 of course be any other program you could imagine.)
-
-```{r}
-reticulate::py_install("scikit-allel", pip = TRUE)
-```
 
 ```{r}
 # a single prior parameter
@@ -421,14 +420,14 @@ observed <- list(diversity = observed_diversity)
 # a single tree-sequence summary function
 compute_diversity1 <- function(vcf) {
   python <- reticulate::py_config()$python
-  program <- system.file("examples/custom_diversity", package = "demografr")
-  program <- "/project/inst/examples/custom_diversity"
+  program <- system.file("examples/vcfpi", package = "demografr")
+  program <- "/project/inst/examples/vcfpi"
   tsv <- tempfile()
 
   cmd <- paste(python, program, "--vcf", vcf, "--tsv", tsv)
   system(cmd)
 
-  # read the computed table with nucleotide diversity in the simulated# VCF
+  # read the computed table with computed nucleotide diversity
   read.table(tsv, header = TRUE)
 }
 
