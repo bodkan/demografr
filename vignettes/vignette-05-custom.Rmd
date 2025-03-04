@@ -489,7 +489,7 @@ gens <- list(
 model_run <- simulate_model(python_script, parameters = list(Ne = 123), format = "files", data = gens)
 ```
 
-We we look at the result, we can see that it no longer contains a `ts`
+When we look at the result, we can see that it no longer contains a `ts`
 tree-sequence object but a path to a VCF file!
 
 ```{r}
@@ -499,7 +499,7 @@ model_run
 Let's test our summary function on that VCF:
 
 ```{r}
-functions$compute_diversity(model_run$vcf)
+functions$diversity(model_run$vcf)
 ```
 
 Or, for convenience, we can do this using the more general function
@@ -582,11 +582,22 @@ plot_posterior(abc) +
   coord_cartesian(xlim = c(100, 5000))
 ```
 
+## Another means of computing simulated summary statistics
 
-<!--
+Let's look at a yet another variation of the same. What if we want to compute
+a summary statistics in R on a different source of genotype data (not
+a tree-sequence object in memory but also not a VCF file stored on disk)?
 
-# a single tree-sequence summary function
-compute_diversity2 <- function(gt) {
+For instance, what if we want to compute a summary statistics on a simple
+data frame of genotypes (`0` -- ancestral state, `1` -- derived state).
+
+We can modify our pipeline in the following way.
+
+First, we need to define a summary statistic function which will operate on
+a data frame, say called `gt`.
+
+```{r}
+compute_diversity <- function(gt) {
   # generate a list of all pairs of chromosomes
   pairs <- combn(names(gt[, -1]), 2, simplify = FALSE)
 
@@ -594,41 +605,53 @@ compute_diversity2 <- function(gt) {
   diffs <- sapply(pairs, function(pair) sum(gt[[pair[1]]] != gt[[pair[2]]]))
   
   # the mean is the nucleotide diversity of the sample of chromosomes
-  total_bp <- gt$pos[nrow(gt)] - gt$pos[1] + 1
-  mean(diffs) / total_bp
+  pi <- mean(diffs) / 1e6
+
+  data.frame(set = "pop", diversity = pi)
 }
 
+functions <- list(diversity = compute_diversity)
+```
 
+We also need a data-generating function, which will create the table of
+genotypes from standard simulated output:
 
-compute_diversity3 <- function(ts) {
-  ts_diversity(ts, list(pop = seq(0, 99)))
-}
-
-# data-generating functions for computing summary statistics
+```{r}
 gens <- list(
-  vcf = function(path) {
-    # read the simulated tree sequence from a given path and subset it
-    ts_path <- file.path(path, "result.trees")
-    ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
-
-    # write a VCF to the same directory
-    vcf_path <- file.path(path, "genotypes.vcf.gz")
-    ts_vcf(ts, vcf_path)
-
-    # return the path to the VCF for use in computing summary statistics
-    return(vcf_path)
-  },
   gt = function(path) {
     # read the simulated tree sequence from a given path and subset it
     ts_path <- file.path(path, "result.trees")
     ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
     ts_genotypes(ts)
-  },
-  ts = function(path) {
-    ts_path <- file.path(path, "result.trees")
-    ts <- ts_read(ts_path) %>% ts_simplify(simplify_to = seq(0, 99))
-    ts
   }
 )
+```
 
--->
+And that's it! Let's check again that the whole setup works correctly.
+
+```{r}
+model_run <- simulate_model(python_script, parameters = list(Ne = 123), format = "files", data = gens)
+```
+
+When we look at the result, we can see that it no longer contains a `ts`
+tree-sequence object but a simple table of genotypes created via the _slendr_
+function `ts_genotypes()` (see the data generating function just above).
+
+```{r}
+model_run
+```
+
+Let's test our summary function on the output of the single testing simulation
+run:
+
+```{r}
+summarise_data(model_run, functions)
+```
+
+Let's also validate our customized setup before we unleash the full scale of ABC
+simulations on the problem!
+
+```{r}
+validate_abc(python_script, priors, functions, observed, data = gens, format = "files")
+```
+
