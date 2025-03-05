@@ -80,8 +80,15 @@ execute_function <- function(fun, env) {
 
   # change the environment of the function only to the restricted scope environment
   # environment(fun) <- list2env(mget(names(arg_list), envir = env))
-  environment(fun) <- env
-  do.call(fun, arg_list)
+  if (inherits(fun, "python.builtin.function")) {
+    result <- do.call(reticulate::py_call, c(list(fun), arg_list))
+    result <- reticulate::py_to_r(result)
+  } else {
+    environment(fun) <- env
+    result <- do.call(fun, arg_list)
+  }
+
+  result
 }
 
 # Populate environment with data results from a simulation
