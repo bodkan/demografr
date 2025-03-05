@@ -5356,15 +5356,14 @@
       "URL": "https://github.com/bodkan/slendr",
       "BugReports": "https://github.com/bodkan/slendr/issues",
       "Config/testthat/edition": "3",
+      "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
+      "Maintainer": "Martin Petr <contact@bodkan.net>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
       "RemoteRef": "HEAD",
-      "RemoteSha": "0594b05306ffa713a1f9c7408754563e6a221942",
-      "NeedsCompilation": "no",
-      "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
-      "Maintainer": "Martin Petr <contact@bodkan.net>"
+      "RemoteSha": "0594b05306ffa713a1f9c7408754563e6a221942"
     },
     "sourcetools": {
       "Package": "sourcetools",
