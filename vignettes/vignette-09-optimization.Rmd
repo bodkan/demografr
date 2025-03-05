@@ -14,7 +14,7 @@ vignette: >
 ⚠️⚠️⚠️
 
 ```{r, include = FALSE}
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -29,7 +29,8 @@ knitr::opts_chunk$set(
 result_path <- here::here("inst/examples/ga_result.rds")
 time_path <- here::here("inst/examples/ga_time.rds")
 
-devtools::load_all()
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ```{r, echo=FALSE, message=FALSE}

@@ -8,9 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-# devtools::install(upgrade=FALSE)
-
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = TRUE)
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -19,7 +17,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present
+  eval = FALSE #slendr_present & FALSE
 )
 
 true_bins_path <- here::here("inst/examples/tracts_true_bins.rds")
@@ -29,7 +27,8 @@ true_f4ratio_path <- here::here("inst/examples/tracts_true_f4ratio.rds")
 data_path <- here::here("inst/examples/tracts_data.rds")
 predictions_path <- here::here("inst/examples/tracts_predictions.rds")
 
-devtools::load_all()
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ```{r, echo=FALSE, message=FALSE}

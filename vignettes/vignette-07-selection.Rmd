@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE, quit = FALSE)
+slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
 knitr::opts_chunk$set(
   collapse = FALSE,
@@ -17,12 +17,11 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present
+  eval = FALSE #slendr_present & FALSE
 )
 
-# devtools::install()
-devtools::load_all()
-devtools::load_all("/home/slendr")
+devtools::install_github("bodkan/demografr", upgrade = FALSE)
+devtools::install_github("bodkan/slendr", upgrade = FALSE)
 
 data_path <- here::here("inst/examples/selection_abc.rds")
 ```
