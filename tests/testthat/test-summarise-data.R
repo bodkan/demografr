@@ -130,3 +130,29 @@ test_that("summarise_data can utilize pre-computed statistics as data (inline da
   expect_type(summarise_data(data, functions = list(ts_pi = ts_pi, slim_pi = slim_pi)), "list")
   expect_type(summarise_data(data, functions = list(ts_pi = function(ts_pi) ts_pi, slim_pi = function(slim_pi) slim_pi)), "list")
 })
+
+test_that("summarise_data requires a named list of simulation outputs", {
+  functions <- list(
+    pi = function(ts) { samples <- ts_names(ts, split = "pop"); ts_diversity(ts, samples) }
+  )
+
+  # errors on unnamed list
+  d <- unname(data)
+  expect_error(all(vapply(summarise_data(d, functions), is.data.frame, FUN.VALUE = logical(1))),
+               "The `data` argument must be a named list")
+  # errors on a partially-named list
+  d <- data
+  names(d)[2] <- ""
+  expect_error(all(vapply(summarise_data(d, functions), is.data.frame, FUN.VALUE = logical(1))),
+               "The `data` argument must be a named list")
+  # works with a single tree-sequence output
+  d <- data$ts
+  expect_true(all(vapply(summarise_data(d, functions), is.data.frame, FUN.VALUE = logical(1))))
+  # does not work on a single non-ts output
+  d <- c(1, 2, 3)
+  expect_error(all(vapply(summarise_data(d, functions), is.data.frame, FUN.VALUE = logical(1))),
+               "The `data` argument must be a named list")
+  # works with a list of outputs
+  d <- data
+  expect_true(all(vapply(summarise_data(data, functions), is.data.frame, FUN.VALUE = logical(1))))
+})
