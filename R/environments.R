@@ -34,13 +34,13 @@ check_arguments <- function(fun, valid_args) {
 }
 
 # Evaluate functions in a given environment (list of objects)
-evaluate <- function(generators, env) {
+evaluate <- function(funs, env) {
   # the parent had to substitute the user list, so let's revert that back
   # to standard R code
-  if (is.call(generators))
-    generators <- lapply(generators[-1], function(item) item)
+  if (is.call(funs))
+    funs <- lapply(funs[-1], function(item) item)
 
-  data <- lapply(generators, function(x) {
+  data <- lapply(funs, function(x) {
     if (is.function(x)) {
       execute_function(x, env = env)
     } else {
