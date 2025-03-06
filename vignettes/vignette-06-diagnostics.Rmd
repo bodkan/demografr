@@ -427,7 +427,7 @@ classified correctly in
 `r cv_selection$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum`
 simulations out of the total of 100 cross-validation simulations, with an
 overall misclassification rate for all models of only
-`{r sprintf("%.1f", cv_selection$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100)}`%.
+`r sprintf("%.1f", cv_selection$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100)`%.
 
 ## Model selection
 
