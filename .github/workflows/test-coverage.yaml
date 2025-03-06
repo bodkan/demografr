@@ -50,13 +50,18 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev
 
-      - name: Setup dedicated Python environment for slendr on Unix
-        run: R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::covr
           needs: coverage
+
+      - name: Setup dedicated Python environment for slendr on Unix
+        if: runner.os != 'Windows'
+        run: |
+          R -e 'slendr::setup_env(pip = TRUE, agree = TRUE)'
+          R --no-echo -e 'reticulate::conda_binary()'
+          R --no-echo -e 'reticulate::conda_list()'
+          R --no-echo -e 'reticulate::py_config()'
 
       - name: Test coverage
         run: |
