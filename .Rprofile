@@ -1,9 +1,14 @@
-source("renv/activate.R")
-
 options(browserNLdisabled = TRUE)
 
+options(install.packages.compile.from.source = "never")
+
 Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
-options("install.packages.compile.from.source" = "never")
+if (Sys.getenv("IN_CONTAINER") == TRUE) {
+  Sys.setenv(RENV_CONFIG_PPM_ENABLED = "TRUE")
+  source("renv/activate.R")
+} else {
+  Sys.setenv(RENV_CONFIG_PPM_ENABLED = "FALSE")
+}
 
 # avoid annoyance of having to manually open .Rproj file
 # https://rstudio.github.io/rstudioapi/reference/projects.html

@@ -83,6 +83,7 @@ RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.pr
 # save R packages to home inside the container to avoid cluttering the project directory
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV R_INSTALL_STAGED=FALSE
+ENV IN_CONTAINER=TRUE
 
 # do this when first setting up the container to create an renv.lock file:
 #   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.0.tar.gz"
