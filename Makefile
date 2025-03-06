@@ -30,6 +30,10 @@ README.md: README.Rmd
 	# 	man/figures/README-prior_T_gf-1.png
 
 $(pkg): README.md
+	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
+		echo "Attempting to build inside a container"; \
+		exit 1; \
+	fi
 	R -e 'devtools::document()'
 	mkdir -p build; cd build; R CMD build --log ../../demografr
 
