@@ -806,6 +806,10 @@ def homebrew_diversity_function(ts):
 functions <- list(diversity = py$homebrew_diversity_function)
 ```
 
+```{r}
+model_run <- simulate_model(model, parameters = priors, sequence_length = 1e6, recombination_rate = 1e-8)
+```
+
 When we look at the result, we can see that it no longer contains a `ts`
 tree-sequence object but a simple table of genotypes created via the _slendr_
 function `ts_genotypes()` (see the data generating function just above).
@@ -836,10 +840,8 @@ tstart <- Sys.time()
 library(future)
 plan(multisession, workers = availableCores())
 
-data <- simulate_abc(
-  model = python_script, priors, functions, observed, iterations = 10000,
-  data = gens, format = "files"
-)
+data <- simulate_abc(model, priors, functions, observed, iterations = 100,
+                     sequence_length = 1e6, recombination_rate = 1e-8)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
