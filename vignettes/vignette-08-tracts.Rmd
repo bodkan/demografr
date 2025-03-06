@@ -20,12 +20,12 @@ knitr::opts_chunk$set(
   eval = FALSE #slendr_present & FALSE
 )
 
-true_bins_path <- here::here("inst/examples/tracts_true_bins.rds")
-true_f4_path <- here::here("inst/examples/tracts_true_f4.rds")
-true_f4ratio_path <- here::here("inst/examples/tracts_true_f4ratio.rds")
+true_bins_path <- system.file("examples/tracts_true_bins.rds", package = "demografr")
+true_f4_path <- system.file("examples/tracts_true_f4.rds", package = "demografr")
+true_f4ratio_path <- system.file("examples/tracts_true_f4ratio.rds", package = "demografr")
 
-data_path <- here::here("inst/examples/tracts_data.rds")
-predictions_path <- here::here("inst/examples/tracts_predictions.rds")
+data_path <- system.file("examples/tracts_data.rds", package = "demografr")
+predictions_path <- system.file("examples/tracts_predictions.rds", package = "demografr")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
@@ -388,7 +388,7 @@ data <- simulate_abc(
 
 end <- Sys.time()
 end - start # 5.5 hours
-saveRDS(end-start, here::here("inst/examples/tracts_time.rds"))
+saveRDS(end-start, system.file("examples/tracts_time.rds", package = "demografr"))
 ```
 
 ```{r, eval=!file.exists(data_path)}

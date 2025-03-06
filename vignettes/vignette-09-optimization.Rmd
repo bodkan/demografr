@@ -26,8 +26,8 @@ knitr::opts_chunk$set(
   eval = FALSE #slendr_present & FALSE
 )
 
-result_path <- here::here("inst/examples/ga_result.rds")
-time_path <- here::here("inst/examples/ga_time.rds")
+result_path <- system.file("examples/ga_result.rds", package = "demografr")
+time_path <- system.file("examples/ga_time.rds", package = "demografr")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)

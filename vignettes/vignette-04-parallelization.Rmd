@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-data_path <- here::here("inst/examples/grid_data.rds")
+data_path <- system.file("examples/grid_data.rds", package = "demografr")
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)

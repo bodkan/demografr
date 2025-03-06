@@ -20,19 +20,19 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-dataX_path <- here::here("inst/examples/downstream_dataX.rds")
-dataY_path <- here::here("inst/examples/downstream_dataY.rds")
-dataZ_path <- here::here("inst/examples/downstream_dataZ.rds")
+dataX_path <- system.file("examples/downstream_dataX.rds", package = "demografr")
+dataY_path <- system.file("examples/downstream_dataY.rds", package = "demografr")
+dataZ_path <- system.file("examples/downstream_dataZ.rds", package = "demografr")
 data_exists <- all(c(file.exists(dataX_path), file.exists(dataY_path), file.exists(dataZ_path)))
 
-abcX_path <- here::here("inst/examples/downstream_abcX.rds")
-abcY_path <- here::here("inst/examples/downstream_abcY.rds")
-abcZ_path <- here::here("inst/examples/downstream_abcZ.rds")
+abcX_path <- system.file("examples/downstream_abcX.rds", package = "demografr")
+abcY_path <- system.file("examples/downstream_abcY.rds", package = "demografr")
+abcZ_path <- system.file("examples/downstream_abcZ.rds", package = "demografr")
 abc_exists <- all(c(file.exists(abcX_path), file.exists(abcY_path), file.exists(abcZ_path)))
 
-predX_path <- here::here("inst/examples/downstream_predX.rds")
-predY_path <- here::here("inst/examples/downstream_predY.rds")
-predZ_path <- here::here("inst/examples/downstream_predZ.rds")
+predX_path <- system.file("examples/downstream_predX.rds", package = "demografr")
+predY_path <- system.file("examples/downstream_predY.rds", package = "demografr")
+predZ_path <- system.file("examples/downstream_predZ.rds", package = "demografr")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
 
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
@@ -316,16 +316,16 @@ ncores <- future::availableCores()
 ```
 
 ```{r, eval=!data_exists, echo=FALSE}
-saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
-saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
+saveRDS(tdelta, system.file("examples/downstream_tdelta.rds"))
+saveRDS(ncores, system.file("examples/downstream_ncores.rds"))
 saveRDS(dataX, dataX_path)
 saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
 ```{r, eval=data_exists, echo=FALSE}
-tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
+tdelta <- readRDS(system.file("examples/downstream_tdelta.rds"))
+ncores <- readRDS(system.file("examples/downstream_ncores.rds"))
 dataX <- readRDS(dataX_path)
 dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)

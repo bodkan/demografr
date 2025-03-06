@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 devtools::install_github("bodkan/demografr", upgrade = FALSE)
 devtools::install_github("bodkan/slendr", upgrade = FALSE)
 
-data_path <- here::here("inst/examples/selection_abc.rds")
+data_path <- system.file("examples/selection_abc.rds", package = "demografr")
 ```
 
 ```{r}

@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
   dpi = 80
 )
 
-abc_path <- here::here("inst/examples/basics_abc.rds")
+abc_path <- system.file("examples/basics_abc.rds", package = "demografr")
 
 if (!file.exists(abc_path))
   stop("Run vignette-01-basics first to generate data", call. = FALSE)
