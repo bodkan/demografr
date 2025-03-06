@@ -26,9 +26,6 @@ true_f4ratio_path <- system.file("examples/tracts_true_f4ratio.rds", package = "
 
 data_path <- system.file("examples/tracts_data.rds", package = "demografr")
 predictions_path <- system.file("examples/tracts_predictions.rds", package = "demografr")
-
-devtools::install_github("bodkan/demografr", upgrade = FALSE)
-devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ```{r, echo=FALSE, message=FALSE}

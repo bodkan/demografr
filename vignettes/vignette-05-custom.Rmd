@@ -25,9 +25,6 @@ abc_path1 <- system.file("examples/custom_abc1.rds", package = "demografr")
 abc_path2 <- system.file("examples/custom_abc2.rds", package = "demografr")
 abc_path3 <- system.file("examples/custom_abc3.rds", package = "demografr")
 abc_path4 <- system.file("examples/custom_abc4.rds", package = "demografr")
-
-devtools::install_github("bodkan/demografr", upgrade = FALSE)
-devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ⚠️⚠️⚠️

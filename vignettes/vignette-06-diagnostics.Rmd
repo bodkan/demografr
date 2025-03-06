@@ -34,9 +34,6 @@ predX_path <- system.file("examples/downstream_predX.rds", package = "demografr"
 predY_path <- system.file("examples/downstream_predY.rds", package = "demografr")
 predZ_path <- system.file("examples/downstream_predZ.rds", package = "demografr")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
-
-devtools::install_github("bodkan/demografr", upgrade = FALSE)
-devtools::install_github("bodkan/slendr", upgrade = FALSE)
 ```
 
 ```{r, echo=FALSE}
@@ -316,16 +313,16 @@ ncores <- future::availableCores()
 ```
 
 ```{r, eval=!data_exists, echo=FALSE}
-saveRDS(tdelta, system.file("examples/downstream_tdelta.rds"))
-saveRDS(ncores, system.file("examples/downstream_ncores.rds"))
+saveRDS(tdelta, system.file("examples/downstream_tdelta.rds", package = "demografr"))
+saveRDS(ncores, system.file("examples/downstream_ncores.rds", package = "demografr"))
 saveRDS(dataX, dataX_path)
 saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
 ```{r, eval=data_exists, echo=FALSE}
-tdelta <- readRDS(system.file("examples/downstream_tdelta.rds"))
-ncores <- readRDS(system.file("examples/downstream_ncores.rds"))
+tdelta <- readRDS(system.file("examples/downstream_tdelta.rds", package = "demografr"))
+ncores <- readRDS(system.file("examples/downstream_ncores.rds", package = "demografr"))
 dataX <- readRDS(dataX_path)
 dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
