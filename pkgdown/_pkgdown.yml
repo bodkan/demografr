@@ -27,10 +27,8 @@ navbar:
           href: articles/vignette-04-parallelization.html
         - text: Custom inference using SLiM or Python
           href: articles/vignette-05-custom.html
-        - text: ABC diagnostics
+        - text: Model selection and other diagnostics
           href: articles/vignette-06-diagnostics.html
-        - text: Selection inference
-          href: articles/vignette-07-selection.html
 
 reference:
 
