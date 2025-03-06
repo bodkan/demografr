@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
+unpack <- demografr::unpack
+
 dataX_path <- system.file("examples/downstream_dataX.rds", package = "demografr")
 dataY_path <- system.file("examples/downstream_dataY.rds", package = "demografr")
 dataZ_path <- system.file("examples/downstream_dataZ.rds", package = "demografr")
