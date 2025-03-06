@@ -766,7 +766,7 @@ model <- function(Ne) {
 We will use the same prior and observed statistic as above:
 
 ```{r}
-observed_diversity <- readRDS(path_observed)
+observed_diversity <- readRDS(here::here("inst/examples/custom_diversity.rds"))
 
 priors <- list(Ne ~ runif(100, 5000))
 
@@ -788,10 +788,9 @@ observed <- list(diversity = observed_diversity)
 ```
 
 ```{r}
-library(reticulate)
-
-py_run_string(r"(
-def homebrew_diversity_function(ts):
+compute_diversity <- function(ts) {
+  reticulate::py_run_string(r"(
+def compute_diversity(ts):
     diffs = []
 
     for i in range(ts.num_samples - 1):
@@ -801,9 +800,12 @@ def homebrew_diversity_function(ts):
     pi = sum(diffs) / len(diffs)
 
     return pd.DataFrame({"set": ["pop"], "diversity": [pi]})
-)")
+)"
+  )
+  reticulate::py$compute_diversity(ts)
+}
 
-functions <- list(diversity = py$homebrew_diversity_function)
+functions <- list(diversity = compute_diversity)
 ```
 
 ```{r}
@@ -840,8 +842,10 @@ tstart <- Sys.time()
 library(future)
 plan(multisession, workers = availableCores())
 
-data <- simulate_abc(model, priors, functions, observed, iterations = 100,
-                     sequence_length = 1e6, recombination_rate = 1e-8)
+data <- simulate_abc(
+  model, priors, functions, observed, iterations = 10000,
+  sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
