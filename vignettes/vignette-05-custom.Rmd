@@ -437,7 +437,6 @@ compute_diversity_vcf <- function(vcf) {
   # path to the software (vcfpi is bundled with the demografr package, but
   # you could of course provide the path to your desired program yourself)
   program <- system.file("examples/vcfpi", package = "demografr")
-  program <- "/project/inst/examples/vcfpi"
   tsv <- tempfile()
 
   # execute the program on the command line using appropriate arguments
