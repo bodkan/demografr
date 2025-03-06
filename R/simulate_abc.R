@@ -83,7 +83,8 @@ simulate_abc <- function(
   globals <- c(
     lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
     names(model_args),
-    names(engine_args)
+    names(engine_args),
+    names(functions)
   ) %>%
     unlist() %>%
     unique()
