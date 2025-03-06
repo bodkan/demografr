@@ -3297,10 +3297,10 @@
     },
     "locfit": {
       "Package": "locfit",
-      "Version": "1.5-9.11",
+      "Version": "1.5-9.12",
       "Source": "Repository",
       "Title": "Local Regression, Likelihood and Density Estimation",
-      "Date": "2025-01-27",
+      "Date": "2025-03-05",
       "Authors@R": "c(person(\"Catherine\", \"Loader\", role = \"aut\"), person(\"Jiayang\", \"Sun\", role = \"ctb\"), person(\"Lucent Technologies\", role = \"cph\"), person(\"Andy\", \"Liaw\", role = \"cre\",  email=\"andy_liaw@merck.com\"))",
       "Author": "Catherine Loader [aut], Jiayang Sun [ctb], Lucent Technologies [cph], Andy Liaw [cre]",
       "Maintainer": "Andy Liaw <andy_liaw@merck.com>",
