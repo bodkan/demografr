@@ -8,9 +8,12 @@ version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/
 pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
 
-website: README.md $(logo)
+website: $(logo) README.md
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'
+	R -e 'pkgdown::build_reference()'
+	R -e 'pkgdown::build_reference_index()'
+	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
 
 docs:
@@ -19,26 +22,6 @@ docs:
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
-
-README.md: README.Rmd
-	R -e 'devtools::install(upgrade = "never")'
-	R -e 'knitr::knit("README.Rmd", output = "README.md")'
-	# restore back useless updates to the non-random figures made by pkgdown
-	#git checkout \
-	# 	man/figures/README-diagnostic_Ne-1.png \
-	# 	man/figures/README-prior_Ne-1.png \
-	# 	man/figures/README-prior_T_gf-1.png
-
-$(pkg): README.md
-	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
-		echo "Attempting to build inside a container"; \
-		exit 1; \
-	fi
-	R -e 'devtools::document()'
-	mkdir -p build; cd build; R CMD build --log ../../demografr
-
-$(logo): logo.R
-	R -e 'source("logo.R")'
 
 build: $(pkg)
 
@@ -56,6 +39,29 @@ winold: README.md
 
 clean:
 	rm -rf build
+
+test:
+	R -e 'devtools::test()'
+
+$(pkg): README.md
+	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
+		echo "Attempting to build inside a container"; \
+		exit 1; \
+	fi
+	R -e 'devtools::document()'
+	mkdir -p build; cd build; R CMD build --log ../../demografr
+
+README.md: README.Rmd
+	R -e 'devtools::install(upgrade = "never")'
+	R -e 'knitr::knit("README.Rmd", output = "README.md")'
+	# restore back useless updates to the non-random figures made by pkgdown
+	#git checkout \
+	# 	man/figures/README-diagnostic_Ne-1.png \
+	# 	man/figures/README-prior_Ne-1.png \
+	# 	man/figures/README-prior_T_gf-1.png
+
+$(logo): logo.R
+	R -e 'source("logo.R")'
 
 ##################################################################
 # Docker shortcuts
