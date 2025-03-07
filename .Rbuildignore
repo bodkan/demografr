@@ -17,3 +17,5 @@ vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
 Dockerfile
 .dockerignore
+^inst/examples/grid_.*$
+^inst/examples/downstream_.*$
