@@ -45,12 +45,13 @@ simulate_priors <- function(priors, replicates = 1000) {
   vars <- get_param_names(priors)
 
   samples_list <- lapply(
-    seq_along(priors), \(i)
-    dplyr::tibble(
-      param = vars[i],
-      value = replicate(n = replicates, sample_prior(priors[[i]])$value),
-      stringsAsFactors = FALSE
-    )
+    seq_along(priors), function(i) {
+      dplyr::tibble(
+        param = vars[i],
+        value = replicate(n = replicates, sample_prior(priors[[i]])$value),
+        stringsAsFactors = FALSE
+      )
+    }
   )
 
   samples_df <- do.call(rbind, samples_list)
