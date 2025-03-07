@@ -4,7 +4,9 @@ abc_files <- here::here(paste0("inst/examples/downstream_data", c("X", "Y", "Z")
 skip_if_not(Sys.getenv("RUNNER_OS") == "" && all(file.exists(c(data_files, abc_files))))
 
 data <- lapply(data_files, readRDS)
+names(data) <- c("X", "Y", "Z")
 abc <- lapply(abc_files, readRDS)
+names(abc) <- c("X", "Y", "Z")
 
 test_that("unpacking data generates the correct merged summary statistics (single model)", {
   unpacked <- unpack(data[["X"]])
