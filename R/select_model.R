@@ -31,7 +31,8 @@ select_model <- function(models, tol, ...) {
 
   parts <- unpack(models)
 
-  result <- abc::postpr(parts$target, parts$index, parts$sumstat, ...)
+  result <- abc::postpr(target = parts$target, index = parts$index,
+                        sumstat = parts$sumstat, tol = tol, ...)
 
   class(result) <- c("demografr_postpr", class(result))
 
