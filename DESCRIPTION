@@ -24,25 +24,25 @@ LazyData: true
 Imports:
     abc,
     dplyr,
-    cowplot,
     future.apply,
     ggplot2,
     magrittr,
     methods,
-    reticulate,
-    tidyr,
-    GA,
-    slendr,
     progressr,
-    locfit
+    reticulate,
+    slendr,
+    tidyr
 Remotes: bodkan/slendr
 Suggests:
     ape,
+    cowplot,
     devtools,
     future,
+    GA,
     here,
     knitr,
     lobstr,
+    locfit,
     rmarkdown,
     sf,
     stars,

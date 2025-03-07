@@ -1,5 +1,5 @@
-#' Compute the fitness of the given parameter set against observed data
-#'
+# Compute the fitness of the given parameter set against observed data
+#
 compute_fitness <- function(
     params, model, functions, observed,
     sequence_length, recombination_rate, mutation_rate = 0,

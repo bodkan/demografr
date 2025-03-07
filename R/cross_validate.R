@@ -19,7 +19,7 @@ cross_validate <- function(x, nval, tols, method, ...) {
 #' @export
 cross_validate.list <- function(x, nval, tols, method, ...) {
   args <- list(nval = nval, tols = tols, method = method, ...)
-  if (all(vapply(models, inherits, "demografr_abc.abc", FUN.VALUE = logical(1)))) {
+  if (all(vapply(x, inherits, "demografr_abc.abc", FUN.VALUE = logical(1)))) {
       args[["models"]] <- x
     do.call(cross_validate_model_selection, args)
   } else {

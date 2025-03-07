@@ -108,7 +108,7 @@ simulate_grid <- function(
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
-          wrap <- if (strict) identity else capture.output
+          wrap <- if (strict) base::identity else utils::capture.output
           wrap(res <- run_iteration(
             grid_i,
             model = model,

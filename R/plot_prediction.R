@@ -84,9 +84,9 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
   names(p_stats) <- stat
 
   if (!is.null(file)) {
-    pdf(file, ...)
+    grDevices::pdf(file, ...)
     for (p in p_stats) print(p)
-    dev.off()
+    grDevices::dev.off()
   } else {
     if (length(p_stats) == 1)
       return(p_stats[[1]])

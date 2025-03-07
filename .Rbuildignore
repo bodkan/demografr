@@ -15,3 +15,4 @@ paper/*
 vignettes/vignette-07-selection.Rmd
 vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
+Dockerfile
