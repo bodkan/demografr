@@ -76,10 +76,6 @@ ENV PROJECT=/project
 # setup all required R and Python packages
 WORKDIR $PROJECT
 
-# put personal dotfiles into the container
-RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
-    cd ~/.dotfiles; ./install.sh
-
 # save R packages to home inside the container to avoid cluttering the project directory
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV R_INSTALL_STAGED=FALSE
@@ -109,6 +105,10 @@ RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 # set the default directory of RStudio Server to the project directory
 RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
+
+# put personal dotfiles into the container
+RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
+    cd ~/.dotfiles; ./install.sh
 
 # clean up compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
