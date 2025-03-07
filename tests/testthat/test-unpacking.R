@@ -1,9 +1,7 @@
-data_files <- vapply(c("X", "Y", "Z"),
-                     function(model) system.file(paste0("examples/downstream_data", model, ".rds"), package = "demografr"),
-                     FUN.VALUE = character(1))
-abc_files <- vapply(c("X", "Y", "Z"),
-                     function(model) system.file(paste0("examples/downstream_abc", model, ".rds"), package = "demografr"),
-                     FUN.VALUE = character(1))
+data_files <- here::here(paste0("inst/examples/downstream_data", c("X", "Y", "Z"), ".rds"))
+abc_files <- here::here(paste0("inst/examples/downstream_data", c("X", "Y", "Z"), ".rds"))
+
+skip_if_not(all(file.exists(c(data_files, abc_files))))
 
 data <- lapply(data_files, readRDS)
 abc <- lapply(abc_files, readRDS)
