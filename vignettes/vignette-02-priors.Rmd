@@ -8,6 +8,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+{}
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -17,8 +18,6 @@ knitr::opts_chunk$set(
 )
 
 set.seed(42)
-
-devtools::load_all()
 ```
 
 ⚠️⚠️⚠️
@@ -339,7 +338,7 @@ data <- simulate_abc(model, <priors>, functions, observed, ...)
 Imagine we have the following _slendr_ model function (hilariously
 overcomplicated, purely for demonstration purposes!):
 
-```{r}
+```{r, eval=slendr::check_dependencies(python = TRUE)}
 library(slendr)
 init_env(quiet = TRUE)
 
