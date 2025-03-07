@@ -7,13 +7,13 @@
 cross_validate(x, nval, tols, method, ...)
 }
 \arguments{
+\item{x}{A list of objects of the class \code{demografr_sims_abc} or
+\code{demografr_abc.abc} which store simulated summary statistics needed for
+calling \code{abc::cv4postpr}}
+
 \item{nval, tols, method}{Required arguments of \code{abc::cv4postpr}}
 
 \item{...}{Other optional arguments to be passed to \code{abc::cv4postpr}}
-
-\item{models}{A list of objects of the class \code{demografr_sims_abc} or
-\code{demografr_abc.abc} which store simulated summary statistics needed for
-calling \code{abc::cv4postpr}}
 }
 \value{
 Object of the class \code{cv4postpr} and \code{demografr_cv}

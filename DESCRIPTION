@@ -33,7 +33,8 @@ Imports:
     tidyr,
     GA,
     slendr,
-    progressr
+    progressr,
+    locfit
 Remotes: bodkan/slendr
 Suggests:
     ape,

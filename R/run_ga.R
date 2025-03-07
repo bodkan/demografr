@@ -39,8 +39,6 @@
 #'   argument for custom simulation script has no effect.
 #' @param ... Additional arguments passed on the \code{ga} function from
 #'   the GA package
-#'
-#' @export
 run_ga <- function(
   model, functions, observed, bounds, iterations,
   sequence_length, recombination_rate, mutation_rate = 0,

@@ -17,6 +17,10 @@
 #'   Ignored when custom simulations scripts are provided.
 #' @param mutation_rate Mutation rate to use for the simulation
 #'   Ignored when custom simulations scripts are provided.
+#' @param data A named list of data-generating functions. The names then represent all possible
+#'   arguments of simulated summary statistic functions.
+#' @param format In which format will the model generate results to be used for computing
+#'   simulated summary statistics?
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (i.e. model which generates an output without error, default is 1000)
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
@@ -30,8 +34,6 @@
 #'   Setting this argument for custom simulation script has no effect.
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
-#' @param random_seed Random seed to be used for simulation and (potentially) adding of mutations
-#'   to a simulated tree sequence
 #'
 #' @return Either a tree-sequence object of the class \code{slendr_ts} when a slendr model
 #'   was simulated, or a path to an output file when a custom simulation script was used.

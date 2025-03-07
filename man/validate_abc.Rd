@@ -41,6 +41,12 @@ Ignored when custom simulations scripts are provided.}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
+\item{format}{In which format will the model generate results to be used for computing
+simulated summary statistics?}
+
+\item{data}{A named list of data-generating functions. The names then represent all possible
+arguments of simulated summary statistic functions.}
+
 \item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
 the built-in slendr simulation back ends. Which engine will be used is determined
 by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will

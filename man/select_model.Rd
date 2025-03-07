@@ -4,16 +4,16 @@
 \alias{select_model}
 \title{Perform selection between different ABC models}
 \usage{
-select_model(models, ...)
+select_model(models, tol, ...)
 }
 \arguments{
 \item{models}{A list of objects of the class \code{demografr_sims_abc} or
 \code{demografr_abc.abc} which store simulated summary statistics needed for
 calling \code{abc::postpr}}
 
-\item{...}{Other optional arguments to be passed to \code{abc::postpr}}
+\item{tol}{Tolerance argument required by \code{abc::postpr}}
 
-\item{tol, method}{Required arguments of \code{abc::postpr}}
+\item{...}{Other optional arguments to be passed to \code{abc::postpr}}
 }
 \value{
 Object of the class \code{postpr} and \code{demografr_postpr}

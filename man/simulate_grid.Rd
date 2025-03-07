@@ -40,6 +40,12 @@ Ignored when custom simulations scripts are provided.}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
+\item{data}{A named list of data-generating functions. The names then represent all possible
+arguments of simulated summary statistic functions.}
+
+\item{format}{In which format will the model generate results to be used for computing
+simulated summary statistics?}
+
 \item{packages}{A character vector with package names used by user-defined summary statistic
 functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 sure that the parallelized tree-sequence summary statistic functions have all of their

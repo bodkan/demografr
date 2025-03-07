@@ -7,13 +7,13 @@
 #' @param models A list of objects of the class \code{demografr_sims_abc} or
 #'   \code{demografr_abc.abc} which store simulated summary statistics needed for
 #'   calling \code{abc::postpr}
-#' @param tol,method Required arguments of \code{abc::postpr}
+#' @param tol Tolerance argument required by \code{abc::postpr}
 #' @param ... Other optional arguments to be passed to \code{abc::postpr}
 #'
 #' @return Object of the class \code{postpr} and \code{demografr_postpr}
 #'
 #' @export
-select_model <- function(models, ...) {
+select_model <- function(models, tol, ...) {
   args <- match.call()
 
   if (!"tol" %in% names(args))

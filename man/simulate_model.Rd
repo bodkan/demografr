@@ -35,6 +35,12 @@ Ignored when custom simulations scripts are provided.}
 \item{mutation_rate}{Mutation rate to use for the simulation
 Ignored when custom simulations scripts are provided.}
 
+\item{data}{A named list of data-generating functions. The names then represent all possible
+arguments of simulated summary statistic functions.}
+
+\item{format}{In which format will the model generate results to be used for computing
+simulated summary statistics?}
+
 \item{engine}{Which simulation engine to use? Values "msprime" and "slim" will use one of
 the built-in slendr simulation back ends. Which engine will be used is determined
 by the nature of the \code{model}. If \code{engine = NULL}, then spatial slendr models will
@@ -51,9 +57,6 @@ argument for custom simulation script has no effect.}
 
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (i.e. model which generates an output without error, default is 1000)}
-
-\item{random_seed}{Random seed to be used for simulation and (potentially) adding of mutations
-to a simulated tree sequence}
 }
 \value{
 Either a tree-sequence object of the class \code{slendr_ts} when a slendr model

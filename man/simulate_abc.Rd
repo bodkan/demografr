@@ -44,6 +44,12 @@ tree sequences}
 
 \item{mutation_rate}{Mutation rate to use for the simulation}
 
+\item{data}{A named list of data-generating functions. The names then represent all possible
+arguments of simulated summary statistic functions.}
+
+\item{format}{In which format will the model generate results to be used for computing
+simulated summary statistics?}
+
 \item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results}
 
 \item{packages}{A character vector with package names used by user-defined summary statistic

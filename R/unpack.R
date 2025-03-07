@@ -1,4 +1,7 @@
 #' Unpack demografr object into individual components of the abc package
+#'
+#' @param object A demografr object to be decomposed to individual components
+#'
 #' @export
 unpack <- function(object) {
   if (inherits(object, "demografr_abc_sims")) {

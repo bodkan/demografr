@@ -6,6 +6,9 @@
 \usage{
 unpack(object)
 }
+\arguments{
+\item{object}{A demografr object to be decomposed to individual components}
+}
 \description{
 Unpack demografr object into individual components of the abc package
 }

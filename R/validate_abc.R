@@ -17,6 +17,10 @@
 #'   Ignored when custom simulations scripts are provided.
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param data A named list of data-generating functions. The names then represent all possible
+#'   arguments of simulated summary statistic functions.
+#' @param format In which format will the model generate results to be used for computing
+#'   simulated summary statistics?
 #' @param quiet Should the log output of the validation be printed to the console?
 #'   (Default is \code{TRUE}.)
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic

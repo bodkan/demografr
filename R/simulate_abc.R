@@ -16,6 +16,10 @@
 #' @param sequence_length Amount of sequence to simulate using slendr (in numbers of basepairs)
 #' @param recombination_rate Recombination rate to use for the simulation
 #' @param mutation_rate Mutation rate to use for the simulation
+#' @param data A named list of data-generating functions. The names then represent all possible
+#'   arguments of simulated summary statistic functions.
+#' @param format In which format will the model generate results to be used for computing
+#'   simulated summary statistics?
 #' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results
 #' @param packages A character vector with package names used by user-defined summary statistic
 #'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
