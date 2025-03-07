@@ -14,8 +14,10 @@ docs
 paper/*
 Dockerfile
 .dockerignore
+^inst/examples/custom_.*rds$
 ^inst/examples/grid_.*$
 ^inst/examples/downstream_.*$
+vignettes/vignette-03-grids.Rmd
 vignettes/vignette-04-parallelization.Rmd
 vignettes/vignette-05-custom.Rmd
 vignettes/vignette-06-diagnostics.Rmd
@@ -23,4 +25,3 @@ vignettes/vignette-07-selection.Rmd
 vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
 vignettes/vignette-10-benchmarking.Rmd
-^inst/examples/custom_.*rds$
