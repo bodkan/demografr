@@ -1,7 +1,7 @@
 data_files <- here::here(paste0("inst/examples/downstream_data", c("X", "Y", "Z"), ".rds"))
 abc_files <- here::here(paste0("inst/examples/downstream_data", c("X", "Y", "Z"), ".rds"))
 
-skip_if_not(all(file.exists(c(data_files, abc_files))))
+skip_if_not(Sys.getenv("RUNNER_OS") == "" && all(file.exists(c(data_files, abc_files))))
 
 data <- lapply(data_files, readRDS)
 abc <- lapply(abc_files, readRDS)
