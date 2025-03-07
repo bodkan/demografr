@@ -71,10 +71,6 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install devtools-related dependencies on Linux
-        if: runner.os == 'Linux'
-        run: sudo apt-get install libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev
-
       - name: Setup dedicated Python environment for slendr
         run: |
           install.packages("reticulate", repos = "http://cran.rstudio.com")
@@ -92,23 +88,4 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Setup dedicated Python environment for slendr on Unix
-        if: runner.os != 'Windows'
-        run: |
-          R -e 'slendr::setup_env(agree = TRUE)'
-          R --no-echo -e 'reticulate::conda_binary()'
-          R --no-echo -e 'reticulate::conda_list()'
-          R --no-echo -e 'reticulate::py_config()'
-
-      - name: Setup dedicated Python environment for slendr on Windows
-        if: runner.os == 'Windows'
-        run: |
-          R -e 'slendr::setup_env(agree = TRUE)'
-          R --no-echo -e 'reticulate::conda_binary()'
-          R --no-echo -e 'reticulate::conda_list()'
-          R --no-echo -e 'reticulate::py_config()'
-        shell: bash
-
       - uses: r-lib/actions/check-r-package@v2
-        with:
-          upload-snapshots: true
