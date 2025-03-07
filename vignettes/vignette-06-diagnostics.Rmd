@@ -503,7 +503,7 @@ Let's start with the posterior predictive checks.
 
 ## Posterior predictive checks
 
-Link: http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf
+Link: `http://www.stat.columbia.edu/~gelman/research/published/A6n41.pdf`
 
 It is one thing to 
 Simply speaking, when fitting a model and estimating its parameters using ABC,
