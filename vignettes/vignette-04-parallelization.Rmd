@@ -164,7 +164,12 @@ CPUs, I can run the above grid simulations using all available CPUs like this.
 
 First we setup _future_:
 
-```{r}
+```{r, echo=Sys.getenv("RUNNER_OS") != "", eval=Sys.getenv("RUNNER_OS") != ""}
+library(future)
+plan(multisession, workers = 3) # use 10 CPUs
+```
+
+```{r, echo=Sys.getenv("RUNNER_OS") == "", eval=Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = 10) # use 10 CPUs
 ```
@@ -262,10 +267,17 @@ To demonstrate this, let's pretend we ran five simulation grid runs across two
 different computers like this (we were originally interested in distributing 10
 replicates, so we'll run two times five replicates individually):
 
-```{r}
+```{r, echo=Sys.getenv("RUNNER_OS") != "", eval=Sys.getenv("RUNNER_OS") != ""}
+library(future)
+plan(multisession, workers = 3)
+```
+
+```{r, echo=Sys.getenv("RUNNER_OS") == "", eval=Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = 5)
+```
 
+```{r}
 run1_file <- tempfile(fileext = ".rds")
 run2_file <- tempfile(fileext = ".rds")
 
