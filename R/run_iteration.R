@@ -17,10 +17,7 @@ run_iteration <- function(it,
   else
     validate_user_functions(data_expr, valid_args = c("path", "model"))
 
-warning(paste(c(reticulate::conda_list()$name,
-	     "###",
-	     normalizePath(reticulate::py_exe(), winslash = "/"),
-	     "###"), collapse="\n"), call. = FALSE)
+warning(paste(c("###", reticulate::conda_list()$name, "###"), collapse="\n"), call. = FALSE)
   init_env(quiet = TRUE)
 warning("@@@",  normalizePath(reticulate::py_exe(), winslash = "/"), "@@@", call. = FALSE)
   result <- run_simulation(
