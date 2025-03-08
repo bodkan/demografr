@@ -1,3 +1,3 @@
-# demografr 0.1.0
+# demografr 0.5.0
 
-* First public beta version of the R package.
+* First CRAN release of the package (and the first release which could be considered "public beta").

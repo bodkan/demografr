@@ -42,17 +42,16 @@ reference:
     contents:
     - simulate_grid
 
-  - title: Genetic algorithms
-    contents:
-    - compute_fitness
-    - run_ga
-
+      #  - title: Genetic algorithms
+      #    contents:
+      #    - compute_fitness
+      #    - run_ga
+      #
   - title: ABC cross-validation and posterior checks
     contents:
     - unpack
     - cross_validate
     - select_model
-    - goodness_of_fit
     - predict.demografr_abc.abc
     - extract_prediction
     - plot_prediction
