@@ -76,11 +76,9 @@ write.table(observed_f4, file = system.file("examples/basics_f4.tsv", package = 
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As
-a result, its documentation is in a draft stage at best. Typos,
-inconsistencies, and other issues are unfortunately expected.
+**The _demografr_ R package is still under active development!**
 
-⚠️⚠️⚠️
+⚠️️⚠️⚠️
 
 This vignette contains an expanded version of the basic ABC inference example
 from the [homepage](https://bodkan.net/demografr/) of _demografr_. It walks

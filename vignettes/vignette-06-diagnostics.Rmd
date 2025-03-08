@@ -62,11 +62,9 @@ set.seed(SEED)
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a
-result, its documentation is in a draft stage at best. Typos, inconsistencies,
-and other issues are unfortunately expected.
+**The _demografr_ R package is still under active development!**
 
-⚠️⚠️⚠
+⚠️⚠️⚠️
 
 Let's return to our [first](vignette-01-basics.html) example. However, this
 time, imagine that we don't really know which of the three following

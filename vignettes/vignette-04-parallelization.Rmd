@@ -25,9 +25,7 @@ data_path <- system.file("examples/grid_data.rds", package = "demografr")
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a
-result, its documentation is in a draft stage at best. Typos, inconsistencies,
-and other issues are unfortunately expected.
+**The _demografr_ R package is still under active development!**
 
 ⚠️⚠️⚠️
 
@@ -108,7 +106,8 @@ across all parameters of the grid?**
 
 ## 1. Implicit parallelization via _future_
 
-The simplest way to parallelize _demografr_ analyses is via the R package [_future_](https://cran.r-project.org/package=future).
+The simplest way to parallelize _demografr_ workflow is via the R package
+[_future_](https://cran.r-project.org/package=future).
 
 The magic of _future_ lies in its ability to set up parallelized schemes of
 arbitrary topologies by automatic scheduling of jobs across a given number of

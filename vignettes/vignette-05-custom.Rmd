@@ -29,11 +29,9 @@ abc_path4 <- system.file("examples/custom_abc4.rds", package = "demografr")
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a
-result, its documentation is in a draft stage at best. Typos, inconsistencies,
-and other issues are unfortunately expected.
+**The _demografr_ R package is still under active development!**
 
-⚠️⚠️⚠️
+⚠️️⚠️⚠️
 
 By default, _demografr_ uses the [_slendr_](https://github.com/bodkan/slendr)
 package for defining models and simulating data from them. But what if you need

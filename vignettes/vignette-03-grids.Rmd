@@ -29,9 +29,7 @@ data_path <- system.file("examples/grid_data.rds", package = "demografr")
 
 ⚠️⚠️⚠️
 
-**Note:** The _demografr_ R package is still under active development. As a
-result, its documentation is in a draft stage at best. Typos, inconsistencies,
-and other issues are unfortunately expected.
+**The _demografr_ R package is still under active development!**
 
 ⚠️⚠️⚠️
 
