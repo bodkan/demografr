@@ -462,7 +462,8 @@ instructs `plot_prediction` to save a figure to disk instead of plotting it
 using a graphical device&mdash;useful for work on remote servers!).
 
 **For more details on additional downstream validation and troubleshooting
-options, please see [this vignette](vignette-06-diagnostics.html).**
+options, please see
+[this vignette](https://bodkan.net/demografr/articles/vignette-06-diagnostics.html).**
 
 ### 7. Extracting esimated parameters
 
