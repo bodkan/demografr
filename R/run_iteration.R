@@ -17,9 +17,10 @@ run_iteration <- function(it,
   else
     validate_user_functions(data_expr, valid_args = c("path", "model"))
 
-stop(paste(c(reticulate::conda_list()$name,
-	     "---",
-	     reticulate::py_exe()), collapse="\n"), call. = FALSE)
+warning(paste(c(reticulate::conda_list()$name,
+	     "###",
+	     reticulate::py_exe(),
+	     "###"), collapse="\n"), call. = FALSE)
   init_env(quiet = TRUE)
   result <- run_simulation(
     model = model, params = params, sequence_length = sequence_length,
