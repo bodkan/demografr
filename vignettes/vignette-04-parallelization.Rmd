@@ -134,6 +134,8 @@ tstart <- Sys.time()
 ```
 
 ```{r}
+ cat(paste(c("a", "b", "c"), collapse="\n"))
+
 data <- simulate_grid(model, grid, functions, replicates = 10,
                       sequence_length = 10000, recombination_rate = 1e-8)
 
