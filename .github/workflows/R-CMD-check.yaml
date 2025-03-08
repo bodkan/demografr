@@ -88,4 +88,11 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: conda test
+        run: |
+          R --no-echo -e 'reticulate::conda_binary()
+          R --no-echo -e 'reticulate::conda_list()'
+          R --no-echo -e 'slendr::init_env(); reticulate::py_config()'
+        shell: Rscript {0}
+
       - uses: r-lib/actions/check-r-package@v2
