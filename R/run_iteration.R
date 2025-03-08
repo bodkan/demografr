@@ -19,7 +19,7 @@ run_iteration <- function(it,
 
 warning(paste(c(reticulate::conda_list()$name,
 	     "###",
-	     reticulate::py_exe(),
+	     normalizePath(reticulate::py_exe(), winslash = "/"),
 	     "###"), collapse="\n"), call. = FALSE)
   init_env(quiet = TRUE)
   result <- run_simulation(
