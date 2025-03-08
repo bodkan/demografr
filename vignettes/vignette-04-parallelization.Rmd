@@ -134,7 +134,7 @@ tstart <- Sys.time()
 ```
 
 ```{r}
-stop(paste(reticulate::conda_list()$name, collapse="\n"))
+warning(paste(reticulate::conda_list()$name, collapse="\n"), call. = FALSE)
 
 data <- simulate_grid(model, grid, functions, replicates = 10,
                       sequence_length = 10000, recombination_rate = 1e-8)

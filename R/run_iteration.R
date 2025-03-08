@@ -18,8 +18,6 @@ run_iteration <- function(it,
     validate_user_functions(data_expr, valid_args = c("path", "model"))
 
   init_env(quiet = TRUE)
- cat(paste(c("a", "b", "c"), collapse="\n"))
-
   result <- run_simulation(
     model = model, params = params, sequence_length = sequence_length,
     recombination_rate = recombination_rate,
