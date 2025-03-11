@@ -228,6 +228,10 @@ priors <- list(
 )
 ```
 
+```{r}
+model <- simulate_model(model, priors, seq = 100, rec=0)
+```
+
 In an ABC simulation step below, the formulas are used to draw the values of
 each parameter from specified distributions (in this case, all uniform
 distributions).
