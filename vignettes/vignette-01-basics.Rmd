@@ -175,7 +175,7 @@ observed <- list(
 ### 1. Setting up a "scaffold" model
 
 The first step in a _demografr_ ABC analysis is setting up a "scaffold"
-model&mdash;a _slendr_ function which will produce a compiled _slendr_ model 
+model&mdash;a _slendr_ function which will produce a compiled _slendr_ model
 object, and which will accept the model parameters in form of normal R
 function arguments. In our simple examples, we will define the following
 function:
@@ -226,10 +226,6 @@ priors <- list(
 
   gf_BC ~ runif(0, 0.3)
 )
-```
-
-```{r}
-model <- simulate_model(model, priors, seq = 100, rec=0)
 ```
 
 In an ABC simulation step below, the formulas are used to draw the values of
@@ -293,6 +289,11 @@ helper function `simulate_model()` which allows us to simulate a single
 tree-sequence object from the specified model. We can then use that tree
 sequence to develop (and test) our summary functions before proceeding further,
 like this:
+
+
+```{r}
+model <- simulate_model(model, priors, sequence_length = 100, recombination_rate = 0)
+```
 
 ```{r}
 ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8)
