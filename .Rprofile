@@ -2,6 +2,12 @@ options(browserNLdisabled = TRUE)
 
 options(install.packages.compile.from.source = "never")
 
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "https://cloud.r-project.org"
+  options(repos=r)
+})
+
 Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
 if (Sys.getenv("IN_CONTAINER") == TRUE) {
   Sys.setenv(RENV_CONFIG_PPM_ENABLED = "TRUE")
