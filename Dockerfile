@@ -64,11 +64,11 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.3.tar.gz -O slim.tar.gz; \
+RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.3.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
-RUN cp SLiM-*/build/slim SLiM-*/build/eidos $BIN
+RUN cd /tmp; cp SLiM-*/build/slim SLiM-*/build/eidos $BIN
 
 # location for the whole project (scripts, notebooks, and data) inside the container
 ENV PROJECT=/project
