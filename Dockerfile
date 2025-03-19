@@ -106,9 +106,9 @@ RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 # set the default directory of RStudio Server to the project directory
 RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 
-# put personal dotfiles into the container
-RUN git clone https://github.com/bodkan/dotfiles ~/.dotfiles; rm ~/.bashrc ~/.profile; \
-    cd ~/.dotfiles; ./install.sh
+# clone configuration dotfiles into the container
+RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm .bashrc .profile; \
+    cd .dotfiles; ./install.sh
 
 # clean up compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
