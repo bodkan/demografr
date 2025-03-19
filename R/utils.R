@@ -98,4 +98,6 @@ get_engine <- function(slendr_model, engine) {
 
 norm_path <- function(path) normalizePath(path, winslash = "/", mustWork = FALSE)
 
+on_windows <- function() Sys.info()["sysname"] == "Windows"
+
 utils::globalVariables(c("value", "."))
