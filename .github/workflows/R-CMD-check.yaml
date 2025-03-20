@@ -59,7 +59,7 @@ jobs:
       - name: Populate PATH with compiled binaries
         if: runner.os != 'Windows'
         run: |
-          export PATH="$HOME/deps/SLiM:$PATH"
+          export PATH="$HOME/deps/SLiM-4.2.2:$PATH"
           echo "PATH=$PATH" >> ~/.Renviron
 
       - uses: r-lib/actions/setup-pandoc@v2
