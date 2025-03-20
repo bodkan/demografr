@@ -87,12 +87,12 @@ model <- function(s, onset_time, origin_pop, target_pop) {
     origin_pop = origin_pop, target_pop = target_pop
   )
 
-  afr <- population("AFR", time = 90000, N = 3000)
-  ooa <- population("OOA", parent = afr, time = 60000, N = 500, remove = 23000)
-  ehg <- population("EHG", parent = ooa, time = 28000, N = 1000, remove = 6000)
-  eur <- population("EUR", parent = ehg, time = 25000, N = 5000)
-  ana <- population("ANA", time = 28000, N = 3000, parent = ooa, remove = 4000)
-  yam <- population("YAM", time = 8000, N = 500, parent = ehg, remove = 2500)
+  afr <- population("AFR", time = 90000, N = 30)
+  ooa <- population("OOA", parent = afr, time = 60000, N = 5, remove = 23000)
+  ehg <- population("EHG", parent = ooa, time = 28000, N = 10, remove = 6000)
+  eur <- population("EUR", parent = ehg, time = 25000, N = 50)
+  ana <- population("ANA", time = 28000, N = 30, parent = ooa, remove = 4000)
+  yam <- population("YAM", time = 8000, N = 5, parent = ehg, remove = 2500)
 
   gf <- list(
     gene_flow(from = ana, to = yam, rate = 0.4, start = 7900, end = 7800),
@@ -173,3 +173,35 @@ test_that("format = 'files' produces only a .trees file (msprime)", {
   expect_s3_class(data$ts_data, "slendr_ts")
 })
 
+# simulate a dummy "observed" data set
+data <- simulate_model(
+  model, priors, sequence_length = 1e6, recombination_rate = 0,
+  model_args = list(origin_pop = "EUR", target_pop = "EUR"),
+  engine = "slim", format = "files", data = list(path = path)
+)
+
+functions <- list(
+  origin_traj = function(path) read.table(file.path(path, "origin_traj.tsv"), header = TRUE)[1, ],
+  target_traj = function(path) read.table(file.path(path, "target_traj.tsv"), header = TRUE)[1, ]
+)
+
+# compute a dummy "observed" data from the simulation
+observed <- list(
+  origin_traj = functions$origin_traj(data$path),
+  target_traj = functions$target_traj(data$path)
+)
+
+test_that("non-prior model arguments must be specified", {
+  quiet(expect_error(
+    validate_abc(model, priors, functions, observed, sequence_length = 1e6, recombination_rate = 0,
+                 format = "files", data = list(path = path)),
+    "The following non-prior model function arguments are missing"
+  ))
+  expect_silent(
+    quiet(validate_abc(
+      model, priors, functions, observed, sequence_length = 1e6, recombination_rate = 0,
+      model_args = list(origin_pop = "EUR", target_pop = "EUR"),
+      format = "files", data = list(path = path)
+    ))
+  )
+})
