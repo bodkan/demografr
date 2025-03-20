@@ -132,3 +132,34 @@ The error message received was:
 It is not possible to simulate non-serialized models in SLiM"
   )
 })
+
+test_that("all model components must be present", {
+  msg <- "A model to simulate from, priors, summary functions, and"
+
+  tmp <- model
+  rm(model)
+  expect_error(validate_abc(model, priors, functions, observed), msg)
+  model <- tmp
+
+  tmp <- priors
+  rm(priors)
+  expect_error(validate_abc(model, priors, functions, observed), msg)
+  priors <- tmp
+
+  tmp <- functions
+  rm(functions)
+  expect_error(validate_abc(model, priors, functions, observed), msg)
+  functions <- tmp
+
+  tmp <- observed
+  rm(observed)
+  expect_error(validate_abc(model, priors, functions, observed), msg)
+  observed <- tmp
+
+  expect_output(validate_abc(model, priors, functions, observed))
+})
+
+test_that("fully customized models must provide data-generating functions", {
+  msg <- "Models which generate custom files require a list of data function\\(s\\)"
+  quiet(expect_error(validate_abc(model, priors, functions, observed, format = "files"), msg))
+})
