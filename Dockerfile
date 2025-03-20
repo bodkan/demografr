@@ -64,7 +64,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.3.tar.gz -O slim.tar.gz; \
+RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.2.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
