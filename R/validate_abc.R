@@ -158,8 +158,9 @@ validate_abc <- function(model, priors, functions, observed,
     missing_args <- setdiff(nonimpl_args, c(prior_names, names(model_args)))
     if (length(missing_args) > 0) {
       cat(" \u274C\n\n")
-      stop("The following non-prior model function arguments are missing:\n    ", missing_args, "\n",
-            call. = FALSE)
+      stop("The following non-prior model function arguments are missing:\n    ",
+           paste0(missing_args, collapse = ", "), "\n",
+           call. = FALSE)
     }
 
     cat(" \u2705\n")
