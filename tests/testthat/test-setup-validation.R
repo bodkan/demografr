@@ -136,24 +136,63 @@ It is not possible to simulate non-serialized models in SLiM"
 test_that("all model components must be present", {
   msg <- "A model to simulate from, priors, summary functions, and"
 
+  model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
+    p1 <- population("p1", time = 1, N = 1000)
+    p2 <- population("p2", time = T_p1_p2, N = 3000, parent = p1)
+    p3 <- population("p3", time = T_p2_p3, N = 10000, parent = p2)
+    p4 <- population("p4", time = T_p3_p4, N = 5000, parent = p3)
+
+    model <- compile_model(
+      populations = list(p1, p2, p3, p4),
+      generation_time = 1,
+      simulation_length = 10000, serialize = FALSE
+    )
+
+    return(model)
+  }
+  pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
+  d_df <- ts_divergence(ts, sample_sets = samples, mode = "branch")
+  observed <- list(diversity = pi_df, divergence = d_df)
+
+  priors <- list(
+    Ne_p1 ~ runif(10, 10000),
+    Ne_p2 ~ runif(10, 10000),
+    Ne_p3 ~ runif(10, 10000),
+    Ne_p4 ~ runif(10, 10000),
+
+    T_p1_p2 ~ runif(100, 1500),
+    T_p2_p3 ~ runif(1500, 3500),
+    T_p3_p4 ~ runif(3000, 5000)
+  )
+
+  compute_diversity <- function(ts) {
+    samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
+    ts_diversity(ts, sample_sets = samples, mode = "branch")
+  }
+  compute_divergence <- function(ts) {
+    samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
+    ts_divergence(ts, sample_sets = samples, mode = "branch")
+  }
+  functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+
   tmp <- model
   rm(model)
-  expect_error(validate_abc(model, priors, functions, observed), msg)
+  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
   model <- tmp
 
   tmp <- priors
   rm(priors)
-  expect_error(validate_abc(model, priors, functions, observed), msg)
+  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
   priors <- tmp
 
   tmp <- functions
   rm(functions)
-  expect_error(validate_abc(model, priors, functions, observed), msg)
+  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
   functions <- tmp
 
   tmp <- observed
   rm(observed)
-  expect_error(validate_abc(model, priors, functions, observed), msg)
+  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
   observed <- tmp
 
   expect_output(validate_abc(model, priors, functions, observed))
