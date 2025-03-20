@@ -190,7 +190,7 @@ validate_abc <- function(model, priors, functions, observed,
                            attempts = 1000, model_name = substitute(model))
   cat(" \u2705\n")
 
-  if (is.null(data)) {
+  if (format == "ts") {
     data <- list(ts = result$data)
   } else {
     cat("---------------------------------------------------------------------\n")
