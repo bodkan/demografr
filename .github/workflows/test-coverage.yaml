@@ -61,6 +61,10 @@ jobs:
           reticulate::conda_install(envname = PYTHON_ENV, packages = c("tspop==0.0.2", "pyslim==1.0.4", "pyarrow"), pip = TRUE)
         shell: Rscript {0}
 
+      - name: Use a separate .Rbuildignore file
+        if: runner.os != 'Windows'
+        run: mv ${{ github.workspace }}/.Rbuildignore_GitHub ${{ github.workspace }}/.Rbuildignore
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::covr
