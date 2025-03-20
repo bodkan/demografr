@@ -52,7 +52,7 @@ evaluate <- function(funs, env) {
         # in the environment
         get(first, env)
       } else {
-        stop("Unknown data `", first, "` encountered while population an environment", call. = FALSE)
+        stop("Unknown data `", first, "` encountered while populating an environment", call. = FALSE)
       }
     }
   })
@@ -102,7 +102,7 @@ populate_data_env <- function(result) {
   else if (inherits(data, "slendr_ts"))
     env$ts <- data
   else
-    stop("Unknown data encountered while population an internal scope")
+    stop("Unknown data encountered while populating an internal scope")
 
   if (!is.null(model))
     env$model <- model
