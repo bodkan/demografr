@@ -50,10 +50,9 @@ jobs:
           mkdir -p ~/deps
           cd ~/deps
 
-          # installation instructions copied from the SLiM manual:
-          wget http://benhaller.com/slim/SLiM.zip
-          unzip SLiM.zip
-          cd SLiM
+          wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.2.tar.gz
+          tar xf v4.2.2.tar.gz
+          cd SLiM-4.2.2
           cmake .
           make slim
 
