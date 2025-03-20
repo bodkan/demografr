@@ -14,3 +14,7 @@ docs
 paper/*
 Dockerfile
 .dockerignore
+vignettes/vignette-07-selection.Rmd
+vignettes/vignette-08-tracts.Rmd
+vignettes/vignette-09-optimization.Rmd
+vignettes/vignette-10-benchmarking.Rmd
