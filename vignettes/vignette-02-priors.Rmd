@@ -413,6 +413,19 @@ This way, when defining prior sampling expressions, you're not hindered by
 the complexity of your model function (having to handle vector indexing as
 you'd have to with vectorized prior sampling statements).
 
+_demografr_ also provides means to visualize the entire prior distribution
+using numbers sampled from each. This can be helpful to check a previously
+defined prior sampling statements for correctnes:
+
+```{r prior_facet_plot1}
+plot_prior(individual_priors)
+```
+
+```{r prior_facet_plot2}
+plot_prior(individual_priors, facets = TRUE)
+```
+
+
 ### Custom functions
 
 The DSL for specification of parameter priors also allows custom-defined prior
