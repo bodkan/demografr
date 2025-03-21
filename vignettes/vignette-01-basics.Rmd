@@ -533,5 +533,9 @@ plot(abc, param = "T_BC")
 plot(abc, param = "gf_BC")
 ```
 
+```{r, hist_Ne}
+hist(abc, param = "Ne_D")
+```
+
 Again, there are numerous tools for additional diagnostics, which you can
 learn about [here](https://bodkan.net/demografr/articles/vignette-06-diagnostics.html).
