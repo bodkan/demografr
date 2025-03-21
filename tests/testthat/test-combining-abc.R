@@ -211,3 +211,9 @@ test_that("abc::abc via run_abc() runs correctly", {
 
   expect_s3_class(abc, "demografr_abc.abc")
 })
+
+test_that("abc predict() works correctly", {
+  data <- combine_data(run1, run2, run3)
+  suppressWarnings(abc <- run_abc(data, engine = "abc", tol = 0.3, method = "neuralnet"))
+  expect_s3_class(suppressWarnings(predict(abc)), "data.frame")
+})
