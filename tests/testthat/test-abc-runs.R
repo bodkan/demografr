@@ -214,6 +214,10 @@ test_that("abc::abc via run_abc() runs correctly", {
 
 test_that("abc predict() works correctly", {
   data <- combine_data(run1, run2, run3)
-  suppressWarnings(abc <- run_abc(data, engine = "abc", tol = 0.3, method = "neuralnet"))
-  expect_s3_class(suppressWarnings(predict(abc)), "data.frame")
+
+  quiet(suppressWarnings(abc <- run_abc(data, engine = "abc", tol = 0.3, method = "neuralnet")))
+
+  expect_error(suppressWarnings(predict(abc)), "The number of samples to generate")
+  expect_s3_class(suppressWarnings(predict(abc, samples = 3)), "data.frame")
+  expect_true(suppressWarnings(nrow(predict(abc, samples = 3)) == 3))
 })

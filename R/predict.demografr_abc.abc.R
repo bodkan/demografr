@@ -34,7 +34,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
   on.exit(options(opts))
 
   if (missing(samples))
-    stop("The number of samples to generate from the posterior must be specified", .call = FALSE)
+    stop("The number of samples to generate from the posterior must be specified", call. = FALSE)
 
   # extract the model function and other components and options used to run the
   # original ABC simulations
