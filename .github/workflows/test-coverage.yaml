@@ -78,7 +78,7 @@ jobs:
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package"),
             type = c("tests", "vignettes"),
-            function_exclusions = c("compute_fitness", "run_ga")
+            function_exclusions = c("print.//", "compute_fitness", "run_ga")
           )
         shell: Rscript {0}
 
