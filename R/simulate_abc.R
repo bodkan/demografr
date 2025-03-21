@@ -194,7 +194,7 @@ simulate_abc <- function(
   )
   if (!missing(sequence_length)) opts$sequence_length <- sequence_length
   if (!missing(recombination_rate)) opts$recombination_rate <- recombination_rate
-  if (!missing(mutation_rate)) opts$mutation_rate <- mutation_rate
+  opts$mutation_rate <- mutation_rate
 
   attr(result, "options") <- opts
 
