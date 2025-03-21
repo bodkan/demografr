@@ -59,29 +59,29 @@ extract_return <- function(model) {
   }
 }
 
-check_model_functions <- function(model) {
-  return_exprs <- extract_return(model)
+# check_model_functions <- function(model) {
+#   return_exprs <- extract_return(model)
+#
+#   if (length(return_expr) != 1)
+#     stop("A demografr model function must have exactly one return statement", call. = FALSE)
+#
+#   # extract the content of the return statement itself (i.e. for return(<expr>) gives <expr>)
+#   return_expr <- as.list(return_exprs[[1]])[[2]]
+#
+#   # unpack the expression
+# }
 
-  if (length(return_expr) != 1)
-    stop("A demografr model function must have exactly one return statement", call. = FALSE)
-
-  # extract the content of the return statement itself (i.e. for return(<expr>) gives <expr>)
-  return_expr <- as.list(return_exprs[[1]])[[2]]
-
-  # unpack the expression
-}
-
-check_model_engine <- function(model, engine) {
-  engine <- match.arg(engine)
-  if (inherits(model, "slendr_model") && !engine %in% c("msprime", "slim"))
-    stop("For a slendr functions as a model, 'engine' must be either \"msprime\" or \"slim\"",
-         call. = FALSE)
-  if ((engine == "custom" && (!is.character(model) || !file.exists(model))) ||
-      (!is.function(model) && engine != "custom"))
-    stop("\nSetting 'engine' to \"custom\" is only allowed with a user-defined 'model' script.\n",
-         "Setting slendr function as a 'model' is only allowed with \"msprime\" or \"slim\" as 'engine'.",
-         call. = FALSE)
-}
+# check_model_engine <- function(model, engine) {
+#   engine <- match.arg(engine)
+#   if (inherits(model, "slendr_model") && !engine %in% c("msprime", "slim"))
+#     stop("For a slendr functions as a model, 'engine' must be either \"msprime\" or \"slim\"",
+#          call. = FALSE)
+#   if ((engine == "custom" && (!is.character(model) || !file.exists(model))) ||
+#       (!is.function(model) && engine != "custom"))
+#     stop("\nSetting 'engine' to \"custom\" is only allowed with a user-defined 'model' script.\n",
+#          "Setting slendr function as a 'model' is only allowed with \"msprime\" or \"slim\" as 'engine'.",
+#          call. = FALSE)
+# }
 
 get_engine <- function(slendr_model, engine) {
   if (!is.null(engine)) # if an engine was specified by the user, use that
