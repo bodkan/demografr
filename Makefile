@@ -9,12 +9,14 @@ pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
 
 website: $(logo) README.md
+	rename 's/Rmd$$/Rmd_/' vignettes/vignette-{07,08,09,10}-*.Rmd
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
+	rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_
 
 docs:
 	R -e 'devtools::install(upgrade = "never")'
