@@ -3,7 +3,7 @@ skip_if(!slendr::check_dependencies(python = TRUE, slim = TRUE))
 library(slendr)
 init_env(quiet = TRUE)
 
-path_observed <- system.file("examples/custom_diversity.rds", package = "demografr")
+path_observed <- "custom_diversity.rds"
 observed_diversity <- readRDS(path_observed)
 
 priors <- list(Ne ~ runif(100, 5000))
