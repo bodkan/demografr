@@ -192,13 +192,13 @@ observed <- list(
 )
 
 test_that("non-prior model arguments must be specified", {
-  quiet(expect_error(
+  expect_error(
     validate_abc(model, priors, functions, observed,
                  sequence_length = 1e6, recombination_rate = 0,
-                 format = "files", data = list(path = path)),
+                 format = "files", data = list(path = path), quiet = TRUE),
     "The following non-prior model function arguments are missing"
-  ))
-  expect_output(
+  )
+  expect_silent(
     quiet(validate_abc(
       model, priors, functions, observed, sequence_length = 1e6, recombination_rate = 0,
       model_args = list(origin_pop = "EUR", target_pop = "EUR"),
