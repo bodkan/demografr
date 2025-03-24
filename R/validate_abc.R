@@ -102,10 +102,6 @@ validate_abc <- function(model, priors, functions, observed,
   cat("---------------------------------------------------------------------\n")
 
   if (is.function(model)) {
-    if (missing(sequence_length)) sequence_length <- 1e6
-    if (missing(recombination_rate)) recombination_rate <- 0
-    if (missing(mutation_rate)) mutation_rate <- 0
-
     cat("The model is a slendr function\n")
 
     cat("---------------------------------------------------------------------\n")
