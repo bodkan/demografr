@@ -76,12 +76,14 @@ test_that("consistent naming of summary functions and observed statistics is enf
   xfunctions <- functions
   xfunctions$diversityyy <- xfunctions$diversity
   xfunctions$diversity <- NULL
-  expect_error(validate_abc(model, priors, xfunctions, observed), error_msg)
+  expect_error(validate_abc(model, priors, xfunctions, observed,
+                            sequence_length = 1e6, recombination_rate = 0), error_msg)
 
   xobserved <- observed
   xobserved$diversityyy <- xobserved$diversity
   xobserved$diversity <- NULL
-  expect_error(validate_abc(model, priors, functions, xobserved), error_msg)
+  expect_error(validate_abc(model, priors, functions, xobserved,
+                            sequence_length = 1e6, recombination_rate = 0), error_msg)
 })
 
 test_that("errors in summary functions will be correctly reported", {
@@ -89,7 +91,8 @@ test_that("errors in summary functions will be correctly reported", {
 
   xfunctions <- functions
   xfunctions$diversity <- function(ts) stop("ERROR HERE!\n", call. = FALSE)
-  expect_error(quiet(validate_abc(model, priors, xfunctions, observed), error_msg))
+  expect_error(quiet(validate_abc(model, priors, xfunctions, observed,
+                                  sequence_length = 1e6, recombination_rate = 0), error_msg))
 })
 
 test_that("dimensions of simulated and observed summary statistics must be the same", {
@@ -112,14 +115,16 @@ test_that("names of observed and simulated statistics must be the same", {
   xobserved <- observed
   xobserved$diversityyy <- xobserved$diversity[1, ]
   xobserved$diversity <- NULL
-  expect_error(validate_abc(model, priors, functions, xobserved), error_msg)
+  expect_error(validate_abc(model, priors, functions, xobserved,
+                            sequence_length = 1e6, recombination_rate = 0), error_msg)
 })
 
 test_that("errors in prior sampling are correctly caught", {
   xpriors <- priors
   xpriors[[1]] <- Ne_popA ~ runif(1e6, 10000)
   error_msg <- "Sampling the prior Ne_popA resuted in the following problem"
-  expect_error(qiet(validate_abc(model, xpriors, functions, observed), error_msg))
+  expect_error(qiet(validate_abc(model, xpriors, functions, observed,
+                                 sequence_length = 1e6, recombination_rate = 0), error_msg))
 })
 
 test_that("an error is raised with SLiM ABC on non-serialized models", {

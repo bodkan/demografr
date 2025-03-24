@@ -322,7 +322,8 @@ function `validate_abc()`. This provides much more elaborate correctness checks
 beyond the simple testing of the summary functions as we did above.
 
 ```{r}
-validate_abc(model, priors, functions, observed)
+validate_abc(model, priors, functions, observed,
+             sequence_length = 1e6, recombination_rate = 1e-8)
 ```
 
 Having verified that all model components are set up correctly, we can proceed

@@ -114,7 +114,8 @@
 
 
 
-  validate_abc(model, priors, functions, observed)
+  validate_abc(model, priors, functions, observed,
+               sequence_length = 1e6, recombination_rate = 1e-8)
 
 
 

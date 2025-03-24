@@ -272,9 +272,12 @@ that the _slendr_ model functions are defined correctly (we set `quiet = TRUE`
 to surpress writing out the full log output):
 
 ```{r}
-validate_abc(modelX, priors, functions, observed, quiet = TRUE)
-validate_abc(modelY, priors, functions, observed, quiet = TRUE)
-validate_abc(modelZ, priors, functions, observed, quiet = TRUE)
+validate_abc(modelX, priors, functions, observed, quiet = TRUE,
+             sequence_length = 1e6, recombination_rate = 1e-8)
+validate_abc(modelY, priors, functions, observed, quiet = TRUE,
+             sequence_length = 1e6, recombination_rate = 1e-8)
+validate_abc(modelZ, priors, functions, observed, quiet = TRUE,
+             sequence_length = 1e6, recombination_rate = 1e-8)
 ```
 
 ```{r, echo=FALSE, eval=FALSE}
