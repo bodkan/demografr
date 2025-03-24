@@ -61,11 +61,13 @@ compute_divergence <- function(ts) {
 functions <- list(diversity = compute_diversity, divergence = compute_divergence)
 
 test_that("correct ABC setups are validated", {
-  expect_output(validate_abc(model, priors, functions, observed))
+  expect_output(validate_abc(model, priors, functions, observed,
+                             sequence_length = 1e6, recombination_rate = 0))
 })
 
 test_that("validation output can be silenced", {
-  expect_silent(validate_abc(model, priors, functions, observed, quiet = TRUE))
+  expect_silent(validate_abc(model, priors, functions, observed,
+                             sequence_length = 1e6, recombination_rate = 0, quiet = TRUE))
 })
 
 test_that("consistent naming of summary functions and observed statistics is enforced", {
@@ -134,9 +136,9 @@ It is not possible to simulate non-serialized models in SLiM"
 })
 
 test_that("all model components must be present", {
-  msg <- "A model to simulate from, priors, summary functions, and"
+  msg <- "A model to simulate from, priors, summary functions, and observed"
 
-  model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
+  model_ <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
     p1 <- population("p1", time = 1, N = 1000)
     p2 <- population("p2", time = T_p1_p2, N = 3000, parent = p1)
     p3 <- population("p3", time = T_p2_p3, N = 10000, parent = p2)
@@ -152,9 +154,9 @@ test_that("all model components must be present", {
   }
   pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
   d_df <- ts_divergence(ts, sample_sets = samples, mode = "branch")
-  observed <- list(diversity = pi_df, divergence = d_df)
+  observed_ <- list(diversity = pi_df, divergence = d_df)
 
-  priors <- list(
+  priors_ <- list(
     Ne_p1 ~ runif(10, 10000),
     Ne_p2 ~ runif(10, 10000),
     Ne_p3 ~ runif(10, 10000),
@@ -173,29 +175,34 @@ test_that("all model components must be present", {
     samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
     ts_divergence(ts, sample_sets = samples, mode = "branch")
   }
-  functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+  functions_ <- list(diversity = compute_diversity, divergence = compute_divergence)
 
-  tmp <- model
-  rm(model)
-  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
-  model <- tmp
+  tmp <- model_
+  rm(model_)
+  expect_error(validate_abc(model_, priors, functions, observed, quiet = TRUE,
+                            sequence_length = 1e6, recombination_rate = 0), msg)
+  model_ <- tmp
 
-  tmp <- priors
-  rm(priors)
-  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
-  priors <- tmp
+  tmp <- priors_
+  rm(priors_)
+  expect_error(validate_abc(model, priors_, functions, observed, quiet = TRUE,
+                            sequence_length = 1e6, recombination_rate = 0), msg)
+  priors_ <- tmp
 
-  tmp <- functions
-  rm(functions)
-  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
-  functions <- tmp
+  tmp <- functions_
+  rm(functions_)
+  expect_error(validate_abc(model, priors, functions_, observed, quiet = TRUE,
+                            sequence_length = 1e6, recombination_rate = 0), msg)
+  functions_ <- tmp
 
-  tmp <- observed
-  rm(observed)
-  expect_error(quiet(validate_abc(model, priors, functions, observed), msg))
-  observed <- tmp
+  tmp <- observed_
+  rm(observed_)
+  expect_error(validate_abc(model, priors, functions, observed_, quiet = TRUE,
+                            sequence_length = 1e6, recombination_rate = 0), msg)
+  observed_ <- tmp
 
-  expect_output(validate_abc(model, priors, functions, observed))
+  expect_output(validate_abc(model_, priors_, functions_, observed_,
+                             sequence_length = 1e6, recombination_rate = 0))
 })
 
 test_that("fully customized models must provide data-generating functions", {
