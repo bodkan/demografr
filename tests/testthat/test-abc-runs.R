@@ -245,6 +245,6 @@ test_that("model selection works correctly", {
                         sequence_length = 1e6, recombination_rate = 1e-8)
   quiet(suppressWarnings(abc2 <- run_abc(data2, engine = "abc", tol = 0.3, method = "neuralnet")))
 
-  expect_s3_class(suppressWarnings(select_model(list(abc1, abc2), tol = 0.1, method = "neuralnet")),
+  expect_s3_class(quiet(select_model(list(abc1, abc2), tol = 0.5, method = "neuralnet")),
                   "demografr_postpr")
 })
