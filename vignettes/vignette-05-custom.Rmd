@@ -825,7 +825,8 @@ Let's also validate our customized setup before we unleash the full scale of ABC
 simulations on the problem!
 
 ```{r}
-validate_abc(model, priors, functions, observed)
+validate_abc(model, priors, functions, observed,
+             sequence_length = 1e6, recombination_rate = 0)
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
