@@ -43,7 +43,8 @@ combine_data.demografr_abc_sims <- function(...) {
     observed = runs[[1]]$observed,
     functions = runs[[1]]$functions,
     priors = runs[[1]]$priors,
-    model = runs[[1]]$model
+    model = runs[[1]]$model,
+    model_name = runs[[1]]$model_name
   )
 
   attr(result, "options") <- attr(runs[[1]], "options")

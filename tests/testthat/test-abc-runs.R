@@ -212,7 +212,7 @@ test_that("abc::abc via run_abc() runs correctly", {
   expect_s3_class(abc, "demografr_abc.abc")
 })
 
-test_that("abc predict() works correctly", {
+test_that("posterior predictive simulations work correctly", {
   data <- combine_data(run1, run2, run3)
 
   quiet(suppressWarnings(abc <- run_abc(data, engine = "abc", tol = 0.3, method = "neuralnet")))
@@ -220,4 +220,30 @@ test_that("abc predict() works correctly", {
   expect_error(suppressWarnings(predict(abc)), "The number of samples to generate")
   expect_s3_class(suppressWarnings(predict(abc, samples = 3)), "data.frame")
   expect_true(suppressWarnings(nrow(predict(abc, samples = 3)) == 3))
+})
+
+test_that("model selection works correctly", {
+  data1 <- combine_data(run1, run2, run3)
+  quiet(suppressWarnings(abc1 <- run_abc(data1, engine = "abc", tol = 0.3, method = "neuralnet")))
+
+  model2 <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
+    p1 <- population("p1", time = 1, N = 1000)
+    p2 <- population("p2", time = 2000, N = 3000, parent = p1)
+    p3 <- population("p3", time = 4000, N = 10000, parent = p1)
+    p4 <- population("p4", time = 6000, N = 5000, parent = p3)
+
+    model <- compile_model(
+      populations = list(p1, p2, p3, p4),
+      generation_time = 1,
+      simulation_length = 10000, serialize = FALSE
+    )
+
+    return(model)
+  }
+  data2 <- simulate_abc(model2, priors, functions, observed, iterations = 10,
+                        sequence_length = 1e6, recombination_rate = 1e-8)
+  quiet(suppressWarnings(abc2 <- run_abc(data2, engine = "abc", tol = 0.3, method = "neuralnet")))
+
+  expect_s3_class(suppressWarnings(select_model(list(abc1, abc2), tol = 0.1, method = "neuralnet")),
+                  "demografr_postpr")
 })
