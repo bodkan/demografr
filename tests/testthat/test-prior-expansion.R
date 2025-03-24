@@ -50,7 +50,8 @@ test_that("Nonsensical priors are correctly caught", {
 })
 
 test_that("Normal prior sampling expressions validate correctly", {
-  expect_output(validate_abc(model, individual_priors, functions, observed))
+  expect_output(validate_abc(model, individual_priors, functions, observed,
+                             sequence_length = 1e6, recombination_rate = 0))
 })
 
 templated_priors <- list(
@@ -61,7 +62,8 @@ templated_priors <- list(
 )
 
 test_that("Templated prior sampling expressions validate correctly", {
-  expect_output(validate_abc(model, templated_priors, functions, observed))
+  expect_output(validate_abc(model, templated_priors, functions, observed,
+                             sequence_length = 1e6, recombination_rate = 0))
 })
 
 test_that("expand_fromulas() produces parameters equal to formal arguments of a model", {
