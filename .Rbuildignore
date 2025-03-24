@@ -14,6 +14,8 @@ docs
 paper/*
 Dockerfile
 .dockerignore
+^inst/examples/downstream_.*$
+^inst/examples/custom_.*$
 vignettes/vignette-05-custom.Rmd
 vignettes/vignette-06-diagnostics.Rmd
 vignettes/vignette-07-selection.Rmd
@@ -21,7 +23,3 @@ vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
 vignettes/vignette-10-benchmarking.Rmd
 .Rbuildignore_GitHub
-^inst/examples/downstream_.*$
-inst/examples/custom.py
-inst/examples/custom.slim
-inst/examples/custom_diversity.rds
