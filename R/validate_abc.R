@@ -159,7 +159,7 @@ validate_abc <- function(model, priors, functions, observed,
            call. = FALSE)
     }
 
-    cat(" \u2705\n")
+    # cat(" \u2705\n")
   } else {
     script_contents <- readLines(model)
     script_engine <- if (any(grepl("treeSeqOutput\\(", script_contents))) "SLiM" else "msprime"

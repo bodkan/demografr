@@ -198,7 +198,7 @@ test_that("non-prior model arguments must be specified", {
                  format = "files", data = list(path = path)),
     "The following non-prior model function arguments are missing"
   ))
-  expect_output(
+  expect_silent(
     quiet(validate_abc(
       model, priors, functions, observed, sequence_length = 1e6, recombination_rate = 0,
       model_args = list(origin_pop = "EUR", target_pop = "EUR"),
