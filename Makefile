@@ -8,6 +8,12 @@ version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/
 pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
 
+docs:
+	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::document()'
+	R -e 'pkgdown::build_reference()'
+	R -e 'pkgdown::build_reference_index()'
+	R -e 'pkgdown::build_news()'
 website: $(logo) README.md
 	rename 's/Rmd$$/Rmd_/' vignettes/vignette-{07,08,09,10}-*.Rmd
 	R -e 'devtools::install(upgrade = "never")'
@@ -17,13 +23,9 @@ website: $(logo) README.md
 	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
 	rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_
+test:
+	R -e 'devtools::test()'
 
-docs:
-	R -e 'devtools::install(upgrade = "never")'
-	R -e 'devtools::document()'
-	R -e 'pkgdown::build_reference()'
-	R -e 'pkgdown::build_reference_index()'
-	R -e 'pkgdown::build_news()'
 
 build: $(pkg)
 
@@ -53,7 +55,7 @@ $(pkg): README.md
 	R -e 'devtools::document()'
 	mkdir -p build; cd build; R CMD build --log ../../demografr
 
-README.md: README.Rmd
+README.md: README.Rmd $(logo)
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
 	# restore back useless updates to the non-random figures made by pkgdown
