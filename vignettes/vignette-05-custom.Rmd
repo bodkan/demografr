@@ -354,7 +354,7 @@ Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
 ```{r, eval=!file.exists(abc_path1)}
-abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+abc <- run_abc(data, tol = 0.01, method = "neuralnet")
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path1)}
@@ -431,10 +431,8 @@ but given that our `vcfpi` is a command-line program, we will use the function
 
 
 ```{r}
-compute_diversity_vcf <- function(vcf) {
-  # path to the software (vcfpi is bundled with the demografr package, but
-  # you could of course provide the path to your desired program yourself)
-  program <- system.file("examples/vcfpi", package = "demografr")
+compute_pi_vcf <- function(vcf, program) {
+  # path to the output summary statistic file
   tsv <- tempfile()
 
   # execute the program on the command line using appropriate arguments
@@ -447,7 +445,7 @@ compute_diversity_vcf <- function(vcf) {
   read.table(tsv, header = TRUE)
 }
 
-functions <- list(diversity = compute_diversity_vcf)
+functions <- list(diversity = compute_pi_vcf)
 ```
 
 There's one last thing we need to do -- our summary function `compute_diversity`
