@@ -224,7 +224,8 @@ observed <- list(diversity = observed_diversity)
 
 # compute diversity using 100 chromosomes
 compute_diversity_ts <- function(ts) {
-  ts_diversity(ts, list(pop = seq(0, 99)))
+  samples <- ts$samples()
+  ts_diversity(ts, list(pop = sample(samples, 100)))
 }
 functions <- list(diversity = compute_diversity_ts)
 
