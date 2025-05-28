@@ -432,9 +432,13 @@ but given that our `vcfpi` is a command-line program, we will use the function
 
 
 ```{r}
-compute_pi_vcf <- function(vcf, program) {
+compute_pi_vcf <- function(vcf) {
   # path to the output summary statistic file
   tsv <- tempfile()
+
+  # path to the example command-line utility (in this example we use a built-in toy program
+  # called `vcfpi`, but this could be a path to any other program of your choosing, of course)
+  program <- system.file("examples/vcfpi", package = "demografr")
 
   # execute the program on the command line using appropriate arguments
   system2(program, args = c("--vcf", vcf, "--tsv", tsv))
