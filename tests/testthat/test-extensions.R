@@ -37,7 +37,7 @@ model <- function(s, onset_time, origin_pop, target_pop) {
 
   function (void) add_mutation(void) {
       // sample one target carrier of the new mutation...
-      target = sample(population(origin_pop).genomes, 1);
+      target = sample(population(origin_pop).haplosomes, 1);
       // ... and add the mutation in the middle of it
       mut = target.addNewDrawnMutation(m1, position = asInteger(SEQUENCE_LENGTH / 2));
 
@@ -72,9 +72,9 @@ model <- function(s, onset_time, origin_pop, target_pop) {
       freq_origin = "NA";
       freq_target = "NA";
       if (population(origin_pop, check = T))
-        freq_origin = population(origin_pop).genomes.mutationFrequenciesInGenomes();
+        freq_origin = population(origin_pop).haplosomes.mutationFrequenciesInHaplosomes();
       if (population(target_pop, check = T))
-        freq_target = population(target_pop).genomes.mutationFrequenciesInGenomes();
+        freq_target = population(target_pop).haplosomes.mutationFrequenciesInHaplosomes();
 
       writeFile(origin_file, model_time(community.tick) + "\t" + freq_origin, append = T);
       writeFile(target_file, model_time(community.tick) + "\t" + freq_target, append = T);

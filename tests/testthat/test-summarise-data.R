@@ -26,11 +26,11 @@ SIMULATION_END late() {
 
     // save summary statistics values
     writeFile(stats_file, "het_pop1\thet_pop2\tfst");
-    het_pop1 = calcHeterozygosity(population("pop1").genomes);
-    het_pop2 = calcHeterozygosity(population("pop2").genomes);
+    het_pop1 = calcHeterozygosity(population("pop1").haplosomes);
+    het_pop2 = calcHeterozygosity(population("pop2").haplosomes);
     fst = calcFST(
-        population("pop1").genomes,
-        population("pop2").genomes
+        population("pop1").haplosomes,
+        population("pop2").haplosomes
     );
     writeFile(stats_file, het_pop1 + "\t" + het_pop2 + "\t" + fst, append = T);
 }
