@@ -14,6 +14,7 @@ docs:
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
+
 website: $(logo) README.md
 	rename 's/Rmd$$/Rmd_/' vignettes/vignette-{07,08,09,10}-*.Rmd
 	R -e 'devtools::install(upgrade = "never")'
