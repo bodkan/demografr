@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc_path <- system.file("examples/basics_abc.rds", package = "demografr")
+abc_path <- here::here("inst/examples/basics_abc.rds")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -387,15 +387,15 @@ that's otherwise necessary. As such, all parameters of the function `abc()` can
 be provided to `run_abc()`, which will then pass them on appropriately.
 
 
-```{r, eval=!file.exists(here::here("inst/examples/basics_abc.rds")), echo=FALSE}
+```{r, eval=!file.exists(abc_path)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, eval=!file.exists(here::here("inst/examples/basics_abc.rds")), echo=FALSE}
-saveRDS(abc, here::here("inst/examples/basics_abc.rds"))
+```{r, eval=!file.exists(abc_path), echo=FALSE}
+saveRDS(abc, abc_path)
 ```
 
-```{r, eval=file.exists(abc_path), echo=FALSE}
+```{r, eval=!file.exists(abc_path), echo=FALSE}
 abc <- readRDS(abc_path)
 ```
 
@@ -421,7 +421,7 @@ predictions <- predict(abc, samples = 1000)
 saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
 ```
 
-```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds"), echo=FALSE}
+```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
 predictions <- readRDS(here::here("inst/examples/basics_predictions.rds"))
 ```
 
