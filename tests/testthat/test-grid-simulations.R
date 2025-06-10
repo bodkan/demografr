@@ -40,11 +40,17 @@ functions <- list(diversity = compute_diversity, divergence = compute_divergence
 test_that("broken grid leads to an expected error (strict = TRUE)", {
   grid <- data.frame(
     Ne_A = 1, Ne_B = 1, Ne_C = 1, Ne_D = 1,
-    T_a = c(10, 20, 30), T_b = c(10, 20, 30), T_c = c(10, 20, 30)
+    T_1 = c(10, 20, 30), T_2 = c(10, 20, 30), T_3 = c(10, 20, 30)
   )
   expect_error(
-    simulate_grid(model, grid, functions, replicates = 1,
-                  sequence_length = 1e5, recombination_rate = 0, strict = TRUE),
+    # A new release of future_apply appears to have changed handling of the case
+    # of some iterations failing, which now results in a warning:
+    #    "Warning: Caught simpleError. Canceling all iterations ..."
+    # This slightly messes up our own error handling because we don't need
+    # this warning. In this test, let's therefore silence this warning and check
+    # that our error is produced too.
+    suppressWarnings(simulate_grid(model, grid, functions, replicates = 1,
+                  sequence_length = 1e5, recombination_rate = 0, strict = TRUE)),
     "An unexpected error was raised"
   )
 })
@@ -55,8 +61,8 @@ test_that("inconsistent parameter grid leads to an expected error (strict = TRUE
     T_1 = 30, T_2 = 20, T_3 = 10
   )
   expect_error(
-    simulate_grid(model, grid, functions, replicates = 1,
-                  sequence_length = 1e5, recombination_rate = 0, strict = TRUE),
+    suppressWarnings(simulate_grid(model, grid, functions, replicates = 1,
+                     sequence_length = 1e5, recombination_rate = 0, strict = TRUE)),
     "The model implies forward time direction but the specified split"
   )
 })
@@ -79,8 +85,9 @@ test_that("partially invalid grids only retain valid simulations", {
     T_1 = c(10, 20, 30, 10), T_2 = c(10, 20, 30, 20), T_3 = c(10, 20, 30, 30)
   )
   expect_s3_class(
-    suppressMessages(res <- simulate_grid(model, grid, functions, replicates = 1,
-                              sequence_length = 1e5, recombination_rate = 0, strict = FALSE)),
+    suppressMessages(
+      res <- simulate_grid(model, grid, functions, replicates = 1,
+                           sequence_length = 1e5, recombination_rate = 0, strict = FALSE)),
     "data.frame"
   )
   expect_true(nrow(res) == 1)
