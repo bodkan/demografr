@@ -66,11 +66,11 @@ observed_f4 <- rbind(
   # ts_f4(ts, A, D, B, C)
 )
 
-write.table(observed_diversity, file = system.file("examples/basics_diversity.tsv", package = "demografr"),
+write.table(observed_diversity, file = here::here("inst/examples/basics_diversity.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_divergence, file = system.file("examples/basics_divergence.tsv", package = "demografr"),
+write.table(observed_divergence, file = here::here("inst/examples/basics_divergence.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_f4, file = system.file("examples/basics_f4.tsv", package = "demografr"),
+write.table(observed_f4, file = here::here("inst/examples/basics_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
