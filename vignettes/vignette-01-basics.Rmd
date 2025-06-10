@@ -411,14 +411,14 @@ the `run_abc()` function (containing, among other things, the information about
 the inferred posteriors), and the number of draws to take from the
 posterior distribution of the parameters:
 
-```{r, eval=!file.exists(system.file("examples/basics_predictions.rds", package = "demografr"))}
+```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds"))}
 # because we set up a parallelization plan() above, the predictions are
 # computed in parallel across all available CPUs
 predictions <- predict(abc, samples = 1000)
 ```
 
-```{r, eval=!file.exists(system.file("examples/basics_predictions.rds", package = "demografr")), echo=FALSE}
-saveRDS(predictions, file = system.file("examples/basics_predictions.rds"))
+```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
+saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
 ```
 
 ```{r, eval=file.exists(system.file("examples/basics_predictions.rds", package = "demografr")), echo=FALSE}
