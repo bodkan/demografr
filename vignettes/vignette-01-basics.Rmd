@@ -348,8 +348,8 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path)}
-saveRDS(tdelta, system.file("examples/basics_tdelta.rds", package = "demografr"))
-saveRDS(ncores, system.file("examples/basics_ncores.rds", package = "demografr"))
+saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path)}
@@ -387,12 +387,12 @@ that's otherwise necessary. As such, all parameters of the function `abc()` can
 be provided to `run_abc()`, which will then pass them on appropriately.
 
 
-```{r, eval=!file.exists(abc_path), echo=FALSE}
+```{r, eval=!file.exists(here::here("inst/examples/basics_abc.rds")), echo=FALSE}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, eval=!file.exists(abc_path), echo=FALSE}
-saveRDS(abc, abc_path)
+```{r, eval=!file.exists(here::here("inst/examples/basics_abc.rds")), echo=FALSE}
+saveRDS(abc, here::here("inst/examples/basics_abc.rds"))
 ```
 
 ```{r, eval=file.exists(abc_path), echo=FALSE}
