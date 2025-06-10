@@ -1,7 +1,27 @@
 {
   "R": {
-    "Version": "4.4.3",
+    "Version": "4.5.0",
     "Repositories": [
+      {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.21/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.21/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.21/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.21/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.21/books"
+      },
       {
         "Name": "CRAN",
         "URL": "https://cloud.r-project.org"
@@ -9,7 +29,7 @@
     ]
   },
   "Bioconductor": {
-    "Version": "3.20"
+    "Version": "3.21"
   },
   "Packages": {
     "MASS": {
@@ -1690,9 +1710,9 @@
     },
     "lattice": {
       "Package": "lattice",
-      "Version": "0.22-6",
+      "Version": "0.22-7",
       "Source": "Repository",
-      "Date": "2024-03-20",
+      "Date": "2025-03-31",
       "Priority": "recommended",
       "Title": "Trellis Graphics for R",
       "Authors@R": "c(person(\"Deepayan\", \"Sarkar\", role = c(\"aut\", \"cre\"), email = \"deepayan.sarkar@r-project.org\", comment = c(ORCID = \"0000-0003-4107-1553\")), person(\"Felix\", \"Andrews\", role = \"ctb\"), person(\"Kevin\", \"Wright\", role = \"ctb\", comment = \"documentation\"), person(\"Neil\", \"Klepeis\", role = \"ctb\"), person(\"Johan\", \"Larsson\", role = \"ctb\", comment = \"miscellaneous improvements\"), person(\"Zhijian (Jason)\", \"Wen\", role = \"cph\", comment = \"filled contour code\"), person(\"Paul\", \"Murrell\", role = \"ctb\", email = \"paul@stat.auckland.ac.nz\"), person(\"Stefan\", \"Eng\", role = \"ctb\", comment = \"violin plot improvements\"), person(\"Achim\", \"Zeileis\", role = \"ctb\", comment = \"modern colors\"), person(\"Alexandre\", \"Courtiol\", role = \"ctb\", comment = \"generics for larrows, lpolygon, lrect and lsegments\") )",
@@ -1928,10 +1948,9 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.9-1",
+      "Version": "1.9-3",
       "Source": "Repository",
-      "Author": "Simon Wood <simon.wood@r-project.org>",
-      "Maintainer": "Simon Wood <simon.wood@r-project.org>",
+      "Authors@R": "person(given = \"Simon\", family = \"Wood\", role = c(\"aut\", \"cre\"), email = \"simon.wood@r-project.org\")",
       "Title": "Mixed GAM Computation Vehicle with Automatic Smoothness Estimation",
       "Description": "Generalized additive (mixed) models, some of their extensions and  other generalized ridge regression with multiple smoothing  parameter estimation by (Restricted) Marginal Likelihood,  Generalized Cross Validation and similar, or using iterated  nested Laplace approximation for fully Bayesian inference. See  Wood (2017) <doi:10.1201/9781315370279> for an overview.  Includes a gam() function, a wide variety of smoothers, 'JAGS'  support and distributions beyond the exponential family.",
       "Priority": "recommended",
@@ -1956,6 +1975,8 @@
       "ByteCompile": "yes",
       "License": "GPL (>= 2)",
       "NeedsCompilation": "yes",
+      "Author": "Simon Wood [aut, cre]",
+      "Maintainer": "Simon Wood <simon.wood@r-project.org>",
       "Repository": "CRAN"
     },
     "mime": {
@@ -1981,9 +2002,9 @@
     },
     "nlme": {
       "Package": "nlme",
-      "Version": "3.1-167",
+      "Version": "3.1-168",
       "Source": "Repository",
-      "Date": "2025-01-27",
+      "Date": "2025-03-31",
       "Priority": "recommended",
       "Title": "Linear and Nonlinear Mixed Effects Models",
       "Authors@R": "c(person(\"José\", \"Pinheiro\", role = \"aut\", comment = \"S version\"), person(\"Douglas\", \"Bates\", role = \"aut\", comment = \"up to 2007\"), person(\"Saikat\", \"DebRoy\", role = \"ctb\", comment = \"up to 2002\"), person(\"Deepayan\", \"Sarkar\", role = \"ctb\", comment = \"up to 2005\"), person(\"EISPACK authors\", role = \"ctb\", comment = \"src/rs.f\"), person(\"Siem\", \"Heisterkamp\", role = \"ctb\", comment = \"Author fixed sigma\"), person(\"Bert\", \"Van Willigen\",role = \"ctb\", comment = \"Programmer fixed sigma\"), person(\"Johannes\", \"Ranke\", role = \"ctb\", comment = \"varConstProp()\"), person(\"R Core Team\", email = \"R-core@R-project.org\", role = c(\"aut\", \"cre\"), comment = c(ROR = \"02zz1nj61\")))",
@@ -2908,15 +2929,14 @@
       "URL": "https://github.com/bodkan/slendr",
       "BugReports": "https://github.com/bodkan/slendr/issues",
       "Config/testthat/edition": "3",
+      "Author": "Martin Petr [aut, cre] (ORCID: <https://orcid.org/0000-0003-4879-8421>)",
+      "Maintainer": "Martin Petr <contact@bodkan.net>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteRepo": "slendr",
       "RemoteUsername": "bodkan",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "d60928efd46bbdc0921286e432e1fb4dc8517948",
-      "NeedsCompilation": "no",
-      "Author": "Martin Petr [aut, cre] (<https://orcid.org/0000-0003-4879-8421>)",
-      "Maintainer": "Martin Petr <contact@bodkan.net>"
+      "RemoteRepo": "slendr",
+      "RemoteRef": "main",
+      "RemoteSha": "d60928efd46bbdc0921286e432e1fb4dc8517948"
     },
     "sourcetools": {
       "Package": "sourcetools",

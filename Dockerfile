@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.4.2
+FROM rocker/rstudio:4.5.0
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 

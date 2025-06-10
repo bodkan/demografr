@@ -24,6 +24,7 @@ website: $(logo) README.md
 	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
 	#rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_
+
 test:
 	R -e 'devtools::test()'
 
@@ -44,9 +45,6 @@ winold: README.md
 
 clean:
 	rm -rf build
-
-test:
-	R -e 'devtools::test()'
 
 $(pkg): README.md
 	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
