@@ -1,20 +1,22 @@
-skip_if(!slendr::check_dependencies(python = TRUE))
-slendr::init_env(quiet = TRUE)
+skip_if(!check_dependencies(python = TRUE))
+
+library(slendr)
+init_env(quiet = TRUE)
 
 model <- function(N_a, N_b, T_a1, T_a2, T_a3, T_a4, T_a5, T_b1, T_b2, T_b3, T_b4, T_b5) {
-  a1 <- slendr::population("a1", time = T_a1, N = N_a)
-  a2 <- slendr::population("a2", time = T_a2, N = N_a, parent = a1)
-  a3 <- slendr::population("a3", time = T_a3, N = N_a, parent = a1)
-  a4 <- slendr::population("a4", time = T_a4, N = N_a, parent = a1)
-  a5 <- slendr::population("a5", time = T_a5, N = N_a, parent = a1)
+  a1 <- population("a1", time = T_a1, N = N_a)
+  a2 <- population("a2", time = T_a2, N = N_a, parent = a1)
+  a3 <- population("a3", time = T_a3, N = N_a, parent = a1)
+  a4 <- population("a4", time = T_a4, N = N_a, parent = a1)
+  a5 <- population("a5", time = T_a5, N = N_a, parent = a1)
 
-  b1 <- slendr::population("b1", time = T_b1, N = N_b, parent = a1)
-  b2 <- slendr::population("b2", time = T_b2, N = N_b, parent = b1)
-  b3 <- slendr::population("b3", time = T_b3, N = N_b, parent = b1)
-  b4 <- slendr::population("b4", time = T_b4, N = N_b, parent = b1)
-  b5 <- slendr::population("b5", time = T_b5, N = N_b, parent = b1)
+  b1 <- population("b1", time = T_b1, N = N_b, parent = a1)
+  b2 <- population("b2", time = T_b2, N = N_b, parent = b1)
+  b3 <- population("b3", time = T_b3, N = N_b, parent = b1)
+  b4 <- population("b4", time = T_b4, N = N_b, parent = b1)
+  b5 <- population("b5", time = T_b5, N = N_b, parent = b1)
 
-  model <- slendr::compile_model(
+  model <- compile_model(
     list(a1, a2, a3, a4, a5, b1, b2, b3, b4, b5),
     generation_time = 30, direction = "backward")
 
@@ -39,7 +41,7 @@ individual_priors <- list(
 
 # generate fake setup data for a testing ABC
 ts <- simulate_model(model, individual_priors, sequence_length = 1, recombination_rate = 0)
-functions <- list(diversity = function(ts) { slendr::ts_diversity(ts, sample_sets = 0:10) })
+functions <- list(diversity = function(ts) { ts_diversity(ts, sample_sets = 0:10) })
 observed <- list(diversity = functions$diversity(ts))
 
 test_that("Nonsensical priors are correctly caught", {
@@ -88,15 +90,15 @@ test_that("With the same seed, both sets of priors give the same tree sequence",
   ts3 <- simulate_model(model, templated_priors, sequence_length = 1, recombination_rate = 0,
                         engine_args = list(random_seed = 42), mutation_rate = 1e-8)
 
-  expect_equal(slendr::ts_table(ts1, "nodes"),       slendr::ts_table(ts2, "nodes"))
-  expect_equal(slendr::ts_table(ts1, "edges"),       slendr::ts_table(ts2, "edges"))
-  expect_equal(slendr::ts_table(ts1, "individuals"), slendr::ts_table(ts2, "individuals"))
-  expect_equal(slendr::ts_table(ts1, "mutations"),   slendr::ts_table(ts2, "mutations"))
+  expect_equal(ts_table(ts1, "nodes"),       ts_table(ts2, "nodes"))
+  expect_equal(ts_table(ts1, "edges"),       ts_table(ts2, "edges"))
+  expect_equal(ts_table(ts1, "individuals"), ts_table(ts2, "individuals"))
+  expect_equal(ts_table(ts1, "mutations"),   ts_table(ts2, "mutations"))
 
-  expect_equal(slendr::ts_table(ts2, "edges"),       slendr::ts_table(ts3, "edges"))
-  expect_equal(slendr::ts_table(ts2, "edges"),       slendr::ts_table(ts3, "edges"))
-  expect_equal(slendr::ts_table(ts2, "individuals"), slendr::ts_table(ts3, "individuals"))
-  expect_equal(slendr::ts_table(ts2, "mutations"),   slendr::ts_table(ts3, "mutations"))
+  expect_equal(ts_table(ts2, "edges"),       ts_table(ts3, "edges"))
+  expect_equal(ts_table(ts2, "edges"),       ts_table(ts3, "edges"))
+  expect_equal(ts_table(ts2, "individuals"), ts_table(ts3, "individuals"))
+  expect_equal(ts_table(ts2, "mutations"),   ts_table(ts3, "mutations"))
 })
 
 test_that("expand_formulas() catches multiple template matches", {
@@ -117,7 +119,7 @@ test_that("Sampling from empty prior list is correctly caught", {
   broken_prior <- list()
   expect_error(sample_prior(broken_prior), "A prior expression must take a form of an R formula")
   expect_error(simulate_model(model, broken_prior),
-               "A model generating function and parameters must be provided")
+               "A model and model parameters \\(or priors\\) must be provided")
 })
 
 test_that("Catch attempts at templating of vectorized priors", {
