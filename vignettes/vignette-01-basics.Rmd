@@ -421,8 +421,8 @@ predictions <- predict(abc, samples = 1000)
 saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
 ```
 
-```{r, eval=file.exists(system.file("examples/basics_predictions.rds", package = "demografr")), echo=FALSE}
-predictions <- readRDS(system.file("examples/basics_predictions.rds", package = "demografr"))
+```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds"), echo=FALSE}
+predictions <- readRDS(here::here("inst/examples/basics_predictions.rds"))
 ```
 
 If we take a closer look at the produced result, we see that it's a data frame
