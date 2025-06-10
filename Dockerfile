@@ -82,11 +82,11 @@ ENV R_INSTALL_STAGED=FALSE
 ENV IN_CONTAINER=TRUE
 
 # do this when first setting up the container to create an renv.lock file:
-#   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.0.tar.gz"
-#   wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.0.tar.gz -O $RENV_BOOTSTRAP_TARBALL
+#   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.4.tar.gz"
+#   wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.4.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   export GITHUB_PAT=''
-#   renv::init(bare = TRUE, bioconductor = "3.20")
+#   renv::init(bare = TRUE, bioconductor = "3.21")
 #   options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   renv::snapshot(dev = TRUE)
 
