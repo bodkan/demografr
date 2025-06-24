@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc_path <- system.file("examples/basics_abc.rds", package = "demografr")
+abc_path <- here::here("inst/examples/basics_abc.rds")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -66,11 +66,11 @@ observed_f4 <- rbind(
   # ts_f4(ts, A, D, B, C)
 )
 
-write.table(observed_diversity, file = system.file("examples/basics_diversity.tsv", package = "demografr"),
+write.table(observed_diversity, file = here::here("inst/examples/basics_diversity.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_divergence, file = system.file("examples/basics_divergence.tsv", package = "demografr"),
+write.table(observed_divergence, file = here::here("inst/examples/basics_divergence.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_f4, file = system.file("examples/basics_f4.tsv", package = "demografr"),
+write.table(observed_f4, file = here::here("inst/examples/basics_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
@@ -348,8 +348,8 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path)}
-saveRDS(tdelta, system.file("examples/basics_tdelta.rds", package = "demografr"))
-saveRDS(ncores, system.file("examples/basics_ncores.rds", package = "demografr"))
+saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path)}
@@ -387,7 +387,7 @@ that's otherwise necessary. As such, all parameters of the function `abc()` can
 be provided to `run_abc()`, which will then pass them on appropriately.
 
 
-```{r, eval=!file.exists(abc_path), echo=FALSE}
+```{r, eval=!file.exists(abc_path)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
@@ -395,7 +395,7 @@ abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 saveRDS(abc, abc_path)
 ```
 
-```{r, eval=file.exists(abc_path), echo=FALSE}
+```{r, eval=!file.exists(abc_path), echo=FALSE}
 abc <- readRDS(abc_path)
 ```
 
@@ -411,18 +411,18 @@ the `run_abc()` function (containing, among other things, the information about
 the inferred posteriors), and the number of draws to take from the
 posterior distribution of the parameters:
 
-```{r, eval=!file.exists(system.file("examples/basics_predictions.rds", package = "demografr"))}
+```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds"))}
 # because we set up a parallelization plan() above, the predictions are
 # computed in parallel across all available CPUs
 predictions <- predict(abc, samples = 1000)
 ```
 
-```{r, eval=!file.exists(system.file("examples/basics_predictions.rds", package = "demografr")), echo=FALSE}
-saveRDS(predictions, file = system.file("examples/basics_predictions.rds"))
+```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
+saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
 ```
 
-```{r, eval=file.exists(system.file("examples/basics_predictions.rds", package = "demografr")), echo=FALSE}
-predictions <- readRDS(system.file("examples/basics_predictions.rds", package = "demografr"))
+```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
+predictions <- readRDS(here::here("inst/examples/basics_predictions.rds"))
 ```
 
 If we take a closer look at the produced result, we see that it's a data frame

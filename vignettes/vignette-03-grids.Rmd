@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-data_path <- system.file("examples/grid_data.rds", package = "demografr")
+data_path <- here::here("inst/examples/grid_data.rds")
 ```
 
 ⚠️⚠️⚠️
@@ -323,13 +323,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
-saveRDS(tdelta, system.file("examples/grid_tdelta.rds", package = "demografr"))
-saveRDS(ncores, system.file("examples/grid_ncores.rds", package = "demografr"))
+saveRDS(tdelta, here::here("inst/examples/grid_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-tdelta <- readRDS(system.file("examples/grid_tdelta.rds", package = "demografr"))
-ncores <- readRDS(system.file("examples/grid_ncores.rds", package = "demografr"))
+tdelta <- readRDS(here::here("inst/examples/grid_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
