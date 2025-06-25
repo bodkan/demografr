@@ -20,11 +20,11 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-path_observed <- system.file("examples/custom_diversity.rds", package = "demografr")
-abc_path1 <- system.file("examples/custom_abc1.rds", package = "demografr")
-abc_path2 <- system.file("examples/custom_abc2.rds", package = "demografr")
-abc_path3 <- system.file("examples/custom_abc3.rds", package = "demografr")
-abc_path4 <- system.file("examples/custom_abc4.rds", package = "demografr")
+path_observed <- here::here("examples/custom_diversity.rds")
+abc_path1 <- here::here("examples/custom_abc1.rds")
+abc_path2 <- here::here("examples/custom_abc2.rds")
+abc_path3 <- here::here("examples/custom_abc3.rds")
+abc_path4 <- here::here("examples/custom_abc4.rds")
 ```
 
 ⚠️⚠️⚠️
@@ -332,13 +332,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path1)}
-saveRDS(tdelta, system.file("examples/custom_tdelta1.rds", package = "demografr"))
-saveRDS(ncores, system.file("examples/custom_ncores1.rds", package = "demografr"))
+saveRDS(tdelta, here::here("examples/custom_tdelta1.rds"))
+saveRDS(ncores, here::here("examples/custom_ncores1.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path1)}
-tdelta <- readRDS(system.file("examples/custom_tdelta1.rds", package = "demografr"))
-ncores <- readRDS(system.file("examples/custom_ncores1.rds", package = "demografr"))
+tdelta <- readRDS(here::here("examples/custom_tdelta1.rds"))
+ncores <- readRDS(here::here("examples/custom_ncores1.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
