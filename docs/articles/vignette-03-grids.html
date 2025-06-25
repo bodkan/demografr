@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parameter grid simulations • demografr</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="../favicon-48x48.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -40,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">demografr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -158,7 +157,7 @@ statistic) showed the following pattern of Neanderthal ancestry
 significantly declining over time (figure from <a href="https://www.nature.com/articles/nature17993" class="external-link">Fu <em>et al.</em>,
 Nature 2016</a>)</li>
 </ol>
-<p><img src="images%2Ffu_2016.png" style="width:80.0%"></p>
+<p><img src="images/fu_2016.png" style="width:80.0%"></p>
 <ol start="2" style="list-style-type: decimal">
 <li>An alternative statistic (called “direct
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>-ratio”
@@ -168,7 +167,7 @@ statistic, shown in the figure below in solid line in contrast to the
 as dashed line) did not find any significant decline at all as shown in
 this figure from Petr <em>et al.</em> (PNAS 2018).</li>
 </ol>
-<p><img src="images%2Fpetr_2018a.png" style="width:80.0%"></p>
+<p><img src="images/petr_2018a.png" style="width:80.0%"></p>
 <p><strong>The question was, why are these two measures of Neanderthal
 ancestry leading to different conclusions?</strong> Could some
 violations of their assumptions (such as an unaccounted-for gene-flow
@@ -207,29 +206,29 @@ for the same reason):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">rate_ea</span>, <span class="va">rate_aa</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># create populations</span></span>
-<span>  <span class="va">chimp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"chimp"</span>, time <span class="op">=</span> <span class="fl">7e6</span>,   N <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span>
-<span>  <span class="va">anc</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"anc"</span>,   time <span class="op">=</span> <span class="fl">6e6</span>,   N <span class="op">=</span> <span class="fl">10000</span>, parent <span class="op">=</span> <span class="va">chimp</span><span class="op">)</span></span>
-<span>  <span class="va">nea</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"nea"</span>,   time <span class="op">=</span> <span class="fl">600e3</span>, N <span class="op">=</span> <span class="fl">2000</span>,  parent <span class="op">=</span> <span class="va">anc</span><span class="op">)</span></span>
-<span>  <span class="va">afr1</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"afr1"</span>,  time <span class="op">=</span> <span class="fl">600e3</span>, N <span class="op">=</span> <span class="fl">15000</span>, parent <span class="op">=</span> <span class="va">anc</span><span class="op">)</span></span>
-<span>  <span class="va">afr2</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"afr2"</span>,  time <span class="op">=</span> <span class="fl">150e3</span>, N <span class="op">=</span> <span class="fl">15000</span>, parent <span class="op">=</span> <span class="va">afr1</span><span class="op">)</span></span>
-<span>  <span class="va">eur</span>   <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"eur"</span>,   time <span class="op">=</span> <span class="fl">75e3</span>,  N <span class="op">=</span> <span class="fl">5000</span>,  parent <span class="op">=</span> <span class="va">afr2</span><span class="op">)</span></span>
+<span>  <span class="va">chimp</span> <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"chimp"</span>, time <span class="op">=</span> <span class="fl">7e6</span>,   N <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span>
+<span>  <span class="va">anc</span>   <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"anc"</span>,   time <span class="op">=</span> <span class="fl">6e6</span>,   N <span class="op">=</span> <span class="fl">10000</span>, parent <span class="op">=</span> <span class="va">chimp</span><span class="op">)</span></span>
+<span>  <span class="va">nea</span>   <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"nea"</span>,   time <span class="op">=</span> <span class="fl">600e3</span>, N <span class="op">=</span> <span class="fl">2000</span>,  parent <span class="op">=</span> <span class="va">anc</span><span class="op">)</span></span>
+<span>  <span class="va">afr1</span>  <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"afr1"</span>,  time <span class="op">=</span> <span class="fl">600e3</span>, N <span class="op">=</span> <span class="fl">15000</span>, parent <span class="op">=</span> <span class="va">anc</span><span class="op">)</span></span>
+<span>  <span class="va">afr2</span>  <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"afr2"</span>,  time <span class="op">=</span> <span class="fl">150e3</span>, N <span class="op">=</span> <span class="fl">15000</span>, parent <span class="op">=</span> <span class="va">afr1</span><span class="op">)</span></span>
+<span>  <span class="va">eur</span>   <span class="op">&lt;-</span> <span class="fu">population</span><span class="op">(</span><span class="st">"eur"</span>,   time <span class="op">=</span> <span class="fl">75e3</span>,  N <span class="op">=</span> <span class="fl">5000</span>,  parent <span class="op">=</span> <span class="va">afr2</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># define gene-flow events</span></span>
 <span>  <span class="va">gf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="co"># back flow from Eurasia into Africa -- one parameter of interest</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/gene_flow.html" class="external-link">gene_flow</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">eur</span>, to <span class="op">=</span> <span class="va">afr1</span>, start <span class="op">=</span> <span class="fl">5e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_ea</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/gene_flow.html" class="external-link">gene_flow</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">eur</span>, to <span class="op">=</span> <span class="va">afr2</span>, start <span class="op">=</span> <span class="fl">5e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_ea</span><span class="op">)</span>,</span>
+<span>    <span class="fu">gene_flow</span><span class="op">(</span>from <span class="op">=</span> <span class="va">eur</span>, to <span class="op">=</span> <span class="va">afr1</span>, start <span class="op">=</span> <span class="fl">5e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_ea</span><span class="op">)</span>,</span>
+<span>    <span class="fu">gene_flow</span><span class="op">(</span>from <span class="op">=</span> <span class="va">eur</span>, to <span class="op">=</span> <span class="va">afr2</span>, start <span class="op">=</span> <span class="fl">5e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_ea</span><span class="op">)</span>,</span>
 <span></span>
 <span>    <span class="co"># gene flow within Africa -- another parameter of interest</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/gene_flow.html" class="external-link">gene_flow</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">afr1</span>, to <span class="op">=</span> <span class="va">afr2</span>, start <span class="op">=</span> <span class="fl">50e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_aa</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/gene_flow.html" class="external-link">gene_flow</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">afr2</span>, to <span class="op">=</span> <span class="va">afr1</span>, start <span class="op">=</span> <span class="fl">50e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_aa</span><span class="op">)</span>,</span>
+<span>    <span class="fu">gene_flow</span><span class="op">(</span>from <span class="op">=</span> <span class="va">afr1</span>, to <span class="op">=</span> <span class="va">afr2</span>, start <span class="op">=</span> <span class="fl">50e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_aa</span><span class="op">)</span>,</span>
+<span>    <span class="fu">gene_flow</span><span class="op">(</span>from <span class="op">=</span> <span class="va">afr2</span>, to <span class="op">=</span> <span class="va">afr1</span>, start <span class="op">=</span> <span class="fl">50e3</span>, end <span class="op">=</span> <span class="fl">0</span>, rate <span class="op">=</span> <span class="va">rate_aa</span><span class="op">)</span>,</span>
 <span></span>
 <span>    <span class="co"># Neanderthal introgression (fixed to 3%)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/gene_flow.html" class="external-link">gene_flow</a></span><span class="op">(</span>from <span class="op">=</span> <span class="va">nea</span>, to <span class="op">=</span> <span class="va">eur</span>, start <span class="op">=</span> <span class="fl">60e3</span>, end <span class="op">=</span> <span class="fl">50e3</span>, rate <span class="op">=</span> <span class="fl">0.03</span><span class="op">)</span></span>
+<span>    <span class="fu">gene_flow</span><span class="op">(</span>from <span class="op">=</span> <span class="va">nea</span>, to <span class="op">=</span> <span class="va">eur</span>, start <span class="op">=</span> <span class="fl">60e3</span>, end <span class="op">=</span> <span class="fl">50e3</span>, rate <span class="op">=</span> <span class="fl">0.03</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="co"># generate a slendr model</span></span>
-<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/compile_model.html" class="external-link">compile_model</a></span><span class="op">(</span></span>
+<span>  <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">compile_model</span><span class="op">(</span></span>
 <span>    populations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">chimp</span>, <span class="va">anc</span>, <span class="va">nea</span>, <span class="va">afr1</span>, <span class="va">afr2</span>, <span class="va">eur</span><span class="op">)</span>, gene_flow <span class="op">=</span> <span class="va">gf</span>,</span>
 <span>    generation_time <span class="op">=</span> <span class="fl">30</span>, serialize <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span></span>
@@ -237,13 +236,13 @@ for the same reason):</p>
 <span>  <span class="co"># specify sampling events</span></span>
 <span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>    <span class="co"># Altai (70 kya) and Vindija (40 kya) Neanderthals</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/schedule_sampling.html" class="external-link">schedule_sampling</a></span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70e3</span>, <span class="fl">40e3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nea</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">schedule_sampling</span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">70e3</span>, <span class="fl">40e3</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">nea</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="co"># Europeans from 40 kya to the present</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/schedule_sampling.html" class="external-link">schedule_sampling</a></span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">40000</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">2000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">eur</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">schedule_sampling</span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">40000</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">2000</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">eur</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="co"># two African populations</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/schedule_sampling.html" class="external-link">schedule_sampling</a></span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">afr1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">afr2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">schedule_sampling</span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">afr1</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">afr2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    <span class="co"># Chimpanzee outgroup</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/schedule_sampling.html" class="external-link">schedule_sampling</a></span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">chimp</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">schedule_sampling</span><span class="op">(</span><span class="va">model</span>, times <span class="op">=</span> <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">chimp</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">samples</span><span class="op">)</span><span class="op">)</span></span>
@@ -255,8 +254,8 @@ visualization test):</p>
 <code class="sourceCode R"><span><span class="va">test_model</span> <span class="op">&lt;-</span> <span class="fu">model</span><span class="op">(</span>rate_ea <span class="op">=</span> <span class="fl">0.42</span>, rate_aa <span class="op">=</span> <span class="fl">0.42</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu">plot_grid</span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/plot_model.html" class="external-link">plot_model</a></span><span class="op">(</span><span class="va">test_model</span>, gene_flow <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/plot_model.html" class="external-link">plot_model</a></span><span class="op">(</span><span class="va">test_model</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, gene_flow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="fu">plot_model</span><span class="op">(</span><span class="va">test_model</span>, gene_flow <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  <span class="fu">plot_model</span><span class="op">(</span><span class="va">test_model</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, gene_flow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-03-grids_files/figure-html/plot_model-1.png" width="640" style="display: block; margin: auto;"></p>
 <p>The model looks OK, so in the next step we define summary statistics
@@ -301,14 +300,14 @@ above):</p>
 <span><span class="co"># returning its data frame output as it is</span></span>
 <span><span class="va">indirect</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"eur_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">21</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4ratio</a></span><span class="op">(</span><span class="va">ts</span>, X <span class="op">=</span> <span class="va">X</span>, A <span class="op">=</span> <span class="st">"afr1_1"</span>, B <span class="op">=</span> <span class="st">"afr2_1"</span>, C <span class="op">=</span> <span class="st">"nea_2"</span>, O <span class="op">=</span> <span class="st">"chimp_1"</span><span class="op">)</span></span>
+<span>  <span class="fu">ts_f4ratio</span><span class="op">(</span><span class="va">ts</span>, X <span class="op">=</span> <span class="va">X</span>, A <span class="op">=</span> <span class="st">"afr1_1"</span>, B <span class="op">=</span> <span class="st">"afr2_1"</span>, C <span class="op">=</span> <span class="st">"nea_2"</span>, O <span class="op">=</span> <span class="st">"chimp_1"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># compute the "direct" f4-ratio statistic via slendr/tskit function ts_f4ratio,</span></span>
 <span><span class="co"># returning its data frame output as it is</span></span>
 <span><span class="va">direct</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"eur_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">21</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_f4ratio.html" class="external-link">ts_f4ratio</a></span><span class="op">(</span><span class="va">ts</span>, X <span class="op">=</span> <span class="va">X</span>, A <span class="op">=</span> <span class="st">"nea_2"</span>, B <span class="op">=</span> <span class="st">"nea_1"</span>, C <span class="op">=</span> <span class="st">"afr1_1"</span>, O <span class="op">=</span> <span class="st">"chimp_1"</span><span class="op">)</span></span>
+<span>  <span class="fu">ts_f4ratio</span><span class="op">(</span><span class="va">ts</span>, X <span class="op">=</span> <span class="va">X</span>, A <span class="op">=</span> <span class="st">"nea_2"</span>, B <span class="op">=</span> <span class="st">"nea_1"</span>, C <span class="op">=</span> <span class="st">"afr1_1"</span>, O <span class="op">=</span> <span class="st">"chimp_1"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Exactly as it’s the case for ABC, for the purposes of grid-based
 simulations we have to define functions which will be used to compute
@@ -337,32 +336,32 @@ tree-sequence functions work as they’re supposed to:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.106  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.004<span style="text-decoration: underline;">55</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.004<span style="text-decoration: underline;">55</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.012<span style="text-decoration: underline;">1</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.076<span style="text-decoration: underline;">6</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.084<span style="text-decoration: underline;">2</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.019<span style="text-decoration: underline;">7</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.191  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.048<span style="text-decoration: underline;">5</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.010<span style="text-decoration: underline;">6</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.023</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.031</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.019</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1  0.042<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.029</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.019</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1  0.038<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1  0.050<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">indirect</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A      B      C     O       alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 0.704</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.02 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 0.959</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 1.06 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 0.878</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 0.819</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 0.920</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 0.788</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 0.922</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 0.884</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 1.18 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.05 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 0.968</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 0.970</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 1.16 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 0.963</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 1.17 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 1.01 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 1.04 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 1.06 </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>Excellent, we get the output tables from <code>ts_f4ratio</code>
 functions as we’re supposed to (and get one estimate for each of the
@@ -433,8 +432,8 @@ vignette</a>).</p>
 <span>  <span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">25e6</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the grid simulations was 1 hours 11
-minutes 40 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 1 hours 8
+minutes 8 seconds parallelized across 96 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="examine-results">5. Examine results<a class="anchor" aria-label="anchor" href="#examine-results"></a>
@@ -474,50 +473,50 @@ data frame for each simulation replicate:</p>
 <code class="sourceCode R"><span><span class="va">results</span><span class="op">$</span><span class="va">direct</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [[1]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
-<span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.025<span style="text-decoration: underline;">1</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.045<span style="text-decoration: underline;">5</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.021<span style="text-decoration: underline;">4</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.008<span style="text-decoration: underline;">15</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.052<span style="text-decoration: underline;">7</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.009<span style="text-decoration: underline;">88</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.054<span style="text-decoration: underline;">2</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.018<span style="text-decoration: underline;">4</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.032<span style="text-decoration: underline;">0</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.043<span style="text-decoration: underline;">9</span> </span></span>
+<span><span class="co">#&gt;    X      A     B     C      O        alpha</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.042<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.069<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.022<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.066<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.044<span style="text-decoration: underline;">2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.057<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.077<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.057<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.041<span style="text-decoration: underline;">0</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.053<span style="text-decoration: underline;">5</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[2]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.003<span style="text-decoration: underline;">74</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">57</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.007<span style="text-decoration: underline;">75</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.005<span style="text-decoration: underline;">76</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.034<span style="text-decoration: underline;">1</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.033<span style="text-decoration: underline;">3</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.006<span style="text-decoration: underline;">83</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.016<span style="text-decoration: underline;">7</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.011<span style="text-decoration: underline;">4</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.003<span style="text-decoration: underline;">41</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.001<span style="text-decoration: underline;">50</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.010<span style="text-decoration: underline;">5</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.015<span style="text-decoration: underline;">1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.010<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.024<span style="text-decoration: underline;">1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.014<span style="text-decoration: underline;">1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.028<span style="text-decoration: underline;">3</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.004<span style="text-decoration: underline;">86</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.025<span style="text-decoration: underline;">8</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.003<span style="text-decoration: underline;">57</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A     B     C      O        alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.086<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.050<span style="text-decoration: underline;">4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.048<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.052<span style="text-decoration: underline;">5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.034<span style="text-decoration: underline;">3</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.048<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.053<span style="text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.049<span style="text-decoration: underline;">5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.052<span style="text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.041<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.048<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.028<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.040<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.016<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.034<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.026<span style="text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.038<span style="text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.029<span style="text-decoration: underline;">9</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.046<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.038<span style="text-decoration: underline;">0</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>List columns are very efficient and concise for storing complex data
 like this, but in order to be able to analyze data stored in them, we
@@ -529,18 +528,18 @@ statistic as normal numerical column. In this example:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">direct</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 127,050 × 10</span></span></span>
-<span><span class="co">#&gt;      rep rate_aa rate_ea X      A     B     C      O         alpha indirect</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 eur_1  nea_2 nea_1 afr1_1 chimp_1 0.025<span style="text-decoration: underline;">1</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 eur_2  nea_2 nea_1 afr1_1 chimp_1 0.045<span style="text-decoration: underline;">5</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 eur_3  nea_2 nea_1 afr1_1 chimp_1 0.021<span style="text-decoration: underline;">4</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 eur_4  nea_2 nea_1 afr1_1 chimp_1 0.008<span style="text-decoration: underline;">15</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 eur_5  nea_2 nea_1 afr1_1 chimp_1 0.052<span style="text-decoration: underline;">7</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 eur_6  nea_2 nea_1 afr1_1 chimp_1 0.009<span style="text-decoration: underline;">88</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 eur_7  nea_2 nea_1 afr1_1 chimp_1 0.054<span style="text-decoration: underline;">2</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 eur_8  nea_2 nea_1 afr1_1 chimp_1 0.018<span style="text-decoration: underline;">4</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 eur_9  nea_2 nea_1 afr1_1 chimp_1 0.032<span style="text-decoration: underline;">0</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 eur_10 nea_2 nea_1 afr1_1 chimp_1 0.043<span style="text-decoration: underline;">9</span>  <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt;      rep rate_aa rate_ea X      A     B     C      O        alpha indirect</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 eur_1  nea_2 nea_1 afr1_1 chimp_1 0.042<span style="text-decoration: underline;">8</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 eur_2  nea_2 nea_1 afr1_1 chimp_1 0.069<span style="text-decoration: underline;">9</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 eur_3  nea_2 nea_1 afr1_1 chimp_1 0.022<span style="text-decoration: underline;">6</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 eur_4  nea_2 nea_1 afr1_1 chimp_1 0.066<span style="text-decoration: underline;">8</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 eur_5  nea_2 nea_1 afr1_1 chimp_1 0.044<span style="text-decoration: underline;">2</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 eur_6  nea_2 nea_1 afr1_1 chimp_1 0.057<span style="text-decoration: underline;">7</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 eur_7  nea_2 nea_1 afr1_1 chimp_1 0.077<span style="text-decoration: underline;">9</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 eur_8  nea_2 nea_1 afr1_1 chimp_1 0.057<span style="text-decoration: underline;">8</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 eur_9  nea_2 nea_1 afr1_1 chimp_1 0.041<span style="text-decoration: underline;">0</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 eur_10 nea_2 nea_1 afr1_1 chimp_1 0.053<span style="text-decoration: underline;">5</span> <span style="color: #949494;">&lt;tibble&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127,040 more rows</span></span></span></code></pre>
 <p><strong>Indirect f4-ratio:</strong></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
@@ -548,16 +547,16 @@ statistic as normal numerical column. In this example:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 127,050 × 10</span></span></span>
 <span><span class="co">#&gt;      rep rate_aa rate_ea direct            X      A      B     C     O     alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_1  afr1_1 afr2… nea_2 chim… 1.00 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_1  afr1_1 afr2… nea_2 chim… 0.958</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_2  afr1_1 afr2… nea_2 chim… 0.949</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_3  afr1_1 afr2… nea_2 chim… 1.03 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_4  afr1_1 afr2… nea_2 chim… 1.00 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_5  afr1_1 afr2… nea_2 chim… 0.955</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_6  afr1_1 afr2… nea_2 chim… 0.994</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_7  afr1_1 afr2… nea_2 chim… 0.978</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_8  afr1_1 afr2… nea_2 chim… 0.967</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_9  afr1_1 afr2… nea_2 chim… 0.961</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_10 afr1_1 afr2… nea_2 chim… 0.916</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_3  afr1_1 afr2… nea_2 chim… 0.995</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_4  afr1_1 afr2… nea_2 chim… 0.966</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_5  afr1_1 afr2… nea_2 chim… 0.968</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_6  afr1_1 afr2… nea_2 chim… 0.916</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_7  afr1_1 afr2… nea_2 chim… 0.885</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_8  afr1_1 afr2… nea_2 chim… 0.948</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_9  afr1_1 afr2… nea_2 chim… 0.984</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     1       0       0 <span style="color: #949494;">&lt;tibble [21 × 6]&gt;</span> eur_10 afr1_1 afr2… nea_2 chim… 0.971</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 127,040 more rows</span></span></span></code></pre>
 <p>Because we are interested in the behavior of trajectories of indirect
 and direct estimates of Neanderthal ancestry over time assuming
@@ -687,7 +686,7 @@ described in this vignette (in total just a couple of dozen lines of
 easy-to-read R code) can qualitatively replicate the much original
 result from the ppaerpaper (which required a couple of hundreds of lines
 of Python / shell / R scripts):</p>
-<p><img src="images%2Fpetr_2018b.png" style="width:80.0%"></p>
+<p><img src="images/petr_2018b.png" style="width:80.0%"></p>
 </div>
   </div>
 
@@ -706,7 +705,7 @@ of Python / shell / R scripts):</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
