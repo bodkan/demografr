@@ -763,7 +763,7 @@ model <- function(Ne) {
 We will use the same prior and observed statistic as above:
 
 ```{r}
-observed_diversity <- readRDS(system.file("examples/custom_diversity.rds", package = "demografr"))
+observed_diversity <- readRDS(here::here("inst/examples/custom_diversity.rds"))
 
 priors <- list(Ne ~ runif(100, 5000))
 
