@@ -33,7 +33,6 @@ Imports:
     reticulate,
     slendr,
     tidyr
-#Remotes: bodkan/slendr
 Suggests:
     ape,
     cowplot,
