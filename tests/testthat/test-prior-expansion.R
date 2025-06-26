@@ -1,6 +1,7 @@
+library(slendr)
+
 skip_if(!check_dependencies(python = TRUE))
 
-library(slendr)
 init_env(quiet = TRUE)
 
 model <- function(N_a, N_b, T_a1, T_a2, T_a3, T_a4, T_a5, T_b1, T_b2, T_b3, T_b4, T_b5) {
