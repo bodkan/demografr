@@ -16,14 +16,14 @@ docs:
 	R -e 'pkgdown::build_news()'
 
 website: $(logo) README.md
-	#rename 's/Rmd$$/Rmd_/' vignettes/vignette-{07,08,09,10}-*.Rmd
+	rename 's/Rmd$$/Rmd_/' vignettes/vignette-{07,08,09,10}-*.Rmd
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
-	#rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_
+	rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_
 
 test:
 	R -e 'devtools::test()'
@@ -45,6 +45,8 @@ winold: README.md
 
 clean:
 	rm -rf build
+	if [ -f vignettes/*.Rmd_ ]; then rename 's/Rmd_$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_; fi
+
 
 $(pkg): README.md
 	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
