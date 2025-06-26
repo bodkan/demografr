@@ -353,8 +353,8 @@ saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path)}
-tdelta <- readRDS(system.file("examples/basics_tdelta.rds", package = "demografr"))
-ncores <- readRDS(system.file("examples/basics_ncores.rds", package = "demografr"))
+tdelta <- readRDS(here::here("examples/basics_tdelta.rds"))
+ncores <- readRDS(here::here("examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
