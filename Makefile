@@ -45,7 +45,7 @@ winold: README.md
 
 clean:
 	rm -rf build
-	if [ -f vignettes/*.Rmd_ ]; then rename 's/Rmd_$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_; fi
+	if [ -f vignettes/vignette-07-*.Rmd_ ]; then rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_; fi
 
 
 $(pkg): README.md

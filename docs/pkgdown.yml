@@ -1,5 +1,5 @@
-pandoc: 3.6.4
-pkgdown: 2.1.1
+pandoc: 3.7.0.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   vignette-01-basics: vignette-01-basics.html
@@ -8,7 +8,7 @@ articles:
   vignette-04-parallelization: vignette-04-parallelization.html
   vignette-05-custom: vignette-05-custom.html
   vignette-06-diagnostics: vignette-06-diagnostics.html
-last_built: 2025-03-21T11:48Z
+last_built: 2025-06-26T15:25Z
 urls:
   reference: https://bodkan.net/demografr/reference
   article: https://bodkan.net/demografr/articles
