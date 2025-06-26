@@ -395,7 +395,7 @@ abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 saveRDS(abc, abc_path)
 ```
 
-```{r, eval=!file.exists(abc_path), echo=FALSE}
+```{r, eval=file.exists(abc_path), echo=FALSE}
 abc <- readRDS(abc_path)
 ```
 
