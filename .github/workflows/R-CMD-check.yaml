@@ -24,7 +24,7 @@ jobs:
         config:
           - {os: macOS-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,  r: 'devel'}
           - {os: ubuntu-latest,  r: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
 
@@ -33,7 +33,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
@@ -50,9 +50,9 @@ jobs:
           mkdir -p ~/deps
           cd ~/deps
 
-          wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.2.tar.gz
-          tar xf v4.2.2.tar.gz
-          cd SLiM-4.2.2
+          wget https://github.com/MesserLab/SLiM/releases/download/v5.0/SLiM.zip
+          unzip SLiM.zip
+          cd SLiM
           cmake .
           make slim
 
@@ -74,11 +74,11 @@ jobs:
         run: |
           install.packages("reticulate", repos = "http://cran.rstudio.com")
           reticulate::install_miniconda()
-          deps <- c("msprime==1.3.3", "tskit==0.5.8", "pyslim==1.0.4")
+          deps <- c("msprime==1.3.4", "tskit==0.6.4", "pyslim==1.0.4")
           PYTHON_ENV <- paste0("Python-3.12_", paste(gsub("==", "-", c(deps, "tspop==0.0.2")), collapse = "_"))
           reticulate::conda_create(envname = PYTHON_ENV, python_version = '3.12')
           reticulate::use_condaenv(PYTHON_ENV, required = TRUE)
-          reticulate::conda_install(envname = PYTHON_ENV, packages = c("msprime==1.3.1", "tskit==0.5.6"), pip = FALSE)
+          reticulate::conda_install(envname = PYTHON_ENV, packages = c("msprime==1.3.4", "tskit==0.6.4"), pip = FALSE)
           reticulate::conda_install(envname = PYTHON_ENV, packages = c("tspop==0.0.2", "pyslim==1.0.4", "pyarrow"), pip = TRUE)
         shell: Rscript {0}
 
@@ -90,13 +90,5 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-
-      - name: conda test
-        run: |
-          reticulate::conda_binary()
-          reticulate::conda_list()
-          slendr::init_env()
-          reticulate::py_config()
-        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2

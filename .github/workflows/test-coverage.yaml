@@ -30,15 +30,16 @@ jobs:
           mkdir -p ~/deps
           cd ~/deps
 
-          wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.2.tar.gz
-          tar xf v4.2.2.tar.gz
-          cd SLiM-4.2.2
+          # installation instructions copied from the SLiM manual:
+          wget https://github.com/MesserLab/SLiM/releases/download/v5.0/SLiM.zip
+          unzip SLiM.zip
+          cd SLiM
           cmake .
           make slim
 
       - name: Populate PATH with compiled binaries
         run: |
-          export PATH="$HOME/deps/SLiM-4.2.2:$PATH"
+          export PATH="$HOME/deps/SLiM:$PATH"
           echo "PATH=$PATH" >> ~/.Renviron
 
       - uses: r-lib/actions/setup-r@v2
@@ -53,11 +54,11 @@ jobs:
         run: |
           install.packages("reticulate", repos = "http://cran.rstudio.com")
           reticulate::install_miniconda()
-          deps <- c("msprime==1.3.3", "tskit==0.5.8", "pyslim==1.0.4")
+          deps <- c("msprime==1.3.4", "tskit==0.6.4", "pyslim==1.0.4")
           PYTHON_ENV <- paste0("Python-3.12_", paste(gsub("==", "-", c(deps, "tspop==0.0.2")), collapse = "_"))
           reticulate::conda_create(envname = PYTHON_ENV, python_version = '3.12')
           reticulate::use_condaenv(PYTHON_ENV, required = TRUE)
-          reticulate::conda_install(envname = PYTHON_ENV, packages = c("msprime==1.3.1", "tskit==0.5.6"), pip = FALSE)
+          reticulate::conda_install(envname = PYTHON_ENV, packages = c("msprime==1.3.4", "tskit==0.6.4"), pip = FALSE)
           reticulate::conda_install(envname = PYTHON_ENV, packages = c("tspop==0.0.2", "pyslim==1.0.4", "pyarrow"), pip = TRUE)
         shell: Rscript {0}
 
