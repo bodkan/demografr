@@ -17,10 +17,8 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 80,
-  eval = slendr_present && Sys.info()["sysname"] != "Windows"
+  eval = slendr_present && Sys.info()["sysname"] != "Windows" && Sys.getenv("RUNNER_OS") == ""
 )
-
-data_path <- system.file("examples/grid_data.rds", package = "demografr")
 ```
 
 ⚠️⚠️⚠️
