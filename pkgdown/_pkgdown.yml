@@ -1,3 +1,6 @@
+template:
+  bootstrap: 5
+
 title: demografr
 url: https://bodkan.net/demografr
 
