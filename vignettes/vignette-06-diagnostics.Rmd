@@ -316,16 +316,16 @@ ncores <- future::availableCores()
 ```
 
 ```{r, eval=!data_exists, echo=FALSE}
-saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds")
-saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds")
+saveRDS(tdelta, here::here("inst/examples/downstream_tdelta.rds"))
+saveRDS(ncores, here::here("inst/examples/downstream_ncores.rds"))
 saveRDS(dataX, dataX_path)
 saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
 ```{r, eval=data_exists, echo=FALSE}
-tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds")
-ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds")
+tdelta <- readRDS(here::here("inst/examples/downstream_tdelta.rds"))
+ncores <- readRDS(here::here("inst/examples/downstream_ncores.rds"))
 dataX <- readRDS(dataX_path)
 dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
