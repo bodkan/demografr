@@ -243,7 +243,7 @@ complete genealogical history of a set of samples, it is possible to compute
 population genetic statistics directly on the tree sequence without having to
 first save the outcome of each simulation to disk for computation in different
 software. Thanks to _slendr_'s library of
-[tree-sequence functions](https://www.slendr.net/reference/index.html#tree-sequence-statistics)
+[tree-sequence functions](https://slendr.net/reference/index.html#tree-sequence-statistics)
 serving as an R interface to the
 [_tskit_ module](https://tskit.dev/tskit/docs/stable/stats.html),
 we can specify summary statistics to be computed for ABC using normal R code.
