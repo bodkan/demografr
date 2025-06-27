@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc_path <- here::here("inst/examples/basics_abc.rds")
+abc_path <- here::here("inst/extdata/basics_abc.rds")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -34,6 +34,7 @@ set.seed(SEED)
 ```
 
 ```{r, eval=!file.exists(abc_path), echo=FALSE, message=FALSE}
+stop(paste(abc_path, dirname(abc_path), paste0(dir(dirname(abc_path)), collapse = "\n")))
 A <- population("A", time = 1, N = 2000)
 B <- population("B", time = 2000, N = 800, parent = A)
 C <- population("C", time = 6000, N = 9000, parent = B)
