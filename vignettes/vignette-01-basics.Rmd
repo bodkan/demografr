@@ -152,7 +152,7 @@ and the gene-flow proportion.**
 ## Developing an ABC pipeline
 
 Let's begin by loading _demografr_ together with the R package
-[_slendr_](https://www.slendr.net/) on which _demografr_ relies on for building
+[_slendr_](https://slendr.net/) on which _demografr_ relies on for building
 and simulating demographic models.
 
 ```{r, message=FALSE}
