@@ -334,14 +334,14 @@ to:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">008</span>04</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>31</span></span></code></pre>
 <p>The function works as expected—we have a single population and want
 to compute nucleotide diversity in the whole population, and this is
 exactly what we get.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>61</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>41</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
@@ -357,7 +357,7 @@ results), and apply all summary functions to this data:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">008</span>26</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>65</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="abc-inference">ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
@@ -456,7 +456,7 @@ software dependencies), let’s say we have a program <code>vcfpi</code>,
 which is run in the following way:</p>
 <pre><code>./vcfpi --vcf &lt;path to a VCF&gt; --tsv &lt;path to a TSV table&gt;</code></pre>
 <p>You can find it at
-/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/Rtmp0hvLi4/temp_libpathed3a42163fbd/demografr/examples/vcfpi)
+/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/RtmpXGIUlD/temp_libpath10c4b650b5eeb/demografr/examples/vcfpi)
 and run it yourself in the terminal.</p>
 <p>This program takes in a VCF file and computes the nucleotide
 diversity across all individuals in that VCF file. For simplicity, it
@@ -540,19 +540,19 @@ simulation script, but bear with me here!)</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $vcf</span></span>
-<span><span class="co">#&gt; [1] "/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/Rtmp448GmLdemografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
+<span><span class="co">#&gt; [1] "/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/RtmpriKD7Udemografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
 <p>Let’s test our summary function on that VCF:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">vcf</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 1.587143e-06</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;   set   diversity</span></span>
+<span><span class="co">#&gt; 1 pop 6.99198e-06</span></span></code></pre>
 <p>Or, for convenience, we can do this using the more general function
 <code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
-<span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 1.587143e-06</span></span></code></pre>
+<span><span class="co">#&gt;   set   diversity</span></span>
+<span><span class="co">#&gt; 1 pop 6.99198e-06</span></span></code></pre>
 <p>Now let’s validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
@@ -663,20 +663,20 @@ created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slen
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $gt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 34 × 101</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 101</span></span></span>
 <span><span class="co">#&gt;       pos pop_0_0_chr1 pop_0_0_chr2 pop_0_1_chr1 pop_0_1_chr2 pop_0_2_chr1</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   <span style="text-decoration: underline;">7</span>135            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">12</span>824            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">38</span>923            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">49</span>392            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>  <span style="text-decoration: underline;">56</span>931            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">60</span>199            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">70</span>640            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">116</span>108            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">155</span>389            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">162</span>065            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 24 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">38</span>583            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">49</span>892            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">87</span>848            0            0            1            0            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">107</span>175            1            1            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">113</span>275            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">125</span>835            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">146</span>397            0            0            1            0            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">291</span>016            0            0            1            0            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">461</span>914            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">516</span>696            0            0            1            0            1</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 95 more variables: pop_0_2_chr2 &lt;int&gt;, pop_0_3_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_3_chr2 &lt;int&gt;, pop_0_4_chr1 &lt;int&gt;, pop_0_4_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_5_chr1 &lt;int&gt;, pop_0_5_chr2 &lt;int&gt;, pop_0_6_chr1 &lt;int&gt;,</span></span></span>
@@ -689,7 +689,7 @@ simulation run:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 7.493737e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 3.461818e-06</span></span></code></pre>
 <p>Let’s also validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
@@ -704,9 +704,8 @@ scale of ABC simulations on the problem!</p>
 <span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; Validating custom data-generating functions...  ✅</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
-<span><span class="co">#&gt; Generating data from simulation results:</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; 1 multiallelic sites (0.179% out of 560 total) detected and removed</span></span></code></pre>
-<pre><code><span><span class="co">#&gt;   - gt (type tbl_df) ✅</span></span>
+<span><span class="co">#&gt; Generating data from simulation results:</span></span>
+<span><span class="co">#&gt;   - gt (type tbl_df) ✅</span></span>
 <span><span class="co">#&gt; ---------------------------------------------------------------------</span></span>
 <span><span class="co">#&gt; Computing user-defined summary functions:</span></span>
 <span><span class="co">#&gt;   - diversity ✅</span></span>
@@ -715,7 +714,7 @@ scale of ABC simulations on the problem!</p>
 <span><span class="co">#&gt;   - diversity [data frame] ✅</span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -728,9 +727,9 @@ minutes 38 seconds parallelized across 96 CPUs.</strong></p>
 <p>Once the simulations are finished, we can perform inference of the
 posterior distribution of the single parameter of our model,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
@@ -742,7 +741,7 @@ posterior distribution of the single parameter of our model,
 <span><span class="co">#&gt; Weighted Mode:         1029.4001</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 1436.4719</span></span>
 <span><span class="co">#&gt; Max.:                  1584.7489</span></span></code></pre>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
@@ -765,7 +764,7 @@ simulate a tree sequence with the standard <em>slendr</em> /
 <em>demografr</em> functionality (i.e, not via the external Python
 script as in the examples above), and only customize the summary
 statistic computation of nucleotide diversity.</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Ne</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># this will be a single-population coalescent model, so the time of</span></span>
 <span>  <span class="co"># the appearance of the population is arbitrary -- let's say we</span></span>
@@ -781,13 +780,13 @@ statistic computation of nucleotide diversity.</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">schedule</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We will use the same prior and observed statistic as above:</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu">get_cache</span><span class="op">(</span><span class="st">"examples/custom_diversity.rds"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">observed_diversity</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">r"(</span></span>
 <span><span class="st">def compute_diversity(ts):</span></span>
@@ -806,13 +805,13 @@ statistic computation of nucleotide diversity.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">compute_diversity</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, parameters <span class="op">=</span> <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></code></pre></div>
 <p>When we look at the result, we can see that it no longer contains a
 <code>ts</code> tree-sequence object but a simple table of genotypes
 created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes()</a></code>
 (see the data generating function just above).</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
 <span><span class="co">#&gt; ║TreeSequence               ║</span></span>
@@ -848,14 +847,14 @@ created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slen
 <span><span class="co">#&gt; ╚═══════════╧═════╧═════════╧════════════╝</span></span></code></pre>
 <p>Let’s test our summary function on the output of the single testing
 simulation run:</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set diversity</span></span>
 <span><span class="co">#&gt; 1 pop         0</span></span></code></pre>
 <p>Let’s also validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>,</span>
 <span>             sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
@@ -876,7 +875,7 @@ scale of ABC simulations on the problem!</p>
 <span><span class="co">#&gt;   - diversity [data frame] ✅</span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -889,9 +888,9 @@ minutes 22 seconds parallelized across 96 CPUs.</strong></p>
 <p>Once the simulations are finished, we can perform inference of the
 posterior distribution of the single parameter of our model,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span></code></pre>
@@ -903,7 +902,7 @@ posterior distribution of the single parameter of our model,
 <span><span class="co">#&gt; Weighted Mode:          869.9794</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 1517.4734</span></span>
 <span><span class="co">#&gt; Max.:                  1705.5757</span></span></code></pre>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
