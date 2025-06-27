@@ -17,6 +17,13 @@ knitr::opts_chunk$set(
   dpi = 100
 )
 
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(file.path("~/Code/demografr/inst/", path))
+}
+
 set.seed(42)
 ```
 

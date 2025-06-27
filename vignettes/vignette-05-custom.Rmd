@@ -20,11 +20,18 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-path_observed <- here::here("inst/examples/custom_diversity.rds")
-abc_path1 <- here::here("inst/examples/custom_abc1.rds")
-abc_path2 <- here::here("inst/examples/custom_abc2.rds")
-abc_path3 <- here::here("inst/examples/custom_abc3.rds")
-abc_path4 <- here::here("inst/examples/custom_abc4.rds")
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(file.path("~/Code/demografr/inst/", path))
+}
+
+path_observed <- get_cache("examples/custom_diversity.rds")
+abc_path1 <- get_cache("examples/custom_abc1.rds")
+abc_path2 <- get_cache("examples/custom_abc2.rds")
+abc_path3 <- get_cache("examples/custom_abc3.rds")
+abc_path4 <- get_cache("examples/custom_abc4.rds")
 ```
 
 ⚠️⚠️⚠️
@@ -332,13 +339,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path1)}
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta1.rds"))
-saveRDS(ncores, here::here("inst/examples/custom_ncores1.rds"))
+saveRDS(tdelta, get_cache("examples/custom_tdelta1.rds"))
+saveRDS(ncores, get_cache("examples/custom_ncores1.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path1)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta1.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores1.rds"))
+tdelta <- readRDS(get_cache("examples/custom_tdelta1.rds"))
+ncores <- readRDS(get_cache("examples/custom_ncores1.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -542,13 +549,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path2)}
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta2.rds"))
-saveRDS(ncores, here::here("inst/examples/custom_ncores2.rds"))
+saveRDS(tdelta, get_cache("examples/custom_tdelta2.rds"))
+saveRDS(ncores, get_cache("examples/custom_ncores2.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path2)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta2.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores2.rds"))
+tdelta <- readRDS(get_cache("examples/custom_tdelta2.rds"))
+ncores <- readRDS(get_cache("examples/custom_ncores2.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -682,13 +689,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path3)}
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta3.rds"))
-saveRDS(ncores, here::here("inst/examples/custom_ncores3.rds"))
+saveRDS(tdelta, get_cache("examples/custom_tdelta3.rds"))
+saveRDS(ncores, get_cache("examples/custom_ncores3.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path3)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta3.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores3.rds"))
+tdelta <- readRDS(get_cache("examples/custom_tdelta3.rds"))
+ncores <- readRDS(get_cache("examples/custom_ncores3.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -763,7 +770,7 @@ model <- function(Ne) {
 We will use the same prior and observed statistic as above:
 
 ```{r}
-observed_diversity <- readRDS(here::here("inst/examples/custom_diversity.rds"))
+observed_diversity <- readRDS(get_cache("examples/custom_diversity.rds"))
 
 priors <- list(Ne ~ runif(100, 5000))
 
@@ -853,13 +860,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path4)}
-saveRDS(tdelta, here::here("inst/examples/custom_tdelta4.rds"))
-saveRDS(ncores, here::here("inst/examples/custom_ncores4.rds"))
+saveRDS(tdelta, get_cache("examples/custom_tdelta4.rds"))
+saveRDS(ncores, get_cache("examples/custom_ncores4.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path4)}
-tdelta <- readRDS(here::here("inst/examples/custom_tdelta4.rds"))
-ncores <- readRDS(here::here("inst/examples/custom_ncores4.rds"))
+tdelta <- readRDS(get_cache("examples/custom_tdelta4.rds"))
+ncores <- readRDS(get_cache("examples/custom_ncores4.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}

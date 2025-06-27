@@ -24,7 +24,14 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-data_path <- here::here("inst/examples/grid_data.rds")
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(file.path("~/Code/demografr/inst/", path))
+}
+
+data_path <- get_cache("examples/grid_data.rds")
 ```
 
 ⚠️⚠️⚠️
@@ -323,13 +330,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(data_path)}
-saveRDS(tdelta, here::here("inst/examples/grid_tdelta.rds"))
-saveRDS(ncores, here::here("inst/examples/grid_ncores.rds"))
+saveRDS(tdelta, get_cache("examples/grid_tdelta.rds"))
+saveRDS(ncores, get_cache("examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(data_path)}
-tdelta <- readRDS(here::here("inst/examples/grid_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/grid_ncores.rds"))
+tdelta <- readRDS(get_cache("examples/grid_tdelta.rds"))
+ncores <- readRDS(get_cache("examples/grid_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}

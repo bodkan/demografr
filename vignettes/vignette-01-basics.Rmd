@@ -20,7 +20,14 @@ knitr::opts_chunk$set(
   eval = slendr_present
 )
 
-abc_path <- here::here("inst/examples/basics_abc.rds")
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(file.path("~/Code/demografr/inst/", path))
+}
+
+abc_path <- get_cache("examples/basics_abc.rds")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -34,6 +41,7 @@ set.seed(SEED)
 ```
 
 ```{r, eval=!file.exists(abc_path), echo=FALSE, message=FALSE}
+stop(paste(abc_path, dirname(abc_path), paste0(dir(dirname(abc_path)), collapse = "\n")))
 A <- population("A", time = 1, N = 2000)
 B <- population("B", time = 2000, N = 800, parent = A)
 C <- population("C", time = 6000, N = 9000, parent = B)
@@ -66,11 +74,11 @@ observed_f4 <- rbind(
   # ts_f4(ts, A, D, B, C)
 )
 
-write.table(observed_diversity, file = here::here("inst/examples/basics_diversity.tsv"),
+write.table(observed_diversity, file = get_cache("examples/basics_diversity.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_divergence, file = here::here("inst/examples/basics_divergence.tsv"),
+write.table(observed_divergence, file = get_cache("examples/basics_divergence.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
-write.table(observed_f4, file = here::here("inst/examples/basics_f4.tsv"),
+write.table(observed_f4, file = get_cache("examples/basics_f4.tsv"),
             sep = "\t", row.names = FALSE, quote = FALSE)
 ```
 
@@ -348,13 +356,13 @@ ncores <- future::availableCores()
 ```
 
 ```{r, echo=FALSE, eval=!file.exists(abc_path)}
-saveRDS(tdelta, here::here("inst/examples/basics_tdelta.rds"))
-saveRDS(ncores, here::here("inst/examples/basics_ncores.rds"))
+saveRDS(tdelta, get_cache("examples/basics_tdelta.rds"))
+saveRDS(ncores, get_cache("examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=file.exists(abc_path)}
-tdelta <- readRDS(here::here("inst/examples/basics_tdelta.rds"))
-ncores <- readRDS(here::here("inst/examples/basics_ncores.rds"))
+tdelta <- readRDS(get_cache("examples/basics_tdelta.rds"))
+ncores <- readRDS(get_cache("examples/basics_ncores.rds"))
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
@@ -411,18 +419,18 @@ the `run_abc()` function (containing, among other things, the information about
 the inferred posteriors), and the number of draws to take from the
 posterior distribution of the parameters:
 
-```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds"))}
+```{r, eval=!file.exists(get_cache("examples/basics_predictions.rds"))}
 # because we set up a parallelization plan() above, the predictions are
 # computed in parallel across all available CPUs
 predictions <- predict(abc, samples = 1000)
 ```
 
-```{r, eval=!file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
-saveRDS(predictions, file = here::here("inst/examples/basics_predictions.rds"))
+```{r, eval=!file.exists(get_cache("examples/basics_predictions.rds")), echo=FALSE}
+saveRDS(predictions, file = get_cache("examples/basics_predictions.rds"))
 ```
 
-```{r, eval=file.exists(here::here("inst/examples/basics_predictions.rds")), echo=FALSE}
-predictions <- readRDS(here::here("inst/examples/basics_predictions.rds"))
+```{r, eval=file.exists(get_cache("examples/basics_predictions.rds")), echo=FALSE}
+predictions <- readRDS(get_cache("examples/basics_predictions.rds"))
 ```
 
 If we take a closer look at the produced result, we see that it's a data frame
