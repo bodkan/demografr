@@ -424,11 +424,11 @@ _demografr_ also provides means to visualize the entire prior distribution
 using numbers sampled from each. This can be helpful to check a previously
 defined prior sampling statements for correctnes:
 
-```{r prior_facet_plot1}
+```{r prior_facet_plot1, fig.width=7, fig.height=4}
 plot_prior(individual_priors)
 ```
 
-```{r prior_facet_plot2}
+```{r prior_facet_plot2, fig.width=7, fig.height=4}
 plot_prior(individual_priors, facets = TRUE)
 ```
 
