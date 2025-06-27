@@ -38,7 +38,7 @@ init_env(quiet = TRUE)
 **Please note that _demografr_ is still under active development.
 If you'd like to be notified of updates and releases, click on on
 "Watch" on top of the main GitHub page. You should also keep an eye on
-the [changelog](http://bodkan.net/demografr/news/).**
+the [changelog](https://bodkan.net/demografr/news/).**
 
 ⚠️⚠️⚠️
 
