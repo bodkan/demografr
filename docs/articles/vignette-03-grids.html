@@ -202,7 +202,7 @@ visualization test):</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/plot_model.html" class="external-link">plot_model</a></span><span class="op">(</span><span class="va">test_model</span>, gene_flow <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/plot_model.html" class="external-link">plot_model</a></span><span class="op">(</span><span class="va">test_model</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, gene_flow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-03-grids_files/figure-html/plot_model-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-03-grids_files/figure-html/plot_model-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>The model looks OK, so in the next step we define summary statistics
 statistics we are interested in (again, just as we would for an ABC
 pipeline).</p>
@@ -541,7 +541,7 @@ African subpopulations:</p>
 <span>    <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"The effect of within-Africa gene flow (afr1 &lt;-&gt; afr2) on 'indirect f4-ratio'"</span>,</span>
 <span>            <span class="st">"Red line indicates the true Neanderthal ancestry proportion"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</span></span></code></pre>
-<p><img src="vignette-03-grids_files/figure-html/aa_indirect-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-03-grids_files/figure-html/aa_indirect-1.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="direct-f_4-ratio">Direct
@@ -562,7 +562,7 @@ African subpopulations:</p>
 <span>    <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"The effect of within-Africa gene flow (afr1 &lt;-&gt; afr2) on 'direct f4-ratio'"</span>,</span>
 <span>            <span class="st">"Dashed line indicates the true Neanderthal ancestry proportion"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</span></span></code></pre>
-<p><img src="vignette-03-grids_files/figure-html/aa_direct-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-03-grids_files/figure-html/aa_direct-1.png" width="480" style="display: block; margin: auto;"></p>
 <p><strong>We can see that increasing rates of gene flow <em>within
 Africa</em> shifts apparent Neanderthal ancestry proportions inferred
 using “indirect”
@@ -596,7 +596,7 @@ Africa:</p>
 <span>    <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"The effect of Eurasia -&gt; Africa gene flow on 'indirect f4-ratio'"</span>,</span>
 <span>            <span class="st">"Dashed line indicates the true Neanderthal ancestry proportion"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</span></span></code></pre>
-<p><img src="vignette-03-grids_files/figure-html/ea_indirect-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-03-grids_files/figure-html/ea_indirect-1.png" width="480" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">direct</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
@@ -612,7 +612,7 @@ Africa:</p>
 <span>    <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"The effect of Eurasia -&gt; Africa gene flow on 'direct f4-ratio'"</span>,</span>
 <span>            <span class="st">"Dashed line indicates the true Neanderthal ancestry proportion"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; `geom_smooth()` using method = 'gam' and formula = 'y ~ s(x, bs = "cs")'</span></span></code></pre>
-<p><img src="vignette-03-grids_files/figure-html/ea_direct-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-03-grids_files/figure-html/ea_direct-1.png" width="480" style="display: block; margin: auto;"></p>
 <p><strong>We can see that gene flow from Eurasia back into Africa
 creates an artificial decline of Neanderthal ancestry if measured via
 “indirect”

@@ -334,19 +334,19 @@ to:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>46</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">005</span>28</span></span></code></pre>
 <p>The function works as expected—we have a single population and want
 to compute nucleotide diversity in the whole population, and this is
 exactly what we get.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>27</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>75</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>80</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>93</span></span></code></pre>
 <p>Note that we are also able to use a dedicated function for this,
 called <code><a href="../reference/summarise_data.html">summarise_data()</a></code>, which takes in a product of a
 simulation (tree sequence and/or a path to a directory with simulation
@@ -357,7 +357,7 @@ results), and apply all summary functions to this data:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>54</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>66</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="abc-inference">ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
@@ -441,7 +441,7 @@ value with a vertical line.</p>
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1000</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior1-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior1-1.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
@@ -456,7 +456,7 @@ software dependencies), let’s say we have a program <code>vcfpi</code>,
 which is run in the following way:</p>
 <pre><code>./vcfpi --vcf &lt;path to a VCF&gt; --tsv &lt;path to a TSV table&gt;</code></pre>
 <p>You can find it at
-/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/Rtmp7mEFBC/temp_libpath56b33f9c2204/demografr/examples/vcfpi)
+/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/RtmphV3mwu/temp_libpath87bd178e9caa/demografr/examples/vcfpi)
 and run it yourself in the terminal.</p>
 <p>This program takes in a VCF file and computes the nucleotide
 diversity across all individuals in that VCF file. For simplicity, it
@@ -540,19 +540,19 @@ simulation script, but bear with me here!)</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $vcf</span></span>
-<span><span class="co">#&gt; [1] "/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/RtmpxbysU4demografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
+<span><span class="co">#&gt; [1] "/private/var/folders/h2/qs0z_44x2vn2sskqc0cct7540000gn/T/RtmplSQV6Hdemografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
 <p>Let’s test our summary function on that VCF:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">vcf</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.171077e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 4.679379e-06</span></span></code></pre>
 <p>Or, for convenience, we can do this using the more general function
 <code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.171077e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 4.679379e-06</span></span></code></pre>
 <p>Now let’s validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
@@ -610,7 +610,7 @@ posterior distribution of the single parameter of our model,
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1000</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior2-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior2-1.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="another-means-of-computing-simulated-summary-statistics">Another means of computing simulated summary statistics<a class="anchor" aria-label="anchor" href="#another-means-of-computing-simulated-summary-statistics"></a>
@@ -663,42 +663,33 @@ created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slen
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $gt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 19 × 101</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 35 × 101</span></span></span>
 <span><span class="co">#&gt;       pos pop_0_0_chr1 pop_0_0_chr2 pop_0_1_chr1 pop_0_1_chr2 pop_0_2_chr1</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">68</span>118            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="text-decoration: underline;">102</span>126            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">131</span>454            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">224</span>525            1            1            1            1            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">238</span>006            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">364</span>780            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">419</span>123            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">451</span>887            0            0            1            1            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">540</span>698            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">562</span>509            0            0            1            1            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> <span style="text-decoration: underline;">636</span>591            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> <span style="text-decoration: underline;">640</span>707            1            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> <span style="text-decoration: underline;">706</span>034            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> <span style="text-decoration: underline;">804</span>066            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> <span style="text-decoration: underline;">812</span>850            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> <span style="text-decoration: underline;">911</span>314            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> <span style="text-decoration: underline;">956</span>667            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> <span style="text-decoration: underline;">965</span>512            0            0            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> <span style="text-decoration: underline;">986</span>831            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   <span style="text-decoration: underline;">2</span>827            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   <span style="text-decoration: underline;">6</span>481            1            1            1            1            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">111</span>886            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">119</span>069            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">124</span>550            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">140</span>050            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">190</span>989            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">257</span>814            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">263</span>953            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">302</span>861            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 25 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 95 more variables: pop_0_2_chr2 &lt;int&gt;, pop_0_3_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_3_chr2 &lt;int&gt;, pop_0_4_chr1 &lt;int&gt;, pop_0_4_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_5_chr1 &lt;int&gt;, pop_0_5_chr2 &lt;int&gt;, pop_0_6_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_6_chr2 &lt;int&gt;, pop_0_7_chr1 &lt;int&gt;, pop_0_7_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_8_chr1 &lt;int&gt;, pop_0_8_chr2 &lt;int&gt;, pop_0_9_chr1 &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_9_chr2 &lt;int&gt;, pop_0_10_chr1 &lt;int&gt;, pop_0_10_chr2 &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_11_chr1 &lt;int&gt;, pop_0_11_chr2 &lt;int&gt;, pop_0_12_chr1 &lt;int&gt;, …</span></span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_9_chr2 &lt;int&gt;, pop_0_10_chr1 &lt;int&gt;, pop_0_10_chr2 &lt;int&gt;, …</span></span></span></code></pre>
 <p>Let’s test our summary function on the output of the single testing
 simulation run:</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 2.908283e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 9.403838e-06</span></span></code></pre>
 <p>Let’s also validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
@@ -756,7 +747,7 @@ posterior distribution of the single parameter of our model,
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1000</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior3-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior3-1.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="computing-summary-statistics-with-python">Computing summary statistics with Python<a class="anchor" aria-label="anchor" href="#computing-summary-statistics-with-python"></a>
@@ -917,7 +908,7 @@ posterior distribution of the single parameter of our model,
 <span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">1000</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior4-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-05-custom_files/figure-html/custom_Ne_posterior4-1.png" width="480" style="display: block; margin: auto;"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

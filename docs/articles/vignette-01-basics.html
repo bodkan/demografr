@@ -90,7 +90,7 @@ phylogenetically related in the following way but we don’t know anything
 else (i.e., we have no idea about the values of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>,
 split times, or gene-flow proportions):</p>
-<p><img src="vignette-01-basics_files/figure-html/ape_tree-1.png" width="400" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/ape_tree-1.png" width="300" style="display: block; margin: auto;"></p>
 <p>After sequencing the genomes of individuals from these populations,
 we computed nucleotide diversity in these populations as well as their
 pairwise genetic divergence and a one
@@ -452,13 +452,13 @@ distributions of divergences produced from the parameter posterior like
 this:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"diversity"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/postpred_diversity-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/postpred_diversity-1.png" width="480" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"divergence"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/postpred_divergence-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/postpred_divergence-1.png" width="480" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"f4"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/postpred_f4-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/postpred_f4-1.png" width="480" style="display: block; margin: auto;"></p>
 <p><strong>Nice! It appears that the posterior from our simplistic model
 captures the observed summary statistics (dashed vertical lines) quite
 well.</strong></p>
@@ -545,7 +545,7 @@ easily get a visualization of our posteriors using the function
 <code><a href="../reference/plot_posterior.html">plot_posterior()</a></code>:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/posterior_Ne-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/posterior_Ne-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>Excellent! It looks like we got really nice and informative posterior
 distributions of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
@@ -554,24 +554,24 @@ values!</p>
 split times:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/posterior_Tsplit-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/posterior_Tsplit-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>And the same is true for the gene-flow proportion:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param  <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/posterior_gf-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/posterior_gf-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>Because the internals of <em>demografr</em> ABC objects are
 represented by standard objects created by the <em>abc</em> package, we
 have all of the standard diagnostics functions of the <em>abc</em> R
 package at our disposal.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T_BC"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/diagnostic_Tsplit-1.png" width="800" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/diagnostic_Tsplit-1.png" width="600" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf_BC"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/diagnostic_Ne-1.png" width="800" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/diagnostic_Ne-1.png" width="600" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_D"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="vignette-01-basics_files/figure-html/hist_Ne-1.png" width="640" style="display: block; margin: auto;"></p>
+<p><img src="vignette-01-basics_files/figure-html/hist_Ne-1.png" width="480" style="display: block; margin: auto;"></p>
 <p>Again, there are numerous tools for additional diagnostics, which you
 can learn about <a href="https://bodkan.net/demografr/articles/vignette-06-diagnostics.html">here</a>.</p>
 </div>
