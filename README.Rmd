@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
   fig.width = 6,
   fig.height = 4,
   fig.cap = "",
-  dpi = 80
+  dpi = 60
 )
 
 abc_path <- system.file("examples/basics_abc.rds", package = "demografr")

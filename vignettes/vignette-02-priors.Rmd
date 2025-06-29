@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.width = 5,
   fig.height = 5,
-  dpi = 100
+  dpi = 60
 )
 
 get_cache <- function(path) {
