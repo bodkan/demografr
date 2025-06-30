@@ -68,6 +68,37 @@ all parameters will be extracted.</p></dd>
     <p>A data frame object with posterior summary statistics</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">abc_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_abc.rds"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">extract_summary</span><span class="op">(</span><span class="va">abc_res</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Selecting bandwidth *not* using 'weights'</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                            Ne_A      Ne_B      Ne_C     Ne_D       T_AB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.:                  1609.744  682.6193  7389.026 1846.029  -96.82908</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted 2.5 % Perc.:  1812.239  729.5846  7585.374 2691.913 1242.73702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Median:       2030.741  837.2673  8588.420 3785.385 1907.90411</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mean:         2019.638  841.6564  8674.207 3805.943 1949.07359</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mode:         2049.985  847.0022  8469.365 3642.722 1911.88919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted 97.5 % Perc.: 2204.442  979.8260  9543.851 4742.401 2690.25909</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.:                  2281.020 1038.0898 10965.790 5915.021 2921.08324</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                            T_BC     T_CD       gf_BC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Min.:                  5272.336 6608.244 -0.02143034</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted 2.5 % Perc.:  5630.022 7105.185  0.03373237</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Median:       6133.605 7829.842  0.09864958</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mean:         6110.468 7814.700  0.10241672</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted Mode:         6236.457 7855.537  0.09655264</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Weighted 97.5 % Perc.: 6603.022 8379.513  0.17629759</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Max.:                  6838.022 8551.676  0.21388432</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
