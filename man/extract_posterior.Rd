@@ -22,3 +22,17 @@ A data frame in the long format with posterior values of parameters
 \description{
 Extract inferred posterior(s) as a standard data frame
 }
+\examples{
+# read example ABC result with an inferred joint posterior distribution
+abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
+# extract the entire posterior sample for all parameters as a data frame
+extract_posterior(abc_res)
+
+# extract the posterior sample for one parameter
+extract_posterior(abc_res, param = "Ne_A")
+
+# extract posterior samples for parameters matching a regex
+extract_posterior(abc_res, param = "^Ne_")
+
+}

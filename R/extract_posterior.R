@@ -9,6 +9,19 @@
 #'
 #' @return A data frame in the long format with posterior values of parameters
 #'
+#' @examples
+#' # read example ABC result with an inferred joint posterior distribution
+#' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#'
+#' # extract the entire posterior sample for all parameters as a data frame
+#' extract_posterior(abc_res)
+#'
+#' # extract the posterior sample for one parameter
+#' extract_posterior(abc_res, param = "Ne_A")
+#'
+#' # extract posterior samples for parameters matching a regex
+#' extract_posterior(abc_res, param = "^Ne_")
+#'
 #' @export
 extract_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj")) {
   posterior <- match.arg(posterior)
