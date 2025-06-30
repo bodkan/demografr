@@ -18,3 +18,39 @@ A combined object of the class \code{demografr_abc_sims}
 \description{
 Combine multiple individual ABC simulation runs into one
 }
+\examples{
+\dontshow{slendr::check_dependencies(python = TRUE, quit = TRUE) # dependencies must be present
+}
+library(slendr)
+init_env(quiet = TRUE)
+
+# simulate three runs of a slendr model across a parameter grid
+model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
+  p1 <- population("p1", time = 1, N = 1000)
+  p2 <- population("p2", time = 2000, N = 3000, parent = p1)
+
+  model <- compile_model(
+    populations = list(p1, p2),
+    generation_time = 1,
+    simulation_length = 10000, serialize = FALSE
+  )
+
+  return(model)
+}
+
+grid <- expand.grid(Ne_p1 = c(10, 100), Ne_p2 = c(10, 100))
+
+compute_diversity <- function(ts) {
+  samples <- list(ts_samples(ts)$name)
+  ts_diversity(ts, sample_sets = samples, mode = "branch")
+}
+functions <- list(diversity = compute_diversity)
+
+nreps <- 1
+run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
+run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
+
+# combine both simulation runs
+combine_data(run1, run2)
+
+}
