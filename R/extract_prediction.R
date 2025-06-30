@@ -10,6 +10,17 @@
 #'   statistic computed (useful in case multiple values of the summary statistic computed
 #'   by a tree-sequence function), and a column "value" containing its value.
 #'
+#' @examples
+#' \dontrun{
+#'   # read statistics computed from posterior sample simulations
+#'   stats <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+#'   # note the columns `diversity`, `divergence`, and `f4`
+#'   stats
+#'   # extract_prediction() is a convenience function which unpacks the given
+#'   # summary statistic in a normal data frame column (here `diversity`)
+#'   extract_prediction(pred, "diversity")
+#' }
+#'
 #' @export
 extract_prediction <- function(data, stat) {
   all_stats <- names(attr(data, "components")$observed)
