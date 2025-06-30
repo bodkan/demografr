@@ -21,3 +21,12 @@ A base R histogram plot
 \description{
 Plot histogram of posterior distribution(s)
 }
+\examples{
+abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+# plot histograms of posteriors for all parameters (in sequence)
+hist(abc_res)
+# plot only selected posteriors
+hist(abc_res, param = "gf_BC")
+hist(abc_res, param = "^Ne_")
+
+}

@@ -8,6 +8,14 @@
 #'
 #' @return A base R histogram plot
 #'
+#' @examples
+#' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#' # plot histograms of posteriors for all parameters (in sequence)
+#' hist(abc_res)
+#' # plot only selected posteriors
+#' hist(abc_res, param = "gf_BC")
+#' hist(abc_res, param = "^Ne_")
+#'
 #' @export hist.demografr_abc.abc
 #' @export
 hist.demografr_abc.abc <- function(x, param = NULL, ...) {
