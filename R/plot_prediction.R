@@ -13,6 +13,23 @@
 #'   multiple summary statistics are visualized), otherwise nothing is returned and the
 #'   plots are instead saved to a file.
 #'
+#' @examples
+#' \dontrun{
+#'   # read statistics computed from posterior sample simulations
+#'   stats <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+#'
+#'   # note the columns `diversity`, `divergence`, and `f4`
+#'   stats
+#'
+#'   # extract_prediction() is a convenience function which unpacks the given
+#'   # summary statistic in a normal data frame column (here `diversity`)
+#'   extract_prediction(pred, "diversity")
+#'
+#'   # we can also plot the posterior predictive distributions for all statistics
+#'   plot_prediction(stats, "diversity")
+#'   plot_prediction(stats, "divergence")
+#' }
+#'
 #' @export
 #' @import ggplot2
 plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) {
