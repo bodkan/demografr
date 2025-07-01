@@ -42,6 +42,8 @@
 #' @return A list object of the class \code{demografr_abc_sims} containing the results
 #'   of ABC simulations, sampled parameters, priors, and tree-sequence summary statistics
 #'
+#' @example man/examples/abc_pipeline.R
+#'
 #' @export
 simulate_abc <- function(
   model, priors, functions, observed, iterations,

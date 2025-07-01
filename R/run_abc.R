@@ -22,6 +22,8 @@
 #' @param ... Additional arguments passed on the \code{abc} function from
 #'   the abc package
 #'
+#' @example man/examples/abc_pipeline.R
+#'
 #' @export
 run_abc <- function(data, engine = "abc", stat = NULL, ...) {
   engine <- match.arg(engine, choices = c("abc", "ABC_mcmc"))

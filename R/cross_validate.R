@@ -1,12 +1,11 @@
-#' Perform cross-validation using the \code{anc::cv4postpr} function
+#' Run cross-validation routines of the abc R package
 #'
-#' This function is a convenience wrapper around the \code{cv4postpr} from the
-#' R package abc
+#' This function is a convenience wrapper around the functions \code{cv4postpr}
+#' and \code{anc::cv4abc} from the R package abc
 #'
 #' @param x A list of objects of the class \code{demografr_sims_abc} (each
-#'   representing a model for model selection via the function abc::cv4postpr),
-#'   or a single object \code{demografr_abc.abc} to perform cross-validation
-#'   by calling the function \code{abc::cv4abc}.
+#'   representing an ABC inference result) for the function abc::cv4postpr,
+#'   or an object \code{demografr_abc.abc} for the function \code{abc::cv4abc}
 #' @param nval,tols,method Required arguments of \code{abc::cv4postpr}
 #' @param ... Other optional arguments to be passed to \code{abc::cv4postpr}
 #'
@@ -17,17 +16,8 @@
 #' \dontshow{slendr::check_dependencies(python = TRUE, quit = TRUE) # dependencies must be present
 #' }
 #'
-#' ########################################
-#' # cross-validation
-#'
-#' # read an example result of an ABC inference
-#' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
-#' # perform cross-validation
-#' cv_res <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
-#' cv_res
-#'
-#' ########################################
-#' # model selection
+#' #####################################################
+#' # can we even distinguish between competing models?
 #'
 #' # \dontrun{
 #' # read a list of three different ABC models
@@ -41,8 +31,17 @@
 #' # note that each element of the list is, indeed, a demografr ABC result
 #' models[[1]]
 #  # perform model selection (see the abc package vignette for interpretation)
-#' mod_sel <- cross_validate(models, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
-#' mod_sel
+#' cv_models <- cross_validate(models, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+#' cv_model
+#'
+#' #####################################################
+#' # can our model even estimate the parameters?
+#'
+#' # read an example result of an ABC inference
+#' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#' # perform cross-validation
+#' cv_params <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+#' cv_params
 #' }
 #'
 #' @export

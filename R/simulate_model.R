@@ -38,6 +38,8 @@
 #' @return Either a tree-sequence object of the class \code{slendr_ts} when a slendr model
 #'   was simulated, or a path to an output file when a custom simulation script was used.
 #'
+#' @example man/examples/abc_pipeline.R
+#'
 #' @export
 simulate_model <- function(
     model, parameters,

@@ -70,3 +70,120 @@ by sampling from priors or by a given list of fixed parameter values
 This function is useful to generate a small tree sequence to be used when developing
 summary statistic functions inference using demografr.
 }
+\examples{
+library(demografr)
+
+library(slendr)
+init_env(quiet = TRUE)
+
+##################################################
+# define a model
+
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  A <- population("A", time = 1,    N = Ne_A)
+  B <- population("B", time = T_AB, N = Ne_B, parent = A)
+  C <- population("C", time = T_BC, N = Ne_C, parent = B)
+  D <- population("D", time = T_CD, N = Ne_D, parent = C)
+
+  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = gf_BC)
+
+  model <- compile_model(
+    populations = list(A, B, C, D), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward", serialize = FALSE
+  )
+
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(A, 25), list(B, 25), list(C, 25), list(D, 25),
+    strict = TRUE
+  )
+
+  # when a specific sampling schedule is to be used, both model and samples
+  # must be returned by the function
+  return(list(model, samples))
+}
+
+##################################################
+# set up priors
+
+priors <- list(
+  Ne_A  ~ runif(1000, 3000),
+  Ne_B  ~ runif(100,  1500),
+  Ne_C  ~ runif(5000, 10000),
+  Ne_D  ~ runif(2000, 7000),
+
+  T_AB  ~ runif(1,    4000),
+  T_BC  ~ runif(3000, 9000),
+  T_CD  ~ runif(5000, 10000),
+
+  gf_BC ~ runif(0, 0.3)
+)
+
+##################################################
+# prepare a list of empirical summary statistics
+
+observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", package = "demografr"), header = TRUE)
+observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
+observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demografr"), header = TRUE)
+observed <- list(
+  diversity  = observed_diversity,
+  divergence = observed_divergence,
+  f4         = observed_f4
+
+)
+
+##################################################
+# prepare a list of simulated summary statistics
+
+compute_diversity <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  ts_diversity(ts, sample_sets = samples)
+}
+compute_divergence <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  ts_divergence(ts, sample_sets = samples)
+}
+compute_f4 <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  A <- samples["A"]; B <- samples["B"]
+  C <- samples["C"]; D <- samples["D"]
+  ts_f4(ts, A, B, C, D)
+}
+
+functions <- list(
+  diversity  = compute_diversity,
+  divergence = compute_divergence,
+  f4         = compute_f4
+)
+
+##################################################
+# validate all components of the ABC inference pipeline
+
+validate_abc(model, priors, functions, observed,
+             sequence_length = 1e6, recombination_rate = 1e-8)
+
+#
+# we're skipping the remaining steps because they are extremely
+# computationally intensive for the scope of this example
+#
+
+##################################################
+# set up paralelization
+
+# library(future)
+# plan(multisession, workers = availableCores())
+
+##################################################
+# simulate data (summary statistics)
+
+# data <- simulate_abc(
+#   model, priors, functions, observed, iterations = 10000,
+#   sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8
+# )
+
+##################################################
+# perform ABC inference
+
+# abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
+}

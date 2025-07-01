@@ -7,6 +7,9 @@
 #' @param functions A named list of data-generating functions
 #'
 #' @returns A named list of data frames, one summary statistic for each
+#'
+#' @example man/examples/abc_pipeline.R
+#'
 #' @export
 summarise_data <- function(data, functions) {
   functions_expr <- base::substitute(functions)
