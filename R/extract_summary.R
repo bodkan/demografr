@@ -8,7 +8,9 @@
 #' @return A data frame object with posterior summary statistics
 #'
 #' @examples
+#' # read example ABC result with an inferred joint posterior distribution
 #' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#'
 #' extract_summary(abc_res)
 #'
 #' @import abc

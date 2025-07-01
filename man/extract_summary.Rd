@@ -20,7 +20,9 @@ A data frame object with posterior summary statistics
 Extract table of estimated model parameters
 }
 \examples{
+# read example ABC result with an inferred joint posterior distribution
 abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
 extract_summary(abc_res)
 
 }

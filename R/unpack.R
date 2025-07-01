@@ -2,6 +2,16 @@
 #'
 #' @param object A demografr object to be decomposed to individual components
 #'
+#' @examples
+#' # read example ABC result with an inferred joint posterior distribution
+#' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#'
+#' # decompose the ABC object into components used by the abc R package
+#' parts <- unpack(abc_res)
+#' # the `parts` object is a plain R list of elements which can be used by
+#' # various functions of the underlying R package abc
+#' names(parts)
+#'
 #' @export
 unpack <- function(object) {
   if (inherits(object, "demografr_abc_sims")) {

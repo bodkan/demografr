@@ -122,6 +122,18 @@ functions <- list(
 )
 
 ##################################################
+# simulate data from a single model run
+# (step #1 of a single ABC replicate simulation)
+
+ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8)
+
+##################################################
+# simulate data from a single model run
+# (step #2 of a single ABC replicate simulation)
+
+summarise_data(ts, functions)
+
+##################################################
 # validate all components of the ABC inference pipeline
 
 validate_abc(model, priors, functions, observed,

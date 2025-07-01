@@ -12,3 +12,14 @@ unpack(object)
 \description{
 Unpack demografr object into individual components of the abc package
 }
+\examples{
+# read example ABC result with an inferred joint posterior distribution
+abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
+# decompose the ABC object into components used by the abc R package
+parts <- unpack(abc_res)
+# the `parts` object is a plain R list of elements which can be used by
+# various functions of the underlying R package abc
+names(parts)
+
+}
