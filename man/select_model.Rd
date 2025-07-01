@@ -23,3 +23,19 @@ This function internally uses \code{abc::postpr} for computing posterior probabi
 of models, Bayes factors, etc., in order to aid in the selection of the most likely
 model.
 }
+\examples{
+# \dontrun{
+# read a list of three different ABC models
+models <- lapply(c("X", "Y", "Z"), function(i) {
+  readRDS(
+    url(
+      sprintf("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc\%s.rds", i)
+    )
+  )
+})
+
+modsel <- select_model(models, tol = 0.03, method = "neuralnet")
+modsel
+}
+
+}

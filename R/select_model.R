@@ -12,6 +12,21 @@
 #'
 #' @return Object of the class \code{postpr} and \code{demografr_postpr}
 #'
+#' @examples
+#' # \dontrun{
+#' # read a list of three different ABC models
+#' models <- lapply(c("X", "Y", "Z"), function(i) {
+#'   readRDS(
+#'     url(
+#'       sprintf("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc%s.rds", i)
+#'     )
+#'   )
+#' })
+#'
+#' modsel <- select_model(models, tol = 0.03, method = "neuralnet")
+#' modsel
+#' }
+#'
 #' @export
 select_model <- function(models, tol, ...) {
   args <- match.call()
