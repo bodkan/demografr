@@ -27,22 +27,25 @@
 #'
 #' @examples
 #' \dontrun{
-#'   # read statistics computed from posterior sample simulations
-#'   # the `pred` object was produced by the following call:
-#'   #    pred <- predict(abc, samples = 1000, posterior = "unadj")
-#'   # (where `abc` is the product of the `run_abc()` function)
-#'   pred <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+#' # read statistics computed from posterior sample simulations
+#' # the `pred` object was produced by the following call:
+#' #    pred <- predict(abc, samples = 1000, posterior = "unadj")
+#' # (where `abc` is the product of the `run_abc()` function)
+#' pred <- readRDS(url(paste0(
+#' "https://raw.githubusercontent.com/bodkan/demografr/",
+#' "refs/heads/main/inst/examples/downstream_predX.rds"
+#' )))
 #'
-#'   # note the columns `diversity`, `divergence`, and `f4`
-#'   pred
+#' # note the columns `diversity`, `divergence`, and `f4`
+#' pred
 #'
-#'   # extract_prediction() is a convenience function which unpacks the given
-#'   # summary statistic in a normal data frame column (here `diversity`)
-#'   extract_prediction(pred, "diversity")
+#' # extract_prediction() is a convenience function which unpacks the given
+#' # summary statistic in a normal data frame column (here `diversity`)
+#' extract_prediction(pred, "diversity")
 #'
-#'   # we can also plot the posterior predictive distributions for all statistics
-#'   plot_prediction(stats, "diversity")
-#'   plot_prediction(stats, "divergence")
+#' # we can also plot the posterior predictive distributions for all statistics
+#' plot_prediction(stats, "diversity")
+#' plot_prediction(stats, "divergence")
 #' }
 #'
 #' @export predict.demografr_abc.abc

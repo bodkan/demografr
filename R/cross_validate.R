@@ -28,7 +28,9 @@
 #'
 #' # note that each element of the list is, indeed, a demografr ABC result
 #' models[[1]]
-#  # perform model selection (see the abc package vignette for interpretation)
+#'
+#'  # run cross validation to find out if we have even the power to distinguish
+#' # our competing models(see the abc package vignette for interpretation)
 #' cv_models <- cross_validate(models, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
 #' cv_model
 #'
@@ -37,8 +39,10 @@
 #'
 #' # read an example result of an ABC inference
 #' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#'
 #' # perform cross-validation
-#' cv_params <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+#' cv_params <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05),
+#'                             method = "neuralnet")
 #' cv_params
 #' }
 #'

@@ -26,13 +26,10 @@ model.
 \examples{
 # \dontrun{
 # read a list of three different ABC models
-models <- lapply(c("X", "Y", "Z"), function(i) {
-  readRDS(
-    url(
-      sprintf("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc\%s.rds", i)
-    )
-  )
-})
+models <- lapply(c("X", "Y", "Z"), function(i) { readRDS(url(paste0(
+"raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc",
+i, ".rds"
+))) })
 
 modsel <- select_model(models, tol = 0.03, method = "neuralnet")
 modsel

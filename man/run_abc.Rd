@@ -35,6 +35,8 @@ entirely transparently. A such, all implementation details can be found in the a
 vignette and the manpage which you can access by typing \code{?abc::abc}.
 }
 \examples{
+slendr::check_dependencies(python = TRUE, quit = TRUE)
+
 library(demografr)
 
 library(slendr)

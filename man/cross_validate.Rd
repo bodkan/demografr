@@ -29,17 +29,18 @@ and \code{anc::cv4abc} from the R package abc
 #####################################################
 # can we even distinguish between competing models?
 
-# \dontrun{
+\dontrun{
 # read a list of three different ABC models
-models <- lapply(c("X", "Y", "Z"), function(i) {
-  readRDS(
-    url(
-      sprintf("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc\%s.rds", i)
-    )
-  )
-})
+models <- lapply(c("X", "Y", "Z"), function(i) { readRDS(url(paste0(
+"raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc",
+i, ".rds"
+))) })
+
 # note that each element of the list is, indeed, a demografr ABC result
 models[[1]]
+
+ # run cross validation to find out if we have even the power to distinguish
+# our competing models(see the abc package vignette for interpretation)
 cv_models <- cross_validate(models, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
 cv_model
 
@@ -48,8 +49,10 @@ cv_model
 
 # read an example result of an ABC inference
 abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
 # perform cross-validation
-cv_params <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05), method = "neuralnet")
+cv_params <- cross_validate(abc_res, nval = 10, tols = c(0.005, 0.01, 0.05),
+                            method = "neuralnet")
 cv_params
 }
 

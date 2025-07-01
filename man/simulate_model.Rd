@@ -71,6 +71,8 @@ This function is useful to generate a small tree sequence to be used when develo
 summary statistic functions inference using demografr.
 }
 \examples{
+slendr::check_dependencies(python = TRUE, quit = TRUE)
+
 library(demografr)
 
 library(slendr)

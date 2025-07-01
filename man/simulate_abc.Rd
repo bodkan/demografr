@@ -84,6 +84,8 @@ replicates and computes summary statistic for the next step of an inference proc
 which is the ABC estimation itself.
 }
 \examples{
+slendr::check_dependencies(python = TRUE, quit = TRUE)
+
 library(demografr)
 
 library(slendr)

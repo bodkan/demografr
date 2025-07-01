@@ -21,6 +21,8 @@ A named list of data frames, one summary statistic for each
 Apply summary statistic functions to the simulated data
 }
 \examples{
+slendr::check_dependencies(python = TRUE, quit = TRUE)
+
 library(demografr)
 
 library(slendr)
