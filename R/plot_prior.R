@@ -13,6 +13,29 @@
 #'
 #' @return A ggplot2 plot object
 #'
+#' @examples
+#'
+#' priors <- list(
+#'   Ne_A  ~ runif(1000, 3000),
+#'   Ne_B  ~ runif(100,  1500),
+#'   Ne_C  ~ runif(5000, 10000),
+#'   Ne_D  ~ runif(2000, 7000),
+#'
+#'   T_AB  ~ runif(1,    4000),
+#'   T_BC  ~ runif(3000, 9000),
+#'   T_CD  ~ runif(5000, 10000),
+#'
+#'   gf_BC ~ runif(0, 0.3)
+#' )
+#'
+#' # as with many other distribution plotting functions, plotting everything
+#' # at once doesn't make much sense
+#' plot_prior(priors)
+#'
+#' # it's better to visualize together distributions of the same scale
+#' plot_prior(priors, "^Ne")
+#' plot_prior(priors, "gf") + ggplot2::xlim(0, 1)
+#'
 #' @export
 plot_prior <- function(x, param = NULL, facets = FALSE, file = NULL,
                        replicates = 10000, geom = ggplot2::geom_density, ...) {
