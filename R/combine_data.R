@@ -36,8 +36,10 @@
 #' functions <- list(diversity = compute_diversity)
 #'
 #' nreps <- 1
-#' run1 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
-#' run2 <- simulate_grid(model, grid, functions, replicates = nreps, sequence_length = 10000, recombination_rate = 0)
+#' run1 <- simulate_grid(model, grid, functions, replicates = nreps,
+#'                       sequence_length = 10000, recombination_rate = 0)
+#' run2 <- simulate_grid(model, grid, functions, replicates = nreps,
+#'                       sequence_length = 10000, recombination_rate = 0)
 #'
 #' # combine both simulation runs
 #' combine_data(run1, run2)

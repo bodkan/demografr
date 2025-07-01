@@ -19,15 +19,13 @@
 #' #####################################################
 #' # can we even distinguish between competing models?
 #'
-#' # \dontrun{
+#' \dontrun{
 #' # read a list of three different ABC models
-#' models <- lapply(c("X", "Y", "Z"), function(i) {
-#'   readRDS(
-#'     url(
-#'       sprintf("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc%s.rds", i)
-#'     )
-#'   )
-#' })
+#' models <- lapply(c("X", "Y", "Z"), function(i) { readRDS(url(paste0(
+#' "raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc",
+#' i, ".rds"
+#' ))) })
+#'
 #' # note that each element of the list is, indeed, a demografr ABC result
 #' models[[1]]
 #  # perform model selection (see the abc package vignette for interpretation)
