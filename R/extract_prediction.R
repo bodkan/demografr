@@ -13,10 +13,10 @@
 #' @examples
 #' \dontrun{
 #'   # read statistics computed from posterior sample simulations
-#'   stats <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+#'   pred <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
 #'
 #'   # note the columns `diversity`, `divergence`, and `f4`
-#'   stats
+#'   pred
 #'
 #'   # extract_prediction() is a convenience function which unpacks the given
 #'   # summary statistic in a normal data frame column (here `diversity`)

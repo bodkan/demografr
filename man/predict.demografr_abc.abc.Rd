@@ -42,10 +42,30 @@ itself. Otherwise, custom tree-sequence summary statistics can be provided.}
 A data frame object with the results of posterior simulations, with values of
  each summary statistic stored in a list-column (i.e. the same format as used by
  the function \code{simulate_grid}, as the predictions are generated internally using
- this function)
 }
 \description{
 The function draws parameter values from the posterior distribution and then
 internally runs the function \code{simulate_grid} to run simulations from
 the sampled parameters and compute tree-sequence summary statistics
+}
+\examples{
+\dontrun{
+  # read statistics computed from posterior sample simulations
+  # the `pred` object was produced by the following call:
+  #    pred <- predict(abc, samples = 1000, posterior = "unadj")
+  # (where `abc` is the product of the `run_abc()` function)
+  pred <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+
+  # note the columns `diversity`, `divergence`, and `f4`
+  pred
+
+  # extract_prediction() is a convenience function which unpacks the given
+  # summary statistic in a normal data frame column (here `diversity`)
+  extract_prediction(pred, "diversity")
+
+  # we can also plot the posterior predictive distributions for all statistics
+  plot_prediction(stats, "diversity")
+  plot_prediction(stats, "divergence")
+}
+
 }
