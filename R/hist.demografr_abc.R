@@ -9,7 +9,9 @@
 #' @return A base R histogram plot
 #'
 #' @examples
+#' # read inferred posterior distribution object from an example ABC run
 #' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+#'
 #' # plot histograms of posteriors for all parameters (in sequence)
 #' hist(abc_res)
 #' # plot only selected posteriors

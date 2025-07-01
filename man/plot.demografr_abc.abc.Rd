@@ -21,3 +21,15 @@ Used exclusively for printing
 \description{
 Plot diagnostics of posterior distribution(s)
 }
+\examples{
+# read inferred posterior distribution object from an example ABC run
+abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
+# plot diagnostics for all parameters (in sequence)
+plot(abc_res)
+
+# plot diagnostics only for selected parameters
+plot(abc_res, param = "gf_BC")
+plot(abc_res, param = "^Ne_")
+
+}
