@@ -30,6 +30,6 @@ abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr")
 
 # plot diagnostics only for selected parameters
 plot(abc_res, param = "^Ne_")
-plot(abc_res, param = "gf_BC")
+# plot(abc_res, param = "gf_BC")
 
 }

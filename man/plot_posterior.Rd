@@ -47,6 +47,6 @@ abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr")
 plot_posterior(abc_res, facets = TRUE)
 
 # this is perhaps even better
-plot_posterior(abc_res, param = "^Ne_")
+# plot_posterior(abc_res, param = "^Ne_")
 
 }
