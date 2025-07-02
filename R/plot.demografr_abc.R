@@ -17,7 +17,7 @@
 #'
 #' # plot diagnostics only for selected parameters
 #' plot(abc_res, param = "^Ne_")
-#' plot(abc_res, param = "gf_BC")
+#' # plot(abc_res, param = "gf_BC")
 #'
 #' @export plot.demografr_abc.abc
 #' @export

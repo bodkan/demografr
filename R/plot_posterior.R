@@ -24,7 +24,7 @@
 #' plot_posterior(abc_res, facets = TRUE)
 #'
 #' # this is perhaps even better
-#' plot_posterior(abc_res, param = "^Ne_")
+#' # plot_posterior(abc_res, param = "^Ne_")
 #'
 #' @export
 plot_posterior <- function(abc, param = NULL, posterior = c("adj", "unadj"), facets = FALSE,

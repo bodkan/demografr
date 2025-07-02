@@ -16,7 +16,7 @@
 #' # hist(abc_res)
 #'
 #' # plot only selected posteriors
-#' hist(abc_res, param = "gf_BC")
+#' # hist(abc_res, param = "gf_BC")
 #' hist(abc_res, param = "^Ne_")
 #'
 #' @export hist.demografr_abc.abc
