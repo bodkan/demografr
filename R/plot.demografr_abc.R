@@ -13,11 +13,11 @@
 #' abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
 #'
 #' # plot diagnostics for all parameters (in sequence)
-#' plot(abc_res)
+#' # plot(abc_res)
 #'
 #' # plot diagnostics only for selected parameters
-#' plot(abc_res, param = "gf_BC")
 #' plot(abc_res, param = "^Ne_")
+#' plot(abc_res, param = "gf_BC")
 #'
 #' @export plot.demografr_abc.abc
 #' @export

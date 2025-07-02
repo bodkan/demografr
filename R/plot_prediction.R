@@ -30,7 +30,6 @@
 #'
 #' # we can also plot the posterior predictive distributions for all statistics
 #' plot_prediction(pred, "diversity")
-#' plot_prediction(pred, "divergence")
 #' }
 #'
 #' @export
