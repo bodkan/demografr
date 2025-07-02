@@ -24,7 +24,7 @@ of models, Bayes factors, etc., in order to aid in the selection of the most lik
 model.
 }
 \examples{
-# \dontrun{
+\dontrun{
 # read a list of three different ABC models
 models <- lapply(c("X", "Y", "Z"), function(i) { readRDS(url(paste0(
 "raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc",
