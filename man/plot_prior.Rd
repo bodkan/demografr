@@ -55,10 +55,10 @@ priors <- list(
 
 # as with many other distribution plotting functions, plotting everything
 # at once doesn't make much sense
-plot_prior(priors)
+# plot_prior(priors)
 
 # it's better to visualize together distributions of the same scale
-plot_prior(priors, "^Ne")
+# plot_prior(priors, "^Ne")
 plot_prior(priors, "gf") + ggplot2::xlim(0, 1)
 
 }

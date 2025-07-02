@@ -26,7 +26,8 @@ Plot histogram of posterior distribution(s)
 abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
 
 # plot histograms of posteriors for all parameters (in sequence)
-hist(abc_res)
+# hist(abc_res)
+
 # plot only selected posteriors
 hist(abc_res, param = "gf_BC")
 hist(abc_res, param = "^Ne_")

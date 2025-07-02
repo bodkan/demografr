@@ -37,14 +37,16 @@ A ggplot2 plot object
 Plot posterior distribution of given parameters
 }
 \examples{
+# read an example result of an ABC inference
 abc_res <- readRDS(system.file("examples/basics_abc.rds", package = "demografr"))
+
 # plotting posteriors of all parameters at once doesn't make much sense
-plot_posterior(abc_res)
+# plot_posterior(abc_res)
+
 # this is better
 plot_posterior(abc_res, facets = TRUE)
+
 # this is perhaps even better
 plot_posterior(abc_res, param = "^Ne_")
-plot_posterior(abc_res, param = "^T_")
-plot_posterior(abc_res, param = "gf") + ggplot2::xlim(0, 1)
 
 }
