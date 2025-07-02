@@ -13,7 +13,7 @@
 #' @return Object of the class \code{postpr} and \code{demografr_postpr}
 #'
 #' @examples
-#' # \dontrun{
+#' \dontrun{
 #' # read a list of three different ABC models
 #' models <- lapply(c("X", "Y", "Z"), function(i) { readRDS(url(paste0(
 #' "raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_abc",
