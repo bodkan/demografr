@@ -125,9 +125,18 @@ priors <- list(
 ##################################################
 # prepare a list of empirical summary statistics
 
-observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", package = "demografr"), header = TRUE)
-observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
-observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demografr"), header = TRUE)
+observed_diversity <- read.table(
+  system.file("examples/basics_diversity.tsv", package = "demografr"),
+  header = TRUE
+)
+observed_divergence <- read.table(
+  system.file("examples/basics_divergence.tsv", package = "demografr"),
+  header = TRUE
+)
+observed_f4  <- read.table(
+  system.file("examples/basics_f4.tsv", package = "demografr"),
+  header = TRUE
+)
 observed <- list(
   diversity  = observed_diversity,
   divergence = observed_divergence,

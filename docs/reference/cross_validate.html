@@ -90,6 +90,9 @@ or an object <code>demografr_abc.abc</code> for the function <code><a href="http
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># note that each element of the list is, indeed, a demografr ABC result</span></span></span>
 <span class="r-in"><span><span class="va">models</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span> <span class="co"># run cross validation to find out if we have even the power to distinguish</span></span></span>
+<span class="r-in"><span><span class="co"># our competing models(see the abc package vignette for interpretation)</span></span></span>
 <span class="r-in"><span><span class="va">cv_models</span> <span class="op">&lt;-</span> <span class="fu">cross_validate</span><span class="op">(</span><span class="va">models</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cv_model</span></span></span>
 <span class="r-in"><span></span></span>
@@ -98,8 +101,10 @@ or an object <code>demografr_abc.abc</code> for the function <code><a href="http
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># read an example result of an ABC inference</span></span></span>
 <span class="r-in"><span><span class="va">abc_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_abc.rds"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># perform cross-validation</span></span></span>
-<span class="r-in"><span><span class="va">cv_params</span> <span class="op">&lt;-</span> <span class="fu">cross_validate</span><span class="op">(</span><span class="va">abc_res</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cv_params</span> <span class="op">&lt;-</span> <span class="fu">cross_validate</span><span class="op">(</span><span class="va">abc_res</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                            method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cv_params</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

@@ -24,15 +24,18 @@ Unnest the predicted values of a given statistic from the simulated data
 }
 \examples{
 \dontrun{
-  # read statistics computed from posterior sample simulations
-  pred <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+# read statistics computed from posterior sample simulations
+pred <- readRDS(url(paste0(
+"https://raw.githubusercontent.com/bodkan/demografr/",
+"refs/heads/main/inst/examples/downstream_predX.rds"
+)))
 
-  # note the columns `diversity`, `divergence`, and `f4`
-  pred
+# note the columns `diversity`, `divergence`, and `f4`
+pred
 
-  # extract_prediction() is a convenience function which unpacks the given
-  # summary statistic in a normal data frame column (here `diversity`)
-  extract_prediction(pred, "diversity")
+# extract_prediction() is a convenience function which unpacks the given
+# summary statistic in a normal data frame column (here `diversity`)
+extract_prediction(pred, "diversity")
 }
 
 }

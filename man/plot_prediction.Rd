@@ -30,19 +30,22 @@ Plot the results of a posterior predictive check for a given summary statistic
 }
 \examples{
 \dontrun{
-  # read statistics computed from posterior sample simulations
-  pred <- readRDS(url("https://raw.githubusercontent.com/bodkan/demografr/refs/heads/main/inst/examples/downstream_predX.rds"))
+# read statistics computed from posterior sample simulations
+pred <- readRDS(url(paste0(
+"https://raw.githubusercontent.com/bodkan/demografr/",
+"refs/heads/main/inst/examples/downstream_predX.rds"
+)))
 
-  # note the columns `diversity`, `divergence`, and `f4`
-  pred
+# note the columns `diversity`, `divergence`, and `f4`
+pred
 
-  # extract_prediction() is a convenience function which unpacks the given
-  # summary statistic in a normal data frame column (here `diversity`)
-  extract_prediction(pred, "diversity")
+# extract_prediction() is a convenience function which unpacks the given
+# summary statistic in a normal data frame column (here `diversity`)
+extract_prediction(pred, "diversity")
 
-  # we can also plot the posterior predictive distributions for all statistics
-  plot_prediction(pred, "diversity")
-  plot_prediction(pred, "divergence")
+# we can also plot the posterior predictive distributions for all statistics
+plot_prediction(pred, "diversity")
+plot_prediction(pred, "divergence")
 }
 
 }
