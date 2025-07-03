@@ -44,6 +44,8 @@
 #' @return A data frame object with the results of parameter grid simulations, with values of
 #'  each summary statistic stored in a list-column
 #'
+#' @example man/examples/grid_pipeline.R
+#'
 #' @export
 simulate_grid <- function(
   model, grid, functions, replicates,
