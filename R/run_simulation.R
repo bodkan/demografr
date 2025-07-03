@@ -27,6 +27,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
   )
 
   model_is_sampled <- contains_priors(params)
+  model_is_parametrized <- is.data.frame(params)
 
   if (format == "ts")
     path <- NULL
@@ -49,9 +50,11 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
     result <- tryCatch(
       {
         # sample model parameters from the prior or use the parameters as given
-        if (model_is_sampled)
+        if (model_is_sampled) {
           param_args <- generate_prior_args(params)
-        else
+        } else if (model_is_parametrized) {
+          param_args <- params[sample(seq_len(nrow(params)), 1), ]
+        } else
           param_args <- params
 
         # if a slendr model generating function is given as a model, generate a compiled model
@@ -110,7 +113,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
         # check that the received error is one of the valid, potentially expected slendr errors,
         # but only in situations where sampling from priors is used -- all parameters given as
         # a parameter grid must lead to a valid simulation, so any error is reported
-        if (model_is_sampled && any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
+        if ((model_is_sampled || model_is_parametrized) && any(vapply(errors, grepl, msg, FUN.VALUE = logical(1)))) {
           return(NULL)
         } else { # if an unexpected error occurred, report it in full
           cross <- " \u274C\n\n"
