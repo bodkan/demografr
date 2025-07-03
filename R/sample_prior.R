@@ -5,6 +5,24 @@
 #' @return A list of two elements: "variable" containing the name of the sampled variable,
 #'   and "value" containing the actual value of the sampled prior.
 #'
+#' @examples
+#' priors <- list(
+#'   Ne_A  ~ runif(1000, 3000),
+#'   Ne_B  ~ runif(100,  1500),
+#'   Ne_C  ~ runif(5000, 10000),
+#'   Ne_D  ~ runif(2000, 7000),
+#'
+#'   T_AB  ~ runif(1,    4000),
+#'   T_BC  ~ runif(3000, 9000),
+#'   T_CD  ~ runif(5000, 10000),
+#'
+#'   gf_BC ~ runif(0, 0.3)
+#' )
+#'
+#' sample_prior(priors[[1]])
+#' sample_prior(param ~ rnorm(0, 1))
+#'
+#'
 #' @export
 sample_prior <- function(f) {
   if (!inherits(f, "formula"))

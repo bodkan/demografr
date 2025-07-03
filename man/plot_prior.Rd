@@ -39,7 +39,6 @@ A ggplot2 plot object
 Plot prior distribution(s)
 }
 \examples{
-
 priors <- list(
   Ne_A  ~ runif(1000, 3000),
   Ne_B  ~ runif(100,  1500),
