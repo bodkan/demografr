@@ -39,6 +39,8 @@
 #'
 #' @return No return value. The function is ran for its terminal output.
 #'
+#' @example man/examples/abc_pipeline.R
+#'
 #' @export
 validate_abc <- function(model, priors, functions, observed,
                          sequence_length, recombination_rate, mutation_rate = 0,
