@@ -53,7 +53,7 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
         if (model_is_sampled) {
           param_args <- generate_prior_args(params)
         } else if (model_is_parametrized) {
-          param_args <- params[sample(seq_len(nrow(params)), 1), ]
+          param_args <- params[sample(seq_len(nrow(params)), 1), , drop = FALSE]
         } else
           param_args <- params
 

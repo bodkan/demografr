@@ -157,3 +157,11 @@ test_that("format = 'custom' allows only 'path' and 'model' to be available", {
     "data.frame"
   )
 })
+
+test_that("sampling from a grid works just as it does for priors", {
+  grid <- data.frame(N = c(100, 1000, 10000))
+  expect_s3_class(
+    simulate_model(model, grid, sequence_length = 1e6, recombination_rate = 0),
+    "slendr_ts"
+  )
+})
