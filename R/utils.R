@@ -2,10 +2,35 @@
 #' @export
 slendr::init_env
 
+#' Pipe operator
+#'
+#' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @export
+#' @importFrom magrittr %>%
+#' @usage lhs \%>\% rhs
+#' @param lhs A value or the magrittr placeholder.
+#' @param rhs A function call using the magrittr semantics.
+#' @return The result of calling `rhs(lhs)`.
+NULL
+
 # Check that the function argument is really provided by the user
 arg_present <- function(x) {
   tryCatch({get(deparse(substitute(x))); TRUE}, error = function(e) FALSE) ||
   tryCatch({!is.null(x); TRUE}, error = function(e) FALSE)
+}
+
+# Get all non-implicit arguments of the model function
+get_nonimpl_params <- function(model) {
+  # get all arguments of the model function, ...
+  all_args <- names(formals(model))
+  # ... extract names of arguments which don't have an implicit value
+  nonimpl_args <- all_args[vapply(all_args, function(x) is.name(formals(model)[[x]]), logical(1))]
+
+  nonimpl_args
 }
 
 # Extract variable names in formulas as a character vector
