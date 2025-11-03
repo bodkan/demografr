@@ -82,7 +82,7 @@ IMAGE := bodkan/$(shell basename $(shell pwd)):$(PLATFORM)
 CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
 
 # if present, extract GitHub access token
-TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
+TOKEN := $(shell if [[ -f ~/.GITHUB_PAT ]]; then more ~/.GITHUB_PAT; else echo ""; fi)
 
 .PHONY: rstudio bash r docker-build docker-push docker-pull local-webapp remote-webapp
 
