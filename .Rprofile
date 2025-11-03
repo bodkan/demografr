@@ -9,7 +9,7 @@ local({
 })
 
 Sys.setenv(RENV_CONFIG_SANDBOX_ENABLED = "FALSE")
-if (Sys.getenv("IN_CONTAINER") == TRUE) {
+if (file.exists("/.dockerenv")) {
   Sys.setenv(RENV_CONFIG_PPM_ENABLED = "TRUE")
   source("renv/activate.R")
 } else {
