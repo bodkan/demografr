@@ -1,4 +1,4 @@
-FROM rocker/rstudio:4.5.0
+FROM rocker/rstudio:4.5.1
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
@@ -64,7 +64,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v5.0.tar.gz -O slim.tar.gz; \
+RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v5.1.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
