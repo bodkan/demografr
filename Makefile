@@ -28,7 +28,6 @@ website: $(logo) README.md
 test:
 	R -e 'devtools::test()'
 
-
 build: $(pkg)
 
 check: $(pkg)
@@ -85,12 +84,12 @@ CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
 # if present, extract GitHub access token
 TOKEN := $(shell awk -F= '/GITHUB_PAT/{print $$2}' ~/.Renviron)
 
-.PHONY: rstudio bash R r docker-build docker-push docker-pull local-webapp remote-webapp
+.PHONY: rstudio bash r docker-build docker-push docker-pull local-webapp remote-webapp
 
 bash:
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) bash
 
-R:
+r:
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) R
 
 attach:
