@@ -80,6 +80,8 @@ WORKDIR $PROJECT
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV R_INSTALL_STAGED=FALSE
 
+RUN R -e 'install.packages("rstudioapi")'
+
 # do this when first setting up the container to create an renv.lock file:
 #   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.5.tar.gz"
 #   wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.5.tar.gz -O $RENV_BOOTSTRAP_TARBALL
@@ -108,6 +110,12 @@ RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 # clone configuration dotfiles into the container
 RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm .bashrc .profile; \
     cd .dotfiles; ./install.sh
+
+# avoid the annoyance of having to manually open .Rproj file
+# https://rstudio.github.io/rstudioapi/reference/projects.html
+# https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
+# https://stackoverflow.com/a/71522220
+RUN echo "setHook('rstudio.sessionInit', function(newSession) { if (newSession) rstudioapi::openProject('${PROJECT}') }, action = 'append')" >> ${HOME}/.Rprofile
 
 # clean up compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
