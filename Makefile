@@ -105,7 +105,7 @@ endif
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
 
-docker-clean-build:
+docker-build-clean:
 	@echo $(IMAGE)
 	docker build --no-cache --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
 
