@@ -119,7 +119,7 @@ local-webapp:
 ifndef PORT
 	$(error PORT variable must be set explicitly)
 endif
-	GOOGLE_API_KEY="" chromium --app=http://localhost:$(PORT) &
+	chromium --app=http://localhost:$(PORT) &
 
 remote-webapp:
 ifndef SERVER
@@ -138,7 +138,7 @@ endif
 		exit 1; \
 	    }; \
 	fi; \
-	GOOGLE_API_KEY="" chromium --app=http://localhost:$(PORT) &
+	chromium --app=http://localhost:$(PORT) &
 
 port-forward:
 ifndef SERVER
