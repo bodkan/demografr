@@ -112,10 +112,10 @@ RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm .bas
     cd .dotfiles; ./install.sh
 
 # avoid the annoyance of having to manually open .Rproj file
-# https://rstudio.github.io/rstudioapi/reference/projects.html
+# https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
-# https://stackoverflow.com/a/71522220
-RUN echo "setHook('rstudio.sessionInit', function(newSession) { if (newSession) rstudioapi::openProject('${PROJECT}') }, action = 'append')" >> ${HOME}/.Rprofile
+RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" \
+    >> ${HOME}/.Rprofile
 
 # clean up compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
