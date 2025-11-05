@@ -107,10 +107,10 @@ ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.4
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 # clone configuration dotfiles into the container
-RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm .bashrc .profile; \
+RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm -f .bashrc .profile; \
     cd .dotfiles; ./install.sh
 
-# make sure the project is ready and opened when RStudio Server starts
+# make sure the project is ready when RStudio Server session starts
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
 RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" \
