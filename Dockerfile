@@ -80,6 +80,8 @@ WORKDIR $PROJECT
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 ENV R_INSTALL_STAGED=FALSE
 
+# every R package in the container is locked in a dedicated renv environment, but
+# this one package is used system-wide to manage RStudio Server
 RUN R -e 'install.packages("rstudioapi")'
 
 # do this when first setting up the container to create an renv.lock file:
@@ -91,31 +93,28 @@ RUN R -e 'install.packages("rstudioapi")'
 #   options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   renv::snapshot(dev = TRUE)
 
-# for 'production' builds, restore all R dependencies at their locked-in versions
+# install required R packages to their locked-in versions
 COPY DESCRIPTION .
 COPY renv.lock .Rprofile ./
 COPY renv/ renv/
 ARG GITHUB_PAT="''"
 RUN R -e 'renv::restore()'
 
-# rather than installing a separate Python interpreter, use the Python environment
-# that's installed and used by slendr, in order to avoid version compatibility issues
+# setup Python environment for slendr
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
+# rather than installing a separate Python interpreter, use the slendr one
 ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.4_tskit-0.6.4_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
-
-# set the default directory of RStudio Server to the project directory
-RUN echo "session-default-working-dir=${PROJECT}" >> /etc/rstudio/rsession.conf
 
 # clone configuration dotfiles into the container
 RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm .bashrc .profile; \
     cd .dotfiles; ./install.sh
 
-# avoid the annoyance of having to manually open .Rproj file
+# make sure the project is ready and opened when RStudio Server starts
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
 RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" \
     >> ${HOME}/.Rprofile
 
-# clean up compilation sources and other redundant files
+# remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
