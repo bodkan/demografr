@@ -2,6 +2,10 @@ FROM rocker/rstudio:4.5.1
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
+############################################################
+# setup the base system
+############################################################
+
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update -y \
@@ -52,14 +56,20 @@ RUN apt-get update -y \
         vim \
         wget \
         zlib1g-dev
-# Fix for 'Errors were encountered while processing: fontconfig' during unminimize
-RUN fc-cache -f; yes | unminimize
 
-# location for compiled binaries, renv R libraries, and Python modules
+# fix for 'Errors were encountered while processing: fontconfig' while running unminimize
+RUN fc-cache -f
+# make sure we have man pages available
+RUN yes | unminimize
+
+# the container is intended as a dedicated environment to be run in a rootless setting
 ENV HOME="/root"
 
-# all compiled binaries and scripts used by processing and analysis pipelines
-# will be copied to $HOME/bin which will be added to $PATH
+############################################################
+# compile and install third-party software dependencies
+############################################################
+
+# all compiled binaries and scripts used by the project will be in this location
 ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
@@ -70,14 +80,19 @@ RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v5.1.tar.g
 # install all compiled software into $PATH
 RUN cd /tmp; cp SLiM-*/build/slim SLiM-*/build/eidos $BIN
 
+############################################################
+# install R packages required by the project
+############################################################
+
 # location for the whole project (scripts, notebooks, and data) inside the container
 ENV PROJECT=/project
-
-# setup all required R and Python packages
 WORKDIR $PROJECT
 
-# save R packages to home inside the container to avoid cluttering the project directory
+# save R packages under home in the container to avoid cluttering the project directory
+# (because the project itself will be mounted from the host system)
 ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
+# fix an obscure error during R package installations:
+# https://github.com/rstudio/renv/issues/239#issuecomment-553595005
 ENV R_INSTALL_STAGED=FALSE
 
 # every R package in the container is locked in a dedicated renv environment, but
@@ -88,7 +103,7 @@ RUN R -e 'install.packages("rstudioapi")'
 #   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.5.tar.gz"
 #   wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.5.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
-#   export GITHUB_PAT=''
+#   export GITHUB_PAT='<place GitHub token here if needed>'
 #   renv::init(bare = TRUE, bioconductor = "3.22")
 #   options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   renv::snapshot(dev = TRUE)
@@ -106,7 +121,11 @@ RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
 ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.12_msprime-1.3.4_tskit-0.6.4_pyslim-1.0.4_tspop-0.0.2/bin:${PATH}"
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
-# clone configuration dotfiles into the container
+############################################################
+# final configuration steps
+############################################################
+
+# clone shell configuration files into the container
 RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm -f .bashrc .profile; \
     cd .dotfiles; ./install.sh
 
