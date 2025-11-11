@@ -1,6 +1,10 @@
-FROM rocker/rstudio:4.5.1
+FROM rocker/rstudio:4.5.2
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
+
+ENV SLIM_VERSION="v5.1" \
+    RENV_VERSION="v1.1.5" \
+    BIOCONDUCTOR_VERSION="3.22"
 
 ############################################################
 # setup the base system
@@ -57,7 +61,7 @@ RUN apt-get update -y \
         wget \
         zlib1g-dev
 
-# fix for 'Errors were encountered while processing: fontconfig' while running unminimize
+# fix 'Errors were encountered while processing: fontconfig' during unminimize
 RUN fc-cache -f
 # make sure we have man pages available
 RUN yes | unminimize
@@ -74,7 +78,7 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/v5.1.tar.gz -O slim.tar.gz; \
+RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/${SLIM_VERSION}.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
@@ -95,16 +99,17 @@ ENV RENV_PATHS_LIBRARY_ROOT="${HOME}/renv"
 # https://github.com/rstudio/renv/issues/239#issuecomment-553595005
 ENV R_INSTALL_STAGED=FALSE
 
+ENV RENV_BOOTSTRAP_TARBALL="/tmp/${RENV_VERSION}.tar.gz"
+RUN wget https://github.com/rstudio/renv/archive/refs/tags/${RENV_VERSION}.tar.gz -O $RENV_BOOTSTRAP_TARBALL
+
 # every R package in the container is locked in a dedicated renv environment, but
 # this one package is used system-wide to manage RStudio Server
 RUN R -e 'install.packages("rstudioapi")'
 
 # do this when first setting up the container to create an renv.lock file:
-#   export RENV_BOOTSTRAP_TARBALL="/tmp/v1.1.5.tar.gz"
-#   wget https://github.com/rstudio/renv/archive/refs/tags/v1.1.5.tar.gz -O $RENV_BOOTSTRAP_TARBALL
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
-#   export GITHUB_PAT='<place GitHub token here if needed>'
-#   renv::init(bare = TRUE, bioconductor = "3.22")
+#   export GITHUB_PAT='<PLACE GITHUB TOKEN HERE IF NEEDED>'
+#   renv::init(bare = TRUE, bioconductor = "${BIOCONDUCTOR_VERSION}")
 #   options(timeout=600); install.packages("remotes"); remotes::install_deps(dependencies = TRUE)
 #   renv::snapshot(dev = TRUE)
 
@@ -118,7 +123,8 @@ RUN R -e 'renv::restore()'
 # setup Python environment for slendr
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
 # rather than installing a separate Python interpreter, use the slendr one
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2/bin:${PATH}"
+ENV PYTHON_ENV="Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2" \
+    PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
 
 # make sure all software is available in R
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
@@ -134,8 +140,7 @@ RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm -f .
 # make sure the project is ready when RStudio Server session starts
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
-RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" \
-    >> ${HOME}/.Rprofile
+RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" >> ${HOME}/.Rprofile
 
 # remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
