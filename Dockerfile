@@ -119,6 +119,8 @@ RUN R -e 'renv::restore()'
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
 # rather than installing a separate Python interpreter, use the slendr one
 ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2/bin:${PATH}"
+
+# make sure all software is available in R
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 ############################################################
