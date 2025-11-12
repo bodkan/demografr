@@ -4,7 +4,8 @@ LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
 ENV SLIM_VERSION="v5.1" \
     RENV_VERSION="v1.1.5" \
-    BIOCONDUCTOR_VERSION="3.22"
+    BIOCONDUCTOR_VERSION="3.22" \
+    PYTHON_ENV="Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2"
 
 ############################################################
 # setup the base system
@@ -123,8 +124,7 @@ RUN R -e 'renv::restore()'
 # setup Python environment for slendr
 RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
 # rather than installing a separate Python interpreter, use the slendr one
-ENV PYTHON_ENV="Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2" \
-    PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
+ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
 
 # make sure all software is available in R
 RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
