@@ -63,9 +63,7 @@ RUN apt-get update -y \
         zlib1g-dev
 
 # fix 'Errors were encountered while processing: fontconfig' during unminimize
-RUN fc-cache -f
-# make sure we have man pages available
-RUN yes | unminimize
+RUN fc-cache -f; yes | unminimize
 
 # the container is intended as a dedicated environment to be run in a rootless setting
 ENV HOME="/root"
