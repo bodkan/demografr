@@ -48,7 +48,7 @@ clean:
 
 
 $(pkg): README.md
-	@if [ "$$IN_CONTAINER" = "TRUE" ]; then \
+	@if [ -f /.dockerenv ]; then \
 		echo "Attempting to build inside a container"; \
 		exit 1; \
 	fi
@@ -65,7 +65,10 @@ README.md: README.Rmd $(logo)
 	# 	man/figures/README-prior_T_gf-1.png
 
 $(logo): logo.R
-	R -e 'source("logo.R")'
+	Rscript logo.R
+
+example_data:
+
 
 ##################################################################
 # Docker shortcuts
