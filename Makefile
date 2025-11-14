@@ -55,7 +55,7 @@ $(pkg): README.md
 	R -e 'devtools::document()'
 	mkdir -p build; cd build; R CMD build --log ../../demografr
 
-README.md: README.Rmd $(logo)
+README.md: README.Rmd $(logo) inst/examples/basics_abc.rds
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
 	# restore back useless updates to the non-random figures made by pkgdown
@@ -64,11 +64,12 @@ README.md: README.Rmd $(logo)
 	# 	man/figures/README-prior_Ne-1.png \
 	# 	man/figures/README-prior_T_gf-1.png
 
+inst/examples/basics_abc.rds:
+	mkdir -p /tmp/demografr
+	R -e 'knitr::knit("vignettes/vignette-01-basics.Rmd", output = tempfile())'
+
 $(logo): logo.R
 	Rscript logo.R
-
-example_data:
-
 
 ##################################################################
 # Docker shortcuts
