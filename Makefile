@@ -65,8 +65,10 @@ README.md: README.Rmd $(logo) inst/examples/basics_abc.rds
 	# 	man/figures/README-prior_T_gf-1.png
 
 inst/examples/basics_abc.rds:
-	mkdir -p /tmp/demografr
-	R -e 'knitr::knit("vignettes/vignette-01-basics.Rmd", output = tempfile())'
+	# make sure summary statistics are in the installation location
+	R -e 'devtools::install(upgrade = "never")'
+	# generate ABC results based on those summary statistics
+	R -e 'pkgdown::build_article("vignettes/vignette-01-basics")'
 
 $(logo): logo.R
 	Rscript logo.R
