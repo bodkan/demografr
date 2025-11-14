@@ -311,22 +311,22 @@ function `extract_summary()`:
 
 ``` r
 extract_summary(abc)
-#>                            Ne_A      Ne_B      Ne_C     Ne_D       T_AB
-#> Min.:                  1609.744  682.6193  7389.026 1846.029  -96.82908
-#> Weighted 2.5 % Perc.:  1812.239  729.5846  7585.374 2691.913 1242.73702
-#> Weighted Median:       2030.741  837.2673  8588.420 3785.385 1907.90411
-#> Weighted Mean:         2019.638  841.6564  8674.207 3805.943 1949.07359
-#> Weighted Mode:         2049.985  847.0022  8469.365 3642.722 1911.88919
-#> Weighted 97.5 % Perc.: 2204.442  979.8260  9543.851 4742.401 2690.25909
-#> Max.:                  2281.020 1038.0898 10965.790 5915.021 2921.08324
-#>                            T_BC     T_CD       gf_BC
-#> Min.:                  5272.336 6608.244 -0.02143034
-#> Weighted 2.5 % Perc.:  5630.022 7105.185  0.03373237
-#> Weighted Median:       6133.605 7829.842  0.09864958
-#> Weighted Mean:         6110.468 7814.700  0.10241672
-#> Weighted Mode:         6236.457 7855.537  0.09655264
-#> Weighted 97.5 % Perc.: 6603.022 8379.513  0.17629759
-#> Max.:                  6838.022 8551.676  0.21388432
+#>                            Ne_A      Ne_B      Ne_C     Ne_D      T_AB     T_BC
+#> Min.:                  1492.557  526.6231  6373.061 2254.591  859.5749 5131.473
+#> Weighted 2.5 % Perc.:  1774.758  672.5853  7344.040 2895.795 1318.3159 5595.637
+#> Weighted Median:       2032.148  848.1467  8553.144 3814.660 1934.0008 6136.188
+#> Weighted Mean:         2021.722  838.5594  8678.066 3804.614 1954.3343 6112.305
+#> Weighted Mode:         2054.933  861.3408  8428.777 3721.917 1933.3694 6230.341
+#> Weighted 97.5 % Perc.: 2270.334 1003.8421 10162.320 4530.273 2522.5919 6611.315
+#> Max.:                  2438.657 1047.0935 12703.479 5764.139 2650.7248 6851.800
+#>                            T_CD       gf_BC
+#> Min.:                  6752.669 -0.04681798
+#> Weighted 2.5 % Perc.:  7125.349  0.02469992
+#> Weighted Median:       7835.810  0.09867650
+#> Weighted Mean:         7824.532  0.10282631
+#> Weighted Mode:         7851.617  0.09804401
+#> Weighted 97.5 % Perc.: 8426.377  0.18467366
+#> Max.:                  8476.157  0.21801675
 ```
 
 We can also specify a subset of model parameters to select, or provide a
@@ -336,13 +336,13 @@ regular expression for this subsetting:
 ``` r
 extract_summary(abc, param = "gf_BC")
 #>                              gf_BC
-#> Min.:                  -0.02143034
-#> Weighted 2.5 % Perc.:   0.03373237
-#> Weighted Median:        0.09864958
-#> Weighted Mean:          0.10241672
-#> Weighted Mode:          0.09655264
-#> Weighted 97.5 % Perc.:  0.17629759
-#> Max.:                   0.21388432
+#> Min.:                  -0.04681798
+#> Weighted 2.5 % Perc.:   0.02469992
+#> Weighted Median:        0.09867650
+#> Weighted Mean:          0.10282631
+#> Weighted Mode:          0.09804401
+#> Weighted 97.5 % Perc.:  0.18467366
+#> Max.:                   0.21801675
 ```
 
 Of course, we can also visualize the posterior distributions. Rather than
