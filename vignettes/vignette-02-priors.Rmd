@@ -21,7 +21,7 @@ get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
   else
-    return(file.path("inst/", path))
+    return(here::here(file.path("inst/", path)))
 }
 
 set.seed(42)

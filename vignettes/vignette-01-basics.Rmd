@@ -24,13 +24,11 @@ get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
   else
-    return(file.path("inst/", path))
+    return(here::here(file.path("inst/", path)))
 }
 
 abc_path <- get_cache("examples/basics_abc.rds")
-```
 
-```{r, echo=FALSE, message=FALSE}
 SEED <- 42
 set.seed(SEED)
 ```
