@@ -68,7 +68,9 @@ inst/examples/basics_abc.rds:
 	# make sure summary statistics are in the installation location
 	R -e 'devtools::install(upgrade = "never")'
 	# generate ABC results based on those summary statistics
-	R -e 'pkgdown::build_article("vignettes/vignette-01-basics")'
+	R -e 'pkgdown::build_article("vignette-01-basics")'
+	# discard the figures (they will be created by the website rule for everything)
+	git checkout docs/articles/vignette-01-basics_files/
 
 $(logo): logo.R
 	Rscript logo.R
