@@ -70,33 +70,33 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
       y <- as.symbol(colnames(observed_df)[2])
 
       p <-
-        ggplot() +
-          geom_line(data = predicted_df[[s]], aes(!!x, !!y, color = rep, group = rep), alpha = 0.5) +
-          geom_line(data = observed_df, aes(!!x, !!y, linetype = "observed"), color = "red") +
-          scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
-          scale_color_continuous(name = "samples") +
-          theme(legend.position = "bottom")
+        ggplot2::ggplot() +
+          ggplot2::geom_line(data = predicted_df[[s]], ggplot2::aes(!!x, !!y, color = rep, group = rep), alpha = 0.5) +
+          ggplot2::geom_line(data = observed_df, ggplot2::aes(!!x, !!y, linetype = "observed"), color = "red") +
+          ggplot2::scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
+          ggplot2::scale_color_continuous(name = "samples") +
+          ggplot2::theme(legend.position = "bottom")
     } else {
       color_by <- as.symbol(if (length(s) > 1) "summary" else "stat")
       scales <- if (length(stat) > 1) "free" else NULL
 
       p <-
-        ggplot(predicted_df[[s]], aes(value, color = !!color_by, fill = !!color_by)) +
-          geom_density(alpha = 0.5) +
-          geom_vline(data = observed_df, aes(xintercept = value, color = !!color_by, linetype = "observed")) +
-          guides(color = guide_legend("simulated"),
-                 fill = guide_legend("simulated"),
-                 linetype = guide_legend("observed")) +
-        scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
-        theme_minimal() +
-        theme(legend.position = "bottom")
+        ggplot2::ggplot(predicted_df[[s]], ggplot2::aes(value, color = !!color_by, fill = !!color_by)) +
+          ggplot2::geom_density(alpha = 0.5) +
+          ggplot2::geom_vline(data = observed_df, ggplot2::aes(xintercept = value, color = !!color_by, linetype = "observed")) +
+          ggplot2::guides(color = ggplot2::guide_legend("simulated"),
+                          fill = ggplot2::guide_legend("simulated"),
+                          linetype = ggplot2::guide_legend("observed")) +
+        ggplot2::scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
+        ggplot2::theme_minimal() +
+        theme(ggplot2::legend.position = "bottom")
     }
 
     if (facets && !is_vector_stat) p <- p + ggplot2::facet_wrap(~ stat, scales = scales)
 
     model_name <- attr(data, "components")$model_name
     p <- p +
-      ggtitle(paste0("Posterior predictive check for model '", model_name, "' and statistic '", s, "'"))
+      ggplot2::ggtitle(paste0("Posterior predictive check for model '", model_name, "' and statistic '", s, "'"))
 
     p_stats[[length(p_stats) + 1]] <- p
   }
