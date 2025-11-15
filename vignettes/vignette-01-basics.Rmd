@@ -255,7 +255,7 @@ ts
 ```
 
 With this `ts` object, we can, for instance, test that our `compute_f4` summary
-function is defined correctly (meaning that it returns $f_4$` statistics table
+function is defined correctly (meaning that it returns an $f_4$ statistics table
 formatted in exactly the same way as the observed table above):
 
 ```{r}
