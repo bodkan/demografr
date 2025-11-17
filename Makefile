@@ -57,11 +57,6 @@ $(pkg): README.md
 README.md: README.Rmd $(logo) inst/examples/basics_abc.rds
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
-	# restore back useless updates to the non-random figures made by pkgdown
-	#git checkout \
-	# 	man/figures/README-diagnostic_Ne-1.png \
-	# 	man/figures/README-prior_Ne-1.png \
-	# 	man/figures/README-prior_T_gf-1.png
 
 inst/examples/basics_abc.rds:
 	# make sure summary statistics are in the installation location
