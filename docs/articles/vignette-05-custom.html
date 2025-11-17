@@ -268,17 +268,17 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>92</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>28</span></span></code></pre>
 <p>The function works as expected—we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">001</span>42</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>35</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">001</span>76</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>43</span></span></code></pre>
 <p>Note that we are also able to use a dedicated function for this, called <code><a href="../reference/summarise_data.html">summarise_data()</a></code>, which takes in a product of a simulation (tree sequence and/or a path to a directory with simulation results), and apply all summary functions to this data:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
@@ -286,7 +286,7 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>92</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>12</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="abc-inference">ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
@@ -356,7 +356,7 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <p>Now let’s move things one step forward. What if we either don’t find <em>slendr</em>’s tree-sequence interface to <em>tskit</em> sufficient and want to compute summary statistics from the simulated data using some external software, like PLINK or EIGENSTRAT?</p>
 <p>To keep things as easy as possible (and avoid dragging in multiple software dependencies), let’s say we have a program <code>vcfpi</code>, which is run in the following way:</p>
 <pre><code>./vcfpi --vcf &lt;path to a VCF&gt; --tsv &lt;path to a TSV table&gt;</code></pre>
-<p>You can find it at /tmp/Rtmp48CD29/temp_libpath63ec23857222f/demografr/examples/vcfpi) and run it yourself in the terminal.</p>
+<p>You can find it at /tmp/RtmpHWzs89/temp_libpath9e14f705b2eeb/demografr/examples/vcfpi) and run it yourself in the terminal.</p>
 <p>This program takes in a VCF file and computes the nucleotide diversity across all individuals in that VCF file. For simplicity, it produces a table of results in exactly the same format as the <code>observed_diversity</code> data frame above.</p>
 <p>In this particular example, we want to replace the computation of statistics performed by the R function <code>compute_diversity</code> in the previous section (which also produces a data frame) with the product of the external software <code>vcfpi</code>.</p>
 <p>(We provide this <code>vcfpi</code> program as an example script, but it could of course be any other program you could imagine.)</p>
@@ -414,18 +414,18 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $vcf</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpso80dzdemografr_1110311296/genotypes.vcf.gz"</span></span></code></pre>
+<span><span class="co">#&gt; [1] "/tmp/RtmpghDgdOdemografr_1291523499/genotypes.vcf.gz"</span></span></code></pre>
 <p>Let’s test our summary function on that VCF:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">vcf</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt;   set  diversity</span></span>
-<span><span class="co">#&gt; 1 pop 7.2777e-06</span></span></code></pre>
+<pre><code><span><span class="co">#&gt;   set    diversity</span></span>
+<span><span class="co">#&gt; 1 pop 4.120024e-06</span></span></code></pre>
 <p>Or, for convenience, we can do this using the more general function <code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
-<span><span class="co">#&gt;   set  diversity</span></span>
-<span><span class="co">#&gt; 1 pop 7.2777e-06</span></span></code></pre>
+<span><span class="co">#&gt;   set    diversity</span></span>
+<span><span class="co">#&gt; 1 pop 4.120024e-06</span></span></code></pre>
 <p>Now let’s validate our customized setup before we unleash the full scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span><span class="op">)</span></span></code></pre></div>
@@ -521,32 +521,40 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $gt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 29 × 101</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 18 × 101</span></span></span>
 <span><span class="co">#&gt;       pos pop_0_0_chr1 pop_0_0_chr2 pop_0_1_chr1 pop_0_1_chr2 pop_0_2_chr1</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">28</span>142            0            1            1            1            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">69</span>137            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">72</span>907            0            1            1            1            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">129</span>087            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">130</span>956            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">134</span>781            0            1            1            1            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">144</span>033            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">283</span>688            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">287</span>234            0            1            1            1            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">317</span>706            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 19 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">52</span>941            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">93</span>310            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">110</span>847            1            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">185</span>020            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">204</span>234            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">210</span>112            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">312</span>576            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">453</span>201            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">505</span>339            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">526</span>215            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> <span style="text-decoration: underline;">534</span>487            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> <span style="text-decoration: underline;">537</span>903            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> <span style="text-decoration: underline;">637</span>596            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> <span style="text-decoration: underline;">815</span>385            0            1            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> <span style="text-decoration: underline;">831</span>220            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> <span style="text-decoration: underline;">854</span>528            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> <span style="text-decoration: underline;">940</span>740            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> <span style="text-decoration: underline;">986</span>498            0            0            0            0            0</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 95 more variables: pop_0_2_chr2 &lt;int&gt;, pop_0_3_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_3_chr2 &lt;int&gt;, pop_0_4_chr1 &lt;int&gt;, pop_0_4_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_5_chr1 &lt;int&gt;, pop_0_5_chr2 &lt;int&gt;, pop_0_6_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_6_chr2 &lt;int&gt;, pop_0_7_chr1 &lt;int&gt;, pop_0_7_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_8_chr1 &lt;int&gt;, pop_0_8_chr2 &lt;int&gt;, pop_0_9_chr1 &lt;int&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_9_chr2 &lt;int&gt;, pop_0_10_chr1 &lt;int&gt;, pop_0_10_chr2 &lt;int&gt;, …</span></span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_9_chr2 &lt;int&gt;, pop_0_10_chr1 &lt;int&gt;, pop_0_10_chr2 &lt;int&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_11_chr1 &lt;int&gt;, pop_0_11_chr2 &lt;int&gt;, pop_0_12_chr1 &lt;int&gt;, …</span></span></span></code></pre>
 <p>Let’s test our summary function on the output of the single testing simulation run:</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 8.126061e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 1.383434e-06</span></span></code></pre>
 <p>Let’s also validate our customized setup before we unleash the full scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span><span class="op">)</span></span></code></pre></div>
@@ -656,7 +664,7 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <pre><code><span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
 <span><span class="co">#&gt; ║TreeSequence               ║</span></span>
 <span><span class="co">#&gt; ╠═══════════════╤═══════════╣</span></span>
-<span><span class="co">#&gt; ║Trees          │        704║</span></span>
+<span><span class="co">#&gt; ║Trees          │        832║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sequence Length│  1,000,000║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
@@ -664,12 +672,12 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │        100║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │  126.0 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │  148.5 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧═══════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤═════╤═════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows │Size     │Has Metadata║</span></span>
 <span><span class="co">#&gt; ╠═══════════╪═════╪═════════╪════════════╣</span></span>
-<span><span class="co">#&gt; ║Edges      │2,651│ 82.9 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Edges      │3,157│ 98.7 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Individuals│   50│  1.4 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
@@ -677,7 +685,7 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Mutations  │    0│ 16 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Nodes      │  680│ 18.6 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Nodes      │  781│ 21.4 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Populations│    1│222 Bytes│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>

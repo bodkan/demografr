@@ -176,8 +176,8 @@
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">002</span>91</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">019</span>0</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> p1    0.000<span style="text-decoration: underline;">007</span>45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> p2    0.000<span style="text-decoration: underline;">054</span>4</span></span></code></pre>
 <p>Everything works! <strong>Now, how can we parallelize the computation of diversity across all parameters of the grid?</strong></p>
 <div class="section level2">
 <h2 id="implicit-parallelization-via-future">1. Implicit parallelization via <em>future</em><a class="anchor" aria-label="anchor" href="#implicit-parallelization-via-future"></a>
@@ -209,7 +209,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 5 minutes 27 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 6 minutes 11 seconds parallelized across 96 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>
@@ -319,7 +319,7 @@
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 0 minutes 60 seconds parallelized across 96 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 1 minutes 0 seconds parallelized across 96 CPUs.</strong></p>
 <p>Notice the speed up even for this trivial simulation pipeline!</p>
 </div>
 <div class="section level3">
