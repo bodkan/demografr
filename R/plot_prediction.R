@@ -89,7 +89,7 @@ plot_prediction <- function(data, stat = NULL, file = NULL, facets = TRUE, ...) 
                           linetype = ggplot2::guide_legend("observed")) +
         ggplot2::scale_linetype_manual(name = "observed", values = "dashed", labels = "") +
         ggplot2::theme_minimal() +
-        theme(ggplot2::legend.position = "bottom")
+        ggplot2::theme(legend.position = "bottom")
     }
 
     if (facets && !is_vector_stat) p <- p + ggplot2::facet_wrap(~ stat, scales = scales)
