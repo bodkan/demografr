@@ -16,14 +16,14 @@ docs:
 	R -e 'pkgdown::build_news()'
 
 website: $(logo) README.md
-	rm vignettes/vignette-{07,08,09,10}-*.Rmd
+	for f in vignettes/vignette-{07,08,09,10}-*.Rmd; do mv $$f $${f}_; done
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
 	R -e 'pkgdown::build_site()'
-	git checkout vignettes/vignette-{07,08,09,10}-*.Rmd
+	for f in vignettes/vignette-{07,08,09,10}-*.Rmd_; do mv $$f $${f%?}; done
 
 test:
 	R -e 'devtools::test()'
@@ -44,8 +44,7 @@ winold: README.md
 
 clean:
 	rm -rf build
-	if [ -f vignettes/vignette-07-*.Rmd_ ]; then rename 's/Rmd_$$/Rmd/' vignettes/vignette-{07,08,09,10}-*.Rmd_; fi
-
+	for f in vignettes/vignette-{07,08,09,10}-*.Rmd_; do if [ -f $$f ]; then mv $$f $${f%?}; fi done
 
 $(pkg): README.md
 	@if [ -f /.dockerenv ]; then \
