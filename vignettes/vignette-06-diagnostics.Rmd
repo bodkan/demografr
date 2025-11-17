@@ -43,6 +43,8 @@ predX_path <- get_cache("examples/downstream_predX.rds")
 predY_path <- get_cache("examples/downstream_predY.rds")
 predZ_path <- get_cache("examples/downstream_predZ.rds")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
+
+set.seed(42)
 ```
 
 ```{r, echo=FALSE}
