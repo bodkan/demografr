@@ -78,7 +78,3 @@ news:
 
 template:
   bootstrap: 5
-  params:
-    docsearch:
-      api_key: a232fffe35f6bc68735023bb34d1fee2
-      index_name: bodkan
