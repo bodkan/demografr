@@ -12,8 +12,6 @@
 
 <!-- badges: end -->
 
-<img src="man/figures/logo.png" align="right" />
-
 ⚠️⚠️⚠️
 
 **Please note that until a peer reviewed publication describing the
