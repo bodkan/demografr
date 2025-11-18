@@ -16,12 +16,11 @@
 
 ⚠️⚠️⚠️
 
-**Please note that _demografr_ is still under active development.
-If you'd like to be notified of updates and releases, click on on
-"Watch" on top of the main GitHub page. You should also keep an eye on
-the [changelog](https://bodkan.net/demografr/news/).**
+**Please note that until a peer reviewed publication describing the
+_demografr_ package is published, the software should be regarded as 
+experimental and potentially unstable.**
 
-⚠️⚠️⚠️
+⚠️️⚠️⚠️
 
 The goal of _demografr_ is to simplify and streamline the development of
 simulation-based inference pipelines in population genetics and evolutionary
