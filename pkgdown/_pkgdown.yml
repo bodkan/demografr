@@ -78,3 +78,5 @@ news:
 
 template:
   bootstrap: 5
+
+llm-docs: false
