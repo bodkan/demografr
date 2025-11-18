@@ -36,7 +36,9 @@ data_path <- get_cache("examples/grid_data.rds")
 
 ⚠️⚠️⚠️
 
-**The _demografr_ R package is still under active development!**
+**Please note that until a peer reviewed publication describing the
+_demografr_ package is published, the software should be regarded as 
+experimental and potentially unstable.**
 
 ⚠️⚠️⚠️
 
