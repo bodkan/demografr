@@ -58,9 +58,6 @@
   </div>
 </nav><div class="container template-article">
 
-
-
-
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>A basic ABC workflow</h1>
@@ -73,32 +70,16 @@
     
     
 <p>⚠️⚠️⚠️</p>
-<p><strong>Please note that until a peer reviewed publication describing
-the <em>demografr</em> package is published, the software should be
-regarded as experimental and potentially unstable.</strong></p>
+<p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
-<p>This vignette contains an expanded version of the basic ABC inference
-example from the <a href="https://bodkan.net/demografr/">homepage</a> of
-<em>demografr</em>. It walks through the process of setting up a
-<em>demografr</em> ABC inference pipeline step by step.</p>
+<p>This vignette contains an expanded version of the basic ABC inference example from the <a href="https://bodkan.net/demografr/">homepage</a> of <em>demografr</em>. It walks through the process of setting up a <em>demografr</em> ABC inference pipeline step by step.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Imagine that we sequenced genomes of individuals from populations
-“A”, “B”, “C”, and “D”.</p>
-<p>Let’s also assume that we know that the populations are
-phylogenetically related in the following way but we don’t know anything
-else (i.e., we have no idea about the values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>,
-split times, or gene-flow proportions):</p>
+<p>Imagine that we sequenced genomes of individuals from populations “A”, “B”, “C”, and “D”.</p>
+<p>Let’s also assume that we know that the populations are phylogenetically related in the following way but we don’t know anything else (i.e., we have no idea about the values of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, split times, or gene-flow proportions):</p>
 <p><img src="vignette-01-basics_files/figure-html/ape_tree-1.png" class="r-plt" width="300" style="display: block; margin: auto;"></p>
-<p>After sequencing the genomes of individuals from these populations,
-we computed nucleotide diversity in these populations as well as their
-pairwise genetic divergence and a one
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>
-statistic, observing the following values of these summary statistics
-(which we saved in standard R data frames—perhaps saved by the software
-we used for computing these from empirical sequence data):</p>
+<p>After sequencing the genomes of individuals from these populations, we computed nucleotide diversity in these populations as well as their pairwise genetic divergence and a one <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> statistic, observing the following values of these summary statistics (which we saved in standard R data frames—perhaps saved by the software we used for computing these from empirical sequence data):</p>
 <ol style="list-style-type: decimal">
 <li>Nucleotide diversity in each population:</li>
 </ol>
@@ -126,8 +107,7 @@ we used for computing these from empirical sequence data):</p>
 <span><span class="co">#&gt; 5 B D 0.0001157056</span></span>
 <span><span class="co">#&gt; 6 C D 0.0001100633</span></span></code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li>Value of the following
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>-statistic:</li>
+<li>Value of the following <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>-statistic:</li>
 </ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_f4</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_f4.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -135,19 +115,12 @@ we used for computing these from empirical sequence data):</p>
 <span><span class="va">observed_f4</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;   W X Y Z            f4</span></span>
 <span><span class="co">#&gt; 1 A B C D -3.262146e-06</span></span></code></pre>
-<p><strong>Now let’s develop a simple ABC pipeline which will infer the
-posterior distributions of two sets of parameters we are interested in:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
-of each population lineage, as well as split times between our
-populations of interest, and the gene-flow proportion.</strong></p>
+<p><strong>Now let’s develop a simple ABC pipeline which will infer the posterior distributions of two sets of parameters we are interested in: <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of each population lineage, as well as split times between our populations of interest, and the gene-flow proportion.</strong></p>
 </div>
 <div class="section level2">
 <h2 id="developing-an-abc-pipeline">Developing an ABC pipeline<a class="anchor" aria-label="anchor" href="#developing-an-abc-pipeline"></a>
 </h2>
-<p>Let’s begin by loading <em>demografr</em> together with the R package
-<a href="https://slendr.net/" class="external-link"><em>slendr</em></a> on which
-<em>demografr</em> relies on for building and simulating demographic
-models.</p>
+<p>Let’s begin by loading <em>demografr</em> together with the R package <a href="https://slendr.net/" class="external-link"><em>slendr</em></a> on which <em>demografr</em> relies on for building and simulating demographic models.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
@@ -159,10 +132,7 @@ models.</p>
 <span><span class="co"># setup parallelization across all CPUs</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>For the purpose of our ABC inference, we will bind all statistics in
-an R list, naming them appropriately. The names of each statistic (here
-“diversity”, “divergence”, and “f4”) have a meaning and are quite
-important for later steps:</p>
+<p>For the purpose of our ABC inference, we will bind all statistics in an R list, naming them appropriately. The names of each statistic (here “diversity”, “divergence”, and “f4”) have a meaning and are quite important for later steps:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  diversity  <span class="op">=</span> <span class="va">observed_diversity</span>,</span>
@@ -172,11 +142,7 @@ important for later steps:</p>
 <div class="section level3">
 <h3 id="setting-up-a-scaffold-model">1. Setting up a “scaffold” model<a class="anchor" aria-label="anchor" href="#setting-up-a-scaffold-model"></a>
 </h3>
-<p>The first step in a <em>demografr</em> ABC analysis is setting up a
-“scaffold” model—a <em>slendr</em> function which will produce a
-compiled <em>slendr</em> model object, and which will accept the model
-parameters in form of normal R function arguments. In our simple
-examples, we will define the following function:</p>
+<p>The first step in a <em>demografr</em> ABC analysis is setting up a “scaffold” model—a <em>slendr</em> function which will produce a compiled <em>slendr</em> model object, and which will accept the model parameters in form of normal R function arguments. In our simple examples, we will define the following function:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Ne_A</span>, <span class="va">Ne_B</span>, <span class="va">Ne_C</span>, <span class="va">Ne_D</span>, <span class="va">T_AB</span>, <span class="va">T_BC</span>, <span class="va">T_CD</span>, <span class="va">gf_BC</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"A"</span>, time <span class="op">=</span> <span class="fl">1</span>,    N <span class="op">=</span> <span class="va">Ne_A</span><span class="op">)</span></span>
@@ -206,11 +172,7 @@ examples, we will define the following function:</p>
 <div class="section level3">
 <h3 id="setting-up-priors">2. Setting up priors<a class="anchor" aria-label="anchor" href="#setting-up-priors"></a>
 </h3>
-<p>We are interested in estimating the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
-of all populations, their split times, and gene-flow proportion which
-means we need to specify priors. <em>demografr</em> makes this very easy
-using its own readable syntax:</p>
+<p>We are interested in estimating the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of all populations, their split times, and gene-flow proportion which means we need to specify priors. <em>demografr</em> makes this very easy using its own readable syntax:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va">Ne_A</span>  <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="fl">3000</span><span class="op">)</span>,</span>
@@ -224,38 +186,14 @@ using its own readable syntax:</p>
 <span></span>
 <span>  <span class="va">gf_BC</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.3</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>In an ABC simulation step below, the formulas are used to draw the
-values of each parameter from specified distributions (in this case, all
-uniform distributions).</p>
-<p>For more detail into how <em>demografr</em>’s prior sampling formulas
-work (and why), take a look at <a href="vignette-02-priors.html">this
-vignette</a>.</p>
+<p>In an ABC simulation step below, the formulas are used to draw the values of each parameter from specified distributions (in this case, all uniform distributions).</p>
+<p>For more detail into how <em>demografr</em>’s prior sampling formulas work (and why), take a look at <a href="vignette-02-priors.html">this vignette</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="defining-summary-statistics">3. Defining summary statistics<a class="anchor" aria-label="anchor" href="#defining-summary-statistics"></a>
 </h3>
-<p>Each run of a <em>demografr</em> ABC simulation internally produces a
-tree sequence. Because tree sequence represents an efficient, succint
-representation of the complete genealogical history of a set of samples,
-it is possible to compute population genetic statistics directly on the
-tree sequence without having to first save the outcome of each
-simulation to disk for computation in different software. Thanks to
-<em>slendr</em>’s library of <a href="https://slendr.net/reference/index.html#tree-sequence-statistics" class="external-link">tree-sequence
-functions</a> serving as an R interface to the <a href="https://tskit.dev/tskit/docs/stable/stats.html" class="external-link"><em>tskit</em>
-module</a>, we can specify summary statistics to be computed for ABC
-using normal R code.</p>
-<p>In our example, because we computed nucleotide diversity, pairwise
-divergence, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>
-from the sequence data, we will define the following summary statistic
-functions. Crucially, when run on a tree-sequence object, they will
-produce a data frame in the format analogous to the empirical statistics
-shown in data frames with the observed summary statistics above. This is
-a very important point: each observed statistic must have the same
-format (and dimension) as the data frames produced by the simulation
-summary functions. This minor inconvenience during ABC setup saves us
-the headache of having to match values of statistics between observed
-and simulated data during ABC inference itself.</p>
+<p>Each run of a <em>demografr</em> ABC simulation internally produces a tree sequence. Because tree sequence represents an efficient, succint representation of the complete genealogical history of a set of samples, it is possible to compute population genetic statistics directly on the tree sequence without having to first save the outcome of each simulation to disk for computation in different software. Thanks to <em>slendr</em>’s library of <a href="https://slendr.net/reference/index.html#tree-sequence-statistics" class="external-link">tree-sequence functions</a> serving as an R interface to the <a href="https://tskit.dev/tskit/docs/stable/stats.html" class="external-link"><em>tskit</em> module</a>, we can specify summary statistics to be computed for ABC using normal R code.</p>
+<p>In our example, because we computed nucleotide diversity, pairwise divergence, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> from the sequence data, we will define the following summary statistic functions. Crucially, when run on a tree-sequence object, they will produce a data frame in the format analogous to the empirical statistics shown in data frames with the observed summary statistics above. This is a very important point: each observed statistic must have the same format (and dimension) as the data frames produced by the simulation summary functions. This minor inconvenience during ABC setup saves us the headache of having to match values of statistics between observed and simulated data during ABC inference itself.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span></span>
@@ -277,21 +215,14 @@ and simulated data during ABC inference itself.</p>
 <span>  divergence <span class="op">=</span> <span class="va">compute_divergence</span>,</span>
 <span>  f4         <span class="op">=</span> <span class="va">compute_f4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Of course, having to run ABC simulations in order to check that the
-summary functions have been correctly defined would be slow and
-potentially costly in terms of wasted computation. To speed this process
-up, <em>demografr</em> provides a helper function
-<code><a href="../reference/simulate_model.html">simulate_model()</a></code> which allows us to simulate a single
-tree-sequence object from the specified model. We can then use that tree
-sequence to develop (and test) our summary functions before proceeding
-further, like this:</p>
+<p>Of course, having to run ABC simulations in order to check that the summary functions have been correctly defined would be slow and potentially costly in terms of wasted computation. To speed this process up, <em>demografr</em> provides a helper function <code><a href="../reference/simulate_model.html">simulate_model()</a></code> which allows us to simulate a single tree-sequence object from the specified model. We can then use that tree sequence to develop (and test) our summary functions before proceeding further, like this:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span><span class="va">ts</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
 <span><span class="co">#&gt; ║TreeSequence               ║</span></span>
 <span><span class="co">#&gt; ╠═══════════════╤═══════════╣</span></span>
-<span><span class="co">#&gt; ║Trees          │      1,782║</span></span>
+<span><span class="co">#&gt; ║Trees          │      1,898║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sequence Length│  1,000,000║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
@@ -299,12 +230,12 @@ further, like this:</p>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │        200║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │  383.2 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │  401.0 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧═══════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤═════╤═════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows │Size     │Has Metadata║</span></span>
 <span><span class="co">#&gt; ╠═══════════╪═════╪═════════╪════════════╣</span></span>
-<span><span class="co">#&gt; ║Edges      │7,981│249.4 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Edges      │8,398│262.4 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Individuals│  100│  2.8 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
@@ -312,7 +243,7 @@ further, like this:</p>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Mutations  │    0│ 16 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Nodes      │2,360│ 64.5 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Nodes      │2,416│ 66.1 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Populations│    4│331 Bytes│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
@@ -320,42 +251,20 @@ further, like this:</p>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Sites      │    0│ 16 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧═════╧═════════╧════════════╝</span></span></code></pre>
-<p>With this <code>ts</code> object, we can, for instance, test that our
-<code>compute_f4</code> summary function is defined correctly (meaning
-that it returns an
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>
-statistics table formatted in exactly the same way as the observed table
-above):</p>
+<p>With this <code>ts</code> object, we can, for instance, test that our <code>compute_f4</code> summary function is defined correctly (meaning that it returns an <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> statistics table formatted in exactly the same way as the observed table above):</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">f4</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
 <span><span class="co">#&gt;   W     X     Y     Z        f4</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> A     B     C     D         0</span></span></code></pre>
-<p>Looks good! (We have zero
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>
-values because we didn’t specify mutation rate in
-<code>simulate_model</code>, as we were only interested in the
-compatibility of the formats and dimensions of both simulated and
-observed
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>
-tables). Of course, in your pipeline, you might (should!) check that all
-of your summary functions are set up correctly.</p>
+<p>Looks good! (We have zero <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> values because we didn’t specify mutation rate in <code>simulate_model</code>, as we were only interested in the compatibility of the formats and dimensions of both simulated and observed <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> tables). Of course, in your pipeline, you might (should!) check that all of your summary functions are set up correctly.</p>
 </div>
 <div class="section level3">
 <h3 id="abc-simulations">4. ABC simulations<a class="anchor" aria-label="anchor" href="#abc-simulations"></a>
 </h3>
-<p>Having defined the scaffold model, a set of priors for our parameters
-of interest
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>,
-split times, gene-flow proportion), as well as two summary statistic
-functions, we can integrate all this information into the function
-<code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>.</p>
-<p>Before we run a potentially computationally costly simulations, it is
-a good idea to again validate the ABC components we have so far
-assembled using the function <code><a href="../reference/validate_abc.html">validate_abc()</a></code>. This provides
-much more elaborate correctness checks beyond the simple testing of the
-summary functions as we did above.</p>
+<p>Having defined the scaffold model, a set of priors for our parameters of interest (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, split times, gene-flow proportion), as well as two summary statistic functions, we can integrate all this information into the function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>.</p>
+<p>Before we run a potentially computationally costly simulations, it is a good idea to again validate the ABC components we have so far assembled using the function <code><a href="../reference/validate_abc.html">validate_abc()</a></code>. This provides much more elaborate correctness checks beyond the simple testing of the summary functions as we did above.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>,</span>
 <span>             sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></code></pre></div>
@@ -388,69 +297,35 @@ summary functions as we did above.</p>
 <span><span class="co">#&gt;   - f4 [data frame] ✅</span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<p>Having verified that all model components are set up correctly, we
-can proceed to the ABC simulations themselves, using
-<em>demografr</em>’s function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>:</p>
+<p>Having verified that all model components are set up correctly, we can proceed to the ABC simulations themselves, using <em>demografr</em>’s function <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_abc.html">simulate_abc</a></span><span class="op">(</span></span>
 <span>  <span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">10e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <!--"0 hours 26 minutes 3 seconds"-->
-<p><strong>The total runtime for the ABC simulations was 0 hours 30
-minutes 55 seconds parallelized across 96 CPUs.</strong></p>
-<p>At this point we have generated summary statistics for simulations of
-models using parameters drawn from our priors. In the next step, we can
-finally do inference of our parameters.</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 30 minutes 55 seconds parallelized across 96 CPUs.</strong></p>
+<p>At this point we have generated summary statistics for simulations of models using parameters drawn from our priors. In the next step, we can finally do inference of our parameters.</p>
 </div>
 <div class="section level3">
 <h3 id="abc-inference">5. ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
 </h3>
-<p>Having all the information about observed and simulated data bound in
-a single R object <code>data</code>, we can finally infer the posterior
-distribution of our model parameters using ABC. <em>demografr</em>
-includes a convenient function <code><a href="../reference/run_abc.html">run_abc()</a></code> which reformats
-the simulated and observed data in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and
-internally calls its own function <code>abc()</code>.</p>
-<p>Note that <code>run_abc</code> is just convenience wrapper around the
-<code>abc()</code> function in the package
-<em>abc</em><code>, saving us a lot of work with the reformatting of data that's otherwise necessary. As such, all parameters of the function</code>abc()<code>can be provided to</code>run_abc()`,
-which will then pass them on appropriately.</p>
+<p>Having all the information about observed and simulated data bound in a single R object <code>data</code>, we can finally infer the posterior distribution of our model parameters using ABC. <em>demografr</em> includes a convenient function <code><a href="../reference/run_abc.html">run_abc()</a></code> which reformats the simulated and observed data in a format required by the R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> and internally calls its own function <code>abc()</code>.</p>
+<p>Note that <code>run_abc</code> is just convenience wrapper around the <code>abc()</code> function in the package <em>abc</em><code>, saving us a lot of work with the reformatting of data that's otherwise necessary. As such, all parameters of the function</code>abc()<code>can be provided to</code>run_abc()`, which will then pass them on appropriately.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="posterior-predictive-check">6. Posterior predictive check<a class="anchor" aria-label="anchor" href="#posterior-predictive-check"></a>
 </h3>
-<p>Before we proceed with inferring values of the model parameters from
-their posterior distributions, we should check whether our model can
-actually produce summary statistics which match the statistics observed
-in the empirical data.</p>
-<p>In order to do this, we can use <em>demografr</em>’s
-<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method which accepts two mandatory function
-arguments: the first is the <code>abc</code> object generated by the
-<code><a href="../reference/run_abc.html">run_abc()</a></code> function (containing, among other things, the
-information about the inferred posteriors), and the number of draws to
-take from the posterior distribution of the parameters:</p>
+<p>Before we proceed with inferring values of the model parameters from their posterior distributions, we should check whether our model can actually produce summary statistics which match the statistics observed in the empirical data.</p>
+<p>In order to do this, we can use <em>demografr</em>’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method which accepts two mandatory function arguments: the first is the <code>abc</code> object generated by the <code><a href="../reference/run_abc.html">run_abc()</a></code> function (containing, among other things, the information about the inferred posteriors), and the number of draws to take from the posterior distribution of the parameters:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># because we set up a parallelization plan() above, the predictions are</span></span>
 <span><span class="co"># computed in parallel across all available CPUs</span></span>
 <span><span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">abc</span>, samples <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></code></pre></div>
-<p>If we take a closer look at the produced result, we see that it’s a
-data frame object with several special columns (so-called <a href="https://dcl-prog.stanford.edu/list-columns.html" class="external-link">“list
-columns”</a>). Those columns contain nested data frames with the values
-of tree-sequence summary statistics computed for each combination of the
-parameter values. Because this data has the same format as the output of
-the function <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> (in fact, internally it
-<em>is</em> produced by this function), see the vignette on <a href="vignette-03-grids.html">grid simulations</a> for more detail how
-to analyse this.</p>
-<p>In order to examine the posterior predictive check results for
-individual (or all) summary statistics, we can use the function
-<code><a href="../reference/extract_prediction.html">extract_prediction()</a></code>. A convenient alternative to check the
-results visually is provided by the function
-<code><a href="../reference/plot_prediction.html">plot_prediction()</a></code>. For instance, we can take a look at the
-distributions of divergences produced from the parameter posterior like
-this:</p>
+<p>If we take a closer look at the produced result, we see that it’s a data frame object with several special columns (so-called <a href="https://dcl-prog.stanford.edu/list-columns.html" class="external-link">“list columns”</a>). Those columns contain nested data frames with the values of tree-sequence summary statistics computed for each combination of the parameter values. Because this data has the same format as the output of the function <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> (in fact, internally it <em>is</em> produced by this function), see the vignette on <a href="vignette-03-grids.html">grid simulations</a> for more detail how to analyse this.</p>
+<p>In order to examine the posterior predictive check results for individual (or all) summary statistics, we can use the function <code><a href="../reference/extract_prediction.html">extract_prediction()</a></code>. A convenient alternative to check the results visually is provided by the function <code><a href="../reference/plot_prediction.html">plot_prediction()</a></code>. For instance, we can take a look at the distributions of divergences produced from the parameter posterior like this:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"diversity"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/postpred_diversity-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
@@ -460,16 +335,9 @@ this:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predictions</span>, <span class="st">"f4"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/postpred_f4-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<p><strong>Nice! It appears that the posterior from our simplistic model
-captures the observed summary statistics (dashed vertical lines) quite
-well.</strong></p>
-<p>(To make evaluation a little bit easier, there’s an option
-<code>file =</code> which instructs <code>plot_prediction</code> to save
-a figure to disk instead of plotting it using a graphical device—useful
-for work on remote servers!).</p>
-<p><strong>For more details on additional downstream validation and
-troubleshooting options, please see <a href="https://bodkan.net/demografr/articles/vignette-06-diagnostics.html">this
-vignette</a>.</strong></p>
+<p><strong>Nice! It appears that the posterior from our simplistic model captures the observed summary statistics (dashed vertical lines) quite well.</strong></p>
+<p>(To make evaluation a little bit easier, there’s an option <code>file =</code> which instructs <code>plot_prediction</code> to save a figure to disk instead of plotting it using a graphical device—useful for work on remote servers!).</p>
+<p><strong>For more details on additional downstream validation and troubleshooting options, please see <a href="https://bodkan.net/demografr/articles/vignette-06-diagnostics.html">this vignette</a>.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="extracting-esimated-parameters">7. Extracting esimated parameters<a class="anchor" aria-label="anchor" href="#extracting-esimated-parameters"></a>
@@ -477,14 +345,8 @@ vignette</a>.</strong></p>
 <div class="section level4">
 <h4 id="extracting-posterior-summary-tables">Extracting posterior summary tables<a class="anchor" aria-label="anchor" href="#extracting-posterior-summary-tables"></a>
 </h4>
-<p>Now that we have the ABC output object ready and have more or less
-convinced ourselves that our model can capture the summary statistics
-we’ve chosen via posterior predictive checks, we can proceed with
-parameter inference.</p>
-<p>First, we can get a data frame with summary statistics of the
-posterior distributions of our parameters. For instance, we can easily
-read the maximum <em>a posteriori</em> probability (MAP) of the
-parameters in the row labelled “Mode:”:</p>
+<p>Now that we have the ABC output object ready and have more or less convinced ourselves that our model can capture the summary statistics we’ve chosen via posterior predictive checks, we can proceed with parameter inference.</p>
+<p>First, we can get a data frame with summary statistics of the posterior distributions of our parameters. For instance, we can easily read the maximum <em>a posteriori</em> probability (MAP) of the parameters in the row labelled “Mode:”:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B      Ne_C     Ne_D      T_AB     T_BC</span></span>
@@ -503,8 +365,7 @@ parameters in the row labelled “Mode:”:</p>
 <span><span class="co">#&gt; Weighted Mode:         7851.617  0.09804401</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 8426.377  0.18467366</span></span>
 <span><span class="co">#&gt; Max.:                  8476.157  0.21801675</span></span></code></pre>
-<p>Because large tables can get a little hard to read, it is possible to
-subset to only a specific <em>type</em> of parameter:</p>
+<p>Because large tables can get a little hard to read, it is possible to subset to only a specific <em>type</em> of parameter:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                            Ne_A      Ne_B      Ne_C     Ne_D</span></span>
@@ -525,8 +386,7 @@ subset to only a specific <em>type</em> of parameter:</p>
 <span><span class="co">#&gt; Weighted Mode:         1933.3694 6230.341 7851.617</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 2522.5919 6611.315 8426.377</span></span>
 <span><span class="co">#&gt; Max.:                  2650.7248 6851.800 8476.157</span></span></code></pre>
-<p>Alternatively, we can also extract the posterior summary for a single
-model parameter like this:</p>
+<p>Alternatively, we can also extract the posterior summary for a single model parameter like this:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"gf_BC"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;                              gf_BC</span></span>
@@ -541,18 +401,12 @@ model parameter like this:</p>
 <div class="section level4">
 <h4 id="visualizing-posterior-distributions-of-parameters">Visualizing posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#visualizing-posterior-distributions-of-parameters"></a>
 </h4>
-<p>Because a chart is always more informative than a table, we can
-easily get a visualization of our posteriors using the function
-<code><a href="../reference/plot_posterior.html">plot_posterior()</a></code>:</p>
+<p>Because a chart is always more informative than a table, we can easily get a visualization of our posteriors using the function <code><a href="../reference/plot_posterior.html">plot_posterior()</a></code>:</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/posterior_Ne-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<p>Excellent! It looks like we got really nice and informative posterior
-distributions of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
-values!</p>
-<p>Similarly, we get nice and informative posterior distributions of
-split times:</p>
+<p>Excellent! It looks like we got really nice and informative posterior distributions of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> values!</p>
+<p>Similarly, we get nice and informative posterior distributions of split times:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/posterior_Tsplit-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
@@ -560,10 +414,7 @@ split times:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abc</span>, param  <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/posterior_gf-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<p>Because the internals of <em>demografr</em> ABC objects are
-represented by standard objects created by the <em>abc</em> package, we
-have all of the standard diagnostics functions of the <em>abc</em> R
-package at our disposal.</p>
+<p>Because the internals of <em>demografr</em> ABC objects are represented by standard objects created by the <em>abc</em> package, we have all of the standard diagnostics functions of the <em>abc</em> R package at our disposal.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"T_BC"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/diagnostic_Tsplit-1.png" class="r-plt" width="600" style="display: block; margin: auto;"></p>
@@ -573,8 +424,7 @@ package at our disposal.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">abc</span>, param <span class="op">=</span> <span class="st">"Ne_D"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-01-basics_files/figure-html/hist_Ne-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<p>Again, there are numerous tools for additional diagnostics, which you
-can learn about <a href="https://bodkan.net/demografr/articles/vignette-06-diagnostics.html">here</a>.</p>
+<p>Again, there are numerous tools for additional diagnostics, which you can learn about <a href="https://bodkan.net/demografr/articles/vignette-06-diagnostics.html">here</a>.</p>
 </div>
 </div>
 </div>

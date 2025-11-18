@@ -67,11 +67,8 @@
 <em>demografr</em>: Simulation-based inference for population genetics<a class="anchor" aria-label="anchor" href="#demografr-simulation-based-inference-for-population-genetics"></a>
 </h1>
 </div>
-<!-- badges: start -->
-<!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
-
-<!-- badges: end -->
-<p>⚠️⚠️⚠️</p>
+<!-- badges: start --><!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
+<!-- badges: end --><p>⚠️⚠️⚠️</p>
 <p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
 <p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics and evolutionary biology, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make these inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequences</a> as an internal data structure and computation engine.</p>
@@ -120,9 +117,7 @@
 <p>Let’s also assume that we know that the populations are phylogenetically related in the following way, with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about their <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, their split times, or the proportion of gene flow):</p>
 <p><img src="reference/figures/README-ape_tree-1.png"></p>
 <p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations, their pairwise genetic divergence, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> statistic, and observed the following values (which we saved in two standard R data frames):</p>
-<ol style="list-style-type: decimal">
-<li>Nucleotide diversity in each population:</li>
-</ol>
+<ol style="list-style-type: decimal"><li>Nucleotide diversity in each population:</li></ol>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_diversity.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -132,9 +127,7 @@
 <span><span class="co">#&gt; 2   B 3.288576e-05</span></span>
 <span><span class="co">#&gt; 3   C 1.013804e-04</span></span>
 <span><span class="co">#&gt; 4   D 8.910909e-05</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal">
-<li>Pairwise divergence d_X_Y between populations X and Y:</li>
-</ol>
+<ol start="2" style="list-style-type: decimal"><li>Pairwise divergence d_X_Y between populations X and Y:</li></ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_divergence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_divergence.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -146,9 +139,7 @@
 <span><span class="co">#&gt; 4 B C 0.0001088217</span></span>
 <span><span class="co">#&gt; 5 B D 0.0001157056</span></span>
 <span><span class="co">#&gt; 6 C D 0.0001100633</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>Value of the following <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>-statistic:</li>
-</ol>
+<ol start="3" style="list-style-type: decimal"><li>Value of the following <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math>-statistic:</li></ol>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_f4</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_f4.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
