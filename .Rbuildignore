@@ -24,3 +24,6 @@ vignettes/vignette-09-optimization.Rmd
 vignettes/vignette-10-benchmarking.Rmd
 .Rbuildignore_GitHub
 cran-comments.md
+devdeps.R
+drawing.png
+generate_sumstats.R
