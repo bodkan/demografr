@@ -2,6 +2,8 @@
 # R package infrastructure
 #
 
+SHELL := /bin/bash
+
 .PHONY: website docs build check windev winrel winold clean
 
 version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/\1/')
