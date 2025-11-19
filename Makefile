@@ -17,6 +17,7 @@ docs:
 	R -e 'pkgdown::build_reference_index()'
 	R -e 'pkgdown::build_news()'
 
+# run as `export RERUN=TRUE; make website` to regenerate __everything__
 website: $(logo) README.md
 	for f in vignettes/vignette-{07,08,09,10}-*.Rmd; do mv $$f $${f}_; done
 	R -e 'devtools::install(upgrade = "never")'
