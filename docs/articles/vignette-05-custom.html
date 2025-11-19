@@ -58,6 +58,9 @@
   </div>
 </nav><div class="container template-article">
 
+
+
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Custom inference using SLiM or Python</h1>
@@ -70,10 +73,27 @@
     
     
 <p>⚠️⚠️⚠️</p>
-<p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
+<p><strong>Please note that until a peer reviewed publication describing
+the <em>demografr</em> package is published, the software should be
+regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
-<p>By default, <em>demografr</em> uses the <a href="https://github.com/bodkan/slendr" class="external-link"><em>slendr</em></a> package for defining models and simulating data from them. But what if you need to do inference using your own scripts? Perhaps <em>slendr</em>’s opinionated interface doesn’t allow you to do all that you need to do, such as using some of the powerful simulation features and options of “raw” <a href="https://messerlab.org/slim/" class="external-link">SLiM</a> or <a href="https://tskit.dev/msprime/docs/stable/intro.html" class="external-link"><em>msprime</em></a>? Alternatively, perhaps you don’t want to compute summary statistics (just) with <em>slendr</em>’s tree-sequence interface to <em>tskit</em> (you might want to compute statistics using other software), or you want to compute statistics with fully customized Python functions. This vignette explains how you can use any standard SLiM or <em>msprime</em> script as a simulation engine in a standard <em>demografr</em> pipeline without <em>slendr</em>, as well as how to utilize customized, non-<em>slendr</em> summary statistic functions.</p>
-<p>First, let’s load <em>demografr</em> itself and also <em>slendr</em> (which, in this vignette, will serve only for working with simulated tree sequences, but not simulations themselves).</p>
+<p>By default, <em>demografr</em> uses the <a href="https://github.com/bodkan/slendr" class="external-link"><em>slendr</em></a> package for
+defining models and simulating data from them. But what if you need to
+do inference using your own scripts? Perhaps <em>slendr</em>’s
+opinionated interface doesn’t allow you to do all that you need to do,
+such as using some of the powerful simulation features and options of
+“raw” <a href="https://messerlab.org/slim/" class="external-link">SLiM</a> or <a href="https://tskit.dev/msprime/docs/stable/intro.html" class="external-link"><em>msprime</em></a>?
+Alternatively, perhaps you don’t want to compute summary statistics
+(just) with <em>slendr</em>’s tree-sequence interface to <em>tskit</em>
+(you might want to compute statistics using other software), or you want
+to compute statistics with fully customized Python functions. This
+vignette explains how you can use any standard SLiM or <em>msprime</em>
+script as a simulation engine in a standard <em>demografr</em> pipeline
+without <em>slendr</em>, as well as how to utilize customized,
+non-<em>slendr</em> summary statistic functions.</p>
+<p>First, let’s load <em>demografr</em> itself and also <em>slendr</em>
+(which, in this vignette, will serve only for working with simulated
+tree sequences, but not simulations themselves).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
@@ -81,40 +101,80 @@
 <div class="section level2">
 <h2 id="toy-inference-problem">Toy inference problem<a class="anchor" aria-label="anchor" href="#toy-inference-problem"></a>
 </h2>
-<p>Suppose that we intent to use ABC to infer the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of a constant-sized population given that we observed the following value of nucleotide diversity:</p>
+<p>Suppose that we intent to use ABC to infer the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
+of a constant-sized population given that we observed the following
+value of nucleotide diversity:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_diversity</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set   diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">039</span>4</span></span></code></pre>
-<p>We want to infer the posterior distribution of <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>. In this vignette, we’re going to show how to accomplish first not via the normal <em>slendr</em> interface (as shown <a href="vignette-01-basics.html">here</a>) but using a simple SLiM or Python script. In a later section, we’re also going to use this example to demonstrate how to compute population genetic summary statistic (like nucleotide diversity) using external software.</p>
-<p><strong>We acknowledge that this is a completely trivial example, not really worth spending so much effort on doing an ABC for.</strong> The example was chosen because it runs fast and demonstrates all the features of <em>demografr</em> that you would use regardless of the complexity of your model.</p>
+<p>We want to infer the posterior distribution of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>.
+In this vignette, we’re going to show how to accomplish first not via
+the normal <em>slendr</em> interface (as shown <a href="vignette-01-basics.html">here</a>) but using a simple SLiM or
+Python script. In a later section, we’re also going to use this example
+to demonstrate how to compute population genetic summary statistic (like
+nucleotide diversity) using external software.</p>
+<p><strong>We acknowledge that this is a completely trivial example, not
+really worth spending so much effort on doing an ABC for.</strong> The
+example was chosen because it runs fast and demonstrates all the
+features of <em>demografr</em> that you would use regardless of the
+complexity of your model.</p>
 </div>
 <div class="section level2">
 <h2 id="using-custom-scripts-as-simulation-engines">Using custom scripts as simulation engines<a class="anchor" aria-label="anchor" href="#using-custom-scripts-as-simulation-engines"></a>
 </h2>
-<p>In order to be able to use a custom SLiM or msprime script with <em>demografr</em>, the script must conform to a couple of rules:</p>
+<p>In order to be able to use a custom SLiM or msprime script with
+<em>demografr</em>, the script must conform to a couple of rules:</p>
 <div class="section level3">
-<h3 id="it-must-be-runnable-on-the-command-line-as-any-other-command-line-script">1. It must be runnable on the command-line as any other command-line script<a class="anchor" aria-label="anchor" href="#it-must-be-runnable-on-the-command-line-as-any-other-command-line-script"></a>
+<h3 id="it-must-be-runnable-on-the-command-line-as-any-other-command-line-script">1. It must be runnable on the command-line as any other command-line
+script<a class="anchor" aria-label="anchor" href="#it-must-be-runnable-on-the-command-line-as-any-other-command-line-script"></a>
 </h3>
 <ul>
-<li><p><strong>For an <em>msprime</em> script</strong>, this means something like <code>python &lt;your script&gt;.py &lt;command-line arguments&gt;</code>.</p></li>
-<li><p><strong>For a SLiM script</strong>, this means something like <code>slim &lt;command-line arguments&gt; &lt;your script&gt;.slim</code>.</p></li>
+<li><p><strong>For an <em>msprime</em> script</strong>, this means
+something like
+<code>python &lt;your script&gt;.py &lt;command-line arguments&gt;</code>.</p></li>
+<li><p><strong>For a SLiM script</strong>, this means something like
+<code>slim &lt;command-line arguments&gt; &lt;your script&gt;.slim</code>.</p></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="it-must-accept---path-argument-pointing-to-a-directory-where-it-will-save-output-files">2. It must accept <code>--path</code> argument pointing to a directory where it will save output files<a class="anchor" aria-label="anchor" href="#it-must-accept---path-argument-pointing-to-a-directory-where-it-will-save-output-files"></a>
+<h3 id="it-must-accept---path-argument-pointing-to-a-directory-where-it-will-save-output-files">2. It must accept <code>--path</code> argument pointing to a
+directory where it will save output files<a class="anchor" aria-label="anchor" href="#it-must-accept---path-argument-pointing-to-a-directory-where-it-will-save-output-files"></a>
 </h3>
-<p>This is analogous to the <code>path =</code> argument of <em>slendr</em> functions <code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and <code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>.</p>
-<p><strong>For an <em>msprime</em> script</strong>, this parameter can be specified via the Python built-in module <code>argparse</code>, and provided on the command-line as <code>--path &lt;path to directory&gt;</code>. In the script itself, if you use the <code>argparse</code> module and have thus the values of provided arguments (for instance) in an <code>args</code> object, you can then refer to these arguments as <code>args.path</code>, etc. Given that you’re reading this, I assume you know what the above information means, but here’s a <a href="https://docs.python.org/3/library/argparse.html" class="external-link">link to the relevant section</a> of the Python documentation for completeness.</p>
-<p><strong>For a SLiM script</strong>, this parameter can be specified via SLiM’s standard way of supplying command-line arguments as <code>-d "path='&lt;path to a directory&gt;'"</code>. Importantly, note SLiM’s format of specifying string arguments for the <code>path</code> argument. If you need further detail, see Section 20.2 of the SLiM manual. In the script itself, you can then refer to this argument via the constant <code>path</code>.</p>
+<p>This is analogous to the <code>path =</code> argument of
+<em>slendr</em> functions <code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and
+<code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>.</p>
+<p><strong>For an <em>msprime</em> script</strong>, this parameter can
+be specified via the Python built-in module <code>argparse</code>, and
+provided on the command-line as
+<code>--path &lt;path to directory&gt;</code>. In the script itself, if
+you use the <code>argparse</code> module and have thus the values of
+provided arguments (for instance) in an <code>args</code> object, you
+can then refer to these arguments as <code>args.path</code>, etc. Given
+that you’re reading this, I assume you know what the above information
+means, but here’s a <a href="https://docs.python.org/3/library/argparse.html" class="external-link">link to the
+relevant section</a> of the Python documentation for completeness.</p>
+<p><strong>For a SLiM script</strong>, this parameter can be specified
+via SLiM’s standard way of supplying command-line arguments as
+<code>-d "path='&lt;path to a directory&gt;'"</code>. Importantly, note
+SLiM’s format of specifying string arguments for the <code>path</code>
+argument. If you need further detail, see Section 20.2 of the SLiM
+manual. In the script itself, you can then refer to this argument via
+the constant <code>path</code>.</p>
 </div>
 <div class="section level3">
-<h3 id="all-model-parameters-must-be-provided-as-additional-command-line-arguments">3. All model parameters must be provided as additional command-line arguments<a class="anchor" aria-label="anchor" href="#all-model-parameters-must-be-provided-as-additional-command-line-arguments"></a>
+<h3 id="all-model-parameters-must-be-provided-as-additional-command-line-arguments">3. All model parameters must be provided as additional command-line
+arguments<a class="anchor" aria-label="anchor" href="#all-model-parameters-must-be-provided-as-additional-command-line-arguments"></a>
 </h3>
-<p>You can refer to them in your script as you would to the mandatory arguments as described in the previous section.</p>
-<p><strong>A useful check to see whether you script would make a valid engine for a <em>demografr</em> inference pipeline is to run it manually on the command line like this:</strong></p>
+<p>You can refer to them in your script as you would to the mandatory
+arguments as described in the previous section.</p>
+<p><strong>A useful check to see whether you script would make a valid
+engine for a <em>demografr</em> inference pipeline is to run it manually
+on the command line like this:</strong></p>
 <pre><code>python \
   &lt;path to your Python script&gt;                   \
   --path &lt;path to a directory&gt; \
@@ -123,14 +183,28 @@
 <pre><code>slim \
   -d "path='&lt;path to a directory&gt;'" \
   &lt;... your model parameters ...&gt;</code></pre>
-<p>Then, if you look into the directory and see the desired files produced by your simulation script, you’re good to go!</p>
-<p><strong>Below you are going to see how to actually read back simulation results from disk and use them for computing summary statistics. For now, just note that you can name the files produced by your simulation script however you’d like and can have as many as you’d like, as long as they are all in that one directory given by <code>path</code>.</strong></p>
+<p>Then, if you look into the directory and see the desired files
+produced by your simulation script, you’re good to go!</p>
+<p><strong>Below you are going to see how to actually read back
+simulation results from disk and use them for computing summary
+statistics. For now, just note that you can name the files produced by
+your simulation script however you’d like and can have as many as you’d
+like, as long as they are all in that one directory given by
+<code>path</code>.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="example-pure-slim-and-msprime-script">Example pure SLiM and msprime script<a class="anchor" aria-label="anchor" href="#example-pure-slim-and-msprime-script"></a>
 </h3>
-<p>To demonstrate the requirements 1-3 above in practice, let’s run an ABC inference using an example <em>msprime</em> script and a SLiM script as simulation engines.</p>
-<p>Imagine we have the following two scripts which we want to use as simulation engines instead of <em>slendr</em>’s own functions <code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and <code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>. The scripts have only <strong>one <em>model parameter</em>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of the single modeled population</strong>. The <strong>other parameters are mandatory</strong>, just discussed in the previous section.</p>
+<p>To demonstrate the requirements 1-3 above in practice, let’s run an
+ABC inference using an example <em>msprime</em> script and a SLiM script
+as simulation engines.</p>
+<p>Imagine we have the following two scripts which we want to use as
+simulation engines instead of <em>slendr</em>’s own functions
+<code><a href="https://rdrr.io/pkg/slendr/man/slim.html" class="external-link">slim()</a></code> and <code><a href="https://rdrr.io/pkg/slendr/man/msprime.html" class="external-link">msprime()</a></code>. The scripts have only
+<strong>one <em>model parameter</em>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
+of the single modeled population</strong>. The <strong>other parameters
+are mandatory</strong>, just discussed in the previous section.</p>
 <div class="section level4">
 <h4 id="slim-script">SLiM script<a class="anchor" aria-label="anchor" href="#slim-script"></a>
 </h4>
@@ -183,16 +257,39 @@ ts = msprime.sim_ancestry(
 ts = msprime.sim_mutations(ts, 1e-8)
 
 ts.dump(args.path + "/" + "result.trees")</code></pre>
-<p><strong>Note that the Python script specifies all model parameters (here just <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>) and mandatory arguments via a command-line interface provided by the Python module <code>argparse</code></strong>.</p>
-<p><strong>The SLiM script, on the other hand, uses SLiM’s features for command-line specification of parameters and simply refers to each parameter by its symbolic name.</strong> No other setup is necessary.</p>
-<p>Please also note that given that there are can be discrepancies between values of arguments of some SLiM or Python methods (such as <code>addSubPop</code> of SLiM which expects an integer value for a population size, or the <code>samples</code> argument of <code>msprime.sim_ancestry</code>), and values of parameters sampled from priors by <em>demografr</em> (i.e., <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> often being a floating-point value after sampling from a continuous prior), you might have to perform explicit type conversion in your custom scripts (such as <code>sim.addSubPop("p0", asInteger(Ne)</code> as above).</p>
+<p><strong>Note that the Python script specifies all model parameters
+(here just
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>)
+and mandatory arguments via a command-line interface provided by the
+Python module <code>argparse</code></strong>.</p>
+<p><strong>The SLiM script, on the other hand, uses SLiM’s features for
+command-line specification of parameters and simply refers to each
+parameter by its symbolic name.</strong> No other setup is
+necessary.</p>
+<p>Please also note that given that there are can be discrepancies
+between values of arguments of some SLiM or Python methods (such as
+<code>addSubPop</code> of SLiM which expects an integer value for a
+population size, or the <code>samples</code> argument of
+<code>msprime.sim_ancestry</code>), and values of parameters sampled
+from priors by <em>demografr</em> (i.e.,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
+often being a floating-point value after sampling from a continuous
+prior), you might have to perform explicit type conversion in your
+custom scripts (such as <code>sim.addSubPop("p0", asInteger(Ne)</code>
+as above).</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="abc-inference-using-custom-msprime-script">ABC inference using custom <em>msprime</em> script<a class="anchor" aria-label="anchor" href="#abc-inference-using-custom-msprime-script"></a>
 </h3>
-<p>Apart from the user-defined simulation SLiM and <em>msprime</em> scripts, the components of our toy inference remains the same—we need to define the observed statistics, tree-sequence summary functions, and priors. We don’t need a model function—that will be served by our custom script.</p>
-<p>Here are the <em>demografr</em> pipeline components (we won’t be discussing them here because that’s extensively taken care of <a href="vignette-01-basics.html">elsewhere</a> in <em>demografr</em>’s documentation vignettes):</p>
+<p>Apart from the user-defined simulation SLiM and <em>msprime</em>
+scripts, the components of our toy inference remains the same—we need to
+define the observed statistics, tree-sequence summary functions, and
+priors. We don’t need a model function—that will be served by our custom
+script.</p>
+<p>Here are the <em>demografr</em> pipeline components (we won’t be
+discussing them here because that’s extensively taken care of <a href="vignette-01-basics.html">elsewhere</a> in <em>demografr</em>’s
+documentation vignettes):</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># a single prior parameter</span></span>
 <span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span>
@@ -211,44 +308,72 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="va">gens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  ts <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_read.html" class="external-link">ts_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">path</span>, <span class="st">"result.trees"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>(Note that because our simulated tree sequences won’t be coming with <em>slendr</em> metadata, we have to refer to individuals’ chromosomes using numerical indices rather than <em>slendr</em> symbolic names like we do in all of our other vignettes.)</p>
+<p>(Note that because our simulated tree sequences won’t be coming with
+<em>slendr</em> metadata, we have to refer to individuals’ chromosomes
+using numerical indices rather than <em>slendr</em> symbolic names like
+we do in all of our other vignettes.)</p>
 <div class="section level4">
 <h4 id="simulating-a-testing-tree-sequence">Simulating a testing tree sequence<a class="anchor" aria-label="anchor" href="#simulating-a-testing-tree-sequence"></a>
 </h4>
-<p>As we explained elsewhere, a useful function for developing inference pipelines using <em>demografr</em> is a function <code><a href="../reference/simulate_model.html">simulate_model()</a></code>, which normally accepts a <em>slendr</em> model generating function and the model parameters (either given as priors or as a list of named values), and simulates a tree-sequence object. This function (as any other <em>demografr</em> function operating with models) accepts our custom-defined simulation scripts in place of standard <em>slendr</em> models.</p>
-<p>For instance, we can simulate a couple of Mb of testing sequence from our <em>msprime</em> script like this:</p>
+<p>As we explained elsewhere, a useful function for developing inference
+pipelines using <em>demografr</em> is a function
+<code><a href="../reference/simulate_model.html">simulate_model()</a></code>, which normally accepts a <em>slendr</em>
+model generating function and the model parameters (either given as
+priors or as a list of named values), and simulates a tree-sequence
+object. This function (as any other <em>demografr</em> function
+operating with models) accepts our custom-defined simulation scripts in
+place of standard <em>slendr</em> models.</p>
+<p>For instance, we can simulate a couple of Mb of testing sequence from
+our <em>msprime</em> script like this:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">python_script</span>, parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Ne <span class="op">=</span> <span class="fl">123</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"files"</span>, data <span class="op">=</span> <span class="va">gens</span><span class="op">)</span></span></code></pre></div>
-<p>Now we can finally test our toy tree-sequence summary function, verifying that we can indeed compute the summary statistic we want to:</p>
+<p>Now we can finally test our toy tree-sequence summary function,
+verifying that we can indeed compute the summary statistic we want
+to:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>69</span></span></code></pre>
-<p>The function works as expected—we have a single population and want to compute nucleotide diversity in the whole population, and this is exactly what we get.</p>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>74</span></span></code></pre>
+<p>The function works as expected—we have a single population and want
+to compute nucleotide diversity in the whole population, and this is
+exactly what we get.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">003</span>33</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">006</span>81</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>82</span></span></code></pre>
-<p>Note that we are also able to use a dedicated function for this, called <code><a href="../reference/summarise_data.html">summarise_data()</a></code>, which takes in a product of a simulation (tree sequence and/or a path to a directory with simulation results), and apply all summary functions to this data:</p>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">007</span>16</span></span></code></pre>
+<p>Note that we are also able to use a dedicated function for this,
+called <code><a href="../reference/summarise_data.html">summarise_data()</a></code>, which takes in a product of a
+simulation (tree sequence and/or a path to a directory with simulation
+results), and apply all summary functions to this data:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>79</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">002</span>65</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="abc-inference">ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
 </h4>
-<p>Having all components of our pipeline set up we should, again, validate everything before we proceed to (potentially very costly) simulations. In the remainder of this vignette we’ll only continue with the Python msprime custom script in order to save some computational time. That said, it’s important to realize that you could use this sort of workflow for any kind of SLiM script, including very elaborate spatial simulations, non-WF models, and all kinds of phenotypic simulations too! <strong>Although primarily designed to work with <em>slendr</em>, the <em>demografr</em> package intends to fully support any kind of SLiM or <em>msprime</em> simulation. If something doesn’t work, consider it a <em>demografr</em> bug!</strong></p>
+<p>Having all components of our pipeline set up we should, again,
+validate everything before we proceed to (potentially very costly)
+simulations. In the remainder of this vignette we’ll only continue with
+the Python msprime custom script in order to save some computational
+time. That said, it’s important to realize that you could use this sort
+of workflow for any kind of SLiM script, including very elaborate
+spatial simulations, non-WF models, and all kinds of phenotypic
+simulations too! <strong>Although primarily designed to work with
+<em>slendr</em>, the <em>demografr</em> package intends to fully support
+any kind of SLiM or <em>msprime</em> simulation. If something doesn’t
+work, consider it a <em>demografr</em> bug!</strong></p>
 <p>Let’s first validate all components of our pipeline:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span><span class="op">)</span></span></code></pre></div>
@@ -272,7 +397,10 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="co">#&gt;   - diversity [data frame] ✅</span></span>
 <span><span class="co">#&gt; ======================================================================</span></span>
 <span><span class="co">#&gt; No issues have been found in the ABC setup!</span></span></code></pre>
-<p>Looking good! Now let’s first run ABC simulations. Again, note the use of the Python script where we would normally provide a <em>slendr</em> model function in place of the <code>model</code> argument:</p>
+<p>Looking good! Now let’s first run ABC simulations. Again, note the
+use of the Python script where we would normally provide a
+<em>slendr</em> model function in place of the <code>model</code>
+argument:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># parallelize across all CPUs</span></span>
@@ -281,11 +409,21 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 47 minutes 44 seconds parallelized across 96 CPUs.</strong></p>
-<p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 47
+minutes 44 seconds parallelized across 96 CPUs.</strong></p>
+<p>Once the simulations are finished, we can perform inference of the
+posterior distribution of the single parameter of our model,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
-<p>Having done so, we can again look at the summary statistics of the posterior distribution and also plot the results (we’re skipping diagnostics such as posterior predictive checks but you can read more about those <a href="vignette-01-basics.html">here</a> and <a href="vignette-06-diagnostics.html">here</a>). Because this <code>observed</code> diversity is based on simulated data from a known model, we’ll indicate the true “hidden” <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> value with a vertical line.</p>
+<p>Having done so, we can again look at the summary statistics of the
+posterior distribution and also plot the results (we’re skipping
+diagnostics such as posterior predictive checks but you can read more
+about those <a href="vignette-01-basics.html">here</a> and <a href="vignette-06-diagnostics.html">here</a>). Because this
+<code>observed</code> diversity is based on simulated data from a known
+model, we’ll indicate the true “hidden”
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>
+value with a vertical line.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
@@ -310,21 +448,39 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <div class="section level3">
 <h3 id="using-external-programs-to-compute-summary-statistics">Using external programs to compute summary statistics<a class="anchor" aria-label="anchor" href="#using-external-programs-to-compute-summary-statistics"></a>
 </h3>
-<p>Now let’s move things one step forward. What if we either don’t find <em>slendr</em>’s tree-sequence interface to <em>tskit</em> sufficient and want to compute summary statistics from the simulated data using some external software, like PLINK or EIGENSTRAT?</p>
-<p>To keep things as easy as possible (and avoid dragging in multiple software dependencies), let’s say we have a program <code>vcfpi</code>, which is run in the following way:</p>
+<p>Now let’s move things one step forward. What if we either don’t find
+<em>slendr</em>’s tree-sequence interface to <em>tskit</em> sufficient
+and want to compute summary statistics from the simulated data using
+some external software, like PLINK or EIGENSTRAT?</p>
+<p>To keep things as easy as possible (and avoid dragging in multiple
+software dependencies), let’s say we have a program <code>vcfpi</code>,
+which is run in the following way:</p>
 <pre><code>./vcfpi --vcf &lt;path to a VCF&gt; --tsv &lt;path to a TSV table&gt;</code></pre>
-<p>You can find it at /tmp/Rtmp1FBGZY/temp_libpath125827258b97a1/demografr/examples/vcfpi) and run it yourself in the terminal.</p>
-<p>This program takes in a VCF file and computes the nucleotide diversity across all individuals in that VCF file. For simplicity, it produces a table of results in exactly the same format as the <code>observed_diversity</code> data frame above.</p>
-<p>In this particular example, we want to replace the computation of statistics performed by the R function <code>compute_diversity</code> in the previous section (which also produces a data frame) with the product of the external software <code>vcfpi</code>.</p>
-<p>(We provide this <code>vcfpi</code> program as an example script, but it could of course be any other program you could imagine.)</p>
-<p>First, the definitions of <code>priors</code> and <code>observed</code> statistics do not change:</p>
+<p>You can find it at
+/tmp/Rtmp9aNCRb/temp_libpath1fb73aaaf02/demografr/examples/vcfpi) and
+run it yourself in the terminal.</p>
+<p>This program takes in a VCF file and computes the nucleotide
+diversity across all individuals in that VCF file. For simplicity, it
+produces a table of results in exactly the same format as the
+<code>observed_diversity</code> data frame above.</p>
+<p>In this particular example, we want to replace the computation of
+statistics performed by the R function <code>compute_diversity</code> in
+the previous section (which also produces a data frame) with the product
+of the external software <code>vcfpi</code>.</p>
+<p>(We provide this <code>vcfpi</code> program as an example script, but
+it could of course be any other program you could imagine.)</p>
+<p>First, the definitions of <code>priors</code> and
+<code>observed</code> statistics do not change:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># a single prior parameter</span></span>
 <span><span class="va">priors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">Ne</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">5000</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># a single observed statistic</span></span>
 <span><span class="va">observed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">observed_diversity</span><span class="op">)</span></span></code></pre></div>
-<p>What does change is the simulated summary statistics definition. There are a number of ways we could go about this (and we will show others below), but given that our <code>vcfpi</code> is a command-line program, we will use the function</p>
+<p>What does change is the simulated summary statistics definition.
+There are a number of ways we could go about this (and we will show
+others below), but given that our <code>vcfpi</code> is a command-line
+program, we will use the function</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_pi_vcf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># path to the output summary statistic file</span></span>
@@ -345,10 +501,23 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">compute_pi_vcf</span><span class="op">)</span></span></code></pre></div>
-<p>There’s one last thing we need to do – our summary function <code>compute_diversity</code> does not operate on a tree-sequence file this time. Instead, <code>vcfpi</code> requires a VCF file as its input. But, because of our simulation model <code>python_script</code> still creates a tree-sequence file, we need to create a VCF to be able to compute nucleotide diversity.</p>
-<p>(Of course, we could modify the simulation model script to produce such VCF easily, but for the sake of making this example a bit more educational, let’s make our job a little bit harder).</p>
-<p>Whenever we need to run a simulation summary statistic on a different form of data than a tree-sequence, we can further customize the data-generating function(s). In the first example, we had to provide a function which creates a <code>ts</code> object from <code>path</code> to a directory with all result files. In this example, let’s push this one step further and create a VCF file.</p>
-<p>(Again, we could’ve just as easily create a VCF file from our simulation script, but bear with me here!)</p>
+<p>There’s one last thing we need to do – our summary function
+<code>compute_diversity</code> does not operate on a tree-sequence file
+this time. Instead, <code>vcfpi</code> requires a VCF file as its input.
+But, because of our simulation model <code>python_script</code> still
+creates a tree-sequence file, we need to create a VCF to be able to
+compute nucleotide diversity.</p>
+<p>(Of course, we could modify the simulation model script to produce
+such VCF easily, but for the sake of making this example a bit more
+educational, let’s make our job a little bit harder).</p>
+<p>Whenever we need to run a simulation summary statistic on a different
+form of data than a tree-sequence, we can further customize the
+data-generating function(s). In the first example, we had to provide a
+function which creates a <code>ts</code> object from <code>path</code>
+to a directory with all result files. In this example, let’s push this
+one step further and create a VCF file.</p>
+<p>(Again, we could’ve just as easily create a VCF file from our
+simulation script, but bear with me here!)</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  vcf <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="op">{</span></span>
@@ -367,23 +536,26 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">python_script</span>, parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Ne <span class="op">=</span> <span class="fl">123</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"files"</span>, data <span class="op">=</span> <span class="va">gens</span><span class="op">)</span></span></code></pre></div>
-<p>When we look at the result, we can see that it no longer contains a <code>ts</code> tree-sequence object but a path to a VCF file!</p>
+<p>When we look at the result, we can see that it no longer contains a
+<code>ts</code> tree-sequence object but a path to a VCF file!</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $vcf</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpbdoM07demografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp5YSqPOdemografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
 <p>Let’s test our summary function on that VCF:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">vcf</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.408537e-06</span></span></code></pre>
-<p>Or, for convenience, we can do this using the more general function <code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
+<span><span class="co">#&gt; 1 pop 4.322766e-06</span></span></code></pre>
+<p>Or, for convenience, we can do this using the more general function
+<code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.408537e-06</span></span></code></pre>
-<p>Now let’s validate our customized setup before we unleash the full scale of ABC simulations on the problem!</p>
+<span><span class="co">#&gt; 1 pop 4.322766e-06</span></span></code></pre>
+<p>Now let’s validate our customized setup before we unleash the full
+scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
@@ -414,8 +586,11 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 44 minutes 38 seconds parallelized across 96 CPUs.</strong></p>
-<p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 44
+minutes 38 seconds parallelized across 96 CPUs.</strong></p>
+<p>Once the simulations are finished, we can perform inference of the
+posterior distribution of the single parameter of our model,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
@@ -441,10 +616,16 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <div class="section level3">
 <h3 id="another-means-of-computing-simulated-summary-statistics">Another means of computing simulated summary statistics<a class="anchor" aria-label="anchor" href="#another-means-of-computing-simulated-summary-statistics"></a>
 </h3>
-<p>Let’s look at a yet another variation of the same. What if we want to compute a summary statistics in R on a different source of genotype data (not a tree-sequence object in memory but also not a VCF file stored on disk)?</p>
-<p>For instance, what if we want to compute a summary statistics on a simple data frame of genotypes (<code>0</code> – ancestral state, <code>1</code> – derived state).</p>
+<p>Let’s look at a yet another variation of the same. What if we want to
+compute a summary statistics in R on a different source of genotype data
+(not a tree-sequence object in memory but also not a VCF file stored on
+disk)?</p>
+<p>For instance, what if we want to compute a summary statistics on a
+simple data frame of genotypes (<code>0</code> – ancestral state,
+<code>1</code> – derived state).</p>
 <p>We can modify our pipeline in the following way.</p>
-<p>First, we need to define a summary statistic function which will operate on a data frame, say called <code>gt</code>.</p>
+<p>First, we need to define a summary statistic function which will
+operate on a data frame, say called <code>gt</code>.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compute_diversity</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">gt</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># generate a list of all pairs of chromosomes</span></span>
@@ -460,7 +641,8 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">compute_diversity</span><span class="op">)</span></span></code></pre></div>
-<p>We also need a data-generating function, which will create the table of genotypes from standard simulated output:</p>
+<p>We also need a data-generating function, which will create the table
+of genotypes from standard simulated output:</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gens</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  gt <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">path</span><span class="op">)</span> <span class="op">{</span></span>
@@ -471,40 +653,46 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes</a></span><span class="op">(</span><span class="va">ts</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>And that’s it! Let’s check again that the whole setup works correctly.</p>
+<p>And that’s it! Let’s check again that the whole setup works
+correctly.</p>
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">python_script</span>, parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Ne <span class="op">=</span> <span class="fl">123</span><span class="op">)</span>, format <span class="op">=</span> <span class="st">"files"</span>, data <span class="op">=</span> <span class="va">gens</span><span class="op">)</span></span></code></pre></div>
-<p>When we look at the result, we can see that it no longer contains a <code>ts</code> tree-sequence object but a simple table of genotypes created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes()</a></code> (see the data generating function just above).</p>
+<p>When we look at the result, we can see that it no longer contains a
+<code>ts</code> tree-sequence object but a simple table of genotypes
+created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes()</a></code>
+(see the data generating function just above).</p>
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $gt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 25 × 101</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 24 × 101</span></span></span>
 <span><span class="co">#&gt;       pos pop_0_0_chr1 pop_0_0_chr2 pop_0_1_chr1 pop_0_1_chr2 pop_0_2_chr1</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">58</span>763            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">88</span>471            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">151</span>804            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">227</span>720            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">228</span>899            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">263</span>681            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">265</span>025            0            1            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">306</span>174            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">355</span>498            1            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">602</span>511            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">33</span>229            0            0            1            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="text-decoration: underline;">105</span>940            0            1            0            0            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">195</span>618            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">261</span>337            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">268</span>712            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">298</span>977            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">353</span>020            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">362</span>089            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">362</span>454            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">374</span>106            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 14 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 95 more variables: pop_0_2_chr2 &lt;int&gt;, pop_0_3_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_3_chr2 &lt;int&gt;, pop_0_4_chr1 &lt;int&gt;, pop_0_4_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_5_chr1 &lt;int&gt;, pop_0_5_chr2 &lt;int&gt;, pop_0_6_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_6_chr2 &lt;int&gt;, pop_0_7_chr1 &lt;int&gt;, pop_0_7_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_8_chr1 &lt;int&gt;, pop_0_8_chr2 &lt;int&gt;, pop_0_9_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_9_chr2 &lt;int&gt;, pop_0_10_chr1 &lt;int&gt;, pop_0_10_chr2 &lt;int&gt;, …</span></span></span></code></pre>
-<p>Let’s test our summary function on the output of the single testing simulation run:</p>
+<p>Let’s test our summary function on the output of the single testing
+simulation run:</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 3.570303e-06</span></span></code></pre>
-<p>Let’s also validate our customized setup before we unleash the full scale of ABC simulations on the problem!</p>
+<span><span class="co">#&gt; 1 pop 4.354343e-06</span></span></code></pre>
+<p>Let’s also validate our customized setup before we unleash the full
+scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ======================================================================</span></span>
@@ -535,8 +723,11 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span>  model <span class="op">=</span> <span class="va">python_script</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">gens</span>, format <span class="op">=</span> <span class="st">"files"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 43 minutes 14 seconds parallelized across 96 CPUs.</strong></p>
-<p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 43
+minutes 14 seconds parallelized across 96 CPUs.</strong></p>
+<p>Once the simulations are finished, we can perform inference of the
+posterior distribution of the single parameter of our model,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
@@ -562,8 +753,18 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <div class="section level3">
 <h3 id="computing-summary-statistics-with-python">Computing summary statistics with Python<a class="anchor" aria-label="anchor" href="#computing-summary-statistics-with-python"></a>
 </h3>
-<p>As a last example for customization of <em>demografr</em> inference pipeline, let’s consider the scenario in which the tree-sequence functionality available through <em>slendr</em> isn’t sufficient, and you need to compute summary statistics on the simulated tree-sequence using pure Python and the <em>tskit</em> module directly. As with the other customization examples above, this is again very easy to do.</p>
-<p>First, just to change things up, let’s say that we want to use a normal <em>slendr</em> model function as a scaffold model for inference, simulate a tree sequence with the standard <em>slendr</em> / <em>demografr</em> functionality (i.e, not via the external Python script as in the examples above), and only customize the summary statistic computation of nucleotide diversity.</p>
+<p>As a last example for customization of <em>demografr</em> inference
+pipeline, let’s consider the scenario in which the tree-sequence
+functionality available through <em>slendr</em> isn’t sufficient, and
+you need to compute summary statistics on the simulated tree-sequence
+using pure Python and the <em>tskit</em> module directly. As with the
+other customization examples above, this is again very easy to do.</p>
+<p>First, just to change things up, let’s say that we want to use a
+normal <em>slendr</em> model function as a scaffold model for inference,
+simulate a tree sequence with the standard <em>slendr</em> /
+<em>demografr</em> functionality (i.e, not via the external Python
+script as in the examples above), and only customize the summary
+statistic computation of nucleotide diversity.</p>
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">Ne</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># this will be a single-population coalescent model, so the time of</span></span>
@@ -607,7 +808,10 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="va">functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>diversity <span class="op">=</span> <span class="va">compute_diversity</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, parameters <span class="op">=</span> <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></code></pre></div>
-<p>When we look at the result, we can see that it no longer contains a <code>ts</code> tree-sequence object but a simple table of genotypes created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes()</a></code> (see the data generating function just above).</p>
+<p>When we look at the result, we can see that it no longer contains a
+<code>ts</code> tree-sequence object but a simple table of genotypes
+created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slendr/man/ts_genotypes.html" class="external-link">ts_genotypes()</a></code>
+(see the data generating function just above).</p>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
@@ -642,13 +846,15 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Sites      │    0│ 16 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧═════╧═════════╧════════════╝</span></span></code></pre>
-<p>Let’s test our summary function on the output of the single testing simulation run:</p>
+<p>Let’s test our summary function on the output of the single testing
+simulation run:</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set diversity</span></span>
 <span><span class="co">#&gt; 1 pop         0</span></span></code></pre>
-<p>Let’s also validate our customized setup before we unleash the full scale of ABC simulations on the problem!</p>
+<p>Let’s also validate our customized setup before we unleash the full
+scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/validate_abc.html">validate_abc</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>,</span>
 <span>             sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
@@ -678,8 +884,11 @@ ts.dump(args.path + "/" + "result.trees")</code></pre>
 <span>  <span class="va">model</span>, <span class="va">priors</span>, <span class="va">functions</span>, <span class="va">observed</span>, iterations <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><strong>The total runtime for the ABC simulations was 0 hours 38 minutes 3 seconds parallelized across 96 CPUs.</strong></p>
-<p>Once the simulations are finished, we can perform inference of the posterior distribution of the single parameter of our model, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
+<p><strong>The total runtime for the ABC simulations was 0 hours 38
+minutes 3 seconds parallelized across 96 CPUs.</strong></p>
+<p>Once the simulations are finished, we can perform inference of the
+posterior distribution of the single parameter of our model,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>:</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_abc.html">run_abc</a></span><span class="op">(</span><span class="va">data</span>, engine <span class="op">=</span> <span class="st">"abc"</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
