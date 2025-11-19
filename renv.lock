@@ -3,13 +3,33 @@
     "Version": "4.5.2",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/${BIOCONDUCTOR_VERSION}/books"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://p3m.dev/cran/__linux__/noble/latest"
       }
     ]
   },
   "Bioconductor": {
-    "Version": "${BIOCONDUCTOR_VERSION}"
+    "Version": "3.22"
   },
   "Packages": {
     "DBI": {
