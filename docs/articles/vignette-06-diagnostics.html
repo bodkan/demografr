@@ -338,9 +338,9 @@ confusion matrices and other diagnostic information:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tol0.01</span></span>
 <span><span class="co">#&gt;        modelX modelY modelZ</span></span>
-<span><span class="co">#&gt; modelX 0.8880 0.0592 0.0528</span></span>
+<span><span class="co">#&gt; modelX 0.8878 0.0597 0.0525</span></span>
 <span><span class="co">#&gt; modelY 0.0467 0.9336 0.0197</span></span>
-<span><span class="co">#&gt; modelZ 0.0097 0.0237 0.9666</span></span>
+<span><span class="co">#&gt; modelZ 0.0097 0.0237 0.9667</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $conf.matrix</span></span>
 <span><span class="co">#&gt; $conf.matrix$tol0.01</span></span>
@@ -352,10 +352,10 @@ confusion matrices and other diagnostic information:</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $probs</span></span>
 <span><span class="co">#&gt; $probs$tol0.01</span></span>
-<span><span class="co">#&gt;             modelX     modelY     modelZ</span></span>
-<span><span class="co">#&gt; modelX 0.888004307 0.05915458 0.05284111</span></span>
-<span><span class="co">#&gt; modelY 0.046703625 0.93363301 0.01966336</span></span>
-<span><span class="co">#&gt; modelZ 0.009659479 0.02372472 0.96661580</span></span></code></pre>
+<span><span class="co">#&gt;            modelX     modelY     modelZ</span></span>
+<span><span class="co">#&gt; modelX 0.88777233 0.05968226 0.05254541</span></span>
+<span><span class="co">#&gt; modelY 0.04670368 0.93357416 0.01972216</span></span>
+<span><span class="co">#&gt; modelZ 0.00966135 0.02366910 0.96666955</span></span></code></pre>
 <p>Similarly, you can use the <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> function to visualize
 the result. This function, yet again, internally calls <em>abc</em>’s
 own plotting method internall, with a bonus option to save a figure to a
@@ -424,9 +424,9 @@ convenience wrapper around <em>abc</em>’s own function
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Bayes factors:</span></span>
 <span><span class="co">#&gt;             modelX      modelY      modelZ</span></span>
-<span><span class="co">#&gt; modelX      1.0000 332923.0635 523940.5373</span></span>
-<span><span class="co">#&gt; modelY      0.0000      1.0000      1.5738</span></span>
-<span><span class="co">#&gt; modelZ      0.0000      0.6354      1.0000</span></span></code></pre>
+<span><span class="co">#&gt; modelX      1.0000 332871.6946 524021.4981</span></span>
+<span><span class="co">#&gt; modelY      0.0000      1.0000      1.5742</span></span>
+<span><span class="co">#&gt; modelZ      0.0000      0.6352      1.0000</span></span></code></pre>
 <p>As we can see, <code>modelX</code> shows the highest rate of
 acceptance among all simulations. Specifically, we see that the
 proportion of acceptance is 87.1%.</p>
@@ -684,7 +684,7 @@ the overview of the results by applying the function
 <span><span class="co">#&gt;        modelX modelY modelZ</span></span>
 <span><span class="co">#&gt; modelX 0.9508 0.0114 0.0378</span></span>
 <span><span class="co">#&gt; modelY 0.1030 0.8783 0.0187</span></span>
-<span><span class="co">#&gt; modelZ 0.0008 0.0271 0.9721</span></span></code></pre>
+<span><span class="co">#&gt; modelZ 0.0008 0.0269 0.9723</span></span></code></pre>
 <p>As you can see, we can replicate the result of
 <code><a href="../reference/cross_validate.html">cross_validate()</a></code> for model selection by combining the
 functions <code><a href="../reference/unpack.html">unpack()</a></code>, <code><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr()</a></code> and
@@ -807,13 +807,13 @@ the sensitivity of the parameter estimates to the tolerance rate.</p>
 <pre><code><span><span class="co">#&gt; Prediction error based on a cross-validation sample of 10</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;               T_1         T_2         T_3          gf        Ne_A        Ne_B</span></span>
-<span><span class="co">#&gt; 0.005 0.107205989 0.027775025 0.039234790 0.367902409 0.017486232 0.015731814</span></span>
-<span><span class="co">#&gt; 0.01  0.090034931 0.102400520 0.053148865 0.144891110 0.011081165 0.023581129</span></span>
-<span><span class="co">#&gt; 0.05  0.059208381 0.131924439 0.093712364 0.118852489 0.004812915 0.054709249</span></span>
+<span><span class="co">#&gt; 0.005 0.112171024 0.023216288 0.040375548 0.437431232 0.018562096 0.012536753</span></span>
+<span><span class="co">#&gt; 0.01  0.094252535 0.095275010 0.051788504 0.152548888 0.012150954 0.021756343</span></span>
+<span><span class="co">#&gt; 0.05  0.062071176 0.130028049 0.093912743 0.118171561 0.004605005 0.053417569</span></span>
 <span><span class="co">#&gt;              Ne_C        Ne_D</span></span>
-<span><span class="co">#&gt; 0.005 0.136821883 0.208369012</span></span>
-<span><span class="co">#&gt; 0.01  0.067444820 0.205199359</span></span>
-<span><span class="co">#&gt; 0.05  0.098235642 0.332068417</span></span></code></pre>
+<span><span class="co">#&gt; 0.005 0.140588965 0.203781792</span></span>
+<span><span class="co">#&gt; 0.01  0.070048823 0.211564247</span></span>
+<span><span class="co">#&gt; 0.05  0.096731365 0.346318217</span></span></code></pre>
 <div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/cv_abc-1.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-2.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-3.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-4.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-5.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-6.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-7.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-8.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>

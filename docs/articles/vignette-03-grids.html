@@ -282,32 +282,32 @@ tree-sequence functions work as they’re supposed to:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A     B     C      O         alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.023</span><span style="color: #BB0000; text-decoration: underline;">0</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.031</span><span style="color: #BB0000; text-decoration: underline;">2</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.019</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1  0.042<span style="text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1  0     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.029</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.019</span><span style="color: #BB0000; text-decoration: underline;">7</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1  0.038<span style="text-decoration: underline;">6</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1  0.050<span style="text-decoration: underline;">1</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 -<span style="color: #BB0000;">0.047</span><span style="color: #BB0000; text-decoration: underline;">6</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  nea_2 nea_1 afr1_1 chimp_1 0.106  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  nea_2 nea_1 afr1_1 chimp_1 0.004<span style="text-decoration: underline;">55</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  nea_2 nea_1 afr1_1 chimp_1 0.004<span style="text-decoration: underline;">55</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  nea_2 nea_1 afr1_1 chimp_1 0.012<span style="text-decoration: underline;">1</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  nea_2 nea_1 afr1_1 chimp_1 0.076<span style="text-decoration: underline;">6</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  nea_2 nea_1 afr1_1 chimp_1 0.084<span style="text-decoration: underline;">2</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  nea_2 nea_1 afr1_1 chimp_1 0.019<span style="text-decoration: underline;">7</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  nea_2 nea_1 afr1_1 chimp_1 0.191  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  nea_2 nea_1 afr1_1 chimp_1 0.048<span style="text-decoration: underline;">5</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 nea_2 nea_1 afr1_1 chimp_1 0.010<span style="text-decoration: underline;">6</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">indirect</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 21 × 6</span></span></span>
 <span><span class="co">#&gt;    X      A      B      C     O       alpha</span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 1.18 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.05 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 0.968</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 0.970</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 1.16 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 0.963</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 1.17 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 1.01 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 1.04 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 1.06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> eur_1  afr1_1 afr2_1 nea_2 chimp_1 0.704</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> eur_2  afr1_1 afr2_1 nea_2 chimp_1 1.02 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> eur_3  afr1_1 afr2_1 nea_2 chimp_1 0.959</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> eur_4  afr1_1 afr2_1 nea_2 chimp_1 1.06 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> eur_5  afr1_1 afr2_1 nea_2 chimp_1 0.878</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> eur_6  afr1_1 afr2_1 nea_2 chimp_1 0.819</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> eur_7  afr1_1 afr2_1 nea_2 chimp_1 0.920</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> eur_8  afr1_1 afr2_1 nea_2 chimp_1 0.788</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> eur_9  afr1_1 afr2_1 nea_2 chimp_1 0.922</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> eur_10 afr1_1 afr2_1 nea_2 chimp_1 0.884</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 11 more rows</span></span></span></code></pre>
 <p>Excellent, we get the output tables from <code>ts_f4ratio</code>
 functions as we’re supposed to (and get one estimate for each of the
