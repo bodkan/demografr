@@ -432,11 +432,18 @@ and a relevant statistical textbook.
 
 The confusion matrices and the visualization all suggest that ABC can
 distinguish between the three models very well. For instance, _modelX_ has been
-classified correctly in
-`r cv_selection$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum`
+classified correctly in:
+
+```{r}
+cv_selection$estim[[1]] %>% { .[names(.) == "modelX"] } %>% { names(.) == . } %>% sum
+```
+
 simulations out of the total of 100 cross-validation simulations, with an
-overall misclassification rate for all models of only
-`r sprintf("%.1f", cv_selection$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100)`%.
+overall misclassification rate for all models of only:
+
+```{r, echo=FALSE}
+sprintf("%.1f%%", cv_selection$estim[[1]] %>%  { 1 - mean(names(.) == .) } * 100)
+```
 
 ## Model selection
 
@@ -459,14 +466,25 @@ modsel
 ```
 
 As we can see, `modelX` shows the highest rate of acceptance among all
-simulations. Specifically, we see that the proportion of acceptance is
-`r sprintf("%.1f", max(quiet(summary(modsel))$rejection$Prob) * 100)`%.
+simulations. Specifically, we see that the proportion of acceptance is:
+
+```{r}
+sprintf("%.1f%%", max(quiet(summary(modsel))$rejection$Prob) * 100)
+```
 
 Similarly, looking at the Bayes factors, we see that the "modelX" is
-`r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 2])` times more
-likely than "modelY", and
-`r sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 3])`
-more likely than "modelZ".
+
+```{r}
+sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 2])
+```
+
+times more likely than "modelY", and
+
+```{r}
+sprintf("%.1f", quiet(summary(modsel))$rejection$Bayes[1, 3])
+```
+
+times more likely than "modelZ".
 
 When the posterior probabilities are computed using a more elaborate neural
 network method (again, see more details in the
