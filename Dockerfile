@@ -19,6 +19,7 @@ RUN apt-get update -y \
         build-essential \
         cmake \
         curl \
+        gdal-bin \
         git \
         htop \
         iputils-ping \
