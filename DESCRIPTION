@@ -44,14 +44,11 @@ Suggests:
     knitr,
     lobstr,
     locfit,
-    rmarkdown,
     sf,
     stars,
     rnaturalearth,
     parallel,
-    pkgdown,
     doParallel,
-    markdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3
