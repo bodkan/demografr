@@ -117,7 +117,9 @@ docker-push:
 docker-pull:
 	docker pull $(IMAGE)
 
-local-webapp:
+docker-stop:
+	docker stop $(CONTAINER) || true
+
 ifndef PORT
 	$(error PORT variable must be set explicitly)
 endif
