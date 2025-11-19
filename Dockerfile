@@ -110,37 +110,37 @@ RUN R -e 'install.packages("rstudioapi")'
 # do this when first setting up the container to create an renv.lock file:
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   export GITHUB_PAT='<PLACE GITHUB TOKEN HERE IF NEEDED>'
-#   renv::init(bare = TRUE, bioconductor = "${BIOCONDUCTOR_VERSION}")
+#   renv::init(bare = TRUE, bioconductor = Sys.getenv("BIOCONDUCTOR_VERSION"))
 #   install.packages("yaml") # to be able to discover dependencies in Rmd files
 #   renv::snapshot(dev = TRUE)
 
-# install required R packages to their locked-in versions
-COPY DESCRIPTION .
-COPY renv.lock .Rprofile ./
-COPY renv/ renv/
-ARG GITHUB_PAT="''"
-RUN R -e 'renv::restore()'
-
-# setup Python environment for slendr
-RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
-# rather than installing a separate Python interpreter, use the slendr one
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
-
-# make sure all software is available in R
-RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
-
-############################################################
-# final configuration steps
-############################################################
-
-# clone shell configuration files into the container
-RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm -f .bashrc .profile; \
-    cd .dotfiles; ./install.sh
-
-# make sure the project is ready when RStudio Server session starts
-# https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
-# https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
-RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" >> ${HOME}/.Rprofile
-
-# remove compilation sources and other redundant files
-RUN rm -r /tmp/* /home/rstudio
+## install required R packages to their locked-in versions
+#COPY DESCRIPTION .
+#COPY renv.lock .Rprofile ./
+#COPY renv/ renv/
+#ARG GITHUB_PAT="''"
+#RUN R -e 'renv::restore()'
+#
+## setup Python environment for slendr
+#RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
+## rather than installing a separate Python interpreter, use the slendr one
+#ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
+#
+## make sure all software is available in R
+#RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
+#
+#############################################################
+## final configuration steps
+#############################################################
+#
+## clone shell configuration files into the container
+#RUN cd ${HOME}; git clone https://github.com/bodkan/dotfiles .dotfiles/; rm -f .bashrc .profile; \
+#    cd .dotfiles; ./install.sh
+#
+## make sure the project is ready when RStudio Server session starts
+## https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
+## https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
+#RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" >> ${HOME}/.Rprofile
+#
+## remove compilation sources and other redundant files
+#RUN rm -r /tmp/* /home/rstudio
