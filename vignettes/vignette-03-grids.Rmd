@@ -14,16 +14,6 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE)
 
-knitr::opts_chunk$set(
-  collapse = FALSE,
-  comment = "#>",
-  fig.align = "center",
-  fig.width = 8,
-  fig.height = 5,
-  dpi = 60,
-  eval = slendr_present && Sys.getenv("RUNNER_OS") != "" # don't rerun on CRAN or GHA (no rds)
-)
-
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
@@ -32,6 +22,16 @@ get_cache <- function(path) {
 }
 
 data_path <- get_cache("examples/grid_data.rds")
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 60,
+  eval = file.exists(data_path) && slendr_present && Sys.getenv("RUNNER_OS") != "" # don't rerun on CRAN or GHA (no rds)
+)
 ```
 
 ⚠️⚠️⚠️
@@ -318,7 +318,7 @@ plan(multisession, workers = availableCores())
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(data_path)}
+```{r}
 results <- simulate_grid(
   model, grid, functions, replicates = 50,
   sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
@@ -331,12 +331,12 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(data_path)}
+```{r, echo=FALSE}
 saveRDS(tdelta, get_cache("examples/grid_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/grid_ncores.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(data_path)}
+```{r, echo=FALSE}
 tdelta <- readRDS(get_cache("examples/grid_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/grid_ncores.rds"))
 ```
@@ -351,11 +351,11 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
 parallelized across `r ncores` CPUs.**
 
-```{r, eval=!file.exists(data_path), echo=FALSE}
+```{r, echo=FALSE}
 saveRDS(results, data_path)
 ```
 
-```{r, eval=file.exists(data_path), echo=FALSE}
+```{r, echo=FALSE}
 results <- readRDS(data_path)
 ```
 
