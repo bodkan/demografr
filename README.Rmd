@@ -113,10 +113,10 @@ inference of "standard" demographic models (i.e. estimating $N_e$, split times
 gene-flow parameters, etc.) already works very nicely, our long-term ambitions
 for the project are much higher and extend, for instance, towards inferences
 of spatial models or models which include selection. As such, please be aware
-that the interface might change on a rather short notice to accomodate features
-for estimating parameters of much more complex models.
-
-If you want to follow updates on _demografr_, you can do this also on my [social media](https://bsky.app/profile/bodkan.bsky.social) and by checking out the [changelog](https://github.com/bodkan/demografr/blob/main/NEWS.md) from time
+that the interface might change on a rather short notice to accommodate features
+for estimating parameters of much more complex models. You can follow _demografr_
+updates and bugfixes by checking out the
+[changelog](https://github.com/bodkan/demografr/blob/main/NEWS.md) from time
 to time.
 
 
