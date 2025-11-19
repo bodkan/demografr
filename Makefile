@@ -90,10 +90,10 @@ TOKEN := $(shell if [[ -f ~/.GITHUB_PAT ]]; then more ~/.GITHUB_PAT; else echo "
 
 .PHONY: rstudio bash r docker-build docker-push docker-pull local-webapp remote-webapp
 
-bash:
+bash: docker-stop
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) bash
 
-r:
+r: docker-stop
 	docker run --rm -ti -v $(shell pwd):/project -w /project --name $(CONTAINER) $(IMAGE) R
 
 attach:
