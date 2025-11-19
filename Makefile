@@ -81,7 +81,7 @@ else
 endif
 
 IMAGE := bodkan/$(shell basename $(shell pwd)):$(PLATFORM)
-CONTAINER := $(shell basename $(shell pwd))_$(shell date '+%Y-%m-%d_%H-%M-%S')
+CONTAINER := $(shell basename $(shell pwd))
 
 # if present, extract GitHub access token
 TOKEN := $(shell if [[ -f ~/.GITHUB_PAT ]]; then more ~/.GITHUB_PAT; else echo ""; fi)
@@ -120,7 +120,7 @@ docker-pull:
 docker-stop:
 	docker stop $(CONTAINER) || true
 
-local-webapp: rstudio
+local-webapp: docker-stop rstudio
 ifndef PORT
 	$(error PORT variable must be set explicitly)
 endif
