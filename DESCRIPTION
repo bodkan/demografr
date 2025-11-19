@@ -49,6 +49,7 @@ Suggests:
     stars,
     rnaturalearth,
     parallel,
+    pkgdown,
     doParallel,
     markdown,
     testthat (>= 3.0.0)
