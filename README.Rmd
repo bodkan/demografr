@@ -65,7 +65,7 @@ for simulation and data analysis, making it possible to write complete
 simulation-based workflows entirely in R. Specifically:
 
 1. _slendr_'s intuitive, interactive
-[interface for definning population genetic models](https://slendr.net/articles/vignette-04-nonspatial-models.html)
+[interface for definning population genetic models](https://bodkan.net/slendr/articles/vignette-04-nonspatial-models.html)
 makes it easy to encode even complex demographic models with only bare minimum
 of R knowledge needed.
 
