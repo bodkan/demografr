@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_abc.R
 \name{simulate_abc}
 \alias{simulate_abc}
-\title{Simulate data for ABC inference using specified priors}
+\title{Simulate data for downstream ABC posterior inference by sampling from priors}
 \usage{
 simulate_abc(
   model,

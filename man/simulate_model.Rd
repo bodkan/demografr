@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_model.R
 \name{simulate_model}
 \alias{simulate_model}
-\title{Simulate a single tree sequence from the given inference setup}
+\title{Simulate data (by default, a tree sequence) from a model (by default, a slendr function)}
 \usage{
 simulate_model(
   model,

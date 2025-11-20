@@ -2,7 +2,7 @@
 % Please edit documentation in R/cross_validate.R
 \name{cross_validate}
 \alias{cross_validate}
-\title{Run cross-validation routines of the abc R package}
+\title{Run cross-validation routines of the R package abc}
 \usage{
 cross_validate(x, nval, tols, method, ...)
 }
@@ -20,7 +20,10 @@ Object of the class \code{cv4postpr} and \code{demografr_cv}
 }
 \description{
 This function is a convenience wrapper around the functions \code{cv4postpr}
-and \code{anc::cv4abc} from the R package abc
+and \code{anc::cv4abc} from the R package abc. Rather than having to
+generate intermediate data structures required by those functions in
+a manual and potentially error-prone way, demografr prepares this data in
+an automated manner.
 }
 \examples{
 \dontshow{slendr::check_dependencies(python = TRUE, quit = TRUE) # dependencies must be present

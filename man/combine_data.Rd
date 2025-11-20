@@ -8,8 +8,8 @@ combine_data(...)
 }
 \arguments{
 \item{...}{Either a list of objects of the class \code{demografr_abc_sims} as produced
-by the function \code{simulate_abc}, or individual objects of this class given
-as standard function arguments, or paths to 'rds' files containing serializations of
+by the function \code{simulate_abc}, or multiple objects of this class given
+as individual function arguments, or paths to 'rds' files containing serializations of
 such \code{demografr_abc_sims} objects.}
 }
 \value{

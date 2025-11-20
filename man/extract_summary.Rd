@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_summary.R
 \name{extract_summary}
 \alias{extract_summary}
-\title{Extract table of estimated model parameters}
+\title{Extract estimated model parameters in a tabular format}
 \usage{
 extract_summary(abc, param = NULL)
 }
@@ -17,7 +17,7 @@ all parameters will be extracted.}
 A data frame object with posterior summary statistics
 }
 \description{
-Extract table of estimated model parameters
+Extract estimated model parameters in a tabular format
 }
 \examples{
 # read example ABC result with an inferred joint posterior distribution

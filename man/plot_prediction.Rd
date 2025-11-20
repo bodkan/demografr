@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_prediction.R
 \name{plot_prediction}
 \alias{plot_prediction}
-\title{Plot the results of a posterior predictive check for a given summary statistic}
+\title{Plot the result of a posterior predictive check for a given summary statistic}
 \usage{
 plot_prediction(data, stat = NULL, file = NULL, facets = TRUE, ...)
 }
@@ -26,7 +26,7 @@ If \code{file = NULL}, a ggplot2 object (or a list of such objects, if
   plots are instead saved to a file.
 }
 \description{
-Plot the results of a posterior predictive check for a given summary statistic
+Plot the result of a posterior predictive check for a given summary statistic
 }
 \examples{
 \dontrun{

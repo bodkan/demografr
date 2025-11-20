@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_posterior.R
 \name{plot_posterior}
 \alias{plot_posterior}
-\title{Plot posterior distribution of given parameters}
+\title{Plot posterior distributions of given parameters}
 \usage{
 plot_posterior(
   abc,
@@ -34,7 +34,7 @@ is \code{FALSE}.}
 A ggplot2 plot object
 }
 \description{
-Plot posterior distribution of given parameters
+Plot posterior distributions of given parameters
 }
 \examples{
 # read an example result of an ABC inference

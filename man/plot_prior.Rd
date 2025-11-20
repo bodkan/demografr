@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_prior.R
 \name{plot_prior}
 \alias{plot_prior}
-\title{Plot prior distribution(s)}
+\title{Plot prior distributions of model parameters}
 \usage{
 plot_prior(
   x,
@@ -36,7 +36,7 @@ all parameters will be extracted.}
 A ggplot2 plot object
 }
 \description{
-Plot prior distribution(s)
+Plot prior distributions of model parameters
 }
 \examples{
 priors <- list(

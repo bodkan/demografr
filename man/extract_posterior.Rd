@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_posterior.R
 \name{extract_posterior}
 \alias{extract_posterior}
-\title{Extract inferred posterior(s) as a standard data frame}
+\title{Extract inferred posteriors in a tabular format}
 \usage{
 extract_posterior(abc, param = NULL, posterior = c("adj", "unadj"))
 }
@@ -20,7 +20,7 @@ all parameters will be extracted.}
 A data frame in the long format with posterior values of parameters
 }
 \description{
-Extract inferred posterior(s) as a standard data frame
+Extract inferred posteriors in a tabular format
 }
 \examples{
 # read example ABC result with an inferred joint posterior distribution

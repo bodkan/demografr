@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.demografr_abc.R
 \name{plot.demografr_abc.abc}
 \alias{plot.demografr_abc.abc}
-\title{Plot diagnostics of posterior distribution(s)}
+\title{Plot various diagnostics of posterior distributions}
 \usage{
 \method{plot}{demografr_abc.abc}(x, param = NULL, ...)
 }
@@ -19,7 +19,7 @@ all parameters will be extracted.}
 Used exclusively for printing
 }
 \description{
-Plot diagnostics of posterior distribution(s)
+Plot various diagnostics of posterior distributions
 }
 \examples{
 # read inferred posterior distribution object from an example ABC run

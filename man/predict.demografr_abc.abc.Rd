@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict.demografr_abc.abc.R
 \name{predict.demografr_abc.abc}
 \alias{predict.demografr_abc.abc}
-\title{Generate summary statistics from the inferred posterior distribution of parameters}
+\title{Simulate given summary statistics from the inferred parameter model posteriors}
 \usage{
 \method{predict}{demografr_abc.abc}(
   object,

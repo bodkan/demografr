@@ -2,7 +2,7 @@
 % Please edit documentation in R/hist.demografr_abc.R
 \name{hist.demografr_abc.abc}
 \alias{hist.demografr_abc.abc}
-\title{Plot histogram of posterior distribution(s)}
+\title{Plot histogram of posterior distributions}
 \usage{
 \method{hist}{demografr_abc.abc}(x, param = NULL, ...)
 }
@@ -19,7 +19,7 @@ all parameters will be extracted.}
 A base R histogram plot
 }
 \description{
-Plot histogram of posterior distribution(s)
+Plot histogram of posterior distributions
 }
 \examples{
 # read inferred posterior distribution object from an example ABC run
