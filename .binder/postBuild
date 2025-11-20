@@ -1,15 +1,16 @@
 mkdir bin
 
 # installation instructions from the SLiM manual:
-wget https://github.com/MesserLab/SLiM/archive/refs/tags/v4.2.2.tar.gz
-tar xf v4.2.2.tar.gz
-cd SLiM-4.2.2
+SLIM_VERSION=5.1
+wget https://github.com/MesserLab/SLiM/archive/refs/tags/v${SLIM_VERSION}.tar.gz
+tar xf v${SLIM_VERSION}.tar.gz
+cd SLiM-${SLIM_VERSION}
 cmake .
 make slim
 
 # move the compiled SLiM binary
 cd ../
-mv SLiM-4.2.2/slim bin/
+mv SLiM-${SLIM_VERSION}/slim bin/
 
 export PATH=/home/jovyan/bin:$PATH
 echo "PATH=$PATH" > ~/.Renviron

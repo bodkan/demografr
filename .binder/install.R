@@ -2,7 +2,7 @@
 
 install.packages(c("devtools", "sf", "stars", "rnaturalearth"))
 
-devtools::install_github("bodkan/slendr")
+install.packages("slendr")
 
 slendr::setup_env(pip = TRUE, agree = TRUE)
 
