@@ -51,15 +51,16 @@ run_iteration <- function(it,
   simulated_stats <- summarise_data(result_data, functions)
   #   2. collect all parameter values (sampled from priors or given) into a single parameter matrix
   if (contains_priors(params)) {
-    param_matrix <- matrix(result_params, nrow = 1)
-    colnames(param_matrix) <- names(result_params)
+    param_names <- names(result_params)
+    result_params <- matrix(result_params, nrow = 1)
+    colnames(result_params) <- param_names
   }
 
   if (!is.null(result_path))
     unlink(result_path, recursive = TRUE)
 
   list(
-    parameters = param_matrix,
+    parameters = result_params,
     simulated = simulated_stats
   )
 }
