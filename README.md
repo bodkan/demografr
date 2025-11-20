@@ -68,38 +68,24 @@ simulation data for inference and diagnostics.
 
 ## Installation
 
-You can install the development version of _demografr_ from
-[GitHub](https://github.com/) with:
+Once the _demografr_ package appears on CRAN, you will be able to install
+the latest released version with the following command:
+
+``` r
+install.packages("demografr")
+```
+
+However, especially early after an initial release, it might be worth keeping
+an eye on the [changelog](https://bodkan.net/demografr/news/index.html) for
+bugfixes and improvements, which you can always obtain by installing the development
+version of _demografr_ with:
 
 ``` r
 devtools::install_github("bodkan/demografr")
 ```
 
-Note that this requires an R package _devtools_, which you can obtain simply
+Note that this requires an R package _devtools_, which you can install simply
 by running `install.packages("devtools")`.
-
-Because _demografr_ is tightly linked to the _slendr_ simulation package (in
-fact, new developments
-in _slendr_ ale currently driven by requirements of _demografr_), you will also
-need the development version of _slendr_ itself:
-
-``` r
-devtools::install_github("bodkan/slendr")
-```
-
-### Note on stability
-
-_demografr_ is very much in an experimental stage at this point. Although
-inference of "standard" demographic models (i.e. estimating $N_e$, split times
-gene-flow parameters, etc.) already works very nicely, our long-term ambitions
-for the project are much higher and extend, for instance, towards inferences
-of spatial models or models which include selection. As such, please be aware
-that the interface might change on a rather short notice to accomodate features
-for estimating parameters of much more complex models.
-
-If you want to follow updates on _demografr_, you can do this also on my [social media](https://bsky.app/profile/bodkan.bsky.social) and by checking out the [changelog](https://github.com/bodkan/demografr/blob/main/NEWS.md) from time
-to time.
-
 
 ### Testing the R package in an online RStudio session
 
