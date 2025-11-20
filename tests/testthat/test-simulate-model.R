@@ -46,7 +46,7 @@ test_that("basic simulate_model() runs produce a tree-sequence file (SLiM)", {
     data = data_list
   )
   norm_path <- normalizePath(file.path(result$path, "slim.trees"), winslash = "/", mustWork = FALSE)
-  expect_s3_class(ts_read(norm_path, "slendr_ts"))
+  expect_s3_class(ts_read(norm_path), "slendr_ts")
 })
 
 test_that("basic simulate_model() runs produce a tree-sequence file (msprime)", {
@@ -59,7 +59,7 @@ test_that("basic simulate_model() runs produce a tree-sequence file (msprime)", 
     data = data_list
   )
   norm_path <- normalizePath(file.path(result$path, "msprime.trees"), winslash = "/", mustWork = FALSE)
-  expect_s3_class(ts_read(norm_path, "slendr_ts"))
+  expect_s3_class(ts_read(norm_path), "slendr_ts")
 })
 
 test_that("for customized files, data-generating functions must be provided", {
