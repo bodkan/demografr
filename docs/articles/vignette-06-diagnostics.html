@@ -376,9 +376,13 @@ the <em>abc</em> R package <a href="https://cran.r-project.org/package=abc/vigne
 and a relevant statistical textbook.</p>
 <p>The confusion matrices and the visualization all suggest that ABC can
 distinguish between the three models very well. For instance,
-<em>modelX</em> has been classified correctly in 95 simulations out of
-the total of 100 cross-validation simulations, with an overall
-misclassification rate for all models of only 2.7%.</p>
+<em>modelX</em> has been classified correctly in:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cv_selection</span><span class="op">$</span><span class="va">estim</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="op">{</span> <span class="va">.</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">==</span> <span class="st">"modelX"</span><span class="op">]</span> <span class="op">}</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="op">{</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">==</span> <span class="va">.</span> <span class="op">}</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="va">sum</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] 95</span></span></code></pre>
+<p>simulations out of the total of 100 cross-validation simulations,
+with an overall misclassification rate for all models of only:</p>
+<pre><code><span><span class="co">#&gt; [1] "2.7%"</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="model-selection">Model selection<a class="anchor" aria-label="anchor" href="#model-selection"></a>
@@ -389,13 +393,13 @@ the best model for our empirical data set. This can be done with the
 function <code><a href="../reference/select_model.html">select_model()</a></code> which is <em>demografr</em>’s
 convenience wrapper around <em>abc</em>’s own function
 <code>postpr</code>:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">abcX</span>, <span class="va">abcY</span>, <span class="va">abcZ</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">modsel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_model.html">select_model</a></span><span class="op">(</span><span class="va">models</span>, tol <span class="op">=</span> <span class="fl">0.03</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <p>We can make a decision on the model selection by inspecting the
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> of the produced result:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modsel</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Call: </span></span>
 <span><span class="co">#&gt; abc::postpr(target = parts$target, index = parts$index, sumstat = parts$sumstat, </span></span>
@@ -429,10 +433,20 @@ convenience wrapper around <em>abc</em>’s own function
 <span><span class="co">#&gt; modelZ      0.0000      0.6352      1.0000</span></span></code></pre>
 <p>As we can see, <code>modelX</code> shows the highest rate of
 acceptance among all simulations. Specifically, we see that the
-proportion of acceptance is 87.1%.</p>
-<p>Similarly, looking at the Bayes factors, we see that the “modelX” is
-156.8 times more likely than “modelY”, and 7.1 more likely than
-“modelZ”.</p>
+proportion of acceptance is:</p>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.1f%%"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">modsel</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">rejection</span><span class="op">$</span><span class="va">Prob</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] "87.1%"</span></span></code></pre>
+<p>Similarly, looking at the Bayes factors, we see that the “modelX”
+is</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.1f"</span>, <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">modsel</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">rejection</span><span class="op">$</span><span class="va">Bayes</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] "156.8"</span></span></code></pre>
+<p>times more likely than “modelY”, and</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%.1f"</span>, <span class="fu">quiet</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">modsel</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">rejection</span><span class="op">$</span><span class="va">Bayes</span><span class="op">[</span><span class="fl">1</span>, <span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [1] "7.1"</span></span></code></pre>
+<p>times more likely than “modelZ”.</p>
 <p>When the posterior probabilities are computed using a more elaborate
 neural network method (again, see more details in the <em>abc</em> <a href="https://cran.r-project.org/package=abc/vignettes/abcvignette.pdf" class="external-link">vignette</a>),
 we find that the probability of “modelX” is even more overwhelming. In
@@ -444,7 +458,7 @@ used</a> to generate the “observed” summary statistics, we see that the
 data was indeed simulated by code nearly identical to the one shown
 above as <code>modelX</code>. When plotted, the true model looks like
 this:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"A"</span>, time <span class="op">=</span> <span class="fl">1</span>, N <span class="op">=</span> <span class="fl">2000</span><span class="op">)</span></span>
 <span><span class="va">B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"B"</span>, time <span class="op">=</span> <span class="fl">2000</span>, N <span class="op">=</span> <span class="fl">800</span>, parent <span class="op">=</span> <span class="va">A</span><span class="op">)</span></span>
 <span><span class="va">C</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/population.html" class="external-link">population</a></span><span class="op">(</span><span class="st">"C"</span>, time <span class="op">=</span> <span class="fl">6000</span>, N <span class="op">=</span> <span class="fl">9000</span>, parent <span class="op">=</span> <span class="va">B</span><span class="op">)</span></span>
@@ -492,7 +506,7 @@ together with a vertical line representing the values of the
 <em>observed</em> statistics. Naturally, only if the model can generate
 statistics compatible with the values observed in real data can we
 regard the model as sensible and usable for inference.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">predX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">abcX</span>, samples <span class="op">=</span> <span class="fl">1000</span>, posterior <span class="op">=</span> <span class="st">"unadj"</span><span class="op">)</span></span>
 <span><span class="va">predY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">abcY</span>, samples <span class="op">=</span> <span class="fl">1000</span>, posterior <span class="op">=</span> <span class="st">"unadj"</span><span class="op">)</span></span>
@@ -503,7 +517,7 @@ very well within the distributions of statistics simulated from the
 posterior parameters of the model. This suggests that are model
 (simplified that it must be given the more complex reality), captures
 the empoirical statistics quite well:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span></code></pre>
 <p><img src="vignette-06-diagnostics_files/figure-html/predX-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
@@ -520,7 +534,7 @@ gene-flow detection statistic fits rather nicely, the pairwise
 divergences between populations are completely from the statistics
 simulated from posterior distributions. This strongly suggests that the
 model wasn’t able to capture the features of the data.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predY</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span></code></pre>
 <p><img src="vignette-06-diagnostics_files/figure-html/predY-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
@@ -533,7 +547,7 @@ model wasn’t able to capture the features of the data.</p>
 <p>We can compare the divergences between models directly to see which
 model gives the most reasonable posterior predictive check results more
 clearly:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predX</span>, <span class="st">"divergence"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predY</span>, <span class="st">"divergence"</span><span class="op">)</span>,</span>
@@ -544,7 +558,7 @@ clearly:</p>
 <p>We can see that posterior predictive checks for nucleotide diversity
 are a little less clear as there are no extremely dramatic outliers as
 it’s the case for divergence above:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predX</span>, <span class="st">"diversity"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predY</span>, <span class="st">"diversity"</span><span class="op">)</span>,</span>
@@ -552,7 +566,7 @@ it’s the case for divergence above:</p>
 <span>  ncol <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/pred_diversity-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cowplot</span><span class="fu">::</span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predX</span>, <span class="st">"f4"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/plot_prediction.html">plot_prediction</a></span><span class="op">(</span><span class="va">predY</span>, <span class="st">"f4"</span><span class="op">)</span>,</span>
@@ -562,7 +576,7 @@ it’s the case for divergence above:</p>
 <p><img src="vignette-06-diagnostics_files/figure-html/pred_f4-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
 <p>If more customization or a more detailed analyses is needed, you can
 also extract data from the posterior simulations themselves:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_prediction.html">extract_prediction</a></span><span class="op">(</span><span class="va">predX</span>, <span class="st">"diversity"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4,000 × 12</span></span></span>
@@ -618,12 +632,12 @@ the <em>anc</em> package. This includes <code><a href="https://rdrr.io/pkg/abc/m
 <h3 id="unpacking-a-demografr-object-to-low-level-components-used-by-the-abc-package">“Unpacking” a <em>demografr</em> object to low-level components used
 by the <em>abc</em> package<a class="anchor" aria-label="anchor" href="#unpacking-a-demografr-object-to-low-level-components-used-by-the-abc-package"></a>
 </h3>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>As we can see, the <code><a href="../reference/unpack.html">unpack()</a></code> function produced a list
@@ -637,17 +651,17 @@ could perform the cross-validation of the model selection using
 <em>abc</em>’s own functionality like this.</p>
 <p>First, because model-selection requires, well, multiple models to
 select from, we will unpack information from all the three models:</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">abcX</span>, <span class="va">abcY</span>, <span class="va">abcZ</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">parts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">parts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>Then, we simply run <code><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr()</a></code> as we normally would,
 using the information pre-generated by <code><a href="../reference/unpack.html">unpack()</a></code>:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># cv4postpr() is a function from the abc R package, not demografr!</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Loading required package: abc.data</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; Loading required package: nnet</span></span></code></pre>
@@ -661,13 +675,13 @@ using the information pre-generated by <code><a href="../reference/unpack.html">
 <span><span class="co">#&gt;     area</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; Loading required package: locfit</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; locfit 1.5-9.12   2025-03-05</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv4postpr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">index</span>, sumstat <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">sumstat</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <p>Unlike the result of <code><a href="../reference/cross_validate.html">cross_validate()</a></code> above, typing out
 the object <code>cv4postpr_res</code> will not help us, but we can get
 the overview of the results by applying the function
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>:</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv4postpr_res</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Confusion matrix based on 10 samples for each model.</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -701,24 +715,24 @@ and leave the interpretation to the discussion in the vignette:</p>
 <p>First, we will unpack the results of the selected best-fitting model
 from the appropriate <code>abc</code> object obtained by the
 <em>demografr</em> function <code><a href="../reference/run_abc.html">run_abc()</a></code> above:</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>Then we use the elements of the parts list that we just created as
 inputs for <code><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit()</a></code>:</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># gfit() is a function from the abc R package, not demografr!</span></span>
 <span></span>
 <span><span class="va">gfitX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsX</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsX</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitX</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model X)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitX-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
 <span><span class="co">#&gt; [1] 0.37</span></span>
@@ -729,14 +743,14 @@ inputs for <code><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dist.obs</span></span>
 <span><span class="co">#&gt; [1] 4.076438</span></span></code></pre>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcY</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gfitY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsY</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsY</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitY</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model Y)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitY-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitY</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
 <span><span class="co">#&gt; [1] 0.21</span></span>
@@ -747,14 +761,14 @@ inputs for <code><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dist.obs</span></span>
 <span><span class="co">#&gt; [1] 3.968966</span></span></code></pre>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsZ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcZ</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gfitZ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsZ</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsZ</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitZ</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model Z)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitZ-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitZ</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
 <span><span class="co">#&gt; [1] 0.08</span></span>
@@ -767,7 +781,7 @@ inputs for <code><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external
 <span><span class="co">#&gt; [1] 5.032494</span></span></code></pre>
 <p>For completeness, here is how we can run <code><a href="https://rdrr.io/pkg/abc/man/gfitpca.html" class="external-link">gfitpca()</a></code> on
 <em>demografr</em> results:</p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># gfitpca() is a function from the abc R package, not demografr!</span></span>
 <span></span>
 <span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">abcX</span>, <span class="va">abcY</span>, <span class="va">abcZ</span><span class="op">)</span><span class="op">)</span></span>
@@ -798,11 +812,11 @@ objects as input. Instead, if given a single <em>demografr</em> ABC
 object (generated by the function <code><a href="../reference/run_abc.html">run_abc()</a></code>), it performs
 ABC cross-validation which we can use to gauge the accuracy of ABC and
 the sensitivity of the parameter estimates to the tolerance rate.</p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span>
 <span><span class="va">cv_abc_loclinear</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"loclinear"</span><span class="op">)</span></span>
 <span><span class="va">cv_abc_rejection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"rejection"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_abc</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Prediction error based on a cross-validation sample of 10</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -814,7 +828,7 @@ the sensitivity of the parameter estimates to the tolerance rate.</p>
 <span><span class="co">#&gt; 0.005 0.140588965 0.203781792</span></span>
 <span><span class="co">#&gt; 0.01  0.070048823 0.211564247</span></span>
 <span><span class="co">#&gt; 0.05  0.096731365 0.346318217</span></span></code></pre>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/cv_abc-1.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-2.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-3.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-4.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-5.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-6.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-7.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-8.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
 </div>
@@ -826,7 +840,7 @@ seems to explain data the best – <code>modelX</code>. Because we
 simulated the data from a (hidden) true, known model, we will also
 visualize the true parameter values as vertical dashed lines to compare
 their values against the posterior distributions of all parameters.</p>
-<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abcX</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; abc::abc(target = observed, param = data$parameters, sumstat = simulated, </span></span>
@@ -844,7 +858,7 @@ their values against the posterior distributions of all parameters.</p>
 <span><span class="co">#&gt; Total number of simulations 10000 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of accepted simulations:  100</span></span></code></pre>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -878,17 +892,17 @@ their values against the posterior distributions of all parameters.</p>
 <span><span class="co">#&gt; Weighted Mode:          857.0188  7408.730  2077.874</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 1482.2222 11379.856  6714.054</span></span>
 <span><span class="co">#&gt; Max.:                  1578.6224 12019.281  7547.764</span></span></code></pre>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">6000</span>, <span class="fl">8000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posterior_Tsplit-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">800</span>, <span class="fl">9000</span>, <span class="fl">4000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posterior_Ne-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0.1</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -907,7 +921,7 @@ structure of <code>modelZ</code> is the most appropriate model for our
 data and used it for inference of the split time parameters instead.
 <strong>This is complete non-sense and we show this purely for
 demonstration purposes!</strong></p>
-<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcZ</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">6000</span>, <span class="fl">8000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posteriorZ_Tsplit-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
