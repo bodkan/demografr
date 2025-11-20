@@ -2,7 +2,7 @@
 
 install.packages(c("devtools", "sf", "stars", "rnaturalearth"))
 
-install.packages("slendr")
+install.packages("slendr", repos = "https://cloud.r-project.org")
 
 slendr::setup_env(pip = TRUE, agree = TRUE)
 
