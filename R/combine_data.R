@@ -1,8 +1,8 @@
 #' Combine multiple individual ABC simulation runs into one
 #'
 #' @param ... Either a list of objects of the class \code{demografr_abc_sims} as produced
-#'   by the function \code{simulate_abc}, or individual objects of this class given
-#'   as standard function arguments, or paths to 'rds' files containing serializations of
+#'   by the function \code{simulate_abc}, or multiple objects of this class given
+#'   as individual function arguments, or paths to 'rds' files containing serializations of
 #'   such \code{demografr_abc_sims} objects.
 #'
 #' @return A combined object of the class \code{demografr_abc_sims}
@@ -181,12 +181,4 @@ combine_data.list <- function(...) {
     do.call(combine_data.character, runs)
   else
     stop("Invalid data type of elements in the list of items to combine together", call. = FALSE)
-}
-
-# Formula objects we use for priors are stored alongside their environments, which
-# effectively means that each run has a 'unique' prior, so the unique() calls above
-# don't do what we need. This helper function converts each prior to their raw
-# character representation purely for comparing the code of each prior formula.
-priors_to_strings <- function(priors) {
-  lapply(priors, function(p) paste(deparse(p[[2]]), "~", deparse(p[[3]]), collapse = " "))
 }

@@ -1,4 +1,4 @@
-#' Extract inferred posterior(s) as a standard data frame
+#' Extract inferred posteriors in a tabular format
 #'
 #' @param abc An object produced by \code{run_abc}
 #' @param param A character vector containing either parameter names to summarize,

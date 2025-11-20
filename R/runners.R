@@ -1,3 +1,69 @@
+# Get parameters from the priors, simulate a tree sequence, compute summary statistics
+run_iteration <- function(it,
+                          model, params, functions,
+                          sequence_length, recombination_rate, mutation_rate,
+                          data, format, engine, model_args, engine_args,
+                          model_name, attempts) {
+  if (format == "files" && missing(data))
+    stop("Models which generate custom files require a list of data function(s)\n",
+         "which will process them for computation of summary statistics.", call. = FALSE)
+
+  data_expr <- base::substitute(data)
+  if (is.symbol(data_expr))
+    data_expr <- data
+
+  if (format == "ts")
+    validate_user_functions(data_expr, valid_args = c("ts", "model"))
+  else
+    validate_user_functions(data_expr, valid_args = c("path", "model"))
+
+  init_env(quiet = TRUE)
+  result <- run_simulation(
+    model = model, params = params, sequence_length = sequence_length,
+    recombination_rate = recombination_rate,
+    engine = engine, model_args = model_args, engine_args = engine_args,
+    format = format, model_name = model_name, attempts = attempts
+  )
+  result_data <- result$data
+  result_params <- result$param_values
+
+  if (format == "ts") {
+    if (mutation_rate != 0)
+      result_data <- slendr::ts_mutate(result_data, mutation_rate = mutation_rate)
+
+    result_data <- list(ts = result_data)
+  }
+
+  # if user-defined generators were provided, apply each generator to the result
+  if (!is.null(data_expr)) {
+    env <- populate_data_env(result)
+    result_data <- evaluate(data_expr, env)
+  }
+
+  # clean up if needed
+  if (format == "ts")
+    result_path <- attr(result_data, "path")
+  else
+    result_path <- result$data
+
+  # collect data for a downstream ABC inference:
+  #   1. compute summary statistics using user-defined tree-sequence functions
+  simulated_stats <- summarise_data(result_data, functions)
+  #   2. collect all parameter values (sampled from priors or given) into a single parameter matrix
+  if (contains_priors(params)) {
+    result_params <- matrix(result_params, nrow = 1)
+    colnames(result_params) <- names(result_params)
+  }
+
+  if (!is.null(result_path))
+    unlink(result_path, recursive = TRUE)
+
+  list(
+    parameters = result_params,
+    simulated = simulated_stats
+  )
+}
+
 # Run a single simulation replicate from a model with parameters modified by the
 # prior distribution
 run_simulation <- function(model, params, sequence_length, recombination_rate,
@@ -122,20 +188,20 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
             # (i.e. priors and non-prior arguments to the model generating function)
             model_fun_params <- paste(
               vapply(names(model_fun_args),
-                    function(x) sprintf("%s = %s", x, ifelse(is.numeric(model_fun_args[[x]]),
-                                                            model_fun_args[[x]],
-                                                            sprintf("\"%s\"", model_fun_args[[x]]))),
-                    FUN.VALUE = character(1)),
+                     function(x) sprintf("%s = %s", x, ifelse(is.numeric(model_fun_args[[x]]),
+                                                              model_fun_args[[x]],
+                                                              sprintf("\"%s\"", model_fun_args[[x]]))),
+                     FUN.VALUE = character(1)),
               collapse = ", "
             )
             stop(cross, "An unexpected error was raised when generating data from a slendr model\n",
-                "using the provided slendr function.\n\nThe error message received was:\n",
-                msg,
-                "\n\nPerhaps re-running the model function with the sampled parameters\n",
-                "(ideally also running the model by a respective simulation engine) will\n",
-                "help to identify the problem. You can do so by calling:\n\n",
-                paste0(model_name, "(", model_fun_params, ")"),
-                call. = FALSE)
+                 "using the provided slendr function.\n\nThe error message received was:\n",
+                 msg,
+                 "\n\nPerhaps re-running the model function with the sampled parameters\n",
+                 "(ideally also running the model by a respective simulation engine) will\n",
+                 "help to identify the problem. You can do so by calling:\n\n",
+                 paste0(model_name, "(", model_fun_params, ")"),
+                 call. = FALSE)
           } else
             stop("Simulation via the provided custom script ended with the following error:\n\n",
                  msg, call. = FALSE)
@@ -149,12 +215,6 @@ run_simulation <- function(model, params, sequence_length, recombination_rate,
   list(data = result, param_values = unlist(param_args), model = compiled_model)
 }
 
-collect_param_matrix <- function(prior_values) {
-  m <- matrix(prior_values, nrow = 1)
-  colnames(m) <- names(prior_values)
-  m
-}
-
 # Generate a named list of prior samples to be used in model generating functions
 generate_prior_args <- function(priors) {
   prior_samples <- lapply(seq_along(priors), function(i) sample_prior(priors[[i]]))
@@ -165,7 +225,64 @@ generate_prior_args <- function(priors) {
   prior_args
 }
 
-# Does the given list contain prior sampling formulas?
-contains_priors <- function(l) {
-  all(vapply(l, function(f) inherits(f, "formula"), logical(1)))
+# Run a custom tailored SLiM or Python (msprime) simulation script
+#
+# This function will take as input a path to a SLiM or Python script (detecting
+# which one of the two it is based on the script's contents) and run it on the
+# command line with model arguments formatted on the command line automatically.
+run_script <- function(script, path, ...) {
+  if (!file.exists(script))
+    stop("No '", engine, "' script found at '", script, "'", call. = FALSE)
+  else
+    script <- normalizePath(script)
+
+  # every single valid demografr SLiM script engine must contain the following
+  # string -- this is how we can tell whether the input script is a SLiM script
+  # or an msprime Python script
+  script_contents <- readLines(script)
+  if (any(grepl("initializeMutationRate", script_contents)))
+    engine <- "slim"
+  else
+    engine <- reticulate::py_exe()
+
+  args <- list(...)
+
+  var_names <- names(args)
+  var_values <- unname(args)
+  # compose a vector of CLI arguments, either for a SLiM binary or for a Python script
+  prefix <- if (engine == "slim") "-d " else "--"
+  cli_args <- vapply(
+    seq_along(var_names),
+    function(i) paste0(prefix, var_names[i], "=", var_values[i]),
+    character(1)
+  )
+
+  if (engine == "slim") { # run the SLiM script on the command line
+    # add the generated output path to the list of CLI arguments for SLiM
+    cli_args <- c(cli_args, paste0("-d \"path='", path, "'\""))
+
+    # compose the whole CLI command
+    cli_command <- paste(engine, paste(cli_args, collapse = " "), script, collapse = " ")
+
+    # execute the command on the shell command line
+    system(cli_command, intern = TRUE)
+  } else { # run the msprime Python script in the reticulate'd Python interpreter
+    # add the path to the output tree sequence and collapse the whole CLI command
+    cli_args <- c(cli_args, paste0("--path=\"", path, "\""))
+
+    # compose the whole CLI command
+    cli_command <- paste(c(engine, script, cli_args), collapse = " ")
+
+    # execute the command on the Python command line
+    reticulate::py_run_string(sprintf("import os; os.system(r'%s')", cli_command))
+  }
+
+  if (dir(path) == 0)
+    stop("The provided simulation script did not generate any files. Inspect the log\n",
+         "information above for errors and make sure you can run your custom script \n",
+         "on the command-line manually without any issues.\n\n",
+         "The exact command that failed was:\n\n",
+         cli_command, call. = FALSE)
+
+  path
 }

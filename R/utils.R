@@ -1,3 +1,20 @@
+# -------------------------------------------------------------------------
+# handling of priors and other parameter distributions
+# -------------------------------------------------------------------------
+
+# Does the given list contain prior sampling formulas?
+contains_priors <- function(l) {
+  all(vapply(l, function(f) inherits(f, "formula"), logical(1)))
+}
+
+# Formula objects we use for priors are stored alongside their environments, which
+# effectively means that each run has a 'unique' prior, so the unique() calls above
+# don't do what we need. This helper function converts each prior to their raw
+# character representation purely for comparing the code of each prior formula.
+priors_to_strings <- function(priors) {
+  lapply(priors, function(p) paste(deparse(p[[2]]), "~", deparse(p[[3]]), collapse = " "))
+}
+
 # If there are any priors or bounds specified as "<par>... ~ <expression>", look for slendr
 # model function arguments matching "<par>", and "instantiate" them in form of their own
 # prior sampling or boundary parameter statements
@@ -30,6 +47,23 @@ expand_formulas <- function(formulas, model, model_args = NULL) {
   c(formulas[!to_expand], formulas_expanded)
 }
 
+# Extract variable names in formulas as a character vector
+get_param_names <- function(formulas) {
+  sapply(seq_along(formulas), function(i) {
+    ast <- as.list(formulas[[i]])
+    variable_tokens <- as.character(as.list(ast[[2]]))
+    if (any(grepl("\\.\\.\\.", variable_tokens)) &&
+        any(grepl("\\[", variable_tokens)))
+      stop("Templating of vector priors is not supported", call. = FALSE)
+
+    if (length(variable_tokens) == 1)
+      variable_index <- 1
+    else
+      variable_index <- 2
+    variable_tokens[[variable_index]]
+  })
+}
+
 # Bind list of observed statistics into a matrix
 bind_observed <- function(observed_list) {
   bound_stats <- lapply(names(observed_list), function(stat) {
@@ -60,6 +94,10 @@ bind_observed <- function(observed_list) {
 
   bound_stats
 }
+
+# -------------------------------------------------------------------------
+# handling user-defined functions such as summary statistics
+# -------------------------------------------------------------------------
 
 # Check that all given user-defined functions have arguments only among
 # valid arguments
@@ -190,23 +228,6 @@ get_nonimpl_params <- function(model) {
   nonimpl_args
 }
 
-# Extract variable names in formulas as a character vector
-get_param_names <- function(formulas) {
-  sapply(seq_along(formulas), function(i) {
-    ast <- as.list(formulas[[i]])
-    variable_tokens <- as.character(as.list(ast[[2]]))
-    if (any(grepl("\\.\\.\\.", variable_tokens)) &&
-             any(grepl("\\[", variable_tokens)))
-      stop("Templating of vector priors is not supported", call. = FALSE)
-
-    if (length(variable_tokens) == 1)
-      variable_index <- 1
-    else
-      variable_index <- 2
-    variable_tokens[[variable_index]]
-  })
-}
-
 # a function to silence the unnecessary summary() output on abc objects
 # https://stackoverflow.com/a/54136863
 quiet <- function(x) {
@@ -215,6 +236,7 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
+# Subset parameters to a subset of a given full set of parameter names
 subset_parameters <- function(subset, all) {
   parameters <- all
   if (!is.null(subset)) {

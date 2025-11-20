@@ -1,4 +1,4 @@
-#' Simulate data for ABC inference using specified priors
+#' Simulate data for downstream ABC posterior inference by sampling from priors
 #'
 #' This is a core function for ABC inference using demografr. It generates simulation
 #' replicates and computes summary statistic for the next step of an inference procedure,

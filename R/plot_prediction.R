@@ -1,4 +1,4 @@
-#' Plot the results of a posterior predictive check for a given summary statistic
+#' Plot the result of a posterior predictive check for a given summary statistic
 #'
 #' @param data Data frame with predictions generated from ABC posteriors, as generated
 #'   by the \code{predict} function

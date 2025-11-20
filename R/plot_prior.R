@@ -1,4 +1,4 @@
-#' Plot prior distribution(s)
+#' Plot prior distributions of model parameters
 #'
 #' @param x Either an object of the class \code{demografr_abc}, or a list of prior
 #'   sampling statements

@@ -1,7 +1,10 @@
-#' Run cross-validation routines of the abc R package
+#' Run cross-validation routines of the R package abc
 #'
 #' This function is a convenience wrapper around the functions \code{cv4postpr}
-#' and \code{anc::cv4abc} from the R package abc
+#' and \code{anc::cv4abc} from the R package abc. Rather than having to
+#' generate intermediate data structures required by those functions in
+#' a manual and potentially error-prone way, demografr prepares this data in
+#' an automated manner.
 #'
 #' @param x A list of objects of the class \code{demografr_sims_abc} (each
 #'   representing an ABC inference result) for the function abc::cv4postpr,

@@ -1,4 +1,4 @@
-#' Generate summary statistics from the inferred posterior distribution of parameters
+#' Simulate given summary statistics from the inferred parameter model posteriors
 #'
 #' The function draws parameter values from the posterior distribution and then
 #' internally runs the function \code{simulate_grid} to run simulations from

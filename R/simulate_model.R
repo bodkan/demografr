@@ -1,4 +1,4 @@
-#' Simulate a single tree sequence from the given inference setup
+#' Simulate data (by default, a tree sequence) from a model (by default, a slendr function)
 #'
 #' Simulates a tree sequence object from a model with parameters as specified either
 #' by sampling from priors or by a given list of fixed parameter values
