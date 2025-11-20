@@ -90,19 +90,13 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of <em>demografr</em> from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>Once the <em>demografr</em> package appears on CRAN, you will be able to install the latest released version with the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bodkan/demografr"</span><span class="op">)</span></span></code></pre></div>
-<p>Note that this requires an R package <em>devtools</em>, which you can obtain simply by running <code>install.packages("devtools")</code>.</p>
-<p>Because <em>demografr</em> is tightly linked to the <em>slendr</em> simulation package (in fact, new developments in <em>slendr</em> ale currently driven by requirements of <em>demografr</em>), you will also need the development version of <em>slendr</em> itself:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"demografr"</span><span class="op">)</span></span></code></pre></div>
+<p>However, especially early after an initial release, it might be worth keeping an eye on the <a href="https://bodkan.net/demografr/news/index.html">changelog</a> for bugfixes and improvements, which you can always obtain by installing the development version of <em>demografr</em> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bodkan/slendr"</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="note-on-stability">Note on stability<a class="anchor" aria-label="anchor" href="#note-on-stability"></a>
-</h3>
-<p><em>demografr</em> is very much in an experimental stage at this point. Although inference of “standard” demographic models (i.e. estimating <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, split times gene-flow parameters, etc.) already works very nicely, our long-term ambitions for the project are much higher and extend, for instance, towards inferences of spatial models or models which include selection. As such, please be aware that the interface might change on a rather short notice to accomodate features for estimating parameters of much more complex models.</p>
-<p>If you want to follow updates on <em>demografr</em>, you can do this also on my <a href="https://bsky.app/profile/bodkan.bsky.social" class="external-link">social media</a> and by checking out the <a href="https://github.com/bodkan/demografr/blob/main/NEWS.md" class="external-link">changelog</a> from time to time.</p>
-</div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bodkan/demografr"</span><span class="op">)</span></span></code></pre></div>
+<p>Note that this requires an R package <em>devtools</em>, which you can install simply by running <code>install.packages("devtools")</code>.</p>
 <div class="section level3">
 <h3 id="testing-the-r-package-in-an-online-rstudio-session">Testing the R package in an online RStudio session<a class="anchor" aria-label="anchor" href="#testing-the-r-package-in-an-online-rstudio-session"></a>
 </h3>
