@@ -309,17 +309,17 @@ dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=on_windows && !data_exists}
+```{r, eval=!on_windows && !data_exists}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
-                      sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+                      sequence_length =  = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=on_windows && !data_exists}
+```{r, eval=!on_windows && !data_exists}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=on_windows && !data_exists, echo=FALSE}
+```{r, eval=!on_windows && !data_exists, echo=FALSE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
@@ -352,13 +352,13 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
 parallelized across `r ncores` CPUs.**
 
-```{r, eval=on_windows && !abc_exists, results="hide"}
+```{r, eval=!on_windows && !abc_exists, results="hide"}
 abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
 abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
 abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, eval=on_windows && !abc_exists, echo=FALSE}
+```{r, eval=!on_windows && !abc_exists, echo=FALSE}
 saveRDS(abcX, abcX_path)
 saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
@@ -549,14 +549,14 @@ statistics. Naturally, only if the model can generate statistics compatible
 with the values observed in real data can we regard the model as sensible and
 usable for inference.
 
-```{r, eval=on_windows && !pred_exists}
+```{r, eval=!on_windows && !pred_exists}
 plan(multisession, workers = availableCores())
 predX <- predict(abcX, samples = 1000, posterior = "unadj")
 predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
 ```
 
-```{r, echo=FALSE, eval=on_windows && !pred_exists}
+```{r, echo=FALSE, eval=!on_windows && !pred_exists}
 saveRDS(predX, predX_path)
 saveRDS(predY, predY_path)
 saveRDS(predZ, predZ_path)
