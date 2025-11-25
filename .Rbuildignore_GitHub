@@ -14,7 +14,8 @@ docs
 paper/*
 Dockerfile
 .dockerignore
-^inst/examples/downstream_.*$
+^inst/examples/downstream_abc.*$
+^inst/examples/downstream_data.*$
 ^inst/examples/custom_.*$
 ^inst/examples/grid_.*$
 vignettes/vignette-05-custom.Rmd

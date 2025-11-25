@@ -311,7 +311,7 @@ dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
 
 ```{r, eval=!on_windows && !data_exists}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
-                      sequence_length =  = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+                      sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
 ```{r, eval=!on_windows && !data_exists}
@@ -319,13 +319,13 @@ dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!on_windows && !data_exists, echo=FALSE}
+```{r, echo=FALSE, eval=!on_windows && !data_exists}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, eval=!on_windows && !data_exists, echo=FALSE}
+```{r, echo=FALSE, eval=!on_windows && !data_exists}
 saveRDS(tdelta, get_cache("examples/downstream_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/downstream_ncores.rds"))
 saveRDS(dataX, dataX_path)
@@ -333,7 +333,7 @@ saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
-```{r, eval=data_exists, echo=FALSE}
+```{r, echo=FALSE, eval=data_exists}
 tdelta <- readRDS(get_cache("examples/downstream_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/downstream_ncores.rds"))
 dataX <- readRDS(dataX_path)
@@ -341,7 +341,7 @@ dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r, echo=FALSE, eval=data_exists}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
