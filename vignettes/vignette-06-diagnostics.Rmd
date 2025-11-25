@@ -10,16 +10,6 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE)
 
-knitr::opts_chunk$set(
-  collapse = FALSE,
-  comment = "#>",
-  fig.align = "center",
-  fig.width = 8,
-  fig.height = 5,
-  dpi = 60,
-  eval = slendr_present && Sys.info()[["sysname"]] != "Windows"
-)
-
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
@@ -43,6 +33,16 @@ predX_path <- get_cache("examples/downstream_predX.rds")
 predY_path <- get_cache("examples/downstream_predY.rds")
 predZ_path <- get_cache("examples/downstream_predZ.rds")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 60,
+  eval = slendr_present && Sys.info()[["sysname"]] != "Windows"
+)
 
 set.seed(42)
 ```

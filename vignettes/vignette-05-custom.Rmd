@@ -10,16 +10,6 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
-knitr::opts_chunk$set(
-  collapse = FALSE,
-  comment = "#>",
-  fig.align = "center",
-  fig.width = 8,
-  fig.height = 5,
-  dpi = 60,
-  eval = slendr_present && Sys.info()[["sysname"]] != "Windows"
-)
-
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
@@ -32,6 +22,16 @@ abc_path1 <- get_cache("examples/custom_abc1.rds")
 abc_path2 <- get_cache("examples/custom_abc2.rds")
 abc_path3 <- get_cache("examples/custom_abc3.rds")
 abc_path4 <- get_cache("examples/custom_abc4.rds")
+
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 60,
+  eval = slendr_present && Sys.info()[["sysname"]] != "Windows"
+)
 ```
 
 ⚠️⚠️⚠️

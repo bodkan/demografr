@@ -8,7 +8,6 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-{}
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -16,13 +15,6 @@ knitr::opts_chunk$set(
   fig.height = 5,
   dpi = 60
 )
-
-get_cache <- function(path) {
-  if (Sys.getenv("RERUN") != "TRUE")
-    return(file.path(system.file(path, package = "demografr")))
-  else
-    return(here::here(file.path("inst/", path)))
-}
 
 set.seed(42)
 ```

@@ -10,6 +10,15 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
 
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(here::here(file.path("inst/", path)))
+}
+
+abc_path <- get_cache("examples/basics_abc.rds")
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -19,15 +28,6 @@ knitr::opts_chunk$set(
   dpi = 60,
   eval = slendr_present
 )
-
-get_cache <- function(path) {
-  if (Sys.getenv("RERUN") != "TRUE")
-    return(file.path(system.file(path, package = "demografr")))
-  else
-    return(here::here(file.path("inst/", path)))
-}
-
-abc_path <- get_cache("examples/basics_abc.rds")
 
 SEED <- 42
 set.seed(SEED)

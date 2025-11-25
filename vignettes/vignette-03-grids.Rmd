@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = file.exists(data_path) && slendr_present && Sys.getenv("RUNNER_OS") != "" # don't rerun on CRAN or GHA (no rds)
+  eval = !file.exists(data_path) && slendr_present && Sys.getenv("RUNNER_OS") == "" # don't rerun on CRAN or GHA (no rds)
 )
 ```
 

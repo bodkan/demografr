@@ -10,6 +10,13 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE)
 
+get_cache <- function(path) {
+  if (Sys.getenv("RERUN") != "TRUE")
+    return(file.path(system.file(path, package = "demografr")))
+  else
+    return(here::here(file.path("inst/", path)))
+}
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -19,13 +26,6 @@ knitr::opts_chunk$set(
   dpi = 60,
   eval = slendr_present && Sys.info()["sysname"] != "Windows"
 )
-
-get_cache <- function(path) {
-  if (Sys.getenv("RERUN") != "TRUE")
-    return(file.path(system.file(path, package = "demografr")))
-  else
-    return(here::here(file.path("inst/", path)))
-}
 ```
 
 ⚠️⚠️⚠️
