@@ -44,6 +44,7 @@ jobs:
         run: sudo apt-get install libgsl-dev libwebp-dev libx11-dev libcairo2-dev
 
       - name: Compile and install SLiM
+        if: runner.os != 'Windows'
         run: |
           # download SLiM into a separate directory to avoid CRAN errors
           mkdir -p ~/deps
