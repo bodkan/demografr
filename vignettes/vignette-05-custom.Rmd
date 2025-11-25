@@ -9,7 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
-on_windows <- Sys.info()[["sysname"]] != "Windows"
+on_windows <- Sys.info()[["sysname"]] == "Windows"
 
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
