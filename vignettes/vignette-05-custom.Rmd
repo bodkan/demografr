@@ -9,6 +9,7 @@ vignette: >
 
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
+on_windows <- Sys.info()[["sysname"]] != "Windows"
 
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
@@ -30,7 +31,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = slendr_present && Sys.info()[["sysname"]] != "Windows"
+  eval = slendr_present && !on_windows
 )
 ```
 
@@ -72,7 +73,7 @@ init_env(quiet = TRUE)
 Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
 population given that we observed the following value of nucleotide diversity:
 
-```{r, echo=FALSE, eval=!file.exists(path_observed)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(path_observed)}
 ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
   msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
@@ -324,7 +325,7 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path1)}
+```{r, eval=!on_windows && !file.exists(abc_path1)}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -340,7 +341,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path1)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1)}
 saveRDS(tdelta, get_cache("examples/custom_tdelta1.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores1.rds"))
 ```
@@ -363,11 +364,11 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(abc_path1)}
+```{r, eval=!on_windows && !file.exists(abc_path1)}
 abc <- run_abc(data, tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path1)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1)}
 saveRDS(abc, abc_path1)
 ```
 
@@ -534,7 +535,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path2)}
+```{r, eval=!on_windows && !file.exists(abc_path2)}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -550,7 +551,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path2)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path2)}
 saveRDS(tdelta, get_cache("examples/custom_tdelta2.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores2.rds"))
 ```
@@ -573,11 +574,11 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(abc_path2)}
+```{r, eval=!on_windows && !file.exists(abc_path2)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path2)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path2)}
 saveRDS(abc, abc_path2)
 ```
 
@@ -674,7 +675,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path3)}
+```{r, eval=!on_windows && !file.exists(abc_path3)}
 library(future)
 plan(multisession, workers = availableCores())
 
@@ -690,7 +691,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path3)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path3)}
 saveRDS(tdelta, get_cache("examples/custom_tdelta3.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores3.rds"))
 ```
@@ -713,11 +714,11 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(abc_path3)}
+```{r, eval=!on_windows && !file.exists(abc_path3)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path3)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path3)}
 saveRDS(abc, abc_path3)
 ```
 
@@ -845,7 +846,7 @@ validate_abc(model, priors, functions, observed,
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(abc_path4)}
+```{r, eval=!on_windows && !file.exists(abc_path4)}
 library(future)
 plan(multisession, workers = availableCores())
 
@@ -861,7 +862,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path4)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path4)}
 saveRDS(tdelta, get_cache("examples/custom_tdelta4.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores4.rds"))
 ```
@@ -884,11 +885,11 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!file.exists(abc_path4)}
+```{r, eval=!on_windows && !file.exists(abc_path4)}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!file.exists(abc_path4)}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path4)}
 saveRDS(abc, abc_path4)
 ```
 
