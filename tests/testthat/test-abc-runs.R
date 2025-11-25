@@ -247,4 +247,13 @@ test_that("model selection works correctly", {
 
   expect_s3_class(quiet(select_model(list(abc1, abc2), tol = 0.5, method = "neuralnet")),
                   "demografr_postpr")
+
+  expect_error(quiet(select_model(list(abc1, abc2), method = "neuralnet")),
+                     "The `tol` argument must be provided")
+
+  expect_error(quiet(select_model(list(abc1, abc2), tol = 0.5)),
+                     "The `method` argument must be provided")
+
+  expect_error(quiet(select_model(list(1, 2), tol = 0.5, method = "neuralnet")),
+               "The list of models must be either all objects produced by ")
 })
