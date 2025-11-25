@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = slendr_present && Sys.info()["sysname"] != "Windows" && Sys.getenv("RUNNER_OS") == ""
+  eval = slendr_present && Sys.info()["sysname"] != "Windows"
 )
 
 get_cache <- function(path) {
