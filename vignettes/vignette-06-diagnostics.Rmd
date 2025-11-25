@@ -668,7 +668,7 @@ names(partsX)
 ```
 
 As we can see, the `unpack()` function produced a list object with several
-elements: `r names(partsX)`. It's not a coincidence that the names of these
+elements. It's not a coincidence that the names of these
 list elements correspond to function arguments of various diagnostic functions
 of the _abc_ package. In this way, _demografr_ pre-generates the information
 required by those functions (which normally need to be prepared manually),
