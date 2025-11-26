@@ -351,7 +351,7 @@ tdelta <- readRDS(get_cache("examples/custom_tdelta1.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores1.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
