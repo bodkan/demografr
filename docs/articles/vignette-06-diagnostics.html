@@ -641,14 +641,14 @@ by the <em>abc</em> package<a class="anchor" aria-label="anchor" href="#unpackin
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>As we can see, the <code><a href="../reference/unpack.html">unpack()</a></code> function produced a list
-object with several elements: sumstat, index, param, target. It’s not a
-coincidence that the names of these list elements correspond to function
-arguments of various diagnostic functions of the <em>abc</em> package.
-In this way, <em>demografr</em> pre-generates the information required
-by those functions (which normally need to be prepared manually), which
-can then be run without any additional work whatsoever. For instance, we
-could perform the cross-validation of the model selection using
-<em>abc</em>’s own functionality like this.</p>
+object with several elements. It’s not a coincidence that the names of
+these list elements correspond to function arguments of various
+diagnostic functions of the <em>abc</em> package. In this way,
+<em>demografr</em> pre-generates the information required by those
+functions (which normally need to be prepared manually), which can then
+be run without any additional work whatsoever. For instance, we could
+perform the cross-validation of the model selection using <em>abc</em>’s
+own functionality like this.</p>
 <p>First, because model-selection requires, well, multiple models to
 select from, we will unpack information from all the three models:</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
