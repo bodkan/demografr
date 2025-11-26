@@ -333,18 +333,18 @@ saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
-tdelta <- readRDS(get_cache("examples/downstream_tdelta.rds"))
-ncores <- readRDS(get_cache("examples/downstream_ncores.rds"))
-```
-
 ```{r, echo=FALSE, eval=data_exists}
 dataX <- readRDS(dataX_path)
 dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
+tdelta <- readRDS(get_cache("examples/downstream_tdelta.rds"))
+ncores <- readRDS(get_cache("examples/downstream_ncores.rds"))
+```
+
+```{r, echo=FALSE, eval=TRUE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
