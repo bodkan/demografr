@@ -335,7 +335,7 @@ data <- simulate_abc(
 )
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r, echo=FALSE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
@@ -351,7 +351,7 @@ tdelta <- readRDS(get_cache("examples/custom_tdelta1.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores1.rds"))
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r, echo=FALSE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)

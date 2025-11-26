@@ -319,7 +319,7 @@ dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !data_exists}
+```{r, echo=FALSE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
@@ -349,7 +349,6 @@ hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
 ```
-
 
 **The total runtime for the ABC simulations was
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
