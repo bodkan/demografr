@@ -313,7 +313,7 @@ saveRDS(tdelta, get_cache("examples/basics_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/basics_ncores.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/basics_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/basics_ncores.rds"))
 ```

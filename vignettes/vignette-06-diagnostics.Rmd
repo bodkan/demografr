@@ -333,7 +333,7 @@ saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/downstream_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/downstream_ncores.rds"))
 ```

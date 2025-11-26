@@ -346,7 +346,7 @@ saveRDS(tdelta, get_cache("examples/custom_tdelta1.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores1.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/custom_tdelta1.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores1.rds"))
 ```
@@ -556,7 +556,7 @@ saveRDS(tdelta, get_cache("examples/custom_tdelta2.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores2.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path2)}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/custom_tdelta2.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores2.rds"))
 ```
@@ -696,7 +696,7 @@ saveRDS(tdelta, get_cache("examples/custom_tdelta3.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores3.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path3)}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/custom_tdelta3.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores3.rds"))
 ```
@@ -867,7 +867,7 @@ saveRDS(tdelta, get_cache("examples/custom_tdelta4.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores4.rds"))
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path4)}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/custom_tdelta4.rds"))
 ncores <- readRDS(get_cache("examples/custom_ncores4.rds"))
 ```
