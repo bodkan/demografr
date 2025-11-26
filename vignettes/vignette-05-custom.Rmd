@@ -325,7 +325,7 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path1)}
+```{r, eval=!on_windows && !file.exists(abc_path1) && Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -535,7 +535,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path2)}
+```{r, eval=!on_windows && !file.exists(abc_path2) && Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -675,7 +675,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path3)}
+```{r, eval=!on_windows && !file.exists(abc_path3) && Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = availableCores())
 
@@ -846,7 +846,7 @@ validate_abc(model, priors, functions, observed,
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path4)}
+```{r, eval=!on_windows && !file.exists(abc_path4) && Sys.getenv("RUNNER_OS") == ""}
 library(future)
 plan(multisession, workers = availableCores())
 
