@@ -344,7 +344,7 @@ dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
 ```
 
-```{r, echo=FALSE, eval=data_exists}
+```{r, echo=FALSE}
 hours <- floor(tdelta / 3600)
 minutes <- floor((tdelta - hours * 3600) / 60)
 seconds <- round(tdelta - hours * 3600 - minutes * 60)
