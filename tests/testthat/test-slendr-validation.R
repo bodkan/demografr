@@ -314,3 +314,14 @@ test_that("pairs of summary statistics are enforced to be of the same format", {
                             sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
                "Dimensions of observed and simulated statistics differ")
 })
+
+test_that("data-frame summary statistics must have the same columns", {
+  # it doesn't seem to check the misformatted simulated statistics data frame
+  # because that would be caught by an upstream validation step
+  names(observed$diversity)[2] <- "different_diversity_name_like_pi"
+
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Columns of observed and simulated statistics must have the same names")
+})
+

@@ -289,24 +289,14 @@ validate_abc <- function(model, priors, functions, observed,
     }
 
     if (obs_type == "data frame") {
-      numeric_cols_obs <- ncol(obs)
-      numeric_cols_sim <- ncol(sim)
-
-      # if a summary statistic is given as a data frame, all columns except for the
-      # column with its numerical value must be the same (i.e., same statistic name,
-      # same population labels, any identifiers) -- this ensures that the observed
-      # statistic data frame and the data computed from a simulation is comparable
-      str_cols_obs <- obs[, !numeric_cols_obs]
-      str_cols_sim <- sim[, !numeric_cols_sim]
-      if (!all(str_cols_obs == str_cols_sim)) {
-        mismatch_rows <- which(str_cols_obs != str_cols_sim)
-        cat("\n")
+      # if a summary statistic is given as a data frame, all column names between
+      # observed and simulated statistics must be the same
+      if (!all(names(obs)== names(sim))) {
+        cat(" \u274c\n\n")
         error_msg <- paste(
-          "\n\nSome columns do not match between observed and simulated data.\n",
-          "  Problem occured on rows:", paste(mismatch_rows, collapse = ", "), "\n",
-          "  Example of the first observed mismatch at row:\n",
-          "    observed:", paste(str_cols_obs[mismatch_rows[1], ], collapse = "\t"), "\n",
-          "    simulated:", paste(str_cols_sim[mismatch_rows[1], ], collapse = "\t"), "\n"
+          "\n\nColumns of observed and simulated statistics must have the same names:\n",
+          "  names of observed:", paste0(names(obs), collapse = ", "), "\n",
+          "  names of simulated:", paste0(names(sim), collapse = ", "), "\n"
         )
         stop(error_msg, call. = FALSE)
       }
