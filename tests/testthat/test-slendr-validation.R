@@ -70,6 +70,69 @@ test_that("validation output can be silenced", {
                              sequence_length = 1e6, recombination_rate = 0, quiet = TRUE))
 })
 
+test_that("incorrect priors are caught", {
+  priors <- list(
+    Ne_p1 ~ "hello",
+    Ne_p2 ~ runif(10, 10000)
+  )
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Sampling from the prior Ne_p1 resulted in the following problem:")
+
+  priors <- list(
+    Ne_p1 ~ runif(10, 10000),
+    Ne_p2 ~ "hello"
+  )
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Sampling from the prior Ne_p2 resulted in the following problem:")
+})
+
+test_that("only one return statement in a model function is allowed", {
+  model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
+    p1 <- population("p1", time = 1, N = 1000)
+
+    return("another")
+
+    model <- compile_model(populations = list(p1, p2, p3, p4), generation_time = 1, simulation_length = 10000)
+
+    return(model)
+  }
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "A demografr model function must have exactly one return statement")
+})
+
+test_that("only `return(<model>)` and `return(list(<model>, <schedule>)` are allowed", {
+  model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
+    p1 <- population("p1", time = 1, N = 1000)
+    p2 <- population("p2", time = T_p1_p2, N = 3000, parent = p1)
+    p3 <- population("p3", time = T_p2_p3, N = 10000, parent = p2)
+    p4 <- population("p4", time = T_p3_p4, N = 5000, parent = p3)
+
+    model <- compile_model(
+      populations = list(p1, p2, p3, p4),
+      generation_time = 1,
+      simulation_length = 10000, serialize = FALSE
+    )
+
+    return(c(model, 123, 456))
+  }
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "A demografr model return statement must be:")
+})
+
+test_that("only priors corresponding to a function argument are allowed", {
+  priors <- list(
+    nonexistent ~ runif(1, 100),
+    Ne_p2 ~ runif(10, 10000)
+  )
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "The following priors are not among the model function arguments")
+})
+
 test_that("consistent naming of summary functions and observed statistics is enforced", {
   error_msg <- "Elements of lists of summary functions and observed statistics must have the same names"
 
@@ -213,4 +276,41 @@ test_that("all model components must be present", {
 test_that("fully customized models must provide data-generating functions", {
   msg <- "Models which generate custom files require a list of data function\\(s\\)"
   quiet(expect_error(validate_abc(model, priors, functions, observed, format = "files"), msg))
+})
+
+test_that("pairs of summary statistics are enforced to be of the same format", {
+  compute_diversity <- function(ts) { data.frame(a = "asdf", x = 123) }
+  functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Dimensions of observed and simulated statistics differ")
+})
+
+test_that("all summary statistics must be either vectors or data frames (simulated)", {
+  # simulated summary statistics
+  compute_diversity <- function(ts) { list(list_is_an_incorrect_format = 123) }
+  functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Observed and simulated statistics must be data frames or vectors")
+})
+
+test_that("all summary statistics must be either vectors or data frames (simulated)", {
+  # observed summary statistics
+  observed$diversity <- list(illegal_value = 123)
+
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Observed and simulated statistics must be data frames or vectors")
+})
+
+test_that("pairs of summary statistics are enforced to be of the same format", {
+  compute_diversity <- function(ts) { data.frame(a = "asdf", x = 123) }
+  functions <- list(diversity = compute_diversity, divergence = compute_divergence)
+
+  expect_error(validate_abc(model, priors, functions, observed,
+                            sequence_length = 1e6, recombination_rate = 0, quiet = TRUE),
+               "Dimensions of observed and simulated statistics differ")
 })

@@ -92,8 +92,8 @@ validate_abc <- function(model, priors, functions, observed,
       sample_prior(priors[[i]]),
       error = function(e) {
         cat(" \u274C\n\n")
-        stop(sprintf("Sampling the prior %s resuted in the following problem:\n\n%s",
-                    prior_names[i], e$message), call. = FALSE)
+        stop(sprintf("Sampling from the prior %s resulted in the following problem:\n\n%s",
+                     prior_names[i], e$message), call. = FALSE)
       }
     )
 
@@ -146,7 +146,7 @@ validate_abc <- function(model, priors, functions, observed,
     missing_priors <- setdiff(prior_names, methods::formalArgs(model))
     if (length(missing_priors) > 0) {
       cat(" \u274C\n\n")
-      stop("The following priors are not present in the model interface:\n    ",
+      stop("The following priors are not among the model function arguments:\n    ",
             paste(missing_priors, collapse = ", "), "\n\n",
             "Each prior must correspond to a model function argument.\n",
             call. = FALSE)
@@ -266,14 +266,14 @@ validate_abc <- function(model, priors, functions, observed,
       sim_vals <- vapply(names(sim), function(i) is.numeric(sim[[i]]), FUN.VALUE = logical(1))
       sim_type <- if (all(sim_vals)) "vector" else "data frame"
     } else {
-      obs_type <- "invalid"
+      sim_type <- "invalid"
     }
 
     if (obs_type == "invalid" || sim_type == "invalid" || obs_type != sim_type) {
       error_msg <- paste(
         "Observed and simulated statistics must be data frames or vectors\n",
-        sprintf(" observed data is a %s (%s)\n", obs_type, paste(class(obs), sep = ", ")),
-        sprintf(" simulated data is a %s (%s)\n", sim_type, paste(class(sim), sep = ", "))
+        sprintf(" observed data is %s (%s)\n", obs_type, paste0(class(obs), collapse = ", ")),
+        sprintf(" simulated data is %s (%s)\n", sim_type, paste0(class(sim), collapse = ", "))
       )
       cat(" \u274c\n\n")
       stop(error_msg, call. = FALSE)
