@@ -51,7 +51,7 @@ Unlike traditional ABC and other simulation-based approaches, which generally
 involve custom-built pipelines and scripts for population genetic simulation
 and computation of summary statistics, _demografr_ makes it possible to perform
 simulation, computation of summary statistics, and the inference itself
-entirely in R within a single reproducible workflow script. By eliminating
+within a single reproducible R script. By eliminating
 the need to write custom simulation code and scripting for integration of
 various population genetic tools for computing summary statistics, it lowers
 the barrier for new users and facilitates reproducibility for everyone
@@ -66,24 +66,30 @@ simulation-based workflows entirely in R. Specifically:
 
 1. _slendr_'s intuitive, interactive
 [interface for definning population genetic models](https://bodkan.net/slendr/articles/vignette-04-nonspatial-models.html)
-makes it easy to encode even complex demographic models with only bare minimum
+makes it easy to encode even complex demographic models with only a bare minimum
 of R knowledge needed.
 
 2. _demografr_ makes it possible to encode prior distributions of parameters
 using familiar R interface resembling standard probabilistic statements, and
 provides an automated function which simulates ABC replicates drawing
-parameters from priors in a trivial, one-step manner.
+parameters from priors in a trivial, one-step manner. Automated routines for
+exploring model parameter grids in settings other than ABC are also provided.
 
 3. Because _slendr_ embraces [tree sequence](https://tskit.dev/learn/) as
 its default internal data structure, most population genetic statistics can be
 computed directly on such tree sequences using R functions which are part of
 _slendr_'s statistical library. A tree sequence is never saved to disk and no
 conversion between file formats is required, which significantly speeds up
-every workflow.
+every workflow. That said, using custom simulation scripts as well as computation
+of summary statistics in third party software is also possible (while still
+leveraging the consistent _demografr_ workflow approach and most of its standard
+simulation and inference functions).
 
 4. _demografr_ facilitates tight integration with the powerful R package
 [_abc_](https://cran.r-project.org/package=abc) by automatically feeding it
-simulation data for inference and diagnostics.
+simulation data for inference and diagnostics. At the moment, the _abc_
+package represents a core inference engine of _demografr_. Other inference
+engines and statistical approaches will be developed in the future.
 
 ## Installation
 
@@ -95,7 +101,7 @@ install.packages("demografr")
 ```
 
 However, especially early after an initial release, it might be worth keeping
-an eye on the [changelog](https://bodkan.net/demografr/news/index.html) for
+an eye on the [changelog](https://bodkan.net/demografr/news/) for
 bugfixes and improvements, which you can always obtain by installing the development
 version of _demografr_ with:
 
@@ -125,6 +131,8 @@ Once you get a browser-based RStudio session, you can navigate to the
 
 **Note:** A much more detailed explanation of this toy example can be found
 in the [following vignette](https://bodkan.net/demografr/articles/vignette-01-basics.html).
+Or in the _demografr_ manuscript available on bioRxiv. Please take the code
+below as a bare minimum demonstration of some basic functionality of the package.
 
 Imagine that we sequenced genomes of individuals from populations "A", "B",
 "C", and "D".
@@ -132,7 +140,7 @@ Imagine that we sequenced genomes of individuals from populations "A", "B",
 Let's also assume that we know that the populations are phylogenetically
 related in the following way, with an indicated gene-flow event at a certain
 time in the past, but we don't know anything else (i.e., we have no idea about
-their $N_e$, their split times, or the proportion of gene flow):
+the $N_e$ of the populations, their split times, or the proportion of gene flow):
 
 ```{r ape_tree, echo=FALSE, fig.width=5, fig.height=3.5}
 orig_par <- par(no.readonly = TRUE)
@@ -147,9 +155,11 @@ par(orig_par)
 ```
 
 After sequencing the genomes of individuals from these populations, we computed
-the nucleotide diversity in these populations, their pairwise genetic
+the nucleotide diversity in each of them, their pairwise genetic
 divergence, and $f_4$ statistic, and observed the following values
-(which we saved in two standard R data frames):
+(which we saved in two standard R data frames). In a traditional ABC setting,
+this computation and table formatting would typically be done in some 3rd party
+software like PLINK, ADMIXTOOLS, etc.
 
 1. Nucleotide diversity in each population:
 
@@ -159,7 +169,7 @@ observed_diversity <- read.table(system.file("examples/basics_diversity.tsv", pa
 observed_diversity
 ```
 
-2. Pairwise divergence d_X_Y between populations X and Y:
+2. Pairwise divergence between populations X and Y:
 
 ```{r}
 observed_divergence <- read.table(system.file("examples/basics_divergence.tsv", package = "demografr"), header = TRUE)
@@ -175,11 +185,21 @@ observed_f4  <- read.table(system.file("examples/basics_f4.tsv", package = "demo
 observed_f4
 ```
 
+**Note that the value of each given statistic is given as the last column of
+each data frame, with additional columns providing relevant "metadata". Keeping
+consistent naming throughout an inference pipeline is extremely important for
+_demografr_, and goes a long way towards reproducibility and towards avoiding
+sneaky bugs!** For this reason, _demografr_ often loudly complains if something
+looks inconsistent. Better safe than sorry!
+
 ### A complete ABC pipeline in a single R script
 
 This is how we would use _demografr_ to estimate the $N_e$, split times for all
 populations, as well as the rate of the indicated gene-flow event with
-Approximate Bayesian Computation in a single R script:
+Approximate Bayesian Computation in a single R script. Again, detailed
+description of each component can be found throughout our vignettes, and a
+motivation for various design decisions is also detailed in the _demografr_
+manuscript.
 
 ```{r, eval=FALSE}
 library(demografr)
@@ -296,10 +316,14 @@ abc <- readRDS(abc_path)
 
 ## Examining posterior distributions of parameters
 
-After we run this R script, we end up with an object called `abc` here. This
+After we run this R script, we end up with an object called `abc` (see the
+last row of the script). This
 object contains the complete information about the results of our inference.
 In particular, it carries the posterior samples for our parameters of interest
 ($N_e$ of populations and their split times).
+
+What can we do with this, to get an idea about the most likely parameters of
+the assumed evolutionary history of our populations of interest?
 
 For instance, we can get a summary table of all parameter posteriors with the
 function `extract_summary()`:
@@ -348,8 +372,8 @@ supported by _demografr_. For more information, see
 
 ## Additional functionality
 
-_demografr_ also provides a couple of its own functions designed to make
-troubleshooting a little easier.
+_demografr_ also provides a couple of functions designed to make
+development (and troubleshooting) a little easier.
 
 For instance, assuming we have `priors` set up as above, we can visualize the
 prior distribution(s) like this:
@@ -373,7 +397,7 @@ priors <- list(
 plot_prior(priors, "Ne")
 ```
 
-To make developing complete pipelines even easier, _demografr_ also provides
+To make developing complete pipelines more efficient, _demografr_ also provides
 means to test and evaluate their individual components even further. For instance,
 the function `simulate_model()` simulates data from a single simulation run:
 
@@ -383,8 +407,9 @@ one_run <- simulate_model(model, priors, sequence_length = 1e6, recombination_ra
 one_run
 ```
 
-With this one simulation instance (of which the above-mentioned function
-`simulate_abc()` would produce millions, making troubleshooting challenging),
+With this one simulation data instance `one_run` (of which the above-mentioned function
+`simulate_abc()` would produce millions, making troubleshooting challenging and
+slow),
 we can apply individual summary statistic functions using another helper
 function `summarise_data()`:
 
@@ -392,9 +417,10 @@ function `summarise_data()`:
 summarise_data(one_run, functions)
 ```
 
-By comparing the format of this result to the observed data, we can make sure
+By comparing the format of this result to the observed data (given in the
+list `observed` at the beginning of this page), we can make sure
 that both simulated and observed summary statistics are mutually compatible,
 and can be thus directly compared in later steps of the ABC workflow.
 
 **See [the reference](https://bodkan.net/demografr/reference/) for a complete
-overview of the functionality.**
+overview of the functionality of this package.**

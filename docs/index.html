@@ -75,16 +75,16 @@
 <p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
 <p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics and evolutionary biology, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make these inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequences</a> as an internal data structure and computation engine.</p>
-<p>Unlike traditional ABC and other simulation-based approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, <em>demografr</em> makes it possible to perform simulation, computation of summary statistics, and the inference itself entirely in R within a single reproducible workflow script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier for new users and facilitates reproducibility for everyone regardless of their level of experience by eliminating many common sources of bugs.</p>
+<p>Unlike traditional ABC and other simulation-based approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, <em>demografr</em> makes it possible to perform simulation, computation of summary statistics, and the inference itself within a single reproducible R script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier for new users and facilitates reproducibility for everyone regardless of their level of experience by eliminating many common sources of bugs.</p>
 <div class="section level3">
 <h3 id="how-does-demografr-help-with-abc">How does <em>demografr</em> help with ABC?<a class="anchor" aria-label="anchor" href="#how-does-demografr-help-with-abc"></a>
 </h3>
 <p><em>demografr</em> streamlines every step of a typical ABC pipeline by leveraging the <a href="https://github.com/bodkan/slendr/" class="external-link"><em>slendr</em></a> framework as a building block for simulation and data analysis, making it possible to write complete simulation-based workflows entirely in R. Specifically:</p>
 <ol style="list-style-type: decimal">
-<li><p><em>slendr</em>’s intuitive, interactive <a href="https://bodkan.net/slendr/articles/vignette-04-nonspatial-models.html" class="external-link">interface for definning population genetic models</a> makes it easy to encode even complex demographic models with only bare minimum of R knowledge needed.</p></li>
-<li><p><em>demografr</em> makes it possible to encode prior distributions of parameters using familiar R interface resembling standard probabilistic statements, and provides an automated function which simulates ABC replicates drawing parameters from priors in a trivial, one-step manner.</p></li>
-<li><p>Because <em>slendr</em> embraces <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as its default internal data structure, most population genetic statistics can be computed directly on such tree sequences using R functions which are part of <em>slendr</em>’s statistical library. A tree sequence is never saved to disk and no conversion between file formats is required, which significantly speeds up every workflow.</p></li>
-<li><p><em>demografr</em> facilitates tight integration with the powerful R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> by automatically feeding it simulation data for inference and diagnostics.</p></li>
+<li><p><em>slendr</em>’s intuitive, interactive <a href="https://bodkan.net/slendr/articles/vignette-04-nonspatial-models.html" class="external-link">interface for definning population genetic models</a> makes it easy to encode even complex demographic models with only a bare minimum of R knowledge needed.</p></li>
+<li><p><em>demografr</em> makes it possible to encode prior distributions of parameters using familiar R interface resembling standard probabilistic statements, and provides an automated function which simulates ABC replicates drawing parameters from priors in a trivial, one-step manner. Automated routines for exploring model parameter grids in settings other than ABC are also provided.</p></li>
+<li><p>Because <em>slendr</em> embraces <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as its default internal data structure, most population genetic statistics can be computed directly on such tree sequences using R functions which are part of <em>slendr</em>’s statistical library. A tree sequence is never saved to disk and no conversion between file formats is required, which significantly speeds up every workflow. That said, using custom simulation scripts as well as computation of summary statistics in third party software is also possible (while still leveraging the consistent <em>demografr</em> workflow approach and most of its standard simulation and inference functions).</p></li>
+<li><p><em>demografr</em> facilitates tight integration with the powerful R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> by automatically feeding it simulation data for inference and diagnostics. At the moment, the <em>abc</em> package represents a core inference engine of <em>demografr</em>. Other inference engines and statistical approaches will be developed in the future.</p></li>
 </ol>
 </div>
 <div class="section level2">
@@ -93,7 +93,7 @@
 <p>Once the <em>demografr</em> package appears on CRAN, you will be able to install the latest released version with the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"demografr"</span><span class="op">)</span></span></code></pre></div>
-<p>However, especially early after an initial release, it might be worth keeping an eye on the <a href="https://bodkan.net/demografr/news/index.html">changelog</a> for bugfixes and improvements, which you can always obtain by installing the development version of <em>demografr</em> with:</p>
+<p>However, especially early after an initial release, it might be worth keeping an eye on the <a href="https://bodkan.net/demografr/news/">changelog</a> for bugfixes and improvements, which you can always obtain by installing the development version of <em>demografr</em> with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bodkan/demografr"</span><span class="op">)</span></span></code></pre></div>
 <p>Note that this requires an R package <em>devtools</em>, which you can install simply by running <code>install.packages("devtools")</code>.</p>
@@ -109,11 +109,11 @@
 <div class="section level2">
 <h2 id="an-example-abc-pipeline">An example ABC pipeline<a class="anchor" aria-label="anchor" href="#an-example-abc-pipeline"></a>
 </h2>
-<p><strong>Note:</strong> A much more detailed explanation of this toy example can be found in the <a href="https://bodkan.net/demografr/articles/vignette-01-basics.html">following vignette</a>.</p>
+<p><strong>Note:</strong> A much more detailed explanation of this toy example can be found in the <a href="https://bodkan.net/demografr/articles/vignette-01-basics.html">following vignette</a>. Or in the <em>demografr</em> manuscript available on bioRxiv. Please take the code below as a bare minimum demonstration of some basic functionality of the package.</p>
 <p>Imagine that we sequenced genomes of individuals from populations “A”, “B”, “C”, and “D”.</p>
-<p>Let’s also assume that we know that the populations are phylogenetically related in the following way, with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about their <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, their split times, or the proportion of gene flow):</p>
+<p>Let’s also assume that we know that the populations are phylogenetically related in the following way, with an indicated gene-flow event at a certain time in the past, but we don’t know anything else (i.e., we have no idea about the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of the populations, their split times, or the proportion of gene flow):</p>
 <p><img src="reference/figures/README-ape_tree-1.png"></p>
-<p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in these populations, their pairwise genetic divergence, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> statistic, and observed the following values (which we saved in two standard R data frames):</p>
+<p>After sequencing the genomes of individuals from these populations, we computed the nucleotide diversity in each of them, their pairwise genetic divergence, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mn>4</mn></msub><annotation encoding="application/x-tex">f_4</annotation></semantics></math> statistic, and observed the following values (which we saved in two standard R data frames). In a traditional ABC setting, this computation and table formatting would typically be done in some 3rd party software like PLINK, ADMIXTOOLS, etc.</p>
 <ol style="list-style-type: decimal">
 <li>Nucleotide diversity in each population:</li>
 </ol>
@@ -127,7 +127,7 @@
 <span><span class="co">#&gt; 3   C 1.013804e-04</span></span>
 <span><span class="co">#&gt; 4   D 8.910909e-05</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li>Pairwise divergence d_X_Y between populations X and Y:</li>
+<li>Pairwise divergence between populations X and Y:</li>
 </ol>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">observed_divergence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/basics_divergence.tsv"</span>, package <span class="op">=</span> <span class="st">"demografr"</span><span class="op">)</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -149,10 +149,11 @@
 <span><span class="va">observed_f4</span></span>
 <span><span class="co">#&gt;   W X Y Z            f4</span></span>
 <span><span class="co">#&gt; 1 A B C D -3.262146e-06</span></span></code></pre></div>
+<p><strong>Note that the value of each given statistic is given as the last column of each data frame, with additional columns providing relevant “metadata”. Keeping consistent naming throughout an inference pipeline is extremely important for <em>demografr</em>, and goes a long way towards reproducibility and towards avoiding sneaky bugs!</strong> For this reason, <em>demografr</em> often loudly complains if something looks inconsistent. Better safe than sorry!</p>
 <div class="section level3">
 <h3 id="a-complete-abc-pipeline-in-a-single-r-script">A complete ABC pipeline in a single R script<a class="anchor" aria-label="anchor" href="#a-complete-abc-pipeline-in-a-single-r-script"></a>
 </h3>
-<p>This is how we would use <em>demografr</em> to estimate the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, split times for all populations, as well as the rate of the indicated gene-flow event with Approximate Bayesian Computation in a single R script:</p>
+<p>This is how we would use <em>demografr</em> to estimate the <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math>, split times for all populations, as well as the rate of the indicated gene-flow event with Approximate Bayesian Computation in a single R script. Again, detailed description of each component can be found throughout our vignettes, and a motivation for various design decisions is also detailed in the <em>demografr</em> manuscript.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
@@ -265,7 +266,8 @@
 <div class="section level2">
 <h2 id="examining-posterior-distributions-of-parameters">Examining posterior distributions of parameters<a class="anchor" aria-label="anchor" href="#examining-posterior-distributions-of-parameters"></a>
 </h2>
-<p>After we run this R script, we end up with an object called <code>abc</code> here. This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of populations and their split times).</p>
+<p>After we run this R script, we end up with an object called <code>abc</code> (see the last row of the script). This object contains the complete information about the results of our inference. In particular, it carries the posterior samples for our parameters of interest (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>e</mi></msub><annotation encoding="application/x-tex">N_e</annotation></semantics></math> of populations and their split times).</p>
+<p>What can we do with this, to get an idea about the most likely parameters of the assumed evolutionary history of our populations of interest?</p>
 <p>For instance, we can get a summary table of all parameter posteriors with the function <code><a href="reference/extract_summary.html">extract_summary()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
@@ -317,24 +319,24 @@
 <div class="section level2">
 <h2 id="additional-functionality">Additional functionality<a class="anchor" aria-label="anchor" href="#additional-functionality"></a>
 </h2>
-<p><em>demografr</em> also provides a couple of its own functions designed to make troubleshooting a little easier.</p>
+<p><em>demografr</em> also provides a couple of functions designed to make development (and troubleshooting) a little easier.</p>
 <p>For instance, assuming we have <code>priors</code> set up as above, we can visualize the prior distribution(s) like this:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_prior.html">plot_prior</a></span><span class="op">(</span><span class="va">priors</span>, <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-prior_Ne-1.png"></p>
-<p>To make developing complete pipelines even easier, <em>demografr</em> also provides means to test and evaluate their individual components even further. For instance, the function <code><a href="reference/simulate_model.html">simulate_model()</a></code> simulates data from a single simulation run:</p>
+<p>To make developing complete pipelines more efficient, <em>demografr</em> also provides means to test and evaluate their individual components even further. For instance, the function <code><a href="reference/simulate_model.html">simulate_model()</a></code> simulates data from a single simulation run:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">one_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error: A model and model parameters (or priors) must be provided</span></span>
 <span></span>
 <span><span class="va">one_run</span></span>
 <span><span class="co">#&gt; Error: object 'one_run' not found</span></span></code></pre></div>
-<p>With this one simulation instance (of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
+<p>With this one simulation data instance <code>one_run</code> (of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">one_run</span>, <span class="va">functions</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in eval(functions_expr, envir = parent.frame()): object 'functions' not found</span></span></code></pre></div>
-<p>By comparing the format of this result to the observed data, we can make sure that both simulated and observed summary statistics are mutually compatible, and can be thus directly compared in later steps of the ABC workflow.</p>
-<p><strong>See <a href="https://bodkan.net/demografr/reference/">the reference</a> for a complete overview of the functionality.</strong></p>
+<p>By comparing the format of this result to the observed data (given in the list <code>observed</code> at the beginning of this page), we can make sure that both simulated and observed summary statistics are mutually compatible, and can be thus directly compared in later steps of the ABC workflow.</p>
+<p><strong>See <a href="https://bodkan.net/demografr/reference/">the reference</a> for a complete overview of the functionality of this package.</strong></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
