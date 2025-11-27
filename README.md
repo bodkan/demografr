@@ -32,7 +32,7 @@ Unlike traditional ABC and other simulation-based approaches, which generally
 involve custom-built pipelines and scripts for population genetic simulation
 and computation of summary statistics, _demografr_ makes it possible to perform
 simulation, computation of summary statistics, and the inference itself
-entirely in R within a single reproducible analysis script. By eliminating
+entirely in R within a single reproducible workflow script. By eliminating
 the need to write custom simulation code and scripting for integration of
 various population genetic tools for computing summary statistics, it lowers
 the barrier for new users and facilitates reproducibility for everyone
@@ -163,7 +163,7 @@ observed_f4
 #> 1 A B C D -3.262146e-06
 ```
 
-### A complete ABC analysis in a single R script
+### A complete ABC pipeline in a single R script
 
 This is how we would use _demografr_ to estimate the $N_e$, split times for all
 populations, as well as the rate of the indicated gene-flow event with
@@ -281,7 +281,7 @@ abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 
 
 
-## Analysing posterior distributions of parameters
+## Examining posterior distributions of parameters
 
 After we run this R script, we end up with an object called `abc` here. This
 object contains the complete information about the results of our inference.
@@ -387,3 +387,34 @@ plot_prior(priors, "Ne")
 ```
 
 ![](man/figures/README-prior_Ne-1.png)
+
+To make developing complete pipelines even easier, _demografr_ also provides
+means to test and evaluate their individual components even further. For instance,
+the function `simulate_model()` simulates data from a single simulation run:
+
+
+``` r
+one_run <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+#> Error: A model and model parameters (or priors) must be provided
+
+one_run
+#> Error: object 'one_run' not found
+```
+
+With this one simulation instance (of which the above-mentioned function
+`simulate_abc()` would produce millions, making troubleshooting challenging),
+we can apply individual summary statistic functions using another helper
+function `summarise_data()`:
+
+
+``` r
+summarise_data(one_run, functions)
+#> Error in eval(functions_expr, envir = parent.frame()): object 'functions' not found
+```
+
+By comparing the format of this result to the observed data, we can make sure
+that both simulated and observed summary statistics are mutually compatible,
+and can be thus directly compared in later steps of the ABC workflow.
+
+**See [the reference](https://bodkan.net/demografr/reference/) for a complete
+overview of the functionality.**

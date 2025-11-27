@@ -335,19 +335,19 @@ to:</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">006</span>09</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">004</span>90</span></span></code></pre>
 <p>The function works as expected—we have a single population and want
 to compute nucleotide diversity in the whole population, and this is
 exactly what we get.</p>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">005</span>32</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">008</span>58</span></span></code></pre>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">005</span>65</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">008</span>13</span></span></code></pre>
 <p>Note that we are also able to use a dedicated function for this,
 called <code><a href="../reference/summarise_data.html">summarise_data()</a></code>, which takes in a product of a
 simulation (tree sequence and/or a path to a directory with simulation
@@ -358,7 +358,7 @@ results), and apply all summary functions to this data:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">006</span>19</span></span></code></pre>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> pop   0.000<span style="text-decoration: underline;">005</span>07</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="abc-inference">ABC inference<a class="anchor" aria-label="anchor" href="#abc-inference"></a>
@@ -457,7 +457,7 @@ software dependencies), let’s say we have a program <code>vcfpi</code>,
 which is run in the following way:</p>
 <pre><code>./vcfpi --vcf &lt;path to a VCF&gt; --tsv &lt;path to a TSV table&gt;</code></pre>
 <p>You can find it at
-/private/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/RtmpnEIvjC/temp_libpath101285d548694/demografr/examples/vcfpi)
+/private/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/RtmphBv2dk/temp_libpathefeda39e1a5/demografr/examples/vcfpi)
 and run it yourself in the terminal.</p>
 <p>This program takes in a VCF file and computes the nucleotide
 diversity across all individuals in that VCF file. For simplicity, it
@@ -541,19 +541,19 @@ simulation script, but bear with me here!)</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $vcf</span></span>
-<span><span class="co">#&gt; [1] "/private/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/RtmpJSQdc8demografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
+<span><span class="co">#&gt; [1] "/private/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/RtmpIueuZqdemografr_1823336464/genotypes.vcf.gz"</span></span></code></pre>
 <p>Let’s test our summary function on that VCF:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">functions</span><span class="op">$</span><span class="fu">diversity</span><span class="op">(</span><span class="va">model_run</span><span class="op">$</span><span class="va">vcf</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.835328e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 3.176825e-06</span></span></code></pre>
 <p>Or, for convenience, we can do this using the more general function
 <code><a href="../reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 4.835328e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 3.176825e-06</span></span></code></pre>
 <p>Now let’s validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
@@ -664,20 +664,20 @@ created via the <em>slendr</em> function <code><a href="https://rdrr.io/pkg/slen
 <div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_run</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $gt</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 30 × 101</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 25 × 101</span></span></span>
 <span><span class="co">#&gt;       pos pop_0_0_chr1 pop_0_0_chr2 pop_0_1_chr1 pop_0_1_chr2 pop_0_2_chr1</span></span>
 <span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">12</span>885            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">63</span>071            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">98</span>246            0            0            1            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">153</span>319            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">176</span>967            0            0            1            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">288</span>660            1            0            1            1            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">318</span>030            1            0            1            1            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">319</span>583            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">322</span>135            0            0            0            0            0</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">326</span>253            0            1            0            0            1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 20 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">52</span>380            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">76</span>801            0            0            1            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="text-decoration: underline;">113</span>163            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="text-decoration: underline;">138</span>323            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="text-decoration: underline;">146</span>897            0            0            1            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="text-decoration: underline;">182</span>337            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="text-decoration: underline;">300</span>583            1            1            1            1            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="text-decoration: underline;">304</span>685            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="text-decoration: underline;">319</span>249            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="text-decoration: underline;">326</span>249            0            0            0            0            0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 95 more variables: pop_0_2_chr2 &lt;int&gt;, pop_0_3_chr1 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_3_chr2 &lt;int&gt;, pop_0_4_chr1 &lt;int&gt;, pop_0_4_chr2 &lt;int&gt;,</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;">#   pop_0_5_chr1 &lt;int&gt;, pop_0_5_chr2 &lt;int&gt;, pop_0_6_chr1 &lt;int&gt;,</span></span></span>
@@ -690,7 +690,7 @@ simulation run:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">model_run</span>, <span class="va">functions</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt; 1 pop 6.173737e-06</span></span></code></pre>
+<span><span class="co">#&gt; 1 pop 5.598384e-06</span></span></code></pre>
 <p>Let’s also validate our customized setup before we unleash the full
 scale of ABC simulations on the problem!</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
