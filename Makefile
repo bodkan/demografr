@@ -10,6 +10,9 @@ version := $(shell less DESCRIPTION | grep 'Version' | sed 's/Version: \(.*\)$$/
 pkg := build/demografr_$(version).tar.gz
 logo := man/figures/logo.png
 
+home: README.md
+	R -e 'pkgdown::build_home()'
+
 docs:
 	R -e 'devtools::install(upgrade = "never")'
 	R -e 'devtools::document()'

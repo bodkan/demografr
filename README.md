@@ -417,20 +417,44 @@ means to test and evaluate their individual components even further. For instanc
 the function `simulate_model()` simulates data from a single simulation run:
 
 
-```
-#> Error in parse(text = input): <text>:30:76: unexpected symbol
-#> 29: 
-#> 30: compute_diversity <- function(ts) { samples <- ts_names(ts, split = "pop") ts_diversity
-#>                                                                                ^
-```
 
 
 ``` r
 run_data <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
-#> Error: A model and model parameters (or priors) must be provided
 
 run_data
-#> Error: object 'run_data' not found
+#> ╔═══════════════════════════╗
+#> ║TreeSequence               ║
+#> ╠═══════════════╤═══════════╣
+#> ║Trees          │      1,068║
+#> ╟───────────────┼───────────╢
+#> ║Sequence Length│  1,000,000║
+#> ╟───────────────┼───────────╢
+#> ║Time Units     │generations║
+#> ╟───────────────┼───────────╢
+#> ║Sample Nodes   │        200║
+#> ╟───────────────┼───────────╢
+#> ║Total Size     │  325.3 KiB║
+#> ╚═══════════════╧═══════════╝
+#> ╔═══════════╤═════╤═════════╤════════════╗
+#> ║Table      │Rows │Size     │Has Metadata║
+#> ╠═══════════╪═════╪═════════╪════════════╣
+#> ║Edges      │5,122│160.1 KiB│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Individuals│  100│  2.8 KiB│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Migrations │    0│  8 Bytes│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Mutations  │1,140│ 41.2 KiB│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Nodes      │1,777│ 48.6 KiB│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Populations│    4│331 Bytes│         Yes║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Provenances│    2│  3.3 KiB│          No║
+#> ╟───────────┼─────┼─────────┼────────────╢
+#> ║Sites      │1,139│ 27.8 KiB│          No║
+#> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
 With this one simulation data instance `run_data` (of which the above-mentioned function
@@ -442,7 +466,31 @@ function `summarise_data()`:
 
 ``` r
 summarise_data(run_data, functions)
-#> Error in eval(functions_expr, envir = parent.frame()): object 'functions' not found
+#> $diversity
+#> # A tibble: 4 × 2
+#>   set   diversity
+#>   <chr>     <dbl>
+#> 1 A     0.0000737
+#> 2 B     0.0000127
+#> 3 C     0.0000326
+#> 4 D     0.0000403
+#> 
+#> $divergence
+#> # A tibble: 6 × 3
+#>   x     y     divergence
+#>   <chr> <chr>      <dbl>
+#> 1 A     B      0.000171 
+#> 2 A     C      0.000176 
+#> 3 A     D      0.000181 
+#> 4 B     C      0.0000273
+#> 5 B     D      0.0000327
+#> 6 C     D      0.0000388
+#> 
+#> $f4
+#> # A tibble: 1 × 5
+#>   W     X     Y     Z               f4
+#>   <chr> <chr> <chr> <chr>        <dbl>
+#> 1 A     B     C     D     0.0000000612
 ```
 
 By comparing the format of this result to the observed data (given in the

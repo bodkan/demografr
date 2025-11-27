@@ -432,11 +432,11 @@ priors <- list(
    gf_BC ~ runif(0, 0.3)
 )
 
-compute_diversity <- function(ts) { samples <- ts_names(ts, split = "pop") ts_diversity(ts, sample_sets = samples) }
-compute_divergence <- function(ts) { samples <- ts_names(ts, split = "pop") ts_divergence(ts, sample_sets = samples) }
+compute_diversity <- function(ts) { samples <- ts_names(ts, split = "pop"); ts_diversity(ts, sample_sets = samples) }
+compute_divergence <- function(ts) { samples <- ts_names(ts, split = "pop"); ts_divergence(ts, sample_sets = samples) }
 compute_f4 <- function(ts) {
   samples <- ts_names(ts, split = "pop")
-  A <- samples["A"]; B <- samples["B"] C <- samples["C"]; D <- samples["D"]
+  A <- samples["A"]; B <- samples["B"]; C <- samples["C"]; D <- samples["D"]
   ts_f4(ts, A, B, C, D)
 }
 
