@@ -410,7 +410,7 @@ prior distribution(s) like this:
 plot_prior(priors, "Ne")
 ```
 
-![](man/figures/README-prior_Ne-1.png)
+<img src="man/figures/README-prior_Ne-1.png" style="display: block; margin: auto;" />
 
 To make developing complete pipelines more efficient, _demografr_ also provides
 means to test and evaluate their individual components even further. For instance,
@@ -426,7 +426,7 @@ run_data
 #> ╔═══════════════════════════╗
 #> ║TreeSequence               ║
 #> ╠═══════════════╤═══════════╣
-#> ║Trees          │      1,068║
+#> ║Trees          │      1,198║
 #> ╟───────────────┼───────────╢
 #> ║Sequence Length│  1,000,000║
 #> ╟───────────────┼───────────╢
@@ -434,26 +434,26 @@ run_data
 #> ╟───────────────┼───────────╢
 #> ║Sample Nodes   │        200║
 #> ╟───────────────┼───────────╢
-#> ║Total Size     │  325.3 KiB║
+#> ║Total Size     │  356.9 KiB║
 #> ╚═══════════════╧═══════════╝
 #> ╔═══════════╤═════╤═════════╤════════════╗
 #> ║Table      │Rows │Size     │Has Metadata║
 #> ╠═══════════╪═════╪═════════╪════════════╣
-#> ║Edges      │5,122│160.1 KiB│          No║
+#> ║Edges      │5,624│175.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Individuals│  100│  2.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Migrations │    0│  8 Bytes│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Mutations  │1,140│ 41.2 KiB│          No║
+#> ║Mutations  │1,296│ 46.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Nodes      │1,777│ 48.6 KiB│          No║
+#> ║Nodes      │1,871│ 51.2 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Populations│    4│331 Bytes│         Yes║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Provenances│    2│  3.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Sites      │1,139│ 27.8 KiB│          No║
+#> ║Sites      │1,294│ 31.6 KiB│          No║
 #> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
@@ -468,29 +468,29 @@ function `summarise_data()`:
 summarise_data(run_data, functions)
 #> $diversity
 #> # A tibble: 4 × 2
-#>   set   diversity
-#>   <chr>     <dbl>
-#> 1 A     0.0000737
-#> 2 B     0.0000127
-#> 3 C     0.0000326
-#> 4 D     0.0000403
+#>   set    diversity
+#>   <chr>      <dbl>
+#> 1 A     0.0000599 
+#> 2 B     0.00000967
+#> 3 C     0.0000596 
+#> 4 D     0.0000578 
 #> 
 #> $divergence
 #> # A tibble: 6 × 3
 #>   x     y     divergence
 #>   <chr> <chr>      <dbl>
-#> 1 A     B      0.000171 
-#> 2 A     C      0.000176 
-#> 3 A     D      0.000181 
-#> 4 B     C      0.0000273
-#> 5 B     D      0.0000327
-#> 6 C     D      0.0000388
+#> 1 A     B      0.000190 
+#> 2 A     C      0.000194 
+#> 3 A     D      0.000192 
+#> 4 B     C      0.0000627
+#> 5 B     D      0.0000661
+#> 6 C     D      0.0000678
 #> 
 #> $f4
 #> # A tibble: 1 × 5
-#>   W     X     Y     Z               f4
-#>   <chr> <chr> <chr> <chr>        <dbl>
-#> 1 A     B     C     D     0.0000000612
+#>   W     X     Y     Z              f4
+#>   <chr> <chr> <chr> <chr>       <dbl>
+#> 1 A     B     C     D     -0.00000300
 ```
 
 By comparing the format of this result to the observed data (given in the

@@ -393,7 +393,7 @@ priors <- list(
 )
 ```
 
-```{r, prior_Ne}
+```{r, prior_Ne, fig.align="center"}
 plot_prior(priors, "Ne")
 ```
 
