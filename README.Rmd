@@ -402,19 +402,61 @@ means to test and evaluate their individual components even further. For instanc
 the function `simulate_model()` simulates data from a single simulation run:
 
 ```{r}
-one_run <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+#| echo: false
+model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
+  A <- population("A", time = 1,    N = Ne_A)
+  B <- population("B", time = T_AB, N = Ne_B, parent = A)
+  C <- population("C", time = T_BC, N = Ne_C, parent = B)
+  D <- population("D", time = T_CD, N = Ne_D, parent = C)
 
-one_run
+  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = gf_BC)
+
+  model <- compile_model(
+    populations = list(A, B, C, D), gene_flow = gf,
+    generation_time = 1, simulation_length = 10000,
+    direction = "forward"
+  )
+
+  samples <- schedule_sampling(
+    model, times = 10000,
+    list(A, 25), list(B, 25), list(C, 25), list(D, 25),
+    strict = TRUE
+  )
+
+  return(list(model, samples))
+}
+
+priors <- list(
+  Ne_A  ~ runif(1000, 3000), Ne_B  ~ runif(100,  1500), Ne_C  ~ runif(5000, 10000), Ne_D  ~ runif(2000, 7000),
+  T_AB  ~ runif(1,    4000), T_BC  ~ runif(3000, 9000), T_CD  ~ runif(5000, 10000),
+   gf_BC ~ runif(0, 0.3)
+)
+
+compute_diversity <- function(ts) { samples <- ts_names(ts, split = "pop") ts_diversity(ts, sample_sets = samples) }
+compute_divergence <- function(ts) { samples <- ts_names(ts, split = "pop") ts_divergence(ts, sample_sets = samples) }
+compute_f4 <- function(ts) {
+  samples <- ts_names(ts, split = "pop")
+  A <- samples["A"]; B <- samples["B"] C <- samples["C"]; D <- samples["D"]
+  ts_f4(ts, A, B, C, D)
+}
+
+functions <- list(diversity  = compute_diversity, divergence = compute_divergence, f4 = compute_f4)
 ```
 
-With this one simulation data instance `one_run` (of which the above-mentioned function
+```{r}
+run_data <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+
+run_data
+```
+
+With this one simulation data instance `run_data` (of which the above-mentioned function
 `simulate_abc()` would produce millions, making troubleshooting challenging and
 slow),
 we can apply individual summary statistic functions using another helper
 function `summarise_data()`:
 
 ```{r}
-summarise_data(one_run, functions)
+summarise_data(run_data, functions)
 ```
 
 By comparing the format of this result to the observed data (given in the

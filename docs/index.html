@@ -325,15 +325,19 @@
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_prior.html">plot_prior</a></span><span class="op">(</span><span class="va">priors</span>, <span class="st">"Ne"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-prior_Ne-1.png"></p>
 <p>To make developing complete pipelines more efficient, <em>demografr</em> also provides means to test and evaluate their individual components even further. For instance, the function <code><a href="reference/simulate_model.html">simulate_model()</a></code> simulates data from a single simulation run:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">one_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
+<pre><code><span><span class="co">#&gt; Error in parse(text = input): &lt;text&gt;:30:76: unexpected symbol</span></span>
+<span><span class="co">#&gt; 29:</span></span>
+<span><span class="co">#&gt; 30: compute_diversity &lt;- function(ts) { samples &lt;- ts_names(ts, split = "pop") ts_diversity</span></span>
+<span><span class="co">#&gt;                                                                                ^</span></span></code></pre>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">run_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error: A model and model parameters (or priors) must be provided</span></span>
 <span></span>
-<span><span class="va">one_run</span></span>
-<span><span class="co">#&gt; Error: object 'one_run' not found</span></span></code></pre></div>
-<p>With this one simulation data instance <code>one_run</code> (of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">one_run</span>, <span class="va">functions</span><span class="op">)</span></span>
+<span><span class="va">run_data</span></span>
+<span><span class="co">#&gt; Error: object 'run_data' not found</span></span></code></pre></div>
+<p>With this one simulation data instance <code>run_data</code> (of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">run_data</span>, <span class="va">functions</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in eval(functions_expr, envir = parent.frame()): object 'functions' not found</span></span></code></pre></div>
 <p>By comparing the format of this result to the observed data (given in the list <code>observed</code> at the beginning of this page), we can make sure that both simulated and observed summary statistics are mutually compatible, and can be thus directly compared in later steps of the ABC workflow.</p>
 <p><strong>See <a href="https://bodkan.net/demografr/reference/">the reference</a> for a complete overview of the functionality of this package.</strong></p>

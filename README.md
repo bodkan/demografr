@@ -417,15 +417,23 @@ means to test and evaluate their individual components even further. For instanc
 the function `simulate_model()` simulates data from a single simulation run:
 
 
-``` r
-one_run <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
-#> Error: A model and model parameters (or priors) must be provided
-
-one_run
-#> Error: object 'one_run' not found
+```
+#> Error in parse(text = input): <text>:30:76: unexpected symbol
+#> 29: 
+#> 30: compute_diversity <- function(ts) { samples <- ts_names(ts, split = "pop") ts_diversity
+#>                                                                                ^
 ```
 
-With this one simulation data instance `one_run` (of which the above-mentioned function
+
+``` r
+run_data <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+#> Error: A model and model parameters (or priors) must be provided
+
+run_data
+#> Error: object 'run_data' not found
+```
+
+With this one simulation data instance `run_data` (of which the above-mentioned function
 `simulate_abc()` would produce millions, making troubleshooting challenging and
 slow),
 we can apply individual summary statistic functions using another helper
@@ -433,7 +441,7 @@ function `summarise_data()`:
 
 
 ``` r
-summarise_data(one_run, functions)
+summarise_data(run_data, functions)
 #> Error in eval(functions_expr, envir = parent.frame()): object 'functions' not found
 ```
 
