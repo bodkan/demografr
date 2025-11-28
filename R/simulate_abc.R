@@ -78,15 +78,6 @@ simulate_abc <- function(
   if (mutation_rate < 0)
     stop("Mutation rate must be a non-negative number", call. = FALSE)
 
-  # validate the ABC setup
-  utils::capture.output(validate_abc(
-    model, priors, functions, observed,
-    sequence_length = sequence_length, recombination_rate = recombination_rate,
-    mutation_rate = mutation_rate, format = format, data = data,
-    engine = engine, model_args = model_args,
-    engine_args = engine_args
-  ))
-
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
   global_symbols <- c(
