@@ -684,17 +684,12 @@ Now we can finally get the posterior predictive distributions of the new
 summary statistics (per-population AFS vectors), which are again stored as
 [nested list-columns](https://tidyr.tidyverse.org/articles/nest.html):
 
-```{r, eval=!on_windows && !pred_afs_exists}
+```{r}
 plan(multisession, workers = availableCores())
-pred_afs <- predict(abcX, samples = 1000, posterior = "unadj", functions = afs_functions)
-```
 
-```{r, echo=FALSE, eval=!on_windows && !pred_afs_exists}
-saveRDS(pred_afs, pred_afs_path)
-```
-
-```{r, echo=FALSE, eval=pred_afs_exists}
-pred_afs <- readRDS(pred_afs_path)
+# we simulate only 10 samples from the posterior distribution, but this is only
+# to save computational time!
+pred_afs <- predict(abcX, samples = 10, posterior = "unadj", functions = afs_functions)
 ```
 
 This means that each of those `afs_...` list columns contains an AFS for the
