@@ -17,10 +17,6 @@
 #'   arguments of simulated summary statistic functions.
 #' @param format In which format will the model generate results to be used for computing
 #'   simulated summary statistics?
-#' @param packages A character vector with package names used by user-defined summary statistic
-#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
-#'   sure that the parallelized tree-sequence summary statistic functions have all of their
-#'   packages available.
 #' @param file If not \code{NULL}, a path where to save the data frame with simulated grid results.
 #'   If this path is set, the results data frame is returned but invisibly.
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
@@ -37,6 +33,13 @@
 #' @param strict Should parameter combinations leading to invalid slendr models be treated as
 #'   an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be simply
 #'   dropped, with an informative message.
+#' @param packages A character vector with package names used by user-defined summary statistic
+#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+#'   sure that the parallelized tree-sequence summary statistic functions have all of their
+#'   packages available.
+#' @param globals If a summary statistic function depends on object(s) in the R session which
+#'   would not be available in separate parallel simulation processes, the names of such object(s)
+#'   can be specified here, and they will be passed to each such separate process.
 #'
 #' @return If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
 #'   does not return anything, saving an object to an .rds file instead.
@@ -50,9 +53,9 @@
 simulate_grid <- function(
   model, grid, functions, replicates,
   sequence_length, recombination_rate, mutation_rate = 0,
-  data = NULL, format = c("ts", "files"), packages = NULL, file = NULL,
+  data = NULL, format = c("ts", "files"), file = NULL,
   engine = NULL, model_args = NULL, engine_args = NULL,
-  strict = TRUE
+  strict = TRUE, packages = NULL, globals = NULL
 ) {
   format <- match.arg(format)
 
@@ -84,14 +87,14 @@ simulate_grid <- function(
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
-  globals <- c(
+  global_symbols <- c(
     names(model_args),
     names(engine_args)
   ) %>%
     unlist() %>%
     unique() %>%
-    c(model_name, summary_name, data_name, .) # TODO: Check if this is really needed in all instances
-  if (is.null(globals)) globals <- TRUE
+    c(globals, model_name, summary_name, data_name, .) # TODO: Check if this is really needed in all instances
+  if (is.null(globals)) global_symbols <- TRUE
 
   # prepare the grid data frame for storing the results
   grid <- lapply(
@@ -110,7 +113,7 @@ simulate_grid <- function(
       parameters <- as.list(grid[grid_i, -ncol(grid)])
       iter_result <- tryCatch(
         {
-          wrap <- if (strict) base::identity else utils::capture.output
+          wrap <- ifelse(strict, base::identity, utils::capture.output)
           wrap(res <- run_iteration(
             grid_i,
             model = model,
@@ -141,7 +144,7 @@ simulate_grid <- function(
       iter_result
     },
     future.seed = TRUE,
-    future.globals = globals,
+    future.globals = global_symbols,
     future.packages = c("slendr", packages)
   )
 

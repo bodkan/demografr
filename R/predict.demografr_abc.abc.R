@@ -19,6 +19,13 @@
 #'   applied to each simulated tree sequence. If \code{NULL} (the default), the same
 #'   summary statistics will be computed as those that were used in the ABC inference
 #'   itself. Otherwise, custom tree-sequence summary statistics can be provided.
+#' @param packages A character vector with package names used by user-defined summary statistic
+#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+#'   sure that the parallelized tree-sequence summary statistic functions have all of their
+#'   packages available.
+#' @param globals If a summary statistic function depends on object(s) in the R session which
+#'   would not be available in separate parallel simulation processes, the names of such object(s)
+#'   can be specified here, and they will be passed to each such separate process.
 #' @param ... A formal argument of the \code{predict} generic method (unused)
 #'
 #' @return A data frame object with the results of posterior simulations, with values of
@@ -51,7 +58,7 @@
 #' @export predict.demografr_abc.abc
 #' @export
 predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = c("adj", "unadj"),
-                                      strict = FALSE, functions = NULL, ...) {
+                                      strict = FALSE, functions = NULL, packages = NULL, globals = NULL, ...) {
   opts <- options(warn = 1)
   on.exit(options(opts))
 
@@ -97,21 +104,26 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
   # parameters <- dplyr::as_tibble(abc$adj[samples, ])
   parameters <- dplyr::as_tibble(posterior_params[samples, ])
 
+  # save this to a simple variable to avoid issues with a complex substitute-based
+  # model name composed of multiple components
+  model <- components$model
+
   # once we have sampled parameters from the posteriors, getting the summary statistics
   # is simply a matter of running simulations across a grid, in the same way a
   # user would do it directly in cases where they already had parameter values
   # to simulate from
   result <- simulate_grid(
-    model = components$model,
+    model = model,
     grid = parameters,
     functions = functions,
     replicates = 1,
     sequence_length = opts$sequence_length,
     recombination_rate = opts$recombination_rate,
     mutation_rate = opts$mutation_rate,
-    packages = opts$packages,
     engine = opts$engine, model_args = opts$model_args, engine_args = opts$engine_args,
-    strict = strict
+    strict = strict,
+    packages = c(opts$packages, packages),
+    globals = c(opts$globals, globals)
   )
   # replace the replicate number from simulate_grid by actual numbers of each
   # posterior draw for easier downstream analysis
