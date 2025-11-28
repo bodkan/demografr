@@ -444,19 +444,20 @@ functions <- list(diversity  = compute_diversity, divergence = compute_divergenc
 ```
 
 ```{r}
-run_data <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 
-run_data
+ts
 ```
 
-With this one simulation data instance `run_data` (of which the above-mentioned function
+With this one simulation data instance `ts` (in this case, a tree-sequence
+object of which the above-mentioned function
 `simulate_abc()` would produce millions, making troubleshooting challenging and
 slow),
 we can apply individual summary statistic functions using another helper
 function `summarise_data()`:
 
 ```{r}
-summarise_data(run_data, functions)
+summarise_data(ts, functions)
 ```
 
 By comparing the format of this result to the observed data (given in the
