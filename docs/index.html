@@ -74,7 +74,7 @@
 <p>⚠️⚠️⚠️</p>
 <p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
-<p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics and evolutionary biology, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make these inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequences</a> as an internal data structure and computation engine.</p>
+<p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics and evolutionary biology, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make these inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as an internal data structure and computation engine.</p>
 <p>Unlike traditional ABC and other simulation-based approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, <em>demografr</em> makes it possible to perform simulation, computation of summary statistics, and the inference itself within a single reproducible R script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier for new users and facilitates reproducibility for everyone regardless of their level of experience by eliminating many common sources of bugs.</p>
 <div class="section level3">
 <h3 id="how-does-demografr-help-with-abc">How does <em>demografr</em> help with ABC?<a class="anchor" aria-label="anchor" href="#how-does-demografr-help-with-abc"></a>
@@ -83,7 +83,7 @@
 <ol style="list-style-type: decimal">
 <li><p><em>slendr</em>’s intuitive, interactive <a href="https://bodkan.net/slendr/articles/vignette-04-nonspatial-models.html" class="external-link">interface for definning population genetic models</a> makes it easy to encode even complex demographic models with only a bare minimum of R knowledge needed.</p></li>
 <li><p><em>demografr</em> makes it possible to encode prior distributions of parameters using familiar R interface resembling standard probabilistic statements, and provides an automated function which simulates ABC replicates drawing parameters from priors in a trivial, one-step manner. Automated routines for exploring model parameter grids in settings other than ABC are also provided.</p></li>
-<li><p>Because <em>slendr</em> embraces <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as its default internal data structure, most population genetic statistics can be computed directly on such tree sequences using R functions which are part of <em>slendr</em>’s statistical library. A tree sequence is never saved to disk and no conversion between file formats is required, which significantly speeds up every workflow. That said, using custom simulation scripts as well as computation of summary statistics in third party software is also possible (while still leveraging the consistent <em>demografr</em> workflow approach and most of its standard simulation and inference functions).</p></li>
+<li><p>Because <em>slendr</em> embraces the <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as its default internal data structure, most population genetic statistics can be computed directly on such tree sequences using R functions which are part of <em>slendr</em>’s statistical library. A tree sequence is never saved to disk and no conversion between file formats is required, which significantly speeds up every workflow. That said, using custom simulation scripts as well as computation of summary statistics in third party software is also possible (while still leveraging the consistent <em>demografr</em> workflow approach and most of its standard simulation and inference functions).</p></li>
 <li><p><em>demografr</em> facilitates tight integration with the powerful R package <a href="https://cran.r-project.org/package=abc" class="external-link"><em>abc</em></a> by automatically feeding it simulation data for inference and diagnostics. At the moment, the <em>abc</em> package represents a core inference engine of <em>demografr</em>. Other inference engines and statistical approaches will be developed in the future.</p></li>
 </ol>
 </div>
@@ -326,13 +326,13 @@
 <p><img src="reference/figures/README-prior_Ne-1.png"></p>
 <p>To make developing complete pipelines more efficient, <em>demografr</em> also provides means to test and evaluate their individual components even further. For instance, the function <code><a href="reference/simulate_model.html">simulate_model()</a></code> simulates data from a single simulation run:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">run_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">run_data</span></span>
+<span><span class="va">ts</span></span>
 <span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
 <span><span class="co">#&gt; ║TreeSequence               ║</span></span>
 <span><span class="co">#&gt; ╠═══════════════╤═══════════╣</span></span>
-<span><span class="co">#&gt; ║Trees          │      1,537║</span></span>
+<span><span class="co">#&gt; ║Trees          │      1,751║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sequence Length│  1,000,000║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
@@ -340,55 +340,55 @@
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │        200║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │  435.7 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │  492.1 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧═══════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤═════╤═════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows │Size     │Has Metadata║</span></span>
 <span><span class="co">#&gt; ╠═══════════╪═════╪═════════╪════════════╣</span></span>
-<span><span class="co">#&gt; ║Edges      │6,822│213.2 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Edges      │7,718│241.2 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Individuals│  100│  2.8 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Migrations │    0│  8 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Mutations  │1,747│ 63.1 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Mutations  │2,020│ 73.0 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Nodes      │2,042│ 55.8 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Nodes      │2,219│ 60.7 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Populations│    4│331 Bytes│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Provenances│    2│  3.3 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Sites      │1,746│ 42.6 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Sites      │2,020│ 49.3 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧═════╧═════════╧════════════╝</span></span></code></pre></div>
-<p>With this one simulation data instance <code>run_data</code> (of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
+<p>With this one simulation data instance <code>ts</code> (in this case, a tree-sequence object of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">run_data</span>, <span class="va">functions</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">functions</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $diversity</span></span>
 <span><span class="co">#&gt; # A tibble: 4 × 2</span></span>
-<span><span class="co">#&gt;   set    diversity</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     0.000125  </span></span>
-<span><span class="co">#&gt; 2 B     0.00000324</span></span>
-<span><span class="co">#&gt; 3 C     0.0000984 </span></span>
-<span><span class="co">#&gt; 4 D     0.0000841 </span></span>
+<span><span class="co">#&gt;   set   diversity</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 A     0.0000696</span></span>
+<span><span class="co">#&gt; 2 B     0.0000563</span></span>
+<span><span class="co">#&gt; 3 C     0.000169 </span></span>
+<span><span class="co">#&gt; 4 D     0.000154 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $divergence</span></span>
 <span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
 <span><span class="co">#&gt;   x     y     divergence</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     B       0.000303</span></span>
-<span><span class="co">#&gt; 2 A     C       0.000296</span></span>
-<span><span class="co">#&gt; 3 A     D       0.000289</span></span>
-<span><span class="co">#&gt; 4 B     C       0.000117</span></span>
-<span><span class="co">#&gt; 5 B     D       0.000121</span></span>
-<span><span class="co">#&gt; 6 C     D       0.000110</span></span>
+<span><span class="co">#&gt; 1 A     B       0.000268</span></span>
+<span><span class="co">#&gt; 2 A     C       0.000275</span></span>
+<span><span class="co">#&gt; 3 A     D       0.000284</span></span>
+<span><span class="co">#&gt; 4 B     C       0.000193</span></span>
+<span><span class="co">#&gt; 5 B     D       0.000209</span></span>
+<span><span class="co">#&gt; 6 C     D       0.000188</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $f4</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
-<span><span class="co">#&gt;   W     X     Y     Z             f4</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     B     C     D     -0.0000057</span></span></code></pre></div>
+<span><span class="co">#&gt;   W     X     Y     Z              f4</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 A     B     C     D     -0.00000352</span></span></code></pre></div>
 <p>By comparing the format of this result to the observed data (given in the list <code>observed</code> at the beginning of this page), we can make sure that both simulated and observed summary statistics are mutually compatible, and can be thus directly compared in later steps of the ABC workflow.</p>
 <p><strong>See <a href="https://bodkan.net/demografr/reference/">the reference</a> for a complete overview of the functionality of this package.</strong></p>
 </div>

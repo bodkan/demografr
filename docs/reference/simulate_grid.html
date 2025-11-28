@@ -59,12 +59,13 @@ values of given population genetic statistics</p>
 <span>  mutation_rate <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ts"</span>, <span class="st">"files"</span><span class="op">)</span>,</span>
-<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  strict <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  strict <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  globals <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,13 +114,6 @@ arguments of simulated summary statistic functions.</p></dd>
 simulated summary statistics?</p></dd>
 
 
-<dt id="arg-packages">packages<a class="anchor" aria-label="anchor" href="#arg-packages"></a></dt>
-<dd><p>A character vector with package names used by user-defined summary statistic
-functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
-sure that the parallelized tree-sequence summary statistic functions have all of their
-packages available.</p></dd>
-
-
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
 <dd><p>If not <code>NULL</code>, a path where to save the data frame with simulated grid results.
 If this path is set, the results data frame is returned but invisibly.</p></dd>
@@ -149,6 +143,19 @@ argument for custom simulation script has no effect.</p></dd>
 <dd><p>Should parameter combinations leading to invalid slendr models be treated as
 an error? Default is <code>TRUE</code>. If set to <code>FALSE</code>, invalid simulations will be simply
 dropped, with an informative message.</p></dd>
+
+
+<dt id="arg-packages">packages<a class="anchor" aria-label="anchor" href="#arg-packages"></a></dt>
+<dd><p>A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.</p></dd>
+
+
+<dt id="arg-globals">globals<a class="anchor" aria-label="anchor" href="#arg-globals"></a></dt>
+<dd><p>If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -60,6 +60,8 @@ the sampled parameters and compute tree-sequence summary statistics</p>
 <span>  posterior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"adj"</span>, <span class="st">"unadj"</span><span class="op">)</span>,</span>
 <span>  strict <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  functions <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  globals <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -99,6 +101,19 @@ matrix.</p></dd>
 applied to each simulated tree sequence. If <code>NULL</code> (the default), the same
 summary statistics will be computed as those that were used in the ABC inference
 itself. Otherwise, custom tree-sequence summary statistics can be provided.</p></dd>
+
+
+<dt id="arg-packages">packages<a class="anchor" aria-label="anchor" href="#arg-packages"></a></dt>
+<dd><p>A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.</p></dd>
+
+
+<dt id="arg-globals">globals<a class="anchor" aria-label="anchor" href="#arg-globals"></a></dt>
+<dd><p>If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

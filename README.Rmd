@@ -44,7 +44,7 @@ simulation-based inference pipelines in population genetics and evolutionary
 biology, such as [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation)
 (ABC) or parameter grid inferences, and make them more reproducible.
 _demografr_ also aims to make these inferences orders of magnitude faster and
-more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as
+more efficient by leveraging the [tree sequence](https://tskit.dev/learn/) as
 an internal data structure and computation engine.
 
 Unlike traditional ABC and other simulation-based approaches, which generally
@@ -75,7 +75,7 @@ provides an automated function which simulates ABC replicates drawing
 parameters from priors in a trivial, one-step manner. Automated routines for
 exploring model parameter grids in settings other than ABC are also provided.
 
-3. Because _slendr_ embraces [tree sequence](https://tskit.dev/learn/) as
+3. Because _slendr_ embraces the [tree sequence](https://tskit.dev/learn/) as
 its default internal data structure, most population genetic statistics can be
 computed directly on such tree sequences using R functions which are part of
 _slendr_'s statistical library. A tree sequence is never saved to disk and no

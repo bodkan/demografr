@@ -598,6 +598,122 @@ function which only unnests, reformats, and renames the list-columns
 with summary statistics stored in the <code>predictions</code> data
 frame above. You can do all the processing based on the
 <code>predictions</code> object above.</p>
+<div class="section level3">
+<h3 id="posterior-predictive-checks-using-new-statistics">Posterior predictive checks using new statistics<a class="anchor" aria-label="anchor" href="#posterior-predictive-checks-using-new-statistics"></a>
+</h3>
+<p>In situations in which you might be interested in performing a
+posterior predictive check using a different set of statistics rather
+than the summary statistics used in the posterior inference in the first
+phase of your workflow (see, for instance, <a href="https://stats.stackexchange.com/a/125576" class="external-link">this</a> discussion and
+associated references for more detail on why this might or might not be
+a valuable thing to do), you can use the optional argument
+<code>functions =</code> of the function <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>. Just
+like any other instances of this argument in functions such as
+<code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>, this argument specifies a named list of
+summary functions. You can then compare the posterior predictions of
+these new summary statistics. Of course, as discussed in the link above,
+this might be easier said than done in practice because when we do ABC,
+we should be <em>already</em> using the best summary statistics we can,
+but it’s worth mentioning this possibility here for cases in which this
+might be relevant.</p>
+<p>For instance, let’s say that our new summary statistics are AFS
+vectors in each of our four populations, which can be computed by the
+following tree-sequence summary statistics in R:</p>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">afs_functions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  afs_A <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span> <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span><span class="op">[</span><span class="st">"A"</span><span class="op">]</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_afs.html" class="external-link">ts_afs</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op">}</span>,</span>
+<span>  afs_B <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span> <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span><span class="op">[</span><span class="st">"B"</span><span class="op">]</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_afs.html" class="external-link">ts_afs</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op">}</span>,</span>
+<span>  afs_C <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span> <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span><span class="op">[</span><span class="st">"C"</span><span class="op">]</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_afs.html" class="external-link">ts_afs</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op">}</span>,</span>
+<span>  afs_D <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ts</span><span class="op">)</span> <span class="op">{</span> <span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_names.html" class="external-link">ts_names</a></span><span class="op">(</span><span class="va">ts</span>, split <span class="op">=</span> <span class="st">"pop"</span><span class="op">)</span><span class="op">[</span><span class="st">"D"</span><span class="op">]</span>; <span class="fu"><a href="https://rdrr.io/pkg/slendr/man/ts_afs.html" class="external-link">ts_afs</a></span><span class="op">(</span><span class="va">ts</span>, sample_sets <span class="op">=</span> <span class="va">samples</span><span class="op">)</span> <span class="op">}</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Again, it’s always useful to sanity check our functions definitions,
+which we do it by computing these statistics from a single simulated
+tree sequence (we make it tiny to make things faster—the point is to
+test whether our new summary statistics functions even run the way we
+want them to):</p>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">modelX</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">0</span>, mutation_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/summarise_data.html">summarise_data</a></span><span class="op">(</span><span class="va">ts</span>, <span class="va">afs_functions</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; $afs_A</span></span>
+<span><span class="co">#&gt;   [1] 2357  272   94   33   39   28   84    6   20    3   56   10    4    0    4</span></span>
+<span><span class="co">#&gt;  [16]   24    4    0    3    0    0    0    0    0    3   35    0    0    0   17</span></span>
+<span><span class="co">#&gt;  [31]    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [46]    0    0    0    0    0    8    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [61]    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [76]    0    0    0    0   55    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [91]    0    0    0    0   23    0    0    0    0    0   34</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $afs_B</span></span>
+<span><span class="co">#&gt;   [1] 2530   93   84   37    8   26    6   11   24    6   19    9    1    2    0</span></span>
+<span><span class="co">#&gt;  [16]    1    0    0    0   23  117    0    0    0    0    0    0    0    0  103</span></span>
+<span><span class="co">#&gt;  [31]   17    0   18    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [46]    0    0    0    0    0    0   47    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [61]    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [76]    0    0    0    0    0   25    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [91]    0    0    0    0    0    0    0    0    0    0    9</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $afs_C</span></span>
+<span><span class="co">#&gt;   [1] 2061  245  199   28   38  164   20  148   15   43    0    0    0    0    5</span></span>
+<span><span class="co">#&gt;  [16]    5    0    0    0    2    0    0    2   17   10   15    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [31]   14   92    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [46]    0    0    0   43    0    0    0    0   16    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [61]    0    0   25    0    0    0    0    0    0    9    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [76]    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [91]    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $afs_D</span></span>
+<span><span class="co">#&gt;   [1] 2174  255  135  106   50   62   70    8   22    9    0    0   71    2    9</span></span>
+<span><span class="co">#&gt;  [16]    7    0    8   10    0    6   24    0   11    0    0   60    0    0    0</span></span>
+<span><span class="co">#&gt;  [31]    2    0    5    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [46]    0    0    0    0    0    0    0    6    0    0    0   25    0    0    0</span></span>
+<span><span class="co">#&gt;  [61]    0    0    0    0    0    0    0    0    5    0    0    0    0    0   40</span></span>
+<span><span class="co">#&gt;  [76]    0    0    0    0    0    0    0    0    0    0    0    0    0    0    0</span></span>
+<span><span class="co">#&gt;  [91]    0    0    0    0    0    0    0    0    0    0   34</span></span></code></pre>
+<p>Now we can finally get the posterior predictive distributions of the
+new summary statistics (per-population AFS vectors), which are again
+stored as <a href="https://tidyr.tidyverse.org/articles/nest.html" class="external-link">nested
+list-columns</a>:</p>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># we simulate only 10 samples from the posterior distribution, but this is only</span></span>
+<span><span class="co"># to save computational time!</span></span>
+<span><span class="va">pred_afs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">abcX</span>, samples <span class="op">=</span> <span class="fl">10</span>, posterior <span class="op">=</span> <span class="st">"unadj"</span>, functions <span class="op">=</span> <span class="va">afs_functions</span><span class="op">)</span></span></code></pre></div>
+<p>This means that each of those <code>afs_...</code> list columns
+contains an AFS for the corresponding population for each given
+replicate:</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pred_afs</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 13</span></span></span>
+<span><span class="co">#&gt;      rep    T_1   T_2   T_3     gf  Ne_A  Ne_B  Ne_C  Ne_D afs_A  afs_B  afs_C </span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1 <span style="text-decoration: underline;">3</span>050.  <span style="text-decoration: underline;">7</span>577. <span style="text-decoration: underline;">8</span>936. 0.066<span style="text-decoration: underline;">3</span> <span style="text-decoration: underline;">2</span>365. <span style="text-decoration: underline;">1</span>222. <span style="text-decoration: underline;">3</span>197. <span style="text-decoration: underline;">2</span>109. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2   40.4 <span style="text-decoration: underline;">7</span>205. <span style="text-decoration: underline;">8</span>641. 0.669  <span style="text-decoration: underline;">1</span>333. <span style="text-decoration: underline;">1</span>531. <span style="text-decoration: underline;">3</span>170. <span style="text-decoration: underline;">6</span>227. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3 <span style="text-decoration: underline;">1</span>538.  <span style="text-decoration: underline;">4</span>675. <span style="text-decoration: underline;">9</span>914. 0.642  <span style="text-decoration: underline;">1</span>456.  664. <span style="text-decoration: underline;">5</span>659. <span style="text-decoration: underline;">4</span>147. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4 <span style="text-decoration: underline;">2</span>373.  <span style="text-decoration: underline;">6</span>711. <span style="text-decoration: underline;">9</span>685. 0.688  <span style="text-decoration: underline;">2</span>019. <span style="text-decoration: underline;">1</span>263. <span style="text-decoration: underline;">9</span>451. <span style="text-decoration: underline;">4</span>505. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5  967.  <span style="text-decoration: underline;">8</span>902. <span style="text-decoration: underline;">9</span>671. 0.886  <span style="text-decoration: underline;">1</span>851. <span style="text-decoration: underline;">2</span>284. <span style="text-decoration: underline;">3</span>933.  589. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6 <span style="text-decoration: underline;">1</span>217.  <span style="text-decoration: underline;">5</span>746. <span style="text-decoration: underline;">5</span>894. 0.240  <span style="text-decoration: underline;">1</span>456.  294. <span style="text-decoration: underline;">6</span>053. <span style="text-decoration: underline;">4</span>875. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7 <span style="text-decoration: underline;">2</span>758.  <span style="text-decoration: underline;">8</span>007. <span style="text-decoration: underline;">9</span>034. 0.524  <span style="text-decoration: underline;">2</span>810. <span style="text-decoration: underline;">1</span>341. <span style="text-decoration: underline;">5</span>109. <span style="text-decoration: underline;">8</span>394. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8 <span style="text-decoration: underline;">3</span>094.  <span style="text-decoration: underline;">7</span>611. <span style="text-decoration: underline;">7</span>852. 0.094<span style="text-decoration: underline;">9</span> <span style="text-decoration: underline;">1</span>701. <span style="text-decoration: underline;">1</span>381. <span style="text-decoration: underline;">7</span>170. <span style="text-decoration: underline;">7</span>504. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9 <span style="text-decoration: underline;">2</span>167.  <span style="text-decoration: underline;">7</span>024. <span style="text-decoration: underline;">9</span>708. 0.261  <span style="text-decoration: underline;">1</span>497. <span style="text-decoration: underline;">1</span>886. <span style="text-decoration: underline;">3</span>156. <span style="text-decoration: underline;">4</span>523. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10 <span style="text-decoration: underline;">1</span>644.  <span style="text-decoration: underline;">5</span>518. <span style="text-decoration: underline;">9</span>061. 0.018<span style="text-decoration: underline;">6</span> <span style="text-decoration: underline;">2</span>032.  864. <span style="text-decoration: underline;">4</span>695. <span style="text-decoration: underline;">1</span>399. <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span>  <span style="color: #949494;">&lt;dbl&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: afs_D &lt;list&gt;</span></span></span></code></pre>
+<p>Here’s one of them for the population “A” and the first simulated
+posterior sample:</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pred_afs</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">$</span><span class="va">afs_A</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt;   [1] 10165  1073   465   309   232   199   191   153   124   126   102   110</span></span>
+<span><span class="co">#&gt;  [13]   108   110    79    90    60    62    59    57    62    56    38    47</span></span>
+<span><span class="co">#&gt;  [25]    43    36    41    40    28    26    25    33    34    40    30    28</span></span>
+<span><span class="co">#&gt;  [37]    24    19    19    33    33    23    18    27    13    20    19    15</span></span>
+<span><span class="co">#&gt;  [49]    29    19    14    15    20    13    20    15    11    19    19    28</span></span>
+<span><span class="co">#&gt;  [61]    21    12     8     9    13    23     8    16     8    23    11    25</span></span>
+<span><span class="co">#&gt;  [73]    13     6    15    17     6    16    18    10    14    17    11     9</span></span>
+<span><span class="co">#&gt;  [85]    11    22    11    20    16    15    11    11     7    13    14     3</span></span>
+<span><span class="co">#&gt;  [97]     4     2    12    11   320</span></span></code></pre>
+</div>
 </div>
 <div class="section level2">
 <h2 id="additional-diagnostics-and-backwards-compatibility-with-the-abc-package">Additional diagnostics and backwards compatibility with the
@@ -632,12 +748,12 @@ the <em>anc</em> package. This includes <code><a href="https://rdrr.io/pkg/abc/m
 <h3 id="unpacking-a-demografr-object-to-low-level-components-used-by-the-abc-package">“Unpacking” a <em>demografr</em> object to low-level components used
 by the <em>abc</em> package<a class="anchor" aria-label="anchor" href="#unpacking-a-demografr-object-to-low-level-components-used-by-the-abc-package"></a>
 </h3>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>As we can see, the <code><a href="../reference/unpack.html">unpack()</a></code> function produced a list
@@ -651,37 +767,25 @@ perform the cross-validation of the model selection using <em>abc</em>’s
 own functionality like this.</p>
 <p>First, because model-selection requires, well, multiple models to
 select from, we will unpack information from all the three models:</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">abcX</span>, <span class="va">abcY</span>, <span class="va">abcZ</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">parts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">parts</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>Then, we simply run <code><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr()</a></code> as we normally would,
 using the information pre-generated by <code><a href="../reference/unpack.html">unpack()</a></code>:</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># cv4postpr() is a function from the abc R package, not demografr!</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Loading required package: abc.data</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Loading required package: nnet</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Loading required package: quantreg</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Loading required package: SparseM</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Loading required package: MASS</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'MASS'</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; The following object is masked from 'package:slendr':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     area</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; Loading required package: locfit</span></span></code></pre>
-<pre><code><span><span class="co">#&gt; locfit 1.5-9.12   2025-03-05</span></span></code></pre>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cv4postpr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">index</span>, sumstat <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">sumstat</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># cv4postpr() is a function from the abc R package, not demografr!</span></span>
+<span></span>
+<span><span class="va">cv4postpr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">index</span>, sumstat <span class="op">=</span> <span class="va">parts</span><span class="op">$</span><span class="va">sumstat</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fl">0.01</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span></code></pre></div>
 <p>Unlike the result of <code><a href="../reference/cross_validate.html">cross_validate()</a></code> above, typing out
 the object <code>cv4postpr_res</code> will not help us, but we can get
 the overview of the results by applying the function
 <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>:</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cv4postpr_res</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Confusion matrix based on 10 samples for each model.</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -696,9 +800,9 @@ the overview of the results by applying the function
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $tol0.01</span></span>
 <span><span class="co">#&gt;        modelX modelY modelZ</span></span>
-<span><span class="co">#&gt; modelX 0.9508 0.0114 0.0378</span></span>
-<span><span class="co">#&gt; modelY 0.1030 0.8783 0.0187</span></span>
-<span><span class="co">#&gt; modelZ 0.0008 0.0269 0.9723</span></span></code></pre>
+<span><span class="co">#&gt; modelX 0.9193 0.0640 0.0167</span></span>
+<span><span class="co">#&gt; modelY 0.0294 0.9635 0.0071</span></span>
+<span><span class="co">#&gt; modelZ 0.0003 0.0199 0.9799</span></span></code></pre>
 <p>As you can see, we can replicate the result of
 <code><a href="../reference/cross_validate.html">cross_validate()</a></code> for model selection by combining the
 functions <code><a href="../reference/unpack.html">unpack()</a></code>, <code><a href="https://rdrr.io/pkg/abc/man/cv4postpr.html" class="external-link">cv4postpr()</a></code> and
@@ -715,73 +819,73 @@ and leave the interpretation to the discussion in the vignette:</p>
 <p>First, we will unpack the results of the selected best-fitting model
 from the appropriate <code>abc</code> object obtained by the
 <em>demografr</em> function <code><a href="../reference/run_abc.html">run_abc()</a></code> above:</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsX</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "list"</span></span></code></pre>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partsX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; [1] "sumstat" "index"   "param"   "target"</span></span></code></pre>
 <p>Then we use the elements of the parts list that we just created as
 inputs for <code><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit()</a></code>:</p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># gfit() is a function from the abc R package, not demografr!</span></span>
 <span></span>
 <span><span class="va">gfitX</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsX</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsX</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitX</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model X)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitX-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
-<span><span class="co">#&gt; [1] 0.37</span></span>
+<span><span class="co">#&gt; [1] 0.35</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $s.dist.sim</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;   2.936   3.393   3.792   3.925   4.350   7.145 </span></span>
+<span><span class="co">#&gt;   2.958   3.462   3.822   3.959   4.384   5.866 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dist.obs</span></span>
 <span><span class="co">#&gt; [1] 4.076438</span></span></code></pre>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsY</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcY</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gfitY</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsY</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsY</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitY</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model Y)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitY-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitY</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
-<span><span class="co">#&gt; [1] 0.21</span></span>
+<span><span class="co">#&gt; [1] 0.22</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $s.dist.sim</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;   2.717   3.099   3.407   3.536   3.818   5.478 </span></span>
+<span><span class="co">#&gt;   2.703   3.086   3.423   3.532   3.904   4.941 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dist.obs</span></span>
 <span><span class="co">#&gt; [1] 3.968966</span></span></code></pre>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">partsZ</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="va">abcZ</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">gfitZ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/abc/man/gfit.html" class="external-link">gfit</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">partsZ</span><span class="op">$</span><span class="va">target</span>, sumstat <span class="op">=</span> <span class="va">partsZ</span><span class="op">$</span><span class="va">sumstat</span>, statistic <span class="op">=</span> <span class="va">mean</span>, nb.replicate <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gfitZ</span>, main<span class="op">=</span><span class="st">"Histogram under H0 (model Z)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/gfitZ-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">gfitZ</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; $pvalue</span></span>
-<span><span class="co">#&gt; [1] 0.08</span></span>
+<span><span class="co">#&gt; [1] 0.07</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $s.dist.sim</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;   2.826   3.331   3.808   3.874   4.353   5.538 </span></span>
+<span><span class="co">#&gt;   2.942   3.268   3.733   3.853   4.384   5.915 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $dist.obs</span></span>
 <span><span class="co">#&gt; [1] 5.032494</span></span></code></pre>
 <p>For completeness, here is how we can run <code><a href="https://rdrr.io/pkg/abc/man/gfitpca.html" class="external-link">gfitpca()</a></code> on
 <em>demografr</em> results:</p>
-<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span> <span class="co"># gfitpca() is a function from the abc R package, not demografr!</span></span>
 <span></span>
 <span><span class="va">parts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/unpack.html">unpack</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">abcX</span>, <span class="va">abcY</span>, <span class="va">abcZ</span><span class="op">)</span><span class="op">)</span></span>
@@ -812,23 +916,23 @@ objects as input. Instead, if given a single <em>demografr</em> ABC
 object (generated by the function <code><a href="../reference/run_abc.html">run_abc()</a></code>), it performs
 ABC cross-validation which we can use to gauge the accuracy of ABC and
 the sensitivity of the parameter estimates to the tolerance rate.</p>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"neuralnet"</span><span class="op">)</span></span>
 <span><span class="va">cv_abc_loclinear</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"loclinear"</span><span class="op">)</span></span>
 <span><span class="va">cv_abc_rejection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cross_validate.html">cross_validate</a></span><span class="op">(</span><span class="va">abcX</span>, nval <span class="op">=</span> <span class="fl">10</span>, tols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"rejection"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cv_abc</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Prediction error based on a cross-validation sample of 10</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;               T_1         T_2         T_3          gf        Ne_A        Ne_B</span></span>
-<span><span class="co">#&gt; 0.005 0.112171024 0.023216288 0.040375548 0.437431232 0.018562096 0.012536753</span></span>
-<span><span class="co">#&gt; 0.01  0.094252535 0.095275010 0.051788504 0.152548888 0.012150954 0.021756343</span></span>
-<span><span class="co">#&gt; 0.05  0.062071176 0.130028049 0.093912743 0.118171561 0.004605005 0.053417569</span></span>
+<span><span class="co">#&gt; 0.005 0.066127677 0.059804264 0.127565665 0.176387818 0.016653242 0.033635941</span></span>
+<span><span class="co">#&gt; 0.01  0.076075754 0.028500770 0.055767416 0.238912106 0.009378181 0.021096094</span></span>
+<span><span class="co">#&gt; 0.05  0.054353933 0.062892707 0.113332733 0.330300985 0.026141790 0.087732732</span></span>
 <span><span class="co">#&gt;              Ne_C        Ne_D</span></span>
-<span><span class="co">#&gt; 0.005 0.140588965 0.203781792</span></span>
-<span><span class="co">#&gt; 0.01  0.070048823 0.211564247</span></span>
-<span><span class="co">#&gt; 0.05  0.096731365 0.346318217</span></span></code></pre>
-<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; 0.005 0.425600692 0.268586461</span></span>
+<span><span class="co">#&gt; 0.01  0.330747722 0.210105302</span></span>
+<span><span class="co">#&gt; 0.05  0.296105927 0.171603983</span></span></code></pre>
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cv_abc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/cv_abc-1.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-2.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-3.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-4.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-5.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-6.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-7.png" class="r-plt" width="480" style="display: block; margin: auto;"><img src="vignette-06-diagnostics_files/figure-html/cv_abc-8.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
 </div>
@@ -840,7 +944,7 @@ seems to explain data the best – <code>modelX</code>. Because we
 simulated the data from a (hidden) true, known model, we will also
 visualize the true parameter values as vertical dashed lines to compare
 their values against the posterior distributions of all parameters.</p>
-<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abcX</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; abc::abc(target = observed, param = data$parameters, sumstat = simulated, </span></span>
@@ -858,7 +962,7 @@ their values against the posterior distributions of all parameters.</p>
 <span><span class="co">#&gt; Total number of simulations 10000 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of accepted simulations:  100</span></span></code></pre>
-<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_summary.html">extract_summary</a></span><span class="op">(</span><span class="va">abcX</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; Warning in density.default(x, weights = weights): Selecting bandwidth *not*</span></span>
 <span><span class="co">#&gt; using 'weights'</span></span>
@@ -892,17 +996,17 @@ their values against the posterior distributions of all parameters.</p>
 <span><span class="co">#&gt; Weighted Mode:          857.0188  7408.730  2077.874</span></span>
 <span><span class="co">#&gt; Weighted 97.5 % Perc.: 1482.2222 11379.856  6714.054</span></span>
 <span><span class="co">#&gt; Max.:                  1578.6224 12019.281  7547.764</span></span></code></pre>
-<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">6000</span>, <span class="fl">8000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posterior_Tsplit-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"Ne"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">800</span>, <span class="fl">9000</span>, <span class="fl">4000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posterior_Ne-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcX</span>, param <span class="op">=</span> <span class="st">"gf"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0.1</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -921,7 +1025,7 @@ structure of <code>modelZ</code> is the most appropriate model for our
 data and used it for inference of the split time parameters instead.
 <strong>This is complete non-sense and we show this purely for
 demonstration purposes!</strong></p>
-<div class="sourceCode" id="cb96"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_posterior.html">plot_posterior</a></span><span class="op">(</span><span class="va">abcZ</span>, param <span class="op">=</span> <span class="st">"T"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2000</span>, <span class="fl">6000</span>, <span class="fl">8000</span><span class="op">)</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="vignette-06-diagnostics_files/figure-html/posteriorZ_Tsplit-1.png" class="r-plt" width="480" style="display: block; margin: auto;"></p>

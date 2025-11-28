@@ -65,6 +65,7 @@ which is the ABC estimation itself.</p>
 <span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ts"</span>, <span class="st">"files"</span><span class="op">)</span>,</span>
 <span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  globals <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  attempts <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  engine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -131,6 +132,12 @@ simulated summary statistics?</p></dd>
 functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.</p></dd>
+
+
+<dt id="arg-globals">globals<a class="anchor" aria-label="anchor" href="#arg-globals"></a></dt>
+<dd><p>If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.</p></dd>
 
 
 <dt id="arg-attempts">attempts<a class="anchor" aria-label="anchor" href="#arg-attempts"></a></dt>

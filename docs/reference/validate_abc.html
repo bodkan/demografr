@@ -69,7 +69,9 @@ the provided empirical summary statistics.</p>
 <span>  model_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  engine_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  attempts <span class="op">=</span> <span class="fl">1000</span></span>
+<span>  attempts <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  globals <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -148,6 +150,19 @@ argument for custom simulation script has no effect.</p></dd>
 <dt id="arg-attempts">attempts<a class="anchor" aria-label="anchor" href="#arg-attempts"></a></dt>
 <dd><p>Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)</p></dd>
+
+
+<dt id="arg-packages">packages<a class="anchor" aria-label="anchor" href="#arg-packages"></a></dt>
+<dd><p>A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.</p></dd>
+
+
+<dt id="arg-globals">globals<a class="anchor" aria-label="anchor" href="#arg-globals"></a></dt>
+<dd><p>If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.</p></dd>
 
 </dl></div>
     <div class="section level2">

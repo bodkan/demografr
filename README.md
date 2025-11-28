@@ -25,7 +25,7 @@ simulation-based inference pipelines in population genetics and evolutionary
 biology, such as [Approximate Bayesian Computation](https://en.wikipedia.org/wiki/Approximate_Bayesian_computation)
 (ABC) or parameter grid inferences, and make them more reproducible.
 _demografr_ also aims to make these inferences orders of magnitude faster and
-more efficient by leveraging the [tree sequences](https://tskit.dev/learn/) as
+more efficient by leveraging the [tree sequence](https://tskit.dev/learn/) as
 an internal data structure and computation engine.
 
 Unlike traditional ABC and other simulation-based approaches, which generally
@@ -56,7 +56,7 @@ provides an automated function which simulates ABC replicates drawing
 parameters from priors in a trivial, one-step manner. Automated routines for
 exploring model parameter grids in settings other than ABC are also provided.
 
-3. Because _slendr_ embraces [tree sequence](https://tskit.dev/learn/) as
+3. Because _slendr_ embraces the [tree sequence](https://tskit.dev/learn/) as
 its default internal data structure, most population genetic statistics can be
 computed directly on such tree sequences using R functions which are part of
 _slendr_'s statistical library. A tree sequence is never saved to disk and no
@@ -420,13 +420,13 @@ the function `simulate_model()` simulates data from a single simulation run:
 
 
 ``` r
-run_data <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 
-run_data
+ts
 #> ╔═══════════════════════════╗
 #> ║TreeSequence               ║
 #> ╠═══════════════╤═══════════╣
-#> ║Trees          │      1,537║
+#> ║Trees          │      1,751║
 #> ╟───────────────┼───────────╢
 #> ║Sequence Length│  1,000,000║
 #> ╟───────────────┼───────────╢
@@ -434,30 +434,31 @@ run_data
 #> ╟───────────────┼───────────╢
 #> ║Sample Nodes   │        200║
 #> ╟───────────────┼───────────╢
-#> ║Total Size     │  435.7 KiB║
+#> ║Total Size     │  492.1 KiB║
 #> ╚═══════════════╧═══════════╝
 #> ╔═══════════╤═════╤═════════╤════════════╗
 #> ║Table      │Rows │Size     │Has Metadata║
 #> ╠═══════════╪═════╪═════════╪════════════╣
-#> ║Edges      │6,822│213.2 KiB│          No║
+#> ║Edges      │7,718│241.2 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Individuals│  100│  2.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Migrations │    0│  8 Bytes│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Mutations  │1,747│ 63.1 KiB│          No║
+#> ║Mutations  │2,020│ 73.0 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Nodes      │2,042│ 55.8 KiB│          No║
+#> ║Nodes      │2,219│ 60.7 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Populations│    4│331 Bytes│         Yes║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Provenances│    2│  3.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Sites      │1,746│ 42.6 KiB│          No║
+#> ║Sites      │2,020│ 49.3 KiB│          No║
 #> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
-With this one simulation data instance `run_data` (of which the above-mentioned function
+With this one simulation data instance `ts` (in this case, a tree-sequence
+object of which the above-mentioned function
 `simulate_abc()` would produce millions, making troubleshooting challenging and
 slow),
 we can apply individual summary statistic functions using another helper
@@ -465,32 +466,32 @@ function `summarise_data()`:
 
 
 ``` r
-summarise_data(run_data, functions)
+summarise_data(ts, functions)
 #> $diversity
 #> # A tibble: 4 × 2
-#>   set    diversity
-#>   <chr>      <dbl>
-#> 1 A     0.000125  
-#> 2 B     0.00000324
-#> 3 C     0.0000984 
-#> 4 D     0.0000841 
+#>   set   diversity
+#>   <chr>     <dbl>
+#> 1 A     0.0000696
+#> 2 B     0.0000563
+#> 3 C     0.000169 
+#> 4 D     0.000154 
 #> 
 #> $divergence
 #> # A tibble: 6 × 3
 #>   x     y     divergence
 #>   <chr> <chr>      <dbl>
-#> 1 A     B       0.000303
-#> 2 A     C       0.000296
-#> 3 A     D       0.000289
-#> 4 B     C       0.000117
-#> 5 B     D       0.000121
-#> 6 C     D       0.000110
+#> 1 A     B       0.000268
+#> 2 A     C       0.000275
+#> 3 A     D       0.000284
+#> 4 B     C       0.000193
+#> 5 B     D       0.000209
+#> 6 C     D       0.000188
 #> 
 #> $f4
 #> # A tibble: 1 × 5
-#>   W     X     Y     Z             f4
-#>   <chr> <chr> <chr> <chr>      <dbl>
-#> 1 A     B     C     D     -0.0000057
+#>   W     X     Y     Z              f4
+#>   <chr> <chr> <chr> <chr>       <dbl>
+#> 1 A     B     C     D     -0.00000352
 ```
 
 By comparing the format of this result to the observed data (given in the
