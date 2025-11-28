@@ -11,6 +11,8 @@
   posterior = c("adj", "unadj"),
   strict = FALSE,
   functions = NULL,
+  packages = NULL,
+  globals = NULL,
   ...
 )
 }
@@ -35,6 +37,15 @@ matrix.}
 applied to each simulated tree sequence. If \code{NULL} (the default), the same
 summary statistics will be computed as those that were used in the ABC inference
 itself. Otherwise, custom tree-sequence summary statistics can be provided.}
+
+\item{packages}{A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.}
+
+\item{globals}{If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.}
 
 \item{...}{A formal argument of the \code{predict} generic method (unused)}
 }

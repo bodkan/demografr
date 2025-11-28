@@ -14,12 +14,13 @@ simulate_grid(
   mutation_rate = 0,
   data = NULL,
   format = c("ts", "files"),
-  packages = NULL,
   file = NULL,
   engine = NULL,
   model_args = NULL,
   engine_args = NULL,
-  strict = TRUE
+  strict = TRUE,
+  packages = NULL,
+  globals = NULL
 )
 }
 \arguments{
@@ -46,11 +47,6 @@ arguments of simulated summary statistic functions.}
 \item{format}{In which format will the model generate results to be used for computing
 simulated summary statistics?}
 
-\item{packages}{A character vector with package names used by user-defined summary statistic
-functions. Only relevant when parallelization is set up using \code{future::plan()} to make
-sure that the parallelized tree-sequence summary statistic functions have all of their
-packages available.}
-
 \item{file}{If not \code{NULL}, a path where to save the data frame with simulated grid results.
 If this path is set, the results data frame is returned but invisibly.}
 
@@ -71,6 +67,15 @@ argument for custom simulation script has no effect.}
 \item{strict}{Should parameter combinations leading to invalid slendr models be treated as
 an error? Default is \code{TRUE}. If set to \code{FALSE}, invalid simulations will be simply
 dropped, with an informative message.}
+
+\item{packages}{A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.}
+
+\item{globals}{If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.}
 }
 \value{
 If \code{file != NULL}, returns a data frame with simulated grid results. Otherwise
