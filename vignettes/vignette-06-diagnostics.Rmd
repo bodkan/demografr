@@ -636,7 +636,63 @@ unnests, reformats, and renames the list-columns with summary statistics stored
 in the `predictions` data frame above. You can do all the processing based on
 the `predictions` object above.
 
+### Posterior predictive checks using new statistics
 
+In situations in which you might be interested in performing a posterior predictive check
+using a different set of statistics rather than the summary statistics used in
+the posterior inference in the first phase of your workflow (see, for instance,
+[this](https://stats.stackexchange.com/a/125576) discussion and associated
+references for more detail on why this might or might not be a valuable thing to
+do), you can use the optional argument `functions =` of the function `predict()`.
+Just like any other instances of this argument in functions such as
+`simulate_abc()`, this argument specifies a named list of summary functions. You can then
+compare the posterior predictions of these new summary statistics.
+Of course, as discussed in the link above, this might be easier said than done
+in practice because when we do ABC, we should be _already_ using the best
+summary statistics we can, but it's worth mentioning this possibility here for
+cases in which this might be relevant.
+
+For instance, let's say that our new summary statistics are AFS vectors in each
+of our four populations, which can be computed by the following tree-sequence
+summary statistics in R:
+
+```{r}
+compute_afs <- function(ts, pop) {
+  # extract 25 individuals from a given population
+  samples <- ts_names(ts, split = "pop")[pop]
+  # compute AFS for those individuals
+  ts_afs(ts, sample_sets = samples)
+}
+
+afs_functions <- list(
+  afs_A = function(ts) compute_afs(ts, "A"),
+  afs_B = function(ts) compute_afs(ts, "B"),
+  afs_C = function(ts) compute_afs(ts, "C"),
+  afs_D = function(ts) compute_afs(ts, "D")
+)
+```
+
+Again, it's always useful to sanity check our functions definitions, which we
+do it by computing these statistics from a single simulated tree sequence (we
+make it tiny to make things faster&mdash;the point is to test whether our
+new summary statistics functions even run the way we want them to):
+
+```{r}
+ts <- simulate_model(modelX, priors, sequence_length = 1e6, recombination_rate = 0, mutation_rate = 1e-8)
+```
+
+```{r}
+summarise_data(ts, afs_functions)
+```
+
+Now we can finally get the posterior predictive distributions of the new
+summary statistics (per-population AFS vectors), which are again stored as
+[nested list-columns](https://tidyr.tidyverse.org/articles/nest.html):
+
+```{r}
+pred_afs <- predict(abcX, samples = 10, posterior = "unadj", functions = new_functions)
+pred_afs
+```
 
 ## Additional diagnostics and backwards compatibility with the _abc_ package
 
