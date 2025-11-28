@@ -35,6 +35,8 @@ predY_path <- get_cache("examples/downstream_predY.rds")
 predZ_path <- get_cache("examples/downstream_predZ.rds")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
 
+pred_afs_path <- get_cache("examples/downstream_pred_afs.rds")
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -657,18 +659,11 @@ of our four populations, which can be computed by the following tree-sequence
 summary statistics in R:
 
 ```{r}
-compute_afs <- function(ts, pop) {
-  # extract 25 individuals from a given population
-  samples <- ts_names(ts, split = "pop")[pop]
-  # compute AFS for those individuals
-  ts_afs(ts, sample_sets = samples)
-}
-
 afs_functions <- list(
-  afs_A = function(ts) compute_afs(ts, "A"),
-  afs_B = function(ts) compute_afs(ts, "B"),
-  afs_C = function(ts) compute_afs(ts, "C"),
-  afs_D = function(ts) compute_afs(ts, "D")
+  afs_A = function(ts) { samples <- ts_names(ts, split = "pop")["A"]; ts_afs(ts, sample_sets = samples) },
+  afs_B = function(ts) { samples <- ts_names(ts, split = "pop")["B"]; ts_afs(ts, sample_sets = samples) },
+  afs_C = function(ts) { samples <- ts_names(ts, split = "pop")["C"]; ts_afs(ts, sample_sets = samples) },
+  afs_D = function(ts) { samples <- ts_names(ts, split = "pop")["D"]; ts_afs(ts, sample_sets = samples) }
 )
 ```
 
@@ -689,10 +684,30 @@ Now we can finally get the posterior predictive distributions of the new
 summary statistics (per-population AFS vectors), which are again stored as
 [nested list-columns](https://tidyr.tidyverse.org/articles/nest.html):
 
-```{r}
-pred_afs <- predict(abcX, samples = 10, posterior = "unadj", functions = new_functions)
-pred_afs
+```{r, eval=!on_windows && !pred_afs_exists}
+plan(multisession, workers = availableCores())
+pred_afs <- predict(abcX, samples = 1000, posterior = "unadj", functions = afs_functions)
 ```
+
+```{r, echo=FALSE, eval=!on_windows && !pred_afs_exists}
+saveRDS(pred_afs, pred_afs_path)
+```
+
+```{r, echo=FALSE, eval=pred_afs_exists}
+pred_afs <- readRDS(pred_afs_path)
+```
+
+This means that each of those `afs_...` list columns contains an AFS for the
+corresponding population for each given replicate:
+
+```{r}
+pred_sfs
+```
+
+```{r}
+pred_afs[1, ]$afs_A
+```
+
 
 ## Additional diagnostics and backwards compatibility with the _abc_ package
 
