@@ -17,6 +17,7 @@ simulate_abc(
   format = c("ts", "files"),
   file = NULL,
   packages = NULL,
+  globals = NULL,
   attempts = 1000,
   engine = NULL,
   model_args = NULL,
@@ -56,6 +57,10 @@ simulated summary statistics?}
 functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 sure that the parallelized tree-sequence summary statistic functions have all of their
 packages available.}
+
+\item{globals}{If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.}
 
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}

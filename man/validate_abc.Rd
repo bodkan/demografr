@@ -18,7 +18,9 @@ validate_abc(
   model_args = NULL,
   engine_args = NULL,
   quiet = FALSE,
-  attempts = 1000
+  attempts = 1000,
+  packages = NULL,
+  globals = NULL
 )
 }
 \arguments{
@@ -66,6 +68,15 @@ argument for custom simulation script has no effect.}
 
 \item{attempts}{Maximum number of attempts to generate prior values for a valid demographic
 model (default is 1000)}
+
+\item{packages}{A character vector with package names used by user-defined summary statistic
+functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+sure that the parallelized tree-sequence summary statistic functions have all of their
+packages available.}
+
+\item{globals}{If a summary statistic function depends on object(s) in the R session which
+would not be available in separate parallel simulation processes, the names of such object(s)
+can be specified here, and they will be passed to each such separate process.}
 }
 \value{
 No return value. The function is ran for its terminal output.
