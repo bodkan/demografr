@@ -25,6 +25,9 @@
 #'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
 #'   sure that the parallelized tree-sequence summary statistic functions have all of their
 #'   packages available.
+#' @param globals If a summary statistic function depends on object(s) in the R session which
+#'   would not be available in separate parallel simulation processes, the names of such object(s)
+#'   can be specified here, and they will be passed to each such separate process.
 #' @param attempts Maximum number of attempts to generate prior values for a valid demographic
 #'   model (default is 1000)
 #' @param engine Which simulation engine to use? Values "msprime" and "slim" will use one of
@@ -49,7 +52,7 @@ simulate_abc <- function(
   model, priors, functions, observed, iterations,
   sequence_length, recombination_rate, mutation_rate = 0,
   data = NULL, format = c("ts", "files"),
-  file = NULL, packages = NULL, attempts = 1000,
+  file = NULL, packages = NULL, globals = NULL, attempts = 1000,
   engine = NULL, model_args = NULL, engine_args = NULL
 ) {
   # make sure warnings are reported immediately before simulations are even started
@@ -86,14 +89,16 @@ simulate_abc <- function(
 
   # collect all required global objects, in case the ABC simulations will run in
   # multiple parallel sessions
-  globals <- c(
+  global_symbols <- c(
     lapply(priors, function(p) as.character(as.list(as.list(p)[[3]])[[1]])),
     names(model_args),
     names(engine_args),
     names(functions)
   ) %>%
     unlist() %>%
-    unique()
+    unique() %>%
+    c(globals, .)
+  if (is.null(globals)) global_symbols <- TRUE
 
   if (is.function(model))
     priors <- expand_formulas(priors, model, model_args) #%>% strip_prior_environments()
@@ -141,7 +146,7 @@ simulate_abc <- function(
       )
     },
     future.seed = TRUE,
-    future.globals = globals,
+    future.globals = global_symbols,
     future.packages = c("slendr", packages)
   )
 
@@ -192,7 +197,8 @@ simulate_abc <- function(
     engine = engine,
     model_args = model_args,
     engine_args = engine_args,
-    packages = packages
+    packages = packages,
+    globals = global_symbols
   )
   if (!missing(sequence_length)) opts$sequence_length <- sequence_length
   if (!missing(recombination_rate)) opts$recombination_rate <- recombination_rate

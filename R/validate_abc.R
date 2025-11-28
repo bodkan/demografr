@@ -36,6 +36,13 @@
 #'   Setting this argument for custom simulation script has no effect.
 #' @param engine_args Optional arguments for the slendr simulation back end. Setting this
 #'   argument for custom simulation script has no effect.
+#' @param packages A character vector with package names used by user-defined summary statistic
+#'   functions. Only relevant when parallelization is set up using \code{future::plan()} to make
+#'   sure that the parallelized tree-sequence summary statistic functions have all of their
+#'   packages available.
+#' @param globals If a summary statistic function depends on object(s) in the R session which
+#'   would not be available in separate parallel simulation processes, the names of such object(s)
+#'   can be specified here, and they will be passed to each such separate process.
 #'
 #' @return No return value. The function is ran for its terminal output.
 #'
@@ -46,7 +53,7 @@ validate_abc <- function(model, priors, functions, observed,
                          sequence_length, recombination_rate, mutation_rate = 0,
                          format = c("ts", "files"), data = NULL,
                          engine = NULL, model_args = NULL, engine_args = NULL,
-                         quiet = FALSE, attempts = 1000) {
+                         quiet = FALSE, attempts = 1000, packages = NULL, globals = NULL) {
   format <- match.arg(format)
 
   if (!arg_present(model) || !arg_present(priors) || !arg_present(functions) || !arg_present(observed) ||!length(priors))

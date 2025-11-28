@@ -123,7 +123,7 @@ predict.demografr_abc.abc <- function(object, samples, stat = NULL, posterior = 
     engine = opts$engine, model_args = opts$model_args, engine_args = opts$engine_args,
     strict = strict,
     packages = c(opts$packages, packages),
-    globals = c(opts$globals, globals)
+    globals = unique(c(opts$globals, globals))
   )
   # replace the replicate number from simulate_grid by actual numbers of each
   # posterior draw for easier downstream analysis
