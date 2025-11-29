@@ -94,7 +94,6 @@ simulate_grid <- function(
     unlist() %>%
     unique() %>%
     c(globals, model_name, summary_name, data_name, .) # TODO: Check if this is really needed in all instances
-  if (is.null(globals)) global_symbols <- TRUE
 
   # prepare the grid data frame for storing the results
   grid <- lapply(

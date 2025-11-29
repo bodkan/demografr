@@ -89,7 +89,6 @@ simulate_abc <- function(
     unlist() %>%
     unique() %>%
     c(globals, .)
-  if (is.null(globals)) global_symbols <- TRUE
 
   if (is.function(model))
     priors <- expand_formulas(priors, model, model_args) #%>% strip_prior_environments()
