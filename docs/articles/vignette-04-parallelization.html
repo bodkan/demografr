@@ -202,8 +202,8 @@ simulations would be run <em>sequentially</em>:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     1  <span style="text-decoration: underline;">1</span>000  <span style="text-decoration: underline;">1</span>000 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
-<p><strong>The total runtime for the grid simulations was 0 hours 3
-minutes 7 seconds parallelized across 10 CPUs.</strong></p>
+<p><strong>The total runtime for the grid simulations was 0 hours 2
+minutes 52 seconds parallelized across 10 CPUs.</strong></p>
 </div>
 <div class="section level3">
 <h3 id="parallelization-across-cpus-of-one-machine">Parallelization across CPUs of one machine<a class="anchor" aria-label="anchor" href="#parallelization-across-cpus-of-one-machine"></a>
@@ -223,9 +223,14 @@ automatically leverage whatever parallelization scheme you set up via
 <em>future</em>’s function <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>                      sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">data</span></span></code></pre></div>
+<span>                      sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Warning in file.symlink(target, symlink): cannot symlink</span></span>
+<span><span class="co">#&gt; '/Users/mp/Library/r-miniconda-arm64/envs/Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2/lib/lib'</span></span>
+<span><span class="co">#&gt; to</span></span>
+<span><span class="co">#&gt; '/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/rstudio-fallback-library-path-2091760749',</span></span>
+<span><span class="co">#&gt; reason 'File exists'</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data</span></span></code></pre></div>
 <pre><code><span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 90 × 4</span></span></span>
 <span><span class="co">#&gt;      rep Ne_p1 Ne_p2 diversity       </span></span>
 <span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>          </span></span>
@@ -241,7 +246,7 @@ automatically leverage whatever parallelization scheme you set up via
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     2    10    10 <span style="color: #949494;">&lt;tibble [2 × 2]&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 80 more rows</span></span></span></code></pre>
 <p><strong>The total runtime for the grid simulations was 0 hours 0
-minutes 33 seconds parallelized across 10 CPUs.</strong></p>
+minutes 34 seconds parallelized across 10 CPUs.</strong></p>
 <p>Notice the speed up even for this trivial simulation pipeline!</p>
 </div>
 <div class="section level3">
@@ -257,7 +262,7 @@ with available R as well as <em>demografr</em> and <em>slendr</em> R
 packages, with set up <em>slendr</em> environments. In other words, you
 can start an R interpreter on each of these machines and eventually
 call:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/demografr" class="external-link">demografr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/bodkan/slendr" class="external-link">slendr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/slendr/man/init_env.html" class="external-link">init_env</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -265,7 +270,7 @@ call:</p>
 <p>Then, you can distribute the <code><a href="../reference/simulate_grid.html">simulate_grid()</a></code> run (but
 also <code><a href="../reference/simulate_abc.html">simulate_abc()</a></code>, of course!) simply by adjusting the
 <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan()</a></code> setup like this:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hostnames</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"server01"</span>, <span class="st">"server02"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="va">hostnames</span><span class="op">)</span></span></code></pre></div>
 <p>We won’t be running this example here in practice because the
@@ -283,7 +288,7 @@ the parallelization <code><a href="https://future.futureverse.org/reference/plan
 simulation runs of <em>demografr</em> will be run in a sequential
 manner, because the default mode of operation for the <em>future</em> R
 package is the following plan:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">sequential</span><span class="op">)</span></span></code></pre></div>
 <p>But this is just for completeness. It’s not something that makes much
 sense to do in practice, perhaps beyond debugging parallelization
@@ -306,23 +311,18 @@ into a single data set.</p>
 across two different computers like this (we were originally interested
 in distributing 10 replicates, so we’ll run two times five replicates
 individually):</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run1_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span><span class="va">run2_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># on machine #1</span></span>
 <span><span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>              sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, file <span class="op">=</span> <span class="va">run1_file</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Warning in file.symlink(target, symlink): cannot symlink</span></span>
-<span><span class="co">#&gt; '/Users/mp/Library/r-miniconda-arm64/envs/Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2/lib/lib'</span></span>
-<span><span class="co">#&gt; to</span></span>
-<span><span class="co">#&gt; '/var/folders/lq/bl36db_s6w908hnjkntdp4140000gn/T/rstudio-fallback-library-path-2091760749/lib',</span></span>
-<span><span class="co">#&gt; reason 'File exists'</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># on machine #2</span></span>
+<span>              sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, file <span class="op">=</span> <span class="va">run1_file</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># on machine #2</span></span>
 <span><span class="fu"><a href="../reference/simulate_grid.html">simulate_grid</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">grid</span>, <span class="va">functions</span>, replicates <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>              sequence_length <span class="op">=</span> <span class="fl">100000</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span>, file <span class="op">=</span> <span class="va">run2_file</span><span class="op">)</span></span></code></pre></div>
 <p>Then, once we collected the individual <code>.rds</code> files on a
