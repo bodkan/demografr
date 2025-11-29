@@ -4,6 +4,7 @@ library(slendr)
 init_env(quiet = TRUE)
 
 SEED <- 42
+set.seed(SEED)
 
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
   p1 <- population("p1", time = 1, N = 1000)
@@ -29,9 +30,7 @@ samples <- list(
 
 m <- model(100, 2000, 5000, 800, 1000, 3000, 4000)
 
-ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = 42)
-
-set.seed(SEED)
+ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = SEED)
 
 samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
 
@@ -193,8 +192,8 @@ test_that("errors in prior sampling are correctly caught", {
 test_that("an error is raised with SLiM ABC on non-serialized models", {
   skip_if(Sys.which("slim") == "")
   expect_error(
-    utils::capture.output(simulate_abc(model, priors, functions, observed, iterations = 1,
-                 sequence_length = 1e6, recombination_rate = 0, engine = "slim")),
+    suppressWarnings(utils::capture.output(simulate_abc(model, priors, functions, observed, iterations = 1,
+                 sequence_length = 1e6, recombination_rate = 0, engine = "slim"))),
     "An unexpected error was raised when generating data from a slendr model
 using the provided slendr function.
 
