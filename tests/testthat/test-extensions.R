@@ -122,7 +122,7 @@ test_that("format = 'files' produces only a .trees file (msprime)", {
   data <- simulate_model(
     model, priors,
     sequence_length = 1e6, recombination_rate = 0,
-    model_args = list(origin_pop = "EUR", target_pop = "EUR"), engine_args = list(random_seed = 42),
+    model_args = list(origin_pop = "EUR", target_pop = "EUR"),
     engine = "msprime",
     format = "files",
     data = list(path = path),
@@ -133,7 +133,7 @@ test_that("format = 'files' produces only a .trees file (msprime)", {
   data <- simulate_model(
     model, priors,
     sequence_length = 1e6, recombination_rate = 0,
-    model_args = list(origin_pop = "EUR", target_pop = "EUR"), engine_args = list(random_seed = 42),
+    model_args = list(origin_pop = "EUR", target_pop = "EUR"),
     engine = "msprime",
     format = "files",
     data = list(

@@ -74,7 +74,7 @@ test_that("expand_fromulas() produces parameters equal to formal arguments of a 
   expect_true(all(get_param_names(expanded_priors) == names(formals(model))))
 })
 
-test_that("With the same seed, both sets of priors give the same tree sequence", {
+test_that("assuming the same random seed, both sets of priors give the same tree sequence", {
   expanded_priors <- expand_formulas(templated_priors, model)
 
   # first seed is for prior sampling, second for tree sequence generation

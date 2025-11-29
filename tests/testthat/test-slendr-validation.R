@@ -3,9 +3,6 @@ skip_if(!slendr::check_dependencies(python = TRUE, slim = TRUE))
 library(slendr)
 init_env(quiet = TRUE)
 
-SEED <- 42
-set.seed(SEED)
-
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4, T_p1_p2, T_p2_p3, T_p3_p4) {
   p1 <- population("p1", time = 1, N = 1000)
   p2 <- population("p2", time = T_p1_p2, N = 3000, parent = p1)
@@ -30,7 +27,7 @@ samples <- list(
 
 m <- model(100, 2000, 5000, 800, 1000, 3000, 4000)
 
-ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0, random_seed = SEED)
+ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0)
 
 samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
 

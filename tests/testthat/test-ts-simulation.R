@@ -1,8 +1,6 @@
 skip_if(!slendr::check_dependencies(python = TRUE, slim = TRUE))
 slendr::init_env(quiet = TRUE)
 
-SEED <- 42
-
 model <- function(Ne_p1, Ne_p2, Ne_p3, Ne_p4) {
   p1 <- slendr::population("p1", time = 1, N = 1000)
   p2 <- slendr::population("p2", time = 20, N = 3000, parent = p1)
