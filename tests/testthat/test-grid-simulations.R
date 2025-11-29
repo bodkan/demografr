@@ -82,8 +82,6 @@ test_that("completely invalid grids lead to an error", {
   )
 })
 
-This test crashed on Windows, but I'm 100% sure it worked in other runs,
-and definitely worked on Linux and macOS. Commenting it out for now.
 test_that("partially invalid grids only retain valid simulations", {
   grid <- data.frame(
     Ne_A = 1, Ne_B = 1, Ne_C = 1, Ne_D = 1,
