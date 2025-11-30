@@ -318,7 +318,7 @@ plan(multisession, workers = availableCores())
 tstart <- Sys.time()
 ```
 
-```{r}
+```{r, eval=!file.exists(data_path)}
 results <- simulate_grid(
   model, grid, functions, replicates = 50,
   sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
@@ -355,7 +355,7 @@ parallelized across `r ncores` CPUs.**
 saveRDS(results, data_path)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=file.exists(data_path)}
 results <- readRDS(data_path)
 ```
 
