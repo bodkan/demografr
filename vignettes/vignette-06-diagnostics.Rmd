@@ -12,10 +12,10 @@ slendr_present <- slendr::check_dependencies(python = TRUE)
 on_windows <- Sys.info()[["sysname"]] == "Windows"
 
 get_cache <- function(path) {
-  if (Sys.getenv("RERUN") != "TRUE")
-    return(file.path(system.file(path, package = "demografr")))
-  else
+  if (Sys.getenv("RERUN") == "TRUE" || file.exists(here::here(file.path("inst/", path))))
     return(here::here(file.path("inst/", path)))
+  else
+    return(file.path(system.file(path, package = "demografr")))
 }
 
 unpack <- demografr::unpack
