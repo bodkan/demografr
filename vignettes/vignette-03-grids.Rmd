@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = !file.exists(data_path) && slendr_present && Sys.getenv("RUNNER_OS") == "" # don't rerun on CRAN or GHA (no rds)
+  eval = file.exists(data_path) && slendr_present
 )
 ```
 
@@ -337,7 +337,7 @@ saveRDS(tdelta, get_cache("examples/grid_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/grid_ncores.rds"))
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tdelta <- readRDS(get_cache("examples/grid_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/grid_ncores.rds"))
 ```
