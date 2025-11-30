@@ -352,7 +352,7 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
 parallelized across `r ncores` CPUs.**
 
-```{r, echo=FALSE, eval=rerun}}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(results, data_path)
 ```
 
