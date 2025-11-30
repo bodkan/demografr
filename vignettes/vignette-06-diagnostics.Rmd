@@ -363,7 +363,7 @@ abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
 abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE eval=!on_windows && !abc_exists && rerun}
+```{r, echo=FALSE, eval=!on_windows && !abc_exists && rerun}
 saveRDS(abcX, abcX_path)
 saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
