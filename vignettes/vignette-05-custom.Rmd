@@ -74,7 +74,7 @@ init_env(quiet = TRUE)
 Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
 population given that we observed the following value of nucleotide diversity:
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(path_observed) && rerun}}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(path_observed) && rerun}
 ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
   msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
@@ -326,7 +326,7 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path1) && rerun}}
+```{r, eval=!on_windows && !file.exists(abc_path1) && rerun}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -342,7 +342,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1) && rerun}}
+```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1) && rerun}
 saveRDS(tdelta, get_cache("examples/custom_tdelta1.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores1.rds"))
 ```
