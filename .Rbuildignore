@@ -17,7 +17,7 @@ Dockerfile
 ^inst/examples/downstream_abc.*$
 ^inst/examples/downstream_data.*$
 ^inst/examples/custom_abc.*$
-^inst/examples/grid_.*$
+^inst/examples/grid_.data*$
 vignettes/vignette-07-selection.Rmd
 vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
