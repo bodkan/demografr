@@ -15,10 +15,10 @@ vignette: >
 slendr_present <- slendr::check_dependencies(python = TRUE)
 
 get_cache <- function(path) {
-  if (Sys.getenv("RERUN") == "TRUE" || file.exists(here::here(file.path("inst/", path))))
-    return(here::here(file.path("inst/", path)))
-  else
+  if (Sys.getenv("RERUN") != "TRUE")
     return(file.path(system.file(path, package = "demografr")))
+  else
+    return(here::here(file.path("inst/", path)))
 }
 
 data_path <- get_cache("examples/grid_data.rds")
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = slendr_present
+  eval = !file.exists(data_path) && slendr_present && Sys.getenv("RUNNER_OS") == "" # don't rerun on CRAN or GHA (no rds)
 )
 ```
 
