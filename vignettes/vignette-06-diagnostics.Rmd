@@ -10,6 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE)
 on_windows <- Sys.info()[["sysname"]] == "Windows"
+rerun <- Sys.getenv("RERUN") == "TRUE"
 
 get_cache <- function(path) {
   if (Sys.getenv("RERUN") != "TRUE")
@@ -327,7 +328,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !data_exists && Sys.getenv("RERUN") == "TRUE"}}
+```{r, echo=FALSE, eval=!on_windows && !data_exists && rerun}
 saveRDS(tdelta, get_cache("examples/downstream_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/downstream_ncores.rds"))
 saveRDS(dataX, dataX_path)
@@ -362,7 +363,7 @@ abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
 abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE eval=!on_windows && !abc_exists && Sys.getenv("RERUN") == "TRUE"}}
+```{r, echo=FALSE eval=!on_windows && !abc_exists && rerun}
 saveRDS(abcX, abcX_path)
 saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
@@ -560,7 +561,7 @@ predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !pred_exists && Sys.getenv("RERUN") == "TRUE"}}
+```{r, echo=FALSE, eval=!on_windows && !pred_exists && rerun}
 saveRDS(predX, predX_path)
 saveRDS(predY, predY_path)
 saveRDS(predZ, predZ_path)
