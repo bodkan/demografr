@@ -331,7 +331,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=Sys.getenv("RERUN") == "TRUE"}
 saveRDS(tdelta, get_cache("examples/grid_tdelta.rds"))
 saveRDS(ncores, get_cache("examples/grid_ncores.rds"))
 ```
@@ -351,7 +351,7 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
 parallelized across `r ncores` CPUs.**
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=Sys.getenv("RERUN") == "TRUE"}}
 saveRDS(results, data_path)
 ```
 
