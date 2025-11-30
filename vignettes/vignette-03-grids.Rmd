@@ -318,7 +318,7 @@ plan(multisession, workers = availableCores())
 tstart <- Sys.time()
 ```
 
-```{r, eval=!file.exists(data_path)}
+```{r, eval=!file.exists(data_path) && Sys.getenv("RERUN") == "TRUE"}
 results <- simulate_grid(
   model, grid, functions, replicates = 50,
   sequence_length = 25e6, mutation_rate = 1e-8, recombination_rate = 1e-8
