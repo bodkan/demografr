@@ -307,17 +307,17 @@ them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !data_exists}
+```{r, eval=!on_windows && !data_exists && rerun}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!on_windows && !data_exists}
+```{r, eval=!on_windows && !data_exists && rerun}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!on_windows && !data_exists}
+```{r, eval=!on_windows && !data_exists && rerun}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
