@@ -17,13 +17,12 @@ Dockerfile
 ^inst/examples/downstream_abc.*$
 ^inst/examples/downstream_data.*$
 ^inst/examples/custom_abc.*$
-^inst/examples/grid_data.*$
-vignettes/vignette-05-custom.Rmd
-vignettes/vignette-06-diagnostics.Rmd
+^inst/examples/grid_.data*$
 vignettes/vignette-07-selection.Rmd
 vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
 vignettes/vignette-10-benchmarking.Rmd
+.Rbuildignore_GitHub
 cran-comments.md
 devdeps.R
 drawing.png
