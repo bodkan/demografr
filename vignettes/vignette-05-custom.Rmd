@@ -9,14 +9,10 @@ vignette: >
 
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE, slim = TRUE)
-on_windows <- Sys.info()[["sysname"]] == "Windows"
 rerun <- Sys.getenv("RERUN") == "TRUE"
 
 get_cache <- function(path) {
-  if (Sys.getenv("RERUN") == "TRUE")
-    return(here::here(file.path("inst/", path)))
-  else
-    return(file.path(system.file(path, package = "demografr")))
+  return(here::here(file.path("inst/", path)))
 }
 
 path_observed <- get_cache("examples/custom_diversity.rds")
@@ -25,6 +21,8 @@ abc_path2 <- get_cache("examples/custom_abc2.rds")
 abc_path3 <- get_cache("examples/custom_abc3.rds")
 abc_path4 <- get_cache("examples/custom_abc4.rds")
 
+abc_exists <- all(sapply(list(abc_path1, abc_path2, abc_path3, abc_path4), file.exists))
+
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -32,7 +30,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = slendr_present && !on_windows
+  eval = slendr_present && abc_exists
 )
 ```
 
@@ -74,7 +72,7 @@ init_env(quiet = TRUE)
 Suppose that we intent to use ABC to infer the $N_e$ of a constant-sized
 population given that we observed the following value of nucleotide diversity:
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(path_observed) && rerun}
+```{r, echo=FALSE, eval=rerun}
 ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
   msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
@@ -326,7 +324,7 @@ place of the `model` argument:
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path1) && rerun}
+```{r, eval=rerun}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -336,13 +334,13 @@ data <- simulate_abc(
 )
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1) && rerun}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(tdelta, get_cache("examples/custom_tdelta1.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores1.rds"))
 ```
@@ -365,15 +363,15 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!on_windows && !file.exists(abc_path1) && rerun}
+```{r, eval=rerun}
 abc <- run_abc(data, tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path1) && rerun}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(abc, abc_path1)
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path1)}
+```{r, echo=FALSE}
 abc <- readRDS(abc_path1)
 ```
 
@@ -536,7 +534,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path2) && rerun}
+```{r, eval=rerun}
 library(future)
 plan(multisession, workers = availableCores()) # parallelize across all CPUs
 
@@ -552,7 +550,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path2)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(tdelta, get_cache("examples/custom_tdelta2.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores2.rds"))
 ```
@@ -575,17 +573,18 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!on_windows && !file.exists(abc_path2)}
+```{r, eval=rerun}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path2)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(abc, abc_path2)
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path2)}
+```{r, echo=FALSE}
 abc <- readRDS(abc_path2)
 ```
+
 ```{r}
 extract_summary(abc)
 ```
@@ -676,7 +675,7 @@ validate_abc(python_script, priors, functions, observed, data = gens, format = "
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path3) && rerun}
+```{r, eval=rerun}
 library(future)
 plan(multisession, workers = availableCores())
 
@@ -692,7 +691,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path3)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(tdelta, get_cache("examples/custom_tdelta3.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores3.rds"))
 ```
@@ -715,17 +714,18 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!on_windows && !file.exists(abc_path3)}
+```{r, eval=rerun}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path3)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(abc, abc_path3)
 ```
 
-```{r, echo=FALSE, eval=file.exists(abc_path3)}
+```{r, echo=FALSE}
 abc <- readRDS(abc_path3)
 ```
+
 ```{r}
 extract_summary(abc)
 ```
@@ -847,7 +847,7 @@ validate_abc(model, priors, functions, observed,
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !file.exists(abc_path4) && rerun}
+```{r, eval=rerun}
 library(future)
 plan(multisession, workers = availableCores())
 
@@ -863,7 +863,7 @@ tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path4)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(tdelta, get_cache("examples/custom_tdelta4.rds"))
 saveRDS(ncores, get_cache("examples/custom_ncores4.rds"))
 ```
@@ -886,11 +886,11 @@ parallelized across `r ncores` CPUs.**
 Once the simulations are finished, we can perform inference of the posterior
 distribution of the single parameter of our model, $N_e$:
 
-```{r, eval=!on_windows && !file.exists(abc_path4)}
+```{r, eval=rerun}
 abc <- run_abc(data, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !file.exists(abc_path4)}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(abc, abc_path4)
 ```
 

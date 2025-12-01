@@ -9,14 +9,10 @@ vignette: >
 
 ```{r, include = FALSE}
 slendr_present <- slendr::check_dependencies(python = TRUE)
-on_windows <- Sys.info()[["sysname"]] == "Windows"
 rerun <- Sys.getenv("RERUN") == "TRUE"
 
 get_cache <- function(path) {
-  if (Sys.getenv("RERUN") != "TRUE")
-    return(file.path(system.file(path, package = "demografr")))
-  else
-    return(here::here(file.path("inst/", path)))
+  return(here::here(file.path("inst/", path)))
 }
 
 unpack <- demografr::unpack
@@ -36,8 +32,6 @@ predY_path <- get_cache("examples/downstream_predY.rds")
 predZ_path <- get_cache("examples/downstream_predZ.rds")
 pred_exists <- all(c(file.exists(predX_path), file.exists(predY_path), file.exists(predZ_path)))
 
-pred_afs_path <- get_cache("examples/downstream_pred_afs.rds")
-
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "#>",
@@ -45,7 +39,7 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 5,
   dpi = 60,
-  eval = slendr_present && !on_windows
+  eval = slendr_present && data_exists && abc_exists && pred_exists
 )
 
 set.seed(42)
@@ -303,46 +297,49 @@ With that out of the way, we can proceed with generating simulated data for
 inference using all three models. What we'll do is perform three runs and save
 them into appropriately named variables `dataX`, `dataY`, and `dataZ`:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tstart <- Sys.time()
 ```
 
-```{r, eval=!on_windows && !data_exists && rerun}
+```{r, eval=rerun}
 dataX <- simulate_abc(modelX, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!on_windows && !data_exists && rerun}
+```{r, eval=rerun}
 dataY <- simulate_abc(modelY, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, eval=!on_windows && !data_exists && rerun}
+```{r, eval=rerun}
 dataZ <- simulate_abc(modelZ, priors, functions, observed, iterations = 10000,
                       sequence_length = 10e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=TRUE}
 tend <- Sys.time()
 tdelta <- as.numeric(difftime(tend, tstart, units = "secs"))
 ncores <- future::availableCores()
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !data_exists && rerun}
-saveRDS(tdelta, get_cache("examples/downstream_tdelta.rds"))
-saveRDS(ncores, get_cache("examples/downstream_ncores.rds"))
+```{r, echo=FALSE, eval=rerun}
 saveRDS(dataX, dataX_path)
 saveRDS(dataY, dataY_path)
 saveRDS(dataZ, dataZ_path)
 ```
 
-```{r, echo=FALSE, eval=data_exists}
+```{r, echo=FALSE}
 dataX <- readRDS(dataX_path)
 dataY <- readRDS(dataY_path)
 dataZ <- readRDS(dataZ_path)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r, echo=FALSE, eval=rerun}
+saveRDS(tdelta, get_cache("examples/downstream_tdelta.rds"))
+saveRDS(ncores, get_cache("examples/downstream_ncores.rds"))
+```
+
+```{r, echo=FALSE}
 tdelta <- readRDS(get_cache("examples/downstream_tdelta.rds"))
 ncores <- readRDS(get_cache("examples/downstream_ncores.rds"))
 ```
@@ -357,19 +354,19 @@ seconds <- round(tdelta - hours * 3600 - minutes * 60)
 `r paste(hours, "hours", minutes, "minutes", seconds, "seconds")`
 parallelized across `r ncores` CPUs.**
 
-```{r, eval=!on_windows && !abc_exists & rerun, results="hide"}
+```{r, eval=rerun, results="hide"}
 abcX <- run_abc(dataX, engine = "abc", tol = 0.01, method = "neuralnet")
 abcY <- run_abc(dataY, engine = "abc", tol = 0.01, method = "neuralnet")
 abcZ <- run_abc(dataZ, engine = "abc", tol = 0.01, method = "neuralnet")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !abc_exists && rerun}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(abcX, abcX_path)
 saveRDS(abcY, abcY_path)
 saveRDS(abcZ, abcZ_path)
 ```
 
-```{r, eval=abc_exists, echo=FALSE}
+```{r, echo=FALSE}
 abcX <- readRDS(abcX_path)
 abcY <- readRDS(abcY_path)
 abcZ <- readRDS(abcZ_path)
@@ -554,20 +551,20 @@ statistics. Naturally, only if the model can generate statistics compatible
 with the values observed in real data can we regard the model as sensible and
 usable for inference.
 
-```{r, eval=!on_windows && !pred_exists}
+```{r, eval=rerun}
 plan(multisession, workers = availableCores())
 predX <- predict(abcX, samples = 1000, posterior = "unadj")
 predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
 ```
 
-```{r, echo=FALSE, eval=!on_windows && !pred_exists && rerun}
+```{r, echo=FALSE, eval=rerun}
 saveRDS(predX, predX_path)
 saveRDS(predY, predY_path)
 saveRDS(predZ, predZ_path)
 ```
 
-```{r, echo=FALSE, eval=pred_exists}
+```{r, echo=FALSE}
 predX <- readRDS(predX_path)
 predY <- readRDS(predY_path)
 predZ <- readRDS(predZ_path)
