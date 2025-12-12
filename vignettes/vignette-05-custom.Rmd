@@ -378,7 +378,8 @@ abc <- readRDS(abc_path1)
 Having done so, we can again look at the summary statistics of the posterior
 distribution and also plot the results (we're skipping diagnostics such as
 posterior predictive checks but you can read more about those
-[here](vignette-01-basics.html) and [here](vignette-06-diagnostics.html)).
+[here](https://bodkan.net/demografr/vignette-01-basics.html) and
+[here](https://bodkan.net/demografr/vignette-06-diagnostics.html)).
 Because this `observed` diversity is based on simulated data from a known
 model, we'll indicate the true "hidden" $N_e$ value with a vertical line.
 
