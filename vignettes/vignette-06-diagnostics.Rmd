@@ -783,7 +783,7 @@ processing.
 
 On a similar note, we can also run _abc_ functions `gfit()` and `gfitpca()`
 (as described in
-[this vignette](https://cran.r-project.org/web/packages/abc/vignettes/abcvignette.pdf))
+[this vignette](https://CRAN.R-project.org/package=abc/vignettes/abcvignette.pdf))
 in exactly the same way. We will focus just on the code, and leave the
 interpretation to the discussion in the vignette:
 
