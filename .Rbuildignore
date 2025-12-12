@@ -16,8 +16,8 @@ Dockerfile
 .dockerignore
 ^inst/examples/grid_data.*$
 ^inst/examples/custom_abc.*$
-^inst/examples/downstream_abc.*$
-^inst/examples/downstream_data.*$
+^inst/examples/downstream.*$
+vignettes/vignette-06-diagnostics.Rmd
 vignettes/vignette-07-selection.Rmd
 vignettes/vignette-08-tracts.Rmd
 vignettes/vignette-09-optimization.Rmd
