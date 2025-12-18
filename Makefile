@@ -108,7 +108,7 @@ rstudio:
 ifndef PORT
 	$(error PORT variable must be set explicitly)
 endif
-	docker run --detach --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)
+	docker run --rm -ti -p $(PORT):8787 -e RUNROOTLESS=true -e DISABLE_AUTH=true -v $(shell pwd):/project --name $(CONTAINER) $(IMAGE)
 
 docker-build:
 	docker build --build-arg GITHUB_PAT=$(TOKEN) -t $(IMAGE) .
