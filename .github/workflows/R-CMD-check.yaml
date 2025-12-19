@@ -88,4 +88,10 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: Use development version of slendr
+        run: |
+          install.packages("devtools", repos = "http://cran.rstudio.com")
+          devtools::install_github("bodkan/slendr")
+        shell: Rscript {0}
+
       - uses: r-lib/actions/check-r-package@v2
