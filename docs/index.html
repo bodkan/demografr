@@ -69,11 +69,14 @@
 </div>
 <!-- badges: start -->
 <!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
-
+<!-- [![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main) -->
 <!-- badges: end -->
 <p>⚠️⚠️⚠️</p>
 <p><strong>Please note that until a peer reviewed publication describing the <em>demografr</em> package is published, the software should be regarded as experimental and potentially unstable.</strong></p>
 <p>⚠️️⚠️⚠️</p>
+<hr>
+<p><strong>You can now read our preprint on <a href="https://www.biorxiv.org/content/10.64898/2025.12.18.694482v1" class="external-link">bioRxiv</a>!</strong> All comments and feedback are welcome!</p>
+<hr>
 <p>The goal of <em>demografr</em> is to simplify and streamline the development of simulation-based inference pipelines in population genetics and evolutionary biology, such as <a href="https://en.wikipedia.org/wiki/Approximate_Bayesian_computation" class="external-link">Approximate Bayesian Computation</a> (ABC) or parameter grid inferences, and make them more reproducible. <em>demografr</em> also aims to make these inferences orders of magnitude faster and more efficient by leveraging the <a href="https://tskit.dev/learn/" class="external-link">tree sequence</a> as an internal data structure and computation engine.</p>
 <p>Unlike traditional ABC and other simulation-based approaches, which generally involve custom-built pipelines and scripts for population genetic simulation and computation of summary statistics, <em>demografr</em> makes it possible to perform simulation, computation of summary statistics, and the inference itself within a single reproducible R script. By eliminating the need to write custom simulation code and scripting for integration of various population genetic tools for computing summary statistics, it lowers the barrier for new users and facilitates reproducibility for everyone regardless of their level of experience by eliminating many common sources of bugs.</p>
 <div class="section level3">
@@ -97,14 +100,16 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bodkan/demografr"</span><span class="op">)</span></span></code></pre></div>
 <p>Note that this requires an R package <em>devtools</em>, which you can install simply by running <code>install.packages("devtools")</code>.</p>
-<div class="section level3">
-<h3 id="testing-the-r-package-in-an-online-rstudio-session">Testing the R package in an online RStudio session<a class="anchor" aria-label="anchor" href="#testing-the-r-package-in-an-online-rstudio-session"></a>
-</h3>
-<p>You can open an RStudio session and test examples from the <a href="https://bodkan.net/demografr/articles/">vignettes</a> directly in your web browser by clicking this button (no installation is needed!):</p>
-<p><a href="http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio" class="external-link"><img src="http://mybinder.org/badge.svg" alt="Binder"></a></p>
-<p><strong>In case the RStudio instance appears to be starting very slowly, please be patient (Binder is a freely available service with limited computational resources).</strong> If Binder crashes, try reloading the web page, which will restart the cloud session.</p>
-<p>Once you get a browser-based RStudio session, you can navigate to the <code>vignettes/</code> directory and test the examples on your own!</p>
-</div>
+<!-- ### Testing the R package in an online RStudio session -->
+<!-- You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web -->
+<!-- browser by clicking this button (no installation is needed!): -->
+<!-- [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) -->
+<!-- **In case the RStudio instance appears to be starting very slowly, please be -->
+<!-- patient (Binder is a freely available service with limited computational -->
+<!-- resources).** If Binder crashes, try reloading the web page, which will restart -->
+<!-- the cloud session. -->
+<!-- Once you get a browser-based RStudio session, you can navigate to the -->
+<!-- `vignettes/` directory and test the examples on your own! -->
 </div>
 <div class="section level2">
 <h2 id="an-example-abc-pipeline">An example ABC pipeline<a class="anchor" aria-label="anchor" href="#an-example-abc-pipeline"></a>
@@ -332,7 +337,7 @@
 <span><span class="co">#&gt; ╔═══════════════════════════╗</span></span>
 <span><span class="co">#&gt; ║TreeSequence               ║</span></span>
 <span><span class="co">#&gt; ╠═══════════════╤═══════════╣</span></span>
-<span><span class="co">#&gt; ║Trees          │      1,751║</span></span>
+<span><span class="co">#&gt; ║Trees          │      1,670║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sequence Length│  1,000,000║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
@@ -340,26 +345,26 @@
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
 <span><span class="co">#&gt; ║Sample Nodes   │        200║</span></span>
 <span><span class="co">#&gt; ╟───────────────┼───────────╢</span></span>
-<span><span class="co">#&gt; ║Total Size     │  492.1 KiB║</span></span>
+<span><span class="co">#&gt; ║Total Size     │  467.6 KiB║</span></span>
 <span><span class="co">#&gt; ╚═══════════════╧═══════════╝</span></span>
 <span><span class="co">#&gt; ╔═══════════╤═════╤═════════╤════════════╗</span></span>
 <span><span class="co">#&gt; ║Table      │Rows │Size     │Has Metadata║</span></span>
 <span><span class="co">#&gt; ╠═══════════╪═════╪═════════╪════════════╣</span></span>
-<span><span class="co">#&gt; ║Edges      │7,718│241.2 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Edges      │7,284│227.6 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Individuals│  100│  2.8 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Migrations │    0│  8 Bytes│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Mutations  │2,020│ 73.0 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Mutations  │1,942│ 70.2 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Nodes      │2,219│ 60.7 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Nodes      │2,122│ 58.0 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Populations│    4│331 Bytes│         Yes║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
 <span><span class="co">#&gt; ║Provenances│    2│  3.3 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╟───────────┼─────┼─────────┼────────────╢</span></span>
-<span><span class="co">#&gt; ║Sites      │2,020│ 49.3 KiB│          No║</span></span>
+<span><span class="co">#&gt; ║Sites      │1,938│ 47.3 KiB│          No║</span></span>
 <span><span class="co">#&gt; ╚═══════════╧═════╧═════════╧════════════╝</span></span></code></pre></div>
 <p>With this one simulation data instance <code>ts</code> (in this case, a tree-sequence object of which the above-mentioned function <code><a href="reference/simulate_abc.html">simulate_abc()</a></code> would produce millions, making troubleshooting challenging and slow), we can apply individual summary statistic functions using another helper function <code><a href="reference/summarise_data.html">summarise_data()</a></code>:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -368,27 +373,27 @@
 <span><span class="co">#&gt; # A tibble: 4 × 2</span></span>
 <span><span class="co">#&gt;   set   diversity</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     0.0000696</span></span>
-<span><span class="co">#&gt; 2 B     0.0000563</span></span>
-<span><span class="co">#&gt; 3 C     0.000169 </span></span>
-<span><span class="co">#&gt; 4 D     0.000154 </span></span>
+<span><span class="co">#&gt; 1 A     0.0000792</span></span>
+<span><span class="co">#&gt; 2 B     0.0000409</span></span>
+<span><span class="co">#&gt; 3 C     0.000190 </span></span>
+<span><span class="co">#&gt; 4 D     0.000126 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $divergence</span></span>
 <span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
 <span><span class="co">#&gt;   x     y     divergence</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     B       0.000268</span></span>
-<span><span class="co">#&gt; 2 A     C       0.000275</span></span>
-<span><span class="co">#&gt; 3 A     D       0.000284</span></span>
-<span><span class="co">#&gt; 4 B     C       0.000193</span></span>
-<span><span class="co">#&gt; 5 B     D       0.000209</span></span>
-<span><span class="co">#&gt; 6 C     D       0.000188</span></span>
+<span><span class="co">#&gt; 1 A     B       0.000270</span></span>
+<span><span class="co">#&gt; 2 A     C       0.000255</span></span>
+<span><span class="co">#&gt; 3 A     D       0.000268</span></span>
+<span><span class="co">#&gt; 4 B     C       0.000206</span></span>
+<span><span class="co">#&gt; 5 B     D       0.000248</span></span>
+<span><span class="co">#&gt; 6 C     D       0.000211</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $f4</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 5</span></span>
-<span><span class="co">#&gt;   W     X     Y     Z              f4</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 A     B     C     D     -0.00000352</span></span></code></pre></div>
+<span><span class="co">#&gt;   W     X     Y     Z             f4</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 A     B     C     D     -0.0000152</span></span></code></pre></div>
 <p>By comparing the format of this result to the observed data (given in the list <code>observed</code> at the beginning of this page), we can make sure that both simulated and observed summary statistics are mutually compatible, and can be thus directly compared in later steps of the ABC workflow.</p>
 <p><strong>See <a href="https://bodkan.net/demografr/reference/">the reference</a> for a complete overview of the functionality of this package.</strong></p>
 </div>
@@ -423,14 +428,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/bodkan/demografr/actions" class="external-link"><img src="https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio" class="external-link"><img src="http://mybinder.org/badge.svg" alt="Binder"></a></li>
-<li><a href="https://app.codecov.io/github/bodkan/demografr?branch=main" class="external-link"><img src="https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg" alt="Coverage status"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>

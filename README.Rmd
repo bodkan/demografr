@@ -27,7 +27,7 @@ init_env(quiet = TRUE)
 
 <!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
 
-[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
+<!-- [![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main) -->
 
 <!-- badges: end -->
 
@@ -38,6 +38,13 @@ _demografr_ package is published, the software should be regarded as
 experimental and potentially unstable.**
 
 ⚠️️⚠️⚠️
+
+---
+
+**You can now read our preprint on [bioRxiv](https://www.biorxiv.org/content/10.64898/2025.12.18.694482v1)!**
+All comments and feedback are welcome!
+
+---
 
 The goal of _demografr_ is to simplify and streamline the development of
 simulation-based inference pipelines in population genetics and evolutionary
@@ -112,20 +119,20 @@ devtools::install_github("bodkan/demografr")
 Note that this requires an R package _devtools_, which you can install simply
 by running `install.packages("devtools")`.
 
-### Testing the R package in an online RStudio session
+<!-- ### Testing the R package in an online RStudio session -->
 
-You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web
-browser by clicking this button (no installation is needed!):
+<!-- You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web -->
+<!-- browser by clicking this button (no installation is needed!): -->
 
-[![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio)
+<!-- [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) -->
 
-**In case the RStudio instance appears to be starting very slowly, please be
-patient (Binder is a freely available service with limited computational
-resources).** If Binder crashes, try reloading the web page, which will restart
-the cloud session.
+<!-- **In case the RStudio instance appears to be starting very slowly, please be -->
+<!-- patient (Binder is a freely available service with limited computational -->
+<!-- resources).** If Binder crashes, try reloading the web page, which will restart -->
+<!-- the cloud session. -->
 
-Once you get a browser-based RStudio session, you can navigate to the
-`vignettes/` directory and test the examples on your own!
+<!-- Once you get a browser-based RStudio session, you can navigate to the -->
+<!-- `vignettes/` directory and test the examples on your own! -->
 
 ## An example ABC pipeline
 

@@ -8,7 +8,7 @@
 
 <!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
 
-[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
+<!-- [![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main) -->
 
 <!-- badges: end -->
 
@@ -19,6 +19,13 @@ _demografr_ package is published, the software should be regarded as
 experimental and potentially unstable.**
 
 ⚠️️⚠️⚠️
+
+---
+
+**You can now read our preprint on [bioRxiv](https://www.biorxiv.org/content/10.64898/2025.12.18.694482v1)!**
+All comments and feedback are welcome!
+
+---
 
 The goal of _demografr_ is to simplify and streamline the development of
 simulation-based inference pipelines in population genetics and evolutionary
@@ -93,20 +100,20 @@ devtools::install_github("bodkan/demografr")
 Note that this requires an R package _devtools_, which you can install simply
 by running `install.packages("devtools")`.
 
-### Testing the R package in an online RStudio session
+<!-- ### Testing the R package in an online RStudio session -->
 
-You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web
-browser by clicking this button (no installation is needed!):
+<!-- You can open an RStudio session and test examples from the [vignettes](https://bodkan.net/demografr/articles/) directly in your web -->
+<!-- browser by clicking this button (no installation is needed!): -->
 
-[![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio)
+<!-- [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) -->
 
-**In case the RStudio instance appears to be starting very slowly, please be
-patient (Binder is a freely available service with limited computational
-resources).** If Binder crashes, try reloading the web page, which will restart
-the cloud session.
+<!-- **In case the RStudio instance appears to be starting very slowly, please be -->
+<!-- patient (Binder is a freely available service with limited computational -->
+<!-- resources).** If Binder crashes, try reloading the web page, which will restart -->
+<!-- the cloud session. -->
 
-Once you get a browser-based RStudio session, you can navigate to the
-`vignettes/` directory and test the examples on your own!
+<!-- Once you get a browser-based RStudio session, you can navigate to the -->
+<!-- `vignettes/` directory and test the examples on your own! -->
 
 ## An example ABC pipeline
 
@@ -426,7 +433,7 @@ ts
 #> ╔═══════════════════════════╗
 #> ║TreeSequence               ║
 #> ╠═══════════════╤═══════════╣
-#> ║Trees          │      1,751║
+#> ║Trees          │      1,670║
 #> ╟───────────────┼───────────╢
 #> ║Sequence Length│  1,000,000║
 #> ╟───────────────┼───────────╢
@@ -434,26 +441,26 @@ ts
 #> ╟───────────────┼───────────╢
 #> ║Sample Nodes   │        200║
 #> ╟───────────────┼───────────╢
-#> ║Total Size     │  492.1 KiB║
+#> ║Total Size     │  467.6 KiB║
 #> ╚═══════════════╧═══════════╝
 #> ╔═══════════╤═════╤═════════╤════════════╗
 #> ║Table      │Rows │Size     │Has Metadata║
 #> ╠═══════════╪═════╪═════════╪════════════╣
-#> ║Edges      │7,718│241.2 KiB│          No║
+#> ║Edges      │7,284│227.6 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Individuals│  100│  2.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Migrations │    0│  8 Bytes│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Mutations  │2,020│ 73.0 KiB│          No║
+#> ║Mutations  │1,942│ 70.2 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Nodes      │2,219│ 60.7 KiB│          No║
+#> ║Nodes      │2,122│ 58.0 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Populations│    4│331 Bytes│         Yes║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Provenances│    2│  3.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Sites      │2,020│ 49.3 KiB│          No║
+#> ║Sites      │1,938│ 47.3 KiB│          No║
 #> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
@@ -471,27 +478,27 @@ summarise_data(ts, functions)
 #> # A tibble: 4 × 2
 #>   set   diversity
 #>   <chr>     <dbl>
-#> 1 A     0.0000696
-#> 2 B     0.0000563
-#> 3 C     0.000169 
-#> 4 D     0.000154 
+#> 1 A     0.0000792
+#> 2 B     0.0000409
+#> 3 C     0.000190 
+#> 4 D     0.000126 
 #> 
 #> $divergence
 #> # A tibble: 6 × 3
 #>   x     y     divergence
 #>   <chr> <chr>      <dbl>
-#> 1 A     B       0.000268
-#> 2 A     C       0.000275
-#> 3 A     D       0.000284
-#> 4 B     C       0.000193
-#> 5 B     D       0.000209
-#> 6 C     D       0.000188
+#> 1 A     B       0.000270
+#> 2 A     C       0.000255
+#> 3 A     D       0.000268
+#> 4 B     C       0.000206
+#> 5 B     D       0.000248
+#> 6 C     D       0.000211
 #> 
 #> $f4
 #> # A tibble: 1 × 5
-#>   W     X     Y     Z              f4
-#>   <chr> <chr> <chr> <chr>       <dbl>
-#> 1 A     B     C     D     -0.00000352
+#>   W     X     Y     Z             f4
+#>   <chr> <chr> <chr> <chr>      <dbl>
+#> 1 A     B     C     D     -0.0000152
 ```
 
 By comparing the format of this result to the observed data (given in the
