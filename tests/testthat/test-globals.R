@@ -17,7 +17,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   C <- population("C", time = T_2, N = Ne_C, parent = B)
   D <- population("D", time = T_3, N = Ne_D, parent = C)
 
-  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, proportion = gf)
 
   model <- compile_model(
     populations = list(A, B, C, D), gene_flow = gf,

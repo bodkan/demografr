@@ -129,9 +129,9 @@ model <- function(s, onset_time, origin_pop, target_pop) {
   yam <- population("YAM", time = 8000, N = 500, parent = ehg, remove = 2500)
   
   gf <- list(
-    gene_flow(from = ana, to = yam, rate = 0.4, start = 7900, end = 7800),
-    gene_flow(from = ana, to = eur, rate = 0.5, start = 6000, end = 5000),
-    gene_flow(from = yam, to = eur, rate = 0.65, start = 4000, end = 3500)
+    gene_flow(from = ana, to = yam, proportion = 0.4, start = 7900, end = 7800),
+    gene_flow(from = ana, to = eur, proportion = 0.5, start = 6000, end = 5000),
+    gene_flow(from = yam, to = eur, proportion = 0.65, start = 4000, end = 3500)
   )
   
   model <- compile_model(

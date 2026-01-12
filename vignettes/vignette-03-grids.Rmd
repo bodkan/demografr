@@ -131,15 +131,15 @@ model <- function(rate_ea, rate_aa) {
   # define gene-flow events
   gf <- list(
     # back flow from Eurasia into Africa -- one parameter of interest
-    gene_flow(from = eur, to = afr1, start = 5e3, end = 0, rate = rate_ea),
-    gene_flow(from = eur, to = afr2, start = 5e3, end = 0, rate = rate_ea),
+    gene_flow(from = eur, to = afr1, start = 5e3, end = 0, proportion = rate_ea),
+    gene_flow(from = eur, to = afr2, start = 5e3, end = 0, proportion = rate_ea),
 
     # gene flow within Africa -- another parameter of interest
-    gene_flow(from = afr1, to = afr2, start = 50e3, end = 0, rate = rate_aa),
-    gene_flow(from = afr2, to = afr1, start = 50e3, end = 0, rate = rate_aa),
+    gene_flow(from = afr1, to = afr2, start = 50e3, end = 0, proportion = rate_aa),
+    gene_flow(from = afr2, to = afr1, start = 50e3, end = 0, proportion = rate_aa),
 
     # Neanderthal introgression (fixed to 3%)
-    gene_flow(from = nea, to = eur, start = 60e3, end = 50e3, rate = 0.03)
+    gene_flow(from = nea, to = eur, start = 60e3, end = 50e3, proportion = 0.03)
   )
 
   # generate a slendr model

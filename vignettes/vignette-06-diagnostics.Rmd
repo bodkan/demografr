@@ -158,7 +158,7 @@ modelX <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   C <- population("C", time = T_2, N = Ne_C, parent = B)
   D <- population("D", time = T_3, N = Ne_D, parent = C)
 
-  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, proportion = gf)
 
   model <- compile_model(
     populations = list(A, B, C, D), gene_flow = gf,
@@ -181,7 +181,7 @@ modelY <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   C <- population("C", time = T_2, N = Ne_C, parent = A)
   D <- population("D", time = T_3, N = Ne_D, parent = A)
 
-  gf <- gene_flow(from = A, to = B, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = A, to = B, start = 9000, end = 9301, proportion = gf)
 
   model <- compile_model(
     populations = list(A, B, C, D), gene_flow = gf,
@@ -204,7 +204,7 @@ modelZ <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3, gf) {
   C <- population("C", time = T_2, N = Ne_C, parent = A)
   D <- population("D", time = T_3, N = Ne_D, parent = C)
 
-  gf <- gene_flow(from = C, to = D, start = 9000, end = 9301, rate = gf)
+  gf <- gene_flow(from = C, to = D, start = 9000, end = 9301, proportion = gf)
 
   model <- compile_model(
     populations = list(A, B, C, D), gene_flow = gf,
@@ -509,7 +509,7 @@ B <- population("B", time = 2000, N = 800, parent = A)
 C <- population("C", time = 6000, N = 9000, parent = B)
 D <- population("D", time = 8000, N = 4000, parent = C)
 
-gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = 0.1)
+gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, proportion = 0.1)
 
 example_model <- compile_model(
   populations = list(A, B, C, D), gene_flow = gf,

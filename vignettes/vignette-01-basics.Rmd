@@ -148,7 +148,7 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_AB, T_BC, T_CD, gf_BC) {
   C <- population("C", time = T_BC, N = Ne_C, parent = B)
   D <- population("D", time = T_CD, N = Ne_D, parent = C)
 
-  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = gf_BC)
+  gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, proportion = gf_BC)
 
   model <- compile_model(
     populations = list(A, B, C, D), gene_flow = gf,

@@ -47,7 +47,7 @@ afr <- population("Africans", parent = anc, N = 10000, time = 650000)
 nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
 eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 55000 - 30)
+gf <- gene_flow(from = nea, to = eur, proportion = 0.03, start = 55000, end = 55000 - 30)
 
 true_model <- compile_model(
   populations = list(anc, afr, nea, eur), gene_flow = gf,
@@ -97,7 +97,7 @@ observed <- list(tract_bins = observed_bins)
 ## Model function
 
 ```{r}
-model <- function(admixture_time, admixture_rate) {
+model <- function(admixture_time, admixture_prop) {
   generation_time <- 30
 
   anc <- population("ancestors", N = 10000, time = 1000000, remove = 649000)
@@ -107,7 +107,7 @@ model <- function(admixture_time, admixture_rate) {
 
   gf <- gene_flow(
     from = nea, to = eur,
-    rate = admixture_rate,    # first model parameter
+    rate = admixture_prop,    # first model parameter
     start = admixture_time,   # second model parameter
     end = admixture_time - generation_time
   )
@@ -128,7 +128,7 @@ model <- function(admixture_time, admixture_rate) {
 ```{r}
 priors <- list(
   admixture_time ~ runif(20000, 100000),
-  admixture_rate ~ runif(0, 0.3)
+  admixture_prop ~ runif(0, 0.3)
 )
 ```
 
@@ -188,7 +188,7 @@ afr <- population("Africans", parent = anc, N = 10000, time = 650000)
 nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
 eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
 
-gf <- gene_flow(from = nea, to = eur, rate = 0.03, start = 55000, end = 54000)
+gf <- gene_flow(from = nea, to = eur, proportion = 0.03, start = 55000, end = 54000)
 
 true_model <- compile_model(
   populations = list(anc, chimp, afr, nea, eur), gene_flow = gf,
@@ -246,7 +246,7 @@ observed
 ## Model function
 
 ```{r}
-model <- function(admixture_time, admixture_rate) {
+model <- function(admixture_time, admixture_prop) {
   generation_time <- 30
 
   anc <- population("ancestors", N = 10000, time = 7e6, remove = 649000)
@@ -255,7 +255,7 @@ model <- function(admixture_time, admixture_rate) {
   nea <- population("Neanderthals", parent = anc, N = 2000, time = 650000)
   eur <- population("Europeans", parent = afr, N = 5000, time = 60000)
   
-  gf <- gene_flow(from = nea, to = eur, rate = admixture_rate,
+  gf <- gene_flow(from = nea, to = eur, proportion = admixture_prop,
                   start = admixture_time, end = admixture_time - 1000)
   
   model <- compile_model(
@@ -276,7 +276,7 @@ model <- function(admixture_time, admixture_rate) {
 ```{r}
 priors <- list(
   admixture_time ~ runif(20000, 100000),
-  admixture_rate ~ runif(0, 0.3)
+  admixture_prop ~ runif(0, 0.3)
 )
 ```
 
@@ -453,7 +453,7 @@ abc_all <- run_abc(data, engine = "abc", tol = 0.05, method = "neuralnet")
 
 ```{r}
 truth_df <- data.frame(
-  param = c("admixture_rate", "admixture_time"),
+  param = c("admixture_prop", "admixture_time"),
   value = c(0.03, 55000)
 )
 
