@@ -244,6 +244,14 @@ summary statistic functions inference using demografr.</p>
 <span class="r-in"><span><span class="co"># (step #1 of a single ABC replicate simulation)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ts</span> <span class="op">&lt;-</span> <span class="fu">simulate_model</span><span class="op">(</span><span class="va">model</span>, <span class="va">priors</span>, sequence_length <span class="op">=</span> <span class="fl">1e6</span>, recombination_rate <span class="op">=</span> <span class="fl">1e-8</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The argument `rate` is about to be deprecated because of its confusing</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> naming and behavior. If you want to specify the rate of migration per</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> unit of time, please use the new argument `migration_rate`. If you want</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> to specify the total amount of ancestry which the `to` population should</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> received from the `from` population, use the new argument `proportion`</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> (this corresponds to the original interpretation of the deprecated `rate`</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> argument, and a simple replacement of `rate` with `proportion` will thus</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> retain the original meaning of your code all).</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">##################################################</span></span></span>
 <span class="r-in"><span><span class="co"># simulate data from a single model run</span></span></span>
@@ -298,7 +306,16 @@ summary statistic functions inference using demografr.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Checking the return statement of the model function... ✅</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Checking the presence of required model function arguments...---------------------------------------------------------------------</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simulating tree sequence from the given model... ✅</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simulating tree sequence from the given model...</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>The argument `rate` is about to be deprecated because of its confusing</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> naming and behavior. If you want to specify the rate of migration per</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> unit of time, please use the new argument `migration_rate`. If you want</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> to specify the total amount of ancestry which the `to` population should</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> received from the `from` population, use the new argument `proportion`</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> (this corresponds to the original interpretation of the deprecated `rate`</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> argument, and a simple replacement of `rate` with `proportion` will thus</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> retain the original meaning of your code all).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ✅</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> ---------------------------------------------------------------------</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Computing user-defined summary functions:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   - diversity ✅</span>
