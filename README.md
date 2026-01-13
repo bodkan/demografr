@@ -6,9 +6,9 @@
 
 <!-- badges: start -->
 
-<!--[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) -->
+[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr)
 
-<!-- [![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main) -->
+[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
 
 <!-- badges: end -->
 
@@ -428,12 +428,20 @@ the function `simulate_model()` simulates data from a single simulation run:
 
 ``` r
 ts <- simulate_model(model, priors, sequence_length = 1e6, recombination_rate = 1e-8, mutation_rate = 1e-8)
+#> Warning: The argument `rate` is about to be deprecated because of its confusing
+#> naming and behavior. If you want to specify the rate of migration per
+#> unit of time, please use the new argument `migration_rate`. If you want
+#> to specify the total amount of ancestry which the `to` population should
+#> received from the `from` population, use the new argument `proportion`
+#> (this corresponds to the original interpretation of the deprecated `rate`
+#> argument, and a simple replacement of `rate` with `proportion` will thus
+#> retain the original meaning of your code all).
 
 ts
 #> ╔═══════════════════════════╗
 #> ║TreeSequence               ║
 #> ╠═══════════════╤═══════════╣
-#> ║Trees          │      1,670║
+#> ║Trees          │      1,539║
 #> ╟───────────────┼───────────╢
 #> ║Sequence Length│  1,000,000║
 #> ╟───────────────┼───────────╢
@@ -441,26 +449,26 @@ ts
 #> ╟───────────────┼───────────╢
 #> ║Sample Nodes   │        200║
 #> ╟───────────────┼───────────╢
-#> ║Total Size     │  467.6 KiB║
+#> ║Total Size     │  444.2 KiB║
 #> ╚═══════════════╧═══════════╝
 #> ╔═══════════╤═════╤═════════╤════════════╗
 #> ║Table      │Rows │Size     │Has Metadata║
 #> ╠═══════════╪═════╪═════════╪════════════╣
-#> ║Edges      │7,284│227.6 KiB│          No║
+#> ║Edges      │7,027│219.6 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Individuals│  100│  2.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Migrations │    0│  8 Bytes│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Mutations  │1,942│ 70.2 KiB│          No║
+#> ║Mutations  │1,699│ 61.4 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Nodes      │2,122│ 58.0 KiB│          No║
+#> ║Nodes      │2,167│ 59.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Populations│    4│331 Bytes│         Yes║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Provenances│    2│  3.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Sites      │1,938│ 47.3 KiB│          No║
+#> ║Sites      │1,696│ 41.4 KiB│          No║
 #> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
@@ -478,27 +486,27 @@ summarise_data(ts, functions)
 #> # A tibble: 4 × 2
 #>   set   diversity
 #>   <chr>     <dbl>
-#> 1 A     0.0000792
-#> 2 B     0.0000409
-#> 3 C     0.000190 
-#> 4 D     0.000126 
+#> 1 A     0.0000480
+#> 2 B     0.0000487
+#> 3 C     0.000118 
+#> 4 D     0.0000885
 #> 
 #> $divergence
 #> # A tibble: 6 × 3
 #>   x     y     divergence
 #>   <chr> <chr>      <dbl>
-#> 1 A     B       0.000270
-#> 2 A     C       0.000255
-#> 3 A     D       0.000268
-#> 4 B     C       0.000206
-#> 5 B     D       0.000248
-#> 6 C     D       0.000211
+#> 1 A     B       0.000188
+#> 2 A     C       0.000195
+#> 3 A     D       0.000191
+#> 4 B     C       0.000108
+#> 5 B     D       0.000108
+#> 6 C     D       0.000115
 #> 
 #> $f4
 #> # A tibble: 1 × 5
-#>   W     X     Y     Z             f4
-#>   <chr> <chr> <chr> <chr>      <dbl>
-#> 1 A     B     C     D     -0.0000152
+#>   W     X     Y     Z              f4
+#>   <chr> <chr> <chr> <chr>       <dbl>
+#> 1 A     B     C     D     -0.00000215
 ```
 
 By comparing the format of this result to the observed data (given in the
