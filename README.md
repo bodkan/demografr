@@ -6,9 +6,7 @@
 
 <!-- badges: start -->
 
-[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr)
-
-[![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
+[![CRAN-version](https://www.r-pkg.org/badges/version/slendr)](https://cran.r-project.org/package=slendr) [![CRAN-downloads](https://cranlogs.r-pkg.org/badges/grand-total/slendr)](https://cran.r-project.org/package=slendr) [![R-CMD-check](https://github.com/bodkan/demografr/workflows/R-CMD-check/badge.svg)](https://github.com/bodkan/demografr/actions) [![Binder](http://mybinder.org/badge.svg)](http://beta.mybinder.org/v2/gh/bodkan/demografr/main?urlpath=rstudio) [![Coverage status](https://codecov.io/gh/bodkan/demografr/branch/main/graph/badge.svg)](https://app.codecov.io/github/bodkan/demografr?branch=main)
 
 <!-- badges: end -->
 
@@ -441,7 +439,7 @@ ts
 #> ╔═══════════════════════════╗
 #> ║TreeSequence               ║
 #> ╠═══════════════╤═══════════╣
-#> ║Trees          │      1,539║
+#> ║Trees          │      1,880║
 #> ╟───────────────┼───────────╢
 #> ║Sequence Length│  1,000,000║
 #> ╟───────────────┼───────────╢
@@ -449,26 +447,26 @@ ts
 #> ╟───────────────┼───────────╢
 #> ║Sample Nodes   │        200║
 #> ╟───────────────┼───────────╢
-#> ║Total Size     │  444.2 KiB║
+#> ║Total Size     │  530.2 KiB║
 #> ╚═══════════════╧═══════════╝
 #> ╔═══════════╤═════╤═════════╤════════════╗
 #> ║Table      │Rows │Size     │Has Metadata║
 #> ╠═══════════╪═════╪═════════╪════════════╣
-#> ║Edges      │7,027│219.6 KiB│          No║
+#> ║Edges      │8,353│261.0 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Individuals│  100│  2.8 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Migrations │    0│  8 Bytes│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Mutations  │1,699│ 61.4 KiB│          No║
+#> ║Mutations  │2,164│ 78.2 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Nodes      │2,167│ 59.3 KiB│          No║
+#> ║Nodes      │2,391│ 65.4 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Populations│    4│331 Bytes│         Yes║
 #> ╟───────────┼─────┼─────────┼────────────╢
 #> ║Provenances│    2│  3.3 KiB│          No║
 #> ╟───────────┼─────┼─────────┼────────────╢
-#> ║Sites      │1,696│ 41.4 KiB│          No║
+#> ║Sites      │2,161│ 52.8 KiB│          No║
 #> ╚═══════════╧═════╧═════════╧════════════╝
 ```
 
@@ -486,27 +484,27 @@ summarise_data(ts, functions)
 #> # A tibble: 4 × 2
 #>   set   diversity
 #>   <chr>     <dbl>
-#> 1 A     0.0000480
-#> 2 B     0.0000487
-#> 3 C     0.000118 
-#> 4 D     0.0000885
+#> 1 A     0.0000797
+#> 2 B     0.0000587
+#> 3 C     0.000156 
+#> 4 D     0.000154 
 #> 
 #> $divergence
 #> # A tibble: 6 × 3
 #>   x     y     divergence
 #>   <chr> <chr>      <dbl>
-#> 1 A     B       0.000188
-#> 2 A     C       0.000195
-#> 3 A     D       0.000191
-#> 4 B     C       0.000108
-#> 5 B     D       0.000108
-#> 6 C     D       0.000115
+#> 1 A     B       0.000237
+#> 2 A     C       0.000247
+#> 3 A     D       0.000247
+#> 4 B     C       0.000168
+#> 5 B     D       0.000194
+#> 6 C     D       0.000188
 #> 
 #> $f4
 #> # A tibble: 1 × 5
-#>   W     X     Y     Z              f4
-#>   <chr> <chr> <chr> <chr>       <dbl>
-#> 1 A     B     C     D     -0.00000215
+#>   W     X     Y     Z             f4
+#>   <chr> <chr> <chr> <chr>      <dbl>
+#> 1 A     B     C     D     -0.0000130
 ```
 
 By comparing the format of this result to the observed data (given in the
