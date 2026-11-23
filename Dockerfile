@@ -1,11 +1,11 @@
-FROM rocker/rstudio:4.5.2
+FROM rocker/rstudio:4.6.1
 
 LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
-ENV SLIM_VERSION="v5.1" \
-    RENV_VERSION="v1.1.5" \
-    BIOCONDUCTOR_VERSION="3.22" \
-    PYTHON_ENV="Python-3.13_msprime-1.3.4_tskit-0.6.4_pyslim-1.1.0_tspop-0.0.2"
+ENV SLIM_VERSION="v5.2" \
+    RENV_VERSION="v1.3.1" \
+    BIOCONDUCTOR_VERSION="3.23" \
+    PYTHON_ENV="Python-3.12_msprime-1.4.1_tskit-1.0.2_pyslim-1.1.1_tspop-0.0.2"
 
 ############################################################
 # setup the base system
@@ -78,6 +78,9 @@ ENV HOME="/root"
 ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
+# compile fzf
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${HOME}/.fzf;    ${HOME}/.fzf/install
+
 # compile SLiM
 RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/${SLIM_VERSION}.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
@@ -122,7 +125,7 @@ ARG GITHUB_PAT="''"
 RUN R -e 'renv::restore()'
 
 # setup Python environment for slendr
-RUN R -e 'slendr::setup_env(agree = TRUE, pip = TRUE)'
+RUN R -e 'slendr::setup_env(env = "conda", agree = TRUE)'
 # rather than installing a separate Python interpreter, use the slendr one
 ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
 
