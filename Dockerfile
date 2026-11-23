@@ -111,11 +111,14 @@ RUN wget https://github.com/rstudio/renv/archive/refs/tags/${RENV_VERSION}.tar.g
 RUN R -e 'install.packages("rstudioapi")'
 
 # do this when first setting up the container to create an renv.lock file:
+#   rm -f .Rprofile
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   export GITHUB_PAT='<PLACE GITHUB TOKEN HERE IF NEEDED>'
-#   renv::init(bare = TRUE, bioconductor = Sys.getenv("BIOCONDUCTOR_VERSION"))
-#   install.packages("yaml") # to be able to discover dependencies in Rmd files
-#   renv::snapshot(dev = TRUE)
+#   R -e 'renv::init(bare = TRUE, bioconductor = Sys.getenv("BIOCONDUCTOR_VERSION"))'
+#   R -e 'install.packages("yaml")' # to be able to discover dependencies in Rmd files
+#   R -e 'renv::install()'
+#   R -e 'renv::snapshot(dev = TRUE)'
+#   cp Rprofile .Rprofile
 
 # install required R packages to their locked-in versions
 COPY DESCRIPTION .
@@ -147,3 +150,4 @@ RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProje
 
 # remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
+
