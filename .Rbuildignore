@@ -1,3 +1,4 @@
+settings/
 ^renv$
 ^renv\.lock$
 ^.*\.Rproj$
