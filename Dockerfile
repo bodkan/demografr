@@ -125,7 +125,7 @@ ARG GITHUB_PAT="''"
 RUN R -e 'renv::restore()'
 
 # setup Python environment for slendr
-RUN R -e 'slendr::setup_env(env = "conda", agree = TRUE)'
+RUN R -e 'options(timeout = 600); slendr::setup_env(env = "conda", agree = TRUE)'
 # rather than installing a separate Python interpreter, use the slendr one
 ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
 
