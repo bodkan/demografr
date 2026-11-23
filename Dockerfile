@@ -126,15 +126,17 @@ RUN R -e 'renv::restore()'
 
 # setup Python environment for slendr
 RUN R -e 'options(timeout = 600); slendr::setup_env(env = "conda", agree = TRUE)'
-# rather than installing a separate Python interpreter, use the slendr one
-ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/envs/${PYTHON_ENV}/bin:${PATH}"
-
-# make sure all software is available in R
-RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 ############################################################
 # final configuration steps
 ############################################################
+
+# rather than installing a dedicated Python interpreter, use the one
+# distributed with conda installation of the reticulate package
+ENV PATH="${BIN}:${HOME}/.local/share/r-miniconda/bin:${PATH}"
+
+# make sure all software is available in R
+RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 
 # make sure the project is ready when RStudio Server session starts
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
