@@ -171,8 +171,8 @@ to arbitrary values, because this is purely a visualization test):
 test_model <- model(rate_ea = 0.42, rate_aa = 0.42)[[1]]
 
 plot_grid(
-  plot_model(test_model, gene_flow = FALSE),
-  plot_model(test_model, log = TRUE, gene_flow = TRUE)
+  plot_model(test_model, gene_flow = "none"),
+  plot_model(test_model, log = TRUE)
 )
 ```
 

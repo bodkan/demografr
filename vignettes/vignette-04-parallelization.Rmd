@@ -84,7 +84,7 @@ Here is our summary function:
 ```{r}
 functions <- list(
   diversity = function(ts) {
-    samples <- ts_names(ts, split = "pop")
+    samples <- ts_names(ts, split = TRUE)
     ts_diversity(ts, sample_sets = samples)
   }
 )

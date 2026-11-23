@@ -69,7 +69,7 @@ disk_run <- function(ts) {
   eigen <- eigenstrat(prefix)
 
   suppressMessages(df <- f4ratio(data = eigen,
-                                 X = ts_names(ts, split = "pop")$EUR,
+                                 X = ts_names(ts, split = TRUE)$EUR,
                 A = "NEA_1", B = "NEA_2", C = "AFR_1", O = "CHIMP_1", 
                 params = list(blgsize = ts$sequence_length / 1e6 * 0.0025)) %>%
     .[c("X", "A", "B", "C", "O", "alpha")])
@@ -94,7 +94,7 @@ disk_run <- function(ts) {
 
 ts_run <- function(ts) {
   df <- ts_f4ratio(ts,
-                   X = ts_names(ts, split = "pop")$EUR,
+                   X = ts_names(ts, split = TRUE)$EUR,
                    A = "NEA_1", B = "NEA_2", C = "AFR_1", O = "CHIMP_1")
   tibble(result = list(df), nblocks = NA)
 }

@@ -1,7 +1,6 @@
 library(demografr)
 library(slendr)
-
-init_env(quiet = TRUE)
+init_env()
 
 SEED <- 42
 set.seed(SEED)
@@ -11,7 +10,7 @@ B <- population("B", time = 2000, N = 800, parent = A)
 C <- population("C", time = 6000, N = 9000, parent = B)
 D <- population("D", time = 8000, N = 4000, parent = C)
 
-gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, rate = 0.1)
+gf <- gene_flow(from = B, to = C, start = 9000, end = 9301, proportion = 0.1)
 
 true_model <- compile_model(
   populations = list(A, B, C, D), gene_flow = gf,
@@ -22,7 +21,7 @@ true_model <- compile_model(
 ts <- msprime(true_model, sequence_length = 200e6, recombination_rate = 1e-8, random_seed = SEED) %>%
   ts_mutate(1e-8, random_seed = SEED)
 
-samples <- ts_names(ts, split = "pop")
+samples <- ts_names(ts, split = TRUE)
 A <- samples["A"]
 B <- samples["B"]
 C <- samples["C"]

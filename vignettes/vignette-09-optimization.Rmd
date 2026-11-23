@@ -83,15 +83,15 @@ Specify tree-sequence summary statistics (one function per one observed statisti
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   A <- samples["popA"]; B <- samples["popB"]
   C <- samples["popC"]; D <- samples["popD"]
   rbind(

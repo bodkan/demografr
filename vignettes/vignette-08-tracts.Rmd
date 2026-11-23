@@ -165,7 +165,7 @@ true_fun_tract_bins <- function(ts) {
 }
 
 true_fun_f4 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
 
   rbind(
     ts_f4(ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
@@ -175,7 +175,7 @@ true_fun_f4 <- function(ts) {
 
 true_fun_f4ratio <- function(ts) {
  ts_f4ratio(
-    ts, X = ts_names(ts, split = "pop")["Europeans"],
+    ts, X = ts_names(ts, split = TRUE)["Europeans"],
     A = "Neanderthals_1", B = "Neanderthals_2", C = "Africans_1", O = "Chimpanzees_1"
   )
 }
@@ -307,7 +307,7 @@ tract_bins <- function(ts) {
 }
 
 f4 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
 
   rbind(
     ts_f4(ts, W = "Africans_1", X = samples["Europeans"], Y = "Neanderthals_1", Z = "Chimpanzees_1"),
@@ -317,7 +317,7 @@ f4 <- function(ts) {
 
 f4ratio <- function(ts) {
  ts_f4ratio(
-    ts, X = ts_names(ts, split = "pop")["Europeans"],
+    ts, X = ts_names(ts, split = TRUE)["Europeans"],
     A = "Neanderthals_1", B = "Neanderthals_2", C = "Africans_1", O = "Chimpanzees_1"
   )
 }

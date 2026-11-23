@@ -207,7 +207,7 @@ expect_error(
 
 ```{r}
 functions <- quote(list(
-  pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = "pop")["EUR"]),
+  pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = TRUE)["EUR"]),
   origin_traj = origin_traj,
   target_traj = target_traj)
 )
@@ -216,7 +216,7 @@ summarise_data(data, functions = functions)
 summarise_data(
   data,
   functions = list(
-    pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = "pop")["EUR"]),
+    pi = function(ts) ts_diversity(ts, sample_sets = ts_names(ts, split = TRUE)["EUR"]),
     origin_traj = origin_traj,
     target_traj = target_traj
   )

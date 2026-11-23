@@ -251,17 +251,17 @@ summary statistics:
 
 ```{r}
 compute_diversity <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples)
 }
 
 compute_divergence <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples)
 }
 
 compute_f4 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   A <- samples["A"]; B <- samples["B"]
   C <- samples["C"]; D <- samples["D"]
   ts_f4(ts, A, B, C, D)
@@ -658,10 +658,10 @@ summary statistics in R:
 
 ```{r}
 afs_functions <- list(
-  afs_A = function(ts) { samples <- ts_names(ts, split = "pop")["A"]; ts_afs(ts, sample_sets = samples) },
-  afs_B = function(ts) { samples <- ts_names(ts, split = "pop")["B"]; ts_afs(ts, sample_sets = samples) },
-  afs_C = function(ts) { samples <- ts_names(ts, split = "pop")["C"]; ts_afs(ts, sample_sets = samples) },
-  afs_D = function(ts) { samples <- ts_names(ts, split = "pop")["D"]; ts_afs(ts, sample_sets = samples) }
+  afs_A = function(ts) { samples <- ts_names(ts, split = TRUE)["A"]; ts_afs(ts, sample_sets = samples) },
+  afs_B = function(ts) { samples <- ts_names(ts, split = TRUE)["B"]; ts_afs(ts, sample_sets = samples) },
+  afs_C = function(ts) { samples <- ts_names(ts, split = TRUE)["C"]; ts_afs(ts, sample_sets = samples) },
+  afs_D = function(ts) { samples <- ts_names(ts, split = TRUE)["D"]; ts_afs(ts, sample_sets = samples) }
 )
 ```
 
