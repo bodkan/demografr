@@ -82,8 +82,10 @@ $(logo): logo.R
 # check the OS type to assign appropriate Docker image tag
 ifeq ($(shell uname -s), Darwin)
     PLATFORM ?= arm64
+	WEBAPP_CMD := open
 else
     PLATFORM ?= amd64
+	WEPAPP_CMD := xdg-open
 endif
 
 IMAGE := bodkan/$(shell basename $(shell pwd)):$(PLATFORM)
@@ -130,7 +132,7 @@ local-webapp:
 ifndef PORT
 	$(error PORT variable must be set explicitly)
 endif
-	chromium --app=http://localhost:$(PORT) &
+	$(WEBAPP_CMD) http://localhost:$(PORT)
 
 remote-webapp:
 ifndef SERVER
@@ -149,7 +151,7 @@ endif
 		exit 1; \
 	    }; \
 	fi; \
-	chromium --app=http://localhost:$(PORT) &
+	$(WEBAPP_CMD) http://localhost:$(PORT) &
 
 port-forward:
 ifndef SERVER
