@@ -61,5 +61,6 @@
     "chat_provider": "none",
     "assistant_toolbar_button_visible": false,
     "insert_native_pipe_operator": false,
-    "vim_load_vimrc": true
+    "vim_load_vimrc": true,
+    "reduce_remote_filesystem_operations": false
 }

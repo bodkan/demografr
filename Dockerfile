@@ -143,7 +143,7 @@ RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProje
 
 # configure RStudio settings
 RUN mkdir ${HOME}/.config
-COPY settings/rstudio ${HOME}.config
+COPY settings/rstudio ${HOME}/.config/rstudio
 
 # remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
