@@ -140,6 +140,7 @@ RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
 RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" >> ${HOME}/.Rprofile
+RUN echo '{ "reduce_remote_filesystem_operations": false }' >> ${HOME}/.config/rstudio/rstudio-prefs.json
 
 # remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio
