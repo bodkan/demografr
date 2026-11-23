@@ -1,3 +1,6 @@
+# This script simulate summary statistics from a demographic model
+# whose parameters are then inferred in vignettes using ABC.
+
 library(demografr)
 library(slendr)
 init_env()
