@@ -2,6 +2,7 @@ options(browserNLdisabled = TRUE)
 
 options(install.packages.compile.from.source = "never")
 
+# prevent renv::status() from reporting inconsistent library
 options(renv.settings.snapshot.dev = TRUE)
 
 local({
