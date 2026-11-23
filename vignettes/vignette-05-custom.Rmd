@@ -77,7 +77,7 @@ ts <- population("pop", N = 1000, time = 10000) %>%
   compile_model(generation_time = 1, direction = "backward") %>%
   msprime(sequence_length = 200e6, recombination_rate = 1e-8, random_seed = 42) %>%
   ts_mutate(mutation_rate = 1e-8, random_seed = 42)
-observed_diversity <- ts_diversity(ts, list(pop = ts_samples(ts)$name))
+observed_diversity <- ts_diversity(ts, list(pop = ts_names(ts)))
 saveRDS(observed_diversity, path_observed)
 ```
 

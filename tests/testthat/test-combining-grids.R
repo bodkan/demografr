@@ -20,8 +20,7 @@ grid <- tidyr::crossing(
 )
 
 compute_diversity <- function(ts) {
-  samples <- list(ts_samples(ts)$name)
-  ts_diversity(ts, sample_sets = samples, mode = "branch")
+  ts_diversity(ts, sample_sets = ts_names(ts), mode = "branch")
 }
 functions <- list(diversity = compute_diversity)
 

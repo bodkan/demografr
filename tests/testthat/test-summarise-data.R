@@ -62,7 +62,7 @@ data <- simulate_model(
   format = "files",
   data = list(
     ts = function(path, model) file.path(path, "slim.trees") %>% ts_read(model),
-    samples = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_names(split = "pop"),
+    samples = function(path, model) file.path(path, "slim.trees") %>% ts_read(model) %>% ts_names(split = TRUE),
     stats = function(path) file.path(path, "stats.tsv") %>% read.table(header = TRUE)
   )
 )
@@ -91,7 +91,7 @@ test_that("summarise_data can utilize pre-computed statistics as data (pre-defin
   data_functions <- list(
     ts_pi = function(path, model) {
       ts <- file.path(path, "slim.trees") %>% ts_read(model)
-      ts_diversity(ts, ts_names(ts, split = "pop"))
+      ts_diversity(ts, ts_names(ts, split = TRUE))
     },
     slim_pi = function(path) file.path(path, "stats.tsv") %>%
       read.table(header = TRUE) %>%
@@ -119,7 +119,7 @@ test_that("summarise_data can utilize pre-computed statistics as data (inline da
     data = list(
       ts_pi = function(path, model) {
         ts <- file.path(path, "slim.trees") %>% ts_read(model)
-        ts_diversity(ts, ts_names(ts, split = "pop"))
+        ts_diversity(ts, ts_names(ts, split = TRUE))
       },
       slim_pi = function(path) file.path(path, "stats.tsv") %>%
         read.table(header = TRUE) %>%
@@ -133,7 +133,7 @@ test_that("summarise_data can utilize pre-computed statistics as data (inline da
 
 test_that("summarise_data requires a named list of simulation outputs", {
   functions <- list(
-    pi = function(ts) { samples <- ts_names(ts, split = "pop"); ts_diversity(ts, samples) }
+    pi = function(ts) { samples <- ts_names(ts, split = TRUE); ts_diversity(ts, samples) }
   )
 
   # errors on unnamed list

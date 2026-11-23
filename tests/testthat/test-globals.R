@@ -68,15 +68,15 @@ par_grid <- structure(
 # 'self-contained' summary functions --------------------------------------
 
 compute_diversity1 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence1 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f41 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   A <- samples["A"]; B <- samples["B"]
   C <- samples["C"]; D <- samples["D"]
   ts_f4(ts, A, B, C, D)
@@ -92,7 +92,7 @@ test_that("simulation routines all succeed with 'self-contained' summary functio
 
 # summary functions depending on an 'external' function -------------------
 
-get_pop_samples <- function(ts) { ts_names(ts, split = "pop") }
+get_pop_samples <- function(ts) { ts_names(ts, split = TRUE) }
 
 compute_diversity2 <- function(ts) { ts_diversity(ts, sample_sets = get_pop_samples(ts)) }
 compute_divergence2 <- function(ts) { ts_divergence(ts, sample_sets = get_pop_samples(ts)) }
@@ -117,7 +117,7 @@ test_that("simulation routines fail with missing 'external' function in summary 
 # the R session for testing? Doesn't make any sense to me.
 
 # test_that("simulation routines succeed when 'external' function is provided", {
-#   get_pop_samples <- function(ts) { ts_names(ts, split = "pop") }
+#   get_pop_samples <- function(ts) { ts_names(ts, split = TRUE) }
 #
 #   compute_diversity2 <- function(ts) { ts_diversity(ts, sample_sets = get_pop_samples(ts)) }
 #   compute_divergence2 <- function(ts) { ts_divergence(ts, sample_sets = get_pop_samples(ts)) }

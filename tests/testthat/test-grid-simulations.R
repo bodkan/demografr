@@ -22,15 +22,15 @@ model <- function(Ne_A, Ne_B, Ne_C, Ne_D, T_1, T_2, T_3) {
 }
 
 compute_diversity <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_diversity(ts, sample_sets = samples)
 }
 compute_divergence <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_divergence(ts, sample_sets = samples)
 }
 compute_f4 <- function(ts) {
-  samples <- ts_names(ts, split = "pop")
+  samples <- ts_names(ts, split = TRUE)
   ts_f4(ts,
         W = list(popA = samples$popA),
         X = list(popB = samples$popB),

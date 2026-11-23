@@ -29,7 +29,7 @@ m <- model(100, 2000, 5000, 800)
 
 ts <- msprime(m, sequence_length = 1e6, recombination_rate = 0)
 
-samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
+samples <- ts_names(ts, split = TRUE) %>% lapply(sample, 5)
 
 pi_df <- ts_diversity(ts, sample_sets = samples, mode = "branch")
 
@@ -43,7 +43,7 @@ priors <- list(
 )
 
 compute_diversity <- function(ts) {
-  samples <- ts_names(ts, split = "pop") %>% lapply(sample, 5)
+  samples <- ts_names(ts, split = TRUE) %>% lapply(sample, 5)
   ts_diversity(ts, sample_sets = samples, mode = "branch")
 }
 functions <- list(diversity = compute_diversity)
