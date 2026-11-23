@@ -108,7 +108,7 @@ RUN wget https://github.com/rstudio/renv/archive/refs/tags/${RENV_VERSION}.tar.g
 RUN R -e 'install.packages("rstudioapi")'
 
 # do this when first setting up the container to create an renv.lock file:
-#   rm -f .Rprofile
+#   rm -f .Rprofile renv.lock renv/
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   export GITHUB_PAT='<PLACE GITHUB TOKEN HERE IF NEEDED>'
 #   R -e 'renv::init(bare = TRUE, bioconductor = Sys.getenv("BIOCONDUCTOR_VERSION"))'
