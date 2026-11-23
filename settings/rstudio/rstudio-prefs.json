@@ -1,0 +1,65 @@
+{
+    "save_workspace": "never",
+    "load_workspace": false,
+    "remove_history_duplicates": true,
+    "posix_terminal_shell": "bash",
+    "relative_line_numbers": true,
+    "highlight_selected_line": true,
+    "panes": {
+        "quadrants": [
+            "Console",
+            "TabSet1",
+            "Source",
+            "TabSet2"
+        ],
+        "tabSet1": [
+            "Plots",
+            "Build",
+            "Viewer",
+            "Presentation"
+        ],
+        "tabSet2": [
+            "Environment",
+            "Files",
+            "Help",
+            "VCS",
+            "Presentations"
+        ],
+        "hiddenTabSet": [
+            "History",
+            "Connections",
+            "Packages",
+            "Tutorial",
+            "Chat"
+        ],
+        "console_left_on_top": true,
+        "console_right_on_top": true,
+        "additional_source_columns": 0,
+        "sidebar": [],
+        "sidebar_visible": false,
+        "sidebar_location": "right"
+    },
+    "editor_keybindings": "vim",
+    "strip_trailing_whitespace": true,
+    "syntax_color_console": true,
+    "rainbow_parentheses": true,
+    "rmd_chunk_output_inline": false,
+    "terminal_bell_style": "none",
+    "editor_scroll_multiplier": 200,
+    "rmd_viewer_type": "pane",
+    "save_files_before_build": true,
+    "toolbar_visible": false,
+    "show_panel_focus_rectangle": true,
+    "always_save_history": false,
+    "python_project_environment_automatic_activate": false,
+    "terminal_python_integration": false,
+    "jobs_tab_visibility": "shown",
+    "default_project_location": "/private/tmp",
+    "initial_working_directory": "~",
+    "sync_files_pane_working_dir": true,
+    "assistant": "none",
+    "chat_provider": "none",
+    "assistant_toolbar_button_visible": false,
+    "insert_native_pipe_operator": false,
+    "vim_load_vimrc": true
+}

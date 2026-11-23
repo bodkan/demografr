@@ -115,7 +115,7 @@ RUN R -e 'install.packages("rstudioapi")'
 #   R -e 'install.packages("yaml")' # to be able to discover dependencies in Rmd files
 #   R -e 'renv::install()'
 #   R -e 'renv::snapshot(dev = TRUE)'
-#   cp Rprofile .Rprofile
+#   cp settings/Rprofile .Rprofile
 
 # install required R packages to their locked-in versions
 COPY DESCRIPTION .
@@ -140,7 +140,9 @@ RUN echo "PATH=$PATH" >> ${HOME}/.Renviron
 # https://docs.posit.co/ide/server-pro/admin/rstudio_pro_sessions/session_startup_scripts.html
 # https://community.rstudio.com/t/how-to-set-the-default-startup-project-in-rocker-tidyverse/63092/2
 RUN echo "\nsetHook('rstudio.sessionInit', \(new) if (new) rstudioapi::openProject('${PROJECT}'))" >> ${HOME}/.Rprofile
-RUN echo '{ "reduce_remote_filesystem_operations": false }' >> ${HOME}/.config/rstudio/rstudio-prefs.json
+
+# configure RStudio settings
+RUN mkdir ${HOME}/.config/; cp settings/rstudio ${HOME}/.config
 
 # remove compilation sources and other redundant files
 RUN rm -r /tmp/* /home/rstudio

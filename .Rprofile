@@ -2,6 +2,8 @@ options(browserNLdisabled = TRUE)
 
 options(install.packages.compile.from.source = "never")
 
+options(renv.settings.snapshot.dev = TRUE)
+
 local({
   r <- getOption("repos")
   r["CRAN"] <- "https://cloud.r-project.org"
