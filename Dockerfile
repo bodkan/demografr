@@ -4,8 +4,7 @@ LABEL maintainer="Martin Petr <mp@bodkan.net>"
 
 ENV SLIM_VERSION="v5.2" \
     RENV_VERSION="v1.3.1" \
-    BIOCONDUCTOR_VERSION="3.23" \
-    PYTHON_ENV="Python-3.12_msprime-1.4.1_tskit-1.0.2_pyslim-1.1.1_tspop-0.0.2"
+    BIOCONDUCTOR_VERSION="3.23"
 
 ############################################################
 # setup the base system
