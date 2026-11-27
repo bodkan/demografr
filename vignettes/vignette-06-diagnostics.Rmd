@@ -61,7 +61,7 @@ library(slendr)
 init_env()
 
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 
 SEED <- 42
 set.seed(SEED)
@@ -552,7 +552,7 @@ with the values observed in real data can we regard the model as sensible and
 usable for inference.
 
 ```{r, eval=rerun}
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 predX <- predict(abcX, samples = 1000, posterior = "unadj")
 predY <- predict(abcY, samples = 1000, posterior = "unadj")
 predZ <- predict(abcZ, samples = 1000, posterior = "unadj")
@@ -683,7 +683,7 @@ summary statistics (per-population AFS vectors), which are again stored as
 [nested list-columns](https://tidyr.tidyverse.org/articles/nest.html):
 
 ```{r}
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 
 # we simulate only 10 samples from the posterior distribution, but this is only
 # to save computational time!

@@ -32,7 +32,7 @@ library(dplyr)
 library(tidyr)
 
 library(future)
-plan(multisession)
+plan(multisession, workers = detectCores() - 1)
 
 init_env(quiet = TRUE)
 ```

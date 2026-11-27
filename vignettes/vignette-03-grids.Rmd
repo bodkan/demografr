@@ -101,7 +101,7 @@ library(cowplot)
 
 # setup parallelization across all CPUs
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 ```
 
 ### 1. Define a _slendr_ model function capturing the demographic history
@@ -306,7 +306,7 @@ First, we will set up an automated parallelization scheme using the [_future_](h
 library(future)
 
 # parallelize simulations across all CPUs of the machine
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 ```
 
 (See much more detail on parallelization of _demografr_ inference pipelines in

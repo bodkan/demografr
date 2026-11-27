@@ -366,7 +366,7 @@ Set up the parallelization backend to utilize all CPUs on the machine we're at:
 
 ```{r}
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 ```
 
 Set up a progress bar for simulations to be able to track their progress:

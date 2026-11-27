@@ -326,7 +326,7 @@ tstart <- Sys.time()
 
 ```{r, eval=rerun}
 library(future)
-plan(multisession, workers = availableCores()) # parallelize across all CPUs
+plan(multisession, workers = availableCores() - 1) # parallelize across all CPUs
 
 data <- simulate_abc(
   model = python_script, priors, functions, observed, iterations = 10000,
@@ -537,7 +537,7 @@ tstart <- Sys.time()
 
 ```{r, eval=rerun}
 library(future)
-plan(multisession, workers = availableCores()) # parallelize across all CPUs
+plan(multisession, workers = availableCores() - 1) # parallelize across all CPUs
 
 data <- simulate_abc(
   model = python_script, priors, functions, observed, iterations = 10000,
@@ -678,7 +678,7 @@ tstart <- Sys.time()
 
 ```{r, eval=rerun}
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 
 data <- simulate_abc(
   model = python_script, priors, functions, observed, iterations = 10000,
@@ -850,7 +850,7 @@ tstart <- Sys.time()
 
 ```{r, eval=rerun}
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 
 data <- simulate_abc(
   model, priors, functions, observed, iterations = 10000,

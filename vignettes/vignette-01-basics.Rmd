@@ -118,7 +118,7 @@ init_env()
 
 # setup parallelization across all CPUs
 library(future)
-plan(multisession, workers = availableCores())
+plan(multisession, workers = availableCores() - 1)
 ```
 
 For the purpose of our ABC inference, we will bind all statistics in an R list,
