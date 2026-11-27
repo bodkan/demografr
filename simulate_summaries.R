@@ -32,13 +32,7 @@ D <- samples["D"]
 
 observed_diversity <- ts_diversity(ts, sample_sets = samples)
 observed_divergence <- ts_divergence(ts, sample_sets = samples)
-
-# compute only unique f4 stats (up to a sign)
-observed_f4 <- rbind(
-  ts_f4(ts, A, B, C, D)
-  # , ts_f4(ts, A, C, B, D),
-  # ts_f4(ts, A, D, B, C)
-)
+observed_f4 <- ts_f4(ts, A, B, C, D)
 
 write.table(observed_diversity, file = "inst/examples/basics_diversity.tsv",
             sep = "\t", row.names = FALSE, quote = FALSE)
