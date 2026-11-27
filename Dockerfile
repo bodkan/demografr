@@ -78,7 +78,8 @@ ENV BIN="${HOME}/bin/"
 RUN mkdir -p ${BIN}
 
 # compile SLiM
-RUN cd /tmp; wget https://github.com/MesserLab/SLiM/archive/refs/tags/${SLIM_VERSION}.tar.gz -O slim.tar.gz; \
+RUN cd /tmp; \
+    wget https://github.com/MesserLab/SLiM/archive/refs/tags/${SLIM_VERSION}.tar.gz -O slim.tar.gz; \
     tar xf slim.tar.gz; cd SLiM-*; mkdir build; cd build; cmake ..; make slim eidos
 
 # install all compiled software into $PATH
@@ -108,6 +109,7 @@ RUN R -e 'install.packages("rstudioapi")'
 
 # do this when first setting up the container to create an renv.lock file:
 #   rm -rf .Rprofile renv.lock renv/
+#   make bash
 #   R CMD INSTALL $RENV_BOOTSTRAP_TARBALL
 #   export GITHUB_PAT='<PLACE GITHUB TOKEN HERE IF NEEDED>'
 #   R -e 'renv::init(bare = TRUE, bioconductor = Sys.getenv("BIOCONDUCTOR_VERSION"))'
