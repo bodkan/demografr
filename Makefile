@@ -14,7 +14,7 @@ home: README.md
 	R -e 'pkgdown::build_home()'
 
 docs:
-	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::install(upgrade = FALSE)'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
@@ -23,7 +23,7 @@ docs:
 # run as `export RERUN=TRUE; make website` to regenerate __everything__
 website: $(logo) README.md
 	for f in vignettes/vignette-{07,08,09,10}-*.Rmd; do mv $$f $${f}_; done
-	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::install(upgrade = FALSE)'
 	R -e 'devtools::document()'
 	R -e 'pkgdown::build_reference()'
 	R -e 'pkgdown::build_reference_index()'
@@ -61,12 +61,12 @@ $(pkg): README.md
 	mkdir -p build; cd build; R CMD build --log ../../demografr
 
 README.md: README.Rmd $(logo) inst/examples/basics_abc.rds
-	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::install(upgrade = FALSE)'
 	R -e 'knitr::knit("README.Rmd", output = "README.md")'
 
 inst/examples/basics_abc.rds:
 	# make sure summary statistics are in the installation location
-	R -e 'devtools::install(upgrade = "never")'
+	R -e 'devtools::install(upgrade = FALSE)'
 	# generate ABC results based on those summary statistics
 	R -e 'pkgdown::build_article("vignette-01-basics")'
 	# discard the figures (they will be created by the website rule for everything)
